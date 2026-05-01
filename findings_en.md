@@ -1,0 +1,135 @@
+# `CBDB_BJ_User.mdb` Logic Audit Report
+
+Audit date: 2026-04-30
+Scope: `CBDB_BJ_User.mdb` (41 MB) — 79 forms, 21 saved queries, 66 form
+VBA modules, 2 class modules, ~50,000 lines of VBA total.
+
+## Confirmed bugs
+
+### Bug #1 — `View_StatusData` alias swap (display only, does not affect row selection)
+
+`View_StatusData` is the `RecordSource` of `STATUS_DATA_2 Subform`, which
+is shown every time the user opens a person's "Status" sub-datasheet.
+
+**Symptom**: returned rows show `c_fy_range_desc` / `c_fy_range_chn`
+(first-year range descriptions) populated with the *last-year* range
+value rather than the first-year value.
+
+**Root cause** (`analysis/dump/queries.json`, `View_StatusData`):
+
+```sql
+... LEFT JOIN YEAR_RANGE_CODES ON STATUS_DATA.c_fy_range = YEAR_RANGE_CODES.c_range_code
+... LEFT JOIN YEAR_RANGE_CODES AS YEAR_RANGE_CODES_1 ON STATUS_DATA.c_ly_range = YEAR_RANGE_CODES_1.c_range_code
+```
+
+But all four range-related output aliases in the SELECT list pull from
+`YEAR_RANGE_CODES_1`:
+
+```
+YEAR_RANGE_CODES_1.c_range     AS c_fy_range_desc   ← should use YEAR_RANGE_CODES
+YEAR_RANGE_CODES_1.c_range_chn AS c_fy_range_chn    ← should use YEAR_RANGE_CODES
+YEAR_RANGE_CODES_1.c_range     AS c_ly_range_desc   ← correct
+YEAR_RANGE_CODES_1.c_range_chn AS c_ly_range_chn    ← correct
+```
+
+**Fix**: change to
+
+```
+YEAR_RANGE_CODES.c_range     AS c_fy_range_desc
+YEAR_RANGE_CODES.c_range_chn AS c_fy_range_chn
+```
+
+**Regression tests**: `tests/test_known_bugs.py::test_bug_view_statusdata_fy_alias_swap`
+and `test_bug_view_statusdata_fy_value_equals_ly_value`. Once the bug is
+fixed, both tests will start failing — that is the signal that the fix
+worked, and the assertions should be flipped to expect the corrected
+behaviour as instructed in their docstrings.
+
+---
+
+### Bug #2 — VBA reference to `dao360.dll` is broken (blocks form automation and breaks new machines)
+
+The VBA project in `CBDB_BJ_User.mdb` carries a reference to
+`C:\Program Files\Common Files\Microsoft Shared\DAO\dao360.dll`, the DAO
+3.6 location used by Access 2003. Modern Office (2016+) ships
+`ACEDAO.DLL` instead.
+
+**Symptoms**:
+- On any machine without legacy DAO installed, every form's `Form_Open`
+  raises "Can't find project or library".
+- Automated scripts (including the COM-driven UI tests this project
+  originally intended to build) cannot open any form.
+
+**Fix**:
+- Open the .mdb in Access, press `Alt+F11` to enter the VBE.
+- `Tools → References`, uncheck the entry shown as `MISSING: dao360.dll`.
+- Check `Microsoft Office 16.0 Access Database Engine Object Library`
+  (i.e. ACEDAO.DLL).
+- Save.
+
+**Automated**: `analysis/check_vba_refs.py` detects and patches the
+broken reference (against a working copy).
+
+---
+
+## Heuristic scans (no further issues)
+
+| Scanner | Result |
+|---|---|
+| `analysis/audit_view_aliases.py` — YEAR_RANGE_CODES alias mismatches | One false positive in `View_PeopleData` (the `c_da_*` prefix is shorthand for "death age"); the only real positive is Bug #1 |
+| `analysis/audit_duplicate_aliases.py` — duplicate aliases in SELECT lists | None |
+
+---
+
+## Architectural observations (not bugs, but required context for the test suite)
+
+1. **Linked tables**: `BIOG_MAIN`, `*_DATA`, `*_CODES`, `ADDR_CODES`, and
+   ~120 other tables are linked from `CBDB_*_DATA.mdb` (DAO marks them
+   as `record_count == -1` in `tables.json`). `CBDB_BJ_User.mdb` itself
+   only owns ~63 local `ZZ_*` / `Z_*` working tables.
+
+2. **Query entry point**: each `LookAtXxx` form has a single
+   `Private Sub CmdQuery_Click` that:
+   - Clears the `ZZ_SCRATCH_<XXX>` output table
+   - Reads inputs from form controls + picker-populated `ZZ_SCRATCH_<CODE>`
+     tables + form-module public globals like `gUseADDRID`
+   - Builds and executes an
+     `INSERT INTO ZZ_SCRATCH_<XXX> SELECT ... FROM <linked tables>`
+   - Runs follow-up `UPDATE` statements to backfill descriptive columns
+     from the `*_CODES` lookup tables
+   - Re-binds the form's `RecordSource` to `ZZ_SCRATCH_<XXX>`
+
+3. **Picker-form convention**: every `frmPickXxx_multi` writes the
+   user's selection to its corresponding `ZZ_SCRATCH_<XXX>` table
+   (e.g. `ZZ_SCRATCH_ENTRY_CODE`, `ZZ_SCRATCH_ADDR`). Tests can bypass
+   picker UI by INSERT-ing directly into those tables.
+
+4. **Private events cannot be reached via `Application.Run`**:
+   `CmdQuery_Click` is `Private` by default, so calling
+   `Application.Run "Form_X.CmdQuery_Click"` from outside fails. Options
+   are (a) change them to `Public`, (b) use SendKeys, or (c) replay the
+   SQL in Python — this test suite takes option (c).
+
+5. **HelpFile reference numbers drift as CBDB data is updated**:
+   `HelpFile_LookAtEntry.pdf` documents the example "Kaifeng yin general
+   900-1100 = 104 people"; on the current data the replay returns 103
+   (drift -1). The Use-Entry-Years variant is 12 today vs the
+   HelpFile's 11 (drift +1). This confirms two things: (a) our SQL
+   replay is faithful to the VBA, (b) HelpFile numbers should be soft
+   references with 5-20% tolerance rather than hard assertions.
+
+---
+
+## Not yet covered / handed off to the user
+
+- Full `CmdQuery_Click` translations for the other 9 LookAt forms
+  (only LookAtEntry is complete). `tests/cbdb_replay/TEMPLATE_lookat.py`
+  contains the recipe.
+- Edge cases for complex pickers (multi-select, sub-unit expansion,
+  XY-radius expansion). LookAtEntry implements the sub-unit and XY paths
+  but no fixtures exercise them yet.
+- Recursive kin networks (`LookAtKinship` / `LookAtNetworks` rely on the
+  deep recursion in `clsTreeView` to derive kinship, which is the
+  highest-risk audit surface).
+- Bilingual switching (`changeDisplayLanguage` rewrites many label
+  `Caption`s and is currently uncovered).

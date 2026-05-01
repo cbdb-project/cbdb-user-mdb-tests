@@ -1,0 +1,26 @@
+﻿c_personid,c_name,c_name_chn,c_kin_id,c_kin_name,c_kin_chn,c_kin_code,c_kinrel,c_kinrel_chn,c_upstep,c_dwnstep,c_marstep,c_colstep,c_source
+1762,Wang Anshi,王安石,526,Zhu Mingzhi,朱明之,159,Z-H,妹夫,0,0,1,1,7596
+1762,Wang Anshi,王安石,1294,Lv Jiawen,呂嘉問,244,SDH,孫女婿,0,2,1,0,0
+1762,Wang Anshi,王安石,1649,Cai Jing,蔡京,178,BDH,姪女之夫,0,1,1,1,0
+1762,Wang Anshi,王安石,1760,Wang Anli,王安禮,126,B-,弟,0,0,0,1,7596
+1762,Wang Anshi,王安石,1796,Wang Jue,王珏,255,SSS,曾孫; 重孫,0,3,0,0,7596
+1762,Wang Anshi,王安石,1957,Wu Anchi,吳安持,332,D1H,長女婿,0,1,1,0,9601
+1762,Wang Anshi,王安石,3965,Wang Guanzhi,王貫之,64,FFB,從祖;伯叔祖,2,0,0,1,7596
+1762,Wang Anshi,王安石,3967,Wang Ling,王令,173,WZH,連襟;妻姊妹之夫,0,0,2,1,7596
+1762,Wang Anshi,王安石,3968,Wang Pang,王雱,180,S,子,0,1,0,0,7596
+1762,Wang Anshi,王安石,4020,Wu Fen,吳蕡,76,WF,岳父,1,0,1,0,0
+1762,Wang Anshi,王安石,5134,Wu Shi (Wife of Wang Yi ),吳氏(王益妻),111,M,母,1,0,0,0,7596
+1762,Wang Anshi,王安石,7076,Wang Anguo,王安國,126,B-,弟,0,0,0,1,7596
+1762,Wang Anshi,王安石,7082,Wang Yi,王益,75,F,父,1,0,0,0,7596
+1762,Wang Anshi,王安石,7404,Ye Tao,葉濤,181,DH,女婿,0,1,1,0,2229
+1762,Wang Anshi,王安石,8131,Cai Bian,蔡卞,181,DH,女婿,0,1,1,0,0
+1762,Wang Anshi,王安石,13425,Shi Douwen,石斗文,254,BSSDH,曾姪孫女婿,0,3,1,1,0
+1762,Wang Anshi,王安石,18876,Wu Xiandao,吳顯道,137,WB+,妻兄,0,0,1,1,0
+1762,Wang Anshi,王安石,20884,Shen Zhu,沈銖,179,ZS,外甥,0,1,0,1,2229
+1762,Wang Anshi,王安石,20896,Shen Xi,沈錫,179,ZS,外甥,0,1,0,1,2229
+1762,Wang Anshi,王安石,21944,Wang Anren,王安仁,125,B+,兄,0,0,0,1,7596
+1762,Wang Anshi,王安石,21968,Wang Pang (3),王滂,180,S,子,0,1,0,0,0
+1762,Wang Anshi,王安石,38456,Wang Jing,王景,240,BSS,姪孫;從孫,0,2,0,1,7596
+1762,Wang Anshi,王安石,38653,Wu Shi (Wife of Wang Anshi ),吳氏(王安石妻),135,W,妻子,0,0,1,0,7596
+1762,Wang Anshi,王安石,41576,Wang Shi (Wife of Wu An Chi ),王氏(吳安持妻),327,D1,長女,0,1,0,0,9601
+1762,Wang Anshi,王安石,100909,Wang Xi,王熙,282,G+10,十世孫,0,10,0,0,9599

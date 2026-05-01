@@ -1,0 +1,7 @@
+﻿c_person_id,c_name,c_name_chn,c_index_year,c_node_id,c_node_name,c_node_chn,c_link_code,c_link_desc,c_link_chn,c_link_first_year,c_link_last_year,c_source
+1294,Lv Jiawen,呂嘉問,1059,1762,Wang Anshi,王安石,8,Coalition leader of,黨魁為Y,1078,,0
+1294,Lv Jiawen,呂嘉問,1059,1762,Wang Anshi,王安石,146,Sacrificial prayer written by,祭文由Y所作,0,,7596
+1294,Lv Jiawen,呂嘉問,1059,1762,Wang Anshi,王安石,146,Sacrificial prayer written by,祭文由Y所作,-1,,0
+1762,Wang Anshi,王安石,1021,1294,Lv Jiawen,呂嘉問,7,Coalition member of,黨羽為Y,1078,,0
+1762,Wang Anshi,王安石,1021,1294,Lv Jiawen,呂嘉問,145,Sacrificial prayer written for,為Y作祭文,0,,7596
+1762,Wang Anshi,王安石,1021,1294,Lv Jiawen,呂嘉問,145,Sacrificial prayer written for,為Y作祭文,1080,,0

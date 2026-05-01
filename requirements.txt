@@ -1,0 +1,5 @@
+pyodbc
+pywin32
+pywinauto
+pandas
+pytest

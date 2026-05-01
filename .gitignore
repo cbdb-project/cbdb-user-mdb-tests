@@ -1,0 +1,44 @@
+# --- Project-specific ----------------------------------------------------
+
+# CBDB binaries are huge and proprietary. Ship paths, not data.
+# Users obtain CBDB_BJ_User.mdb + CBDB_*_DATA.mdb + HelpFiles/ from CBDB
+# (see README §Setup) and drop them under data/.
+data/
+
+# Per-test working copies, lock files, probe logs, and ad-hoc artefacts
+# the analysis/ and tests/ scripts spew into analysis/.
+analysis/_*
+analysis/_exports_tmp/
+
+# Real-export goldens that are blessed locally before the first push.
+tests/golden/exports/_tmp/
+
+# Local auto-memory (machine-specific assistant context, not portable).
+memory/
+
+# --- Python --------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# --- Access ---------------------------------------------------------------
+*.ldb           # JET lock file
+*.laccdb        # ACE lock file
+~$*.mdb         # Office temp lock
+
+# --- Editor / OS ----------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# --- Claude / agents ------------------------------------------------------
+.claude/

@@ -1,0 +1,661 @@
+﻿c_person_id,c_name,c_name_chn,c_node_id,c_node_name,c_node_chn,c_link_code,c_link_desc,c_link_chn,c_link_count,c_link_first_year,c_link_last_year,c_source
+1762,Wang Anshi,王安石,55,Chen Yi,陳繹,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,77,Chen Shengzhi,陳升之,4,Patron of (= Client was),是Y的恩主,1,-1,,7596
+1762,Wang Anshi,王安石,77,Chen Shengzhi,陳升之,162,Departure note sent to,為Y作臨別贈言(送別詩、序),1,1080,,7596
+1762,Wang Anshi,王安石,118,Cheng Lin,程琳,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,118,Cheng Lin,程琳,145,Sacrificial prayer written for,為Y作祭文,1,1080,,0
+1762,Wang Anshi,王安石,122,Cheng Shimeng,程師孟,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,122,Cheng Shimeng,程師孟,434,Received official letter from,收到Y的啓,1,-1,,27134
+1762,Wang Anshi,王安石,145,Qian Xie,錢勰,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,7596
+1762,Wang Anshi,王安石,147,Qian Gongfu,錢公輔,13,Recommended,推薦,1,0,,7596
+1762,Wang Anshi,王安石,147,Qian Gongfu,錢公輔,61,Disagreed with views of,不合,1,1079,,0
+1762,Wang Anshi,王安石,147,Qian Gongfu,錢公輔,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,147,Qian Gongfu,錢公輔,516,was insulted by,被Y得罪,1,-1,,7596
+1762,Wang Anshi,王安石,195,Zhang Jifu,張吉甫,4,Patron of (= Client was),是Y的恩主,1,1080,,0
+1762,Wang Anshi,王安石,208,Zhang Zhu,張鑄,19,Menren of,為Y之門人,1,-1,,7596
+1762,Wang Anshi,王安石,208,Zhang Zhu,張鑄,22,Student of,為Y之學生,1,1080,,0
+1762,Wang Anshi,王安石,209,Zhang Ju,張巨,107,Offer of office refused by,拒絕在Y的主政期出仕,1,-1,,7596
+1762,Wang Anshi,王安石,217,Zhang Fangping,張方平,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,7596
+1762,Wang Anshi,王安石,217,Zhang Fangping,張方平,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,229,Zhang Shen,張詵,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,245,Zhang Ruogu,張若谷,145,Sacrificial prayer written for,為Y作祭文,1,1080,,7596
+1762,Wang Anshi,王安石,267,Zhang Baoyong,張保雍,32,Prefaced book by,為Y所著書作序,1,0,,7596
+1762,Wang Anshi,王安石,293,Zhang Su,張肅,429,Sent letter to,致書Y,2,-1,,27134
+1762,Wang Anshi,王安石,332,Zhang Yong,張詠,46,Postface written for book by,為Y所著書作跋,1,0,,7596
+1762,Wang Anshi,王安石,333,Zhang Dun,章惇,18,Praised or admired,欣賞/器重,1,-1,,0
+1762,Wang Anshi,王安石,333,Zhang Dun,章惇,359,Liked,喜爱,1,-1,,7596
+1762,Wang Anshi,王安石,333,Zhang Dun,章惇,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,375,Zhao Bian,趙抃,61,Disagreed with views of,不合,1,-1,,7596
+1762,Wang Anshi,王安石,395,Zhao Dingchen,趙鼎臣,9,Friend of,友,1,-1,,7596
+1762,Wang Anshi,王安石,433,Jia Dan,郟亶,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,461,Jiang Zhiji,蔣之奇,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,461,Jiang Zhiji,蔣之奇,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,465,Jiang Tang,蔣堂,433,Sent official letter to,致Y啓,1,-1,,27134
+1762,Wang Anshi,王安石,480,Zhou Jiazheng,周嘉正,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,485,Zhou Tong,周穜,4,Patron of (= Client was),是Y的恩主,1,1110,,0
+1762,Wang Anshi,王安石,485,Zhou Tong,周穜,18,Praised or admired,欣賞/器重,1,-1,,7596
+1762,Wang Anshi,王安石,559,Fan Chunren,范純仁,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,7596
+1762,Wang Anshi,王安石,573,Fan Xun,范峋,431,Replied to letter from,答Y書,2,-1,,27134
+1762,Wang Anshi,王安石,607,Feng Jing,馮京,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,7596
+1762,Wang Anshi,王安石,628,Fu Bi,富弼,107,Offer of office refused by,拒絕在Y的主政期出仕,1,-1,,7596
+1762,Wang Anshi,王安石,628,Fu Bi,富弼,429,Sent letter to,致書Y,2,-1,,27134
+1762,Wang Anshi,王安石,662,Han Zongshi,韓宗師,13,Recommended,推薦,1,1080,,0
+1762,Wang Anshi,王安石,664,Han Zongyan,韓宗彥,145,Sacrificial prayer written for,為Y作祭文,1,0,,7596
+1762,Wang Anshi,王安石,669,Han Yuanji,韓元吉,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,718,Xiao Gu,蕭固,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,723,Xiao Dingji,蕭定基,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,723,Xiao Dingji,蕭定基,406,Wrote Funerary stele for,為Y作神道碑,1,0,,7596
+1762,Wang Anshi,王安石,727,Xie Jiang,謝絳,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,728,Xie Jingwen,謝景溫,9,Friend of,友,1,-1,,7596
+1762,Wang Anshi,王安石,735,Xianyu Shen,鮮于侁,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,7596
+1762,Wang Anshi,王安石,740,Xiong Ben,熊本,431,Replied to letter from,答Y書,2,-1,,27134
+1762,Wang Anshi,王安石,748,Xu Jiusi,徐九思,29,Purged,排擠,1,1080,,0
+1762,Wang Anshi,王安石,748,Xu Jiusi,徐九思,131,Retainer (客) was,門客為Y,1,0,,0
+1762,Wang Anshi,王安石,748,Xu Jiusi,徐九思,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,7596
+1762,Wang Anshi,王安石,753,Xu Xi,徐禧,4,Patron of (= Client was),是Y的恩主,1,1080,,0
+1762,Wang Anshi,王安石,753,Xu Xi,徐禧,26,Supported by,得到Y的支持,1,-1,,7596
+1762,Wang Anshi,王安石,770,Xu Di,徐的,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,788,Xu Ti,許逖,133,Biographer of,為Y作傳,1,0,,7596
+1762,Wang Anshi,王安石,788,Xu Ti,許逖,276,Prefaced geneology of,為Y之家譜作序,1,1080,,0
+1762,Wang Anshi,王安石,800,Xue Xiang,薛向,27,Supported,支持,1,-1,,7596
+1762,Wang Anshi,王安石,833,Hu Zongyu,胡宗愈,516,was insulted by,被Y得罪,1,-1,,0
+1762,Wang Anshi,王安石,870,Hong Kuo,洪适,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,911,Gao Ruona,高若訥,145,Sacrificial prayer written for,為Y作祭文,1,1080,,7596
+1762,Wang Anshi,王安石,911,Gao Ruona,高若訥,145,Sacrificial prayer written for,為Y作祭文,1,1080,,7596
+1762,Wang Anshi,王安石,941,Gong Yuan,龔原,23,Student was,學生為Y,1,1080,,0
+1762,Wang Anshi,王安石,941,Gong Yuan,龔原,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,941,Gong Yuan,龔原,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,964,Lang Jian,郎簡,49,followed,從Y遊,1,1040,,60240
+1762,Wang Anshi,王安石,964,Lang Jian,郎簡,429,Sent letter to,致書Y,2,-1,,27134
+1762,Wang Anshi,王安石,971,Li Chang,李常,9,Friend of,友,1,-1,,0
+1762,Wang Anshi,王安石,1024,Li Fugui,李復圭,4,Patron of (= Client was),是Y的恩主,1,1080,,0
+1762,Wang Anshi,王安石,1024,Li Fugui,李復圭,69,Virtue recognized by,稱道Y之節行,1,-1,,7596
+1762,Wang Anshi,王安石,1024,Li Fugui,李復圭,145,Sacrificial prayer written for,為Y作祭文,1,1080,,7596
+1762,Wang Anshi,王安石,1024,Li Fugui,李復圭,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,1024,Li Fugui,李復圭,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,1048,Li Kuan,李寬,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,1078,Li Shizhong,李師中,16,Opposed by or attacked by,遭到Y的反對/攻訐,1,-1,,0
+1762,Wang Anshi,王安石,1085,Li Shoupeng,李壽朋,145,Sacrificial prayer written for,為Y作祭文,1,1080,,7596
+1762,Wang Anshi,王安石,1097,Li Ding,李定,23,Student was,學生為Y,1,1080,,0
+1762,Wang Anshi,王安石,1097,Li Ding,李定,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,1156,Lin Zhiqi,林之奇,228,Scholarship denounced by,其學為Y所排,1,-1,,7596
+1762,Wang Anshi,王安石,1188,Liu Jin,劉瑾,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,1200,Liu Xiang,劉庠,143,Audience invitation refused by,會面的邀請被Y拒絕,1,-1,,7596
+1762,Wang Anshi,王安石,1201,Liu Yi,劉彝,13,Recommended,推薦,1,1080,,7596
+1762,Wang Anshi,王安石,1216,Liu Mu (2),劉牧,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,1220,Liu Ban,劉攽,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,7596
+1762,Wang Anshi,王安石,1220,Liu Ban,劉攽,430,Was sent  letter by,被致書由Y,1,-1,,27134
+1762,Wang Anshi,王安石,1236,Liu Ding,劉定,443,Composed Building inscription for,為Y之建築物題詠、記、命名,1,0,,7596
+1762,Wang Anshi,王安石,1294,Lv Jiawen,呂嘉問,7,Coalition member of,黨羽為Y,1,1078,,0
+1762,Wang Anshi,王安石,1294,Lv Jiawen,呂嘉問,145,Sacrificial prayer written for,為Y作祭文,1,0,,7596
+1762,Wang Anshi,王安石,1294,Lv Jiawen,呂嘉問,145,Sacrificial prayer written for,為Y作祭文,1,1080,,0
+1762,Wang Anshi,王安石,1309,Lv Huiqing,呂惠卿,13,Recommended,推薦,1,1080,,0
+1762,Wang Anshi,王安石,1309,Lv Huiqing,呂惠卿,367,Agreed with views of,政見趨同,1,1080,,0
+1762,Wang Anshi,王安石,1309,Lv Huiqing,呂惠卿,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,1309,Lv Huiqing,呂惠卿,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,1309,Lv Huiqing,呂惠卿,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,1309,Lv Huiqing,呂惠卿,434,Received official letter from,收到Y的啓,1,-1,,27134
+1762,Wang Anshi,王安石,1309,Lv Huiqing,呂惠卿,472,was harmed by,被Y陷害,1,-1,,0
+1762,Wang Anshi,王安石,1314,Lv Gongzhu,呂公著,13,Recommended,推薦,1,1080,,7596
+1762,Wang Anshi,王安石,1314,Lv Gongzhu,呂公著,429,Sent letter to,致書Y,1,-1,,0
+1762,Wang Anshi,王安石,1316,Lv Gongbi,呂公弼,29,Purged,排擠,1,1080,,0
+1762,Wang Anshi,王安石,1316,Lv Gongbi,呂公弼,131,Retainer (客) was,門客為Y,1,0,,0
+1762,Wang Anshi,王安石,1316,Lv Gongbi,呂公弼,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,0
+1762,Wang Anshi,王安石,1323,Lv Shengqing,呂升卿,13,Recommended,推薦,1,-1,,0
+1762,Wang Anshi,王安石,1324,Lv Tao,呂陶,29,Purged,排擠,1,1080,,0
+1762,Wang Anshi,王安石,1324,Lv Tao,呂陶,131,Retainer (客) was,門客為Y,1,0,,0
+1762,Wang Anshi,王安石,1324,Lv Tao,呂陶,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,0
+1762,Wang Anshi,王安石,1326,Lv Dazhong,呂大忠,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,7596
+1762,Wang Anshi,王安石,1348,Ma Qi,馬玘,145,Sacrificial prayer written for,為Y作祭文,1,1080,,7596
+1762,Wang Anshi,王安石,1353,Ma Zun,馬遵,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,1353,Ma Zun,馬遵,145,Sacrificial prayer written for,為Y作祭文,1,1080,,7596
+1762,Wang Anshi,王安石,1353,Ma Zun,馬遵,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,1361,Mei Xun,梅詢,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,1361,Mei Xun,梅詢,406,Wrote Funerary stele for,為Y作神道碑,1,0,,7596
+1762,Wang Anshi,王安石,1370,Mo Junchen,莫君陳,18,Praised or admired,欣賞/器重,1,-1,,7596
+1762,Wang Anshi,王安石,1384,Ouyang Xiu,歐陽修,14,Recommended by,被Y推薦,1,0,,7596
+1762,Wang Anshi,王安石,1384,Ouyang Xiu,歐陽修,22,Student of,為Y之學生,1,-1,,9602
+1762,Wang Anshi,王安石,1384,Ouyang Xiu,歐陽修,61,Disagreed with views of,不合,1,-1,,7596
+1762,Wang Anshi,王安石,1384,Ouyang Xiu,歐陽修,145,Sacrificial prayer written for,為Y作祭文,1,1080,,7596
+1762,Wang Anshi,王安石,1384,Ouyang Xiu,歐陽修,429,Sent letter to,致書Y,4,-1,,27134
+1762,Wang Anshi,王安石,1384,Ouyang Xiu,歐陽修,430,Was sent  letter by,被致書由Y,1,-1,,27134
+1762,Wang Anshi,王安石,1384,Ouyang Xiu,歐陽修,430,Was sent  letter by,被致書由Y,2,-1,,27134
+1762,Wang Anshi,王安石,1384,Ouyang Xiu,歐陽修,434,Received official letter from,收到Y的啓,1,-1,,27134
+1762,Wang Anshi,王安石,1400,Peng Ruli,彭汝礪,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,1414,Bao You,鮑由,23,Student was,學生為Y,1,-1,,7596
+1762,Wang Anshi,王安石,1414,Bao You,鮑由,35,Member of his school was,該學派的成員為Y,1,1080,,0
+1762,Wang Anshi,王安石,1437,Shao Bi,邵必,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,1443,Shen Qi,沈起,443,Composed Building inscription for,為Y之建築物題詠、記、命名,1,0,,7596
+1762,Wang Anshi,王安石,1445,Shen Jichang,沈季長,26,Supported by,得到Y的支持,1,1080,,0
+1762,Wang Anshi,王安石,1445,Shen Jichang,沈季長,244,Association caused purge of,與他的交往導致Y受牽連,1,1080,,0
+1762,Wang Anshi,王安石,1445,Shen Jichang,沈季長,429,Sent letter to,致書Y,3,-1,,27134
+1762,Wang Anshi,王安石,1445,Shen Jichang,沈季長,429,Sent letter to,致書Y,2,-1,,27134
+1762,Wang Anshi,王安石,1449,Shen Gou,沈遘,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,1449,Shen Gou,沈遘,145,Sacrificial prayer written for,為Y作祭文,1,1080,,7596
+1762,Wang Anshi,王安石,1453,Shen Liao,沈遼,18,Praised or admired,欣賞/器重,1,-1,,0
+1762,Wang Anshi,王安石,1453,Shen Liao,沈遼,61,Disagreed with views of,不合,1,-1,,0
+1762,Wang Anshi,王安石,1453,Shen Liao,沈遼,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,7596
+1762,Wang Anshi,王安石,1471,Shi Xiaosun,時孝孫,21,Coalition associate of,與Y結黨,1,1080,,0
+1762,Wang Anshi,王安石,1483,Shu Dan,舒亶,24,"Directly recruited (bi, zoubi, etc)",辟,1,-1,,7596
+1762,Wang Anshi,王安石,1488,Sima Guang,司馬光,61,Disagreed with views of,不合,1,-1,,7596
+1762,Wang Anshi,王安石,1488,Sima Guang,司馬光,430,Was sent  letter by,被致書由Y,1,-1,,27134
+1762,Wang Anshi,王安石,1488,Sima Guang,司馬光,430,Was sent  letter by,被致書由Y,1,-1,,27134
+1762,Wang Anshi,王安石,1488,Sima Guang,司馬光,430,Was sent  letter by,被致書由Y,1,-1,,27134
+1762,Wang Anshi,王安石,1488,Sima Guang,司馬光,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,1489,Su Anshi,蘇安世,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,1493,Su Zhe,蘇轍,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,7596
+1762,Wang Anshi,王安石,1514,Sun Changqing,孫長卿,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,1521,Sun Jue,孫覺,4,Patron of (= Client was),是Y的恩主,1,1080,,0
+1762,Wang Anshi,王安石,1521,Sun Jue,孫覺,9,Friend of,友,1,-1,,7596
+1762,Wang Anshi,王安石,1521,Sun Jue,孫覺,29,Purged,排擠,1,-1,,0
+1762,Wang Anshi,王安石,1521,Sun Jue,孫覺,146,Sacrificial prayer written by,祭文由Y所作,1,-1,,0
+1762,Wang Anshi,王安石,1521,Sun Jue,孫覺,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,1521,Sun Jue,孫覺,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,1531,Sun Kang,孫抗,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,1542,Sun Sheng,孫升,16,Opposed by or attacked by,遭到Y的反對/攻訐,1,-1,,7596
+1762,Wang Anshi,王安石,1571,Song Minqiu,宋敏求,32,Prefaced book by,為Y所著書作序,1,0,,7596
+1762,Wang Anshi,王安石,1587,Tan Shan,譚掞,117,Tongxue was,同學、同門,1,1080,,0
+1762,Wang Anshi,王安石,1593,Tang Jie,唐介,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,0
+1762,Wang Anshi,王安石,1617,Tian Kuang,田況,44,Epitaph written for,為Y作墓誌銘,1,1063,,0
+1762,Wang Anshi,王安石,1617,Tian Kuang,田況,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,1617,Tian Kuang,田況,49,followed,從Y遊,1,1040,,60240
+1762,Wang Anshi,王安石,1617,Tian Kuang,田況,429,Sent letter to,致書Y,2,-1,,27134
+1762,Wang Anshi,王安石,1630,Deng Wan,鄧綰,4,Patron of (= Client was),是Y的恩主,1,1080,,0
+1762,Wang Anshi,王安石,1630,Deng Wan,鄧綰,587,Toadied to by Y,被Y諂事,1,-1,,7596
+1762,Wang Anshi,王安石,1633,Di Fei,狄棐,406,Wrote Funerary stele for,為Y作神道碑,1,1030,,7596
+1762,Wang Anshi,王安石,1635,Diao Yue,刁約,145,Sacrificial prayer written for,為Y作祭文,1,1080,,7596
+1762,Wang Anshi,王安石,1647,Cai Que,蔡確,4,Patron of (= Client was),是Y的恩主,1,-1,,7596
+1762,Wang Anshi,王安石,1648,Cai Zhao,蔡肇,23,Student was,學生為Y,1,1080,,0
+1762,Wang Anshi,王安石,1648,Cai Zhao,蔡肇,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,1705,Zeng Kang,曾伉,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,1707,Zeng Bu,曾布,516,was insulted by,被Y得罪,1,-1,,7596
+1762,Wang Anshi,王安石,1717,Zu Wuze,祖無擇,83,Disliked or hated,忌/惡,1,1080,,0
+1762,Wang Anshi,王安石,1717,Zu Wuze,祖無擇,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,1722,Du Qi,杜杞,145,Sacrificial prayer written for,為Y作祭文,1,1080,,7596
+1762,Wang Anshi,王安石,1722,Du Qi,杜杞,145,Sacrificial prayer written for,為Y作祭文,1,1080,,7596
+1762,Wang Anshi,王安石,1722,Du Qi,杜杞,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,1722,Du Qi,杜杞,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,1724,Du Chun,杜純,516,was insulted by,被Y得罪,1,-1,,7596
+1762,Wang Anshi,王安石,1759,Wang Yingchen,汪應辰,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,1759,Wang Yingchen,汪應辰,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,1759,Wang Yingchen,汪應辰,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,1781,Wang Zhi,王贄,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,1844,Wang Guangyuan,王廣淵,494,aided (Political Association),護佑Y(政治關係),1,0,,7596
+1762,Wang Anshi,王安石,1845,Wang Gui,王珪,429,Sent letter to,致書Y,2,-1,,27134
+1762,Wang Anshi,王安石,1847,Wang Gongchen,王拱辰,429,Sent letter to,致書Y,3,-1,,27134
+1762,Wang Anshi,王安石,1856,Wang Ping,王平,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,1865,Wang Shao,王韶,429,Sent letter to,致書Y,2,-1,,27134
+1762,Wang Anshi,王安石,1893,Wang Deyong,王德用,426,Wrote account of conduct (xingzhuang) for,為Y作行狀,1,1057,,7596
+1762,Wang Anshi,王安石,1897,Wang Cun,王存,9,Friend of,友,1,-1,,7596
+1762,Wang Anshi,王安石,1953,Wen Yanbo,文彥博,83,Disliked or hated,忌/惡,1,-1,,7596
+1762,Wang Anshi,王安石,1953,Wen Yanbo,文彥博,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,1953,Wen Yanbo,文彥博,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,1960,Wu Chong,吳充,145,Sacrificial prayer written for,為Y作祭文,1,1080,,7596
+1762,Wang Anshi,王安石,1960,Wu Chong,吳充,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,2007,Yang Hui,楊繪,516,was insulted by,被Y得罪,1,-1,,7596
+1762,Wang Anshi,王安石,2020,Yang Pan,楊蟠,429,Sent letter to,致書Y,2,-1,,27134
+1762,Wang Anshi,王安石,2026,Yang Tian,楊畋,32,Prefaced book by,為Y所著書作序,1,1080,,7596
+1762,Wang Anshi,王安石,2032,Yang Wei,楊畏,4,Patron of (= Client was),是Y的恩主,1,1080,,0
+1762,Wang Anshi,王安石,2032,Yang Wei,楊畏,506,"was presented writing, calligraphy by",收到Y所獻詩、文、書,1,-1,,7596
+1762,Wang Anshi,王安石,2112,Yuan Jiang,元絳,431,Replied to letter from,答Y書,2,-1,,27134
+1762,Wang Anshi,王安石,3013,Chao Zhongcan,晁仲參,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,3054,Chen Zhixiang,陳之祥,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,3055,Chen Zhigu,陳執古,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,3056,Chen Zhili,陳執禮,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,3056,Chen Zhili,陳執禮,406,Wrote Funerary stele for,為Y作神道碑,1,0,,7596
+1762,Wang Anshi,王安石,3058,Chen Zhiyuan (2),陳之元,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,3150,Zhang Kui (3),張奎,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,3250,Zhou Yanxian,周彥先,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,3250,Zhou Yanxian,周彥先,44,Epitaph written for,為Y作墓誌銘,1,1038,,0
+1762,Wang Anshi,王安石,3257,Zhu Xi,朱熹,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,3257,Zhu Xi,朱熹,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,3257,Zhu Xi,朱熹,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,3257,Zhu Xi,朱熹,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,3279,Fan Zhen (2),范鎮,61,Disagreed with views of,不合,1,-1,,7596
+1762,Wang Anshi,王安石,3307,Fu Li,傅立,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,3328,Han Zonghou,韓宗厚,23,Student was,學生為Y,1,-1,,7596
+1762,Wang Anshi,王安石,3394,Hu Anguo,胡安國,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,0
+1762,Wang Anshi,王安石,3394,Hu Anguo,胡安國,228,Scholarship denounced by,其學為Y所排,1,-1,,7596
+1762,Wang Anshi,王安石,3439,Kong Wenzhong,孔文仲,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,7596
+1762,Wang Anshi,王安石,3484,Li Zhiyi,李之儀,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,3484,Li Zhiyi,李之儀,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,3484,Li Zhiyi,李之儀,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,3484,Li Zhiyi,李之儀,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,3484,Li Zhiyi,李之儀,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,3484,Li Zhiyi,李之儀,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,3505,Li Xuzhou,李虛舟,43,Epitaph written by,墓誌銘由Y所作,1,0,,0
+1762,Wang Anshi,王安石,3505,Li Xuzhou,李虛舟,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,3505,Li Xuzhou,李虛舟,406,Wrote Funerary stele for,為Y作神道碑,1,0,,7596
+1762,Wang Anshi,王安石,3554,Li Yuqing,李餘慶,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,3554,Li Yuqing,李餘慶,44,Epitaph written for,為Y作墓誌銘,1,1054,,0
+1762,Wang Anshi,王安石,3568,Lin Ji,林積,18,Praised or admired,欣賞/器重,1,-1,,0
+1762,Wang Anshi,王安石,3568,Lin Ji,林積,540,praised the political accomplishments of,稱道Y之政績,1,-1,,7596
+1762,Wang Anshi,王安石,3580,Liu Chang,劉敞,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,3595,Liu Kezhuang,劉克莊,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,3623,Lou Yu,樓郁,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,3624,Lou Yue,樓鑰,444,Building inscription composed by,建築物得到Y的題詠、記、命名,1,0,,7596
+1762,Wang Anshi,王安石,3632,Lu Jiuyuan,陸九淵,561,Shrine inscription written by,祠記由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,3640,Lu You,陸游,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,3640,Lu You,陸游,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,3739,Sheng Jing,盛京,145,Sacrificial prayer written for,為Y作祭文,1,1080,,7596
+1762,Wang Anshi,王安石,3746,Sima Yi,司馬沂,410,Wrote Tomb stone (mubiao) for,為Y作墓表,1,1060,,21514
+1762,Wang Anshi,王安石,3767,Su Shi,蘇軾,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,7596
+1762,Wang Anshi,王安石,3767,Su Shi,蘇軾,430,Was sent  letter by,被致書由Y,2,-1,,27134
+1762,Wang Anshi,王安石,3767,Su Shi,蘇軾,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,3799,Song Baoguo,宋保國,9,Friend of,友,1,1080,,0
+1762,Wang Anshi,王安石,3799,Song Baoguo,宋保國,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,3828,Tang Jiong,唐坰,13,Recommended,推薦,1,1057,,0
+1762,Wang Anshi,王安石,3828,Tang Jiong,唐坰,16,Opposed by or attacked by,遭到Y的反對/攻訐,1,-1,,0
+1762,Wang Anshi,王安石,3903,Zeng Fu,曾阜,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,3941,Wang Zhu,王洙,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,3958,Wang Hui (8),王回,9,Friend of,友,1,1080,,0
+1762,Wang Anshi,王安石,3958,Wang Hui (8),王回,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,3958,Wang Hui (8),王回,145,Sacrificial prayer written for,為Y作祭文,1,0,,7596
+1762,Wang Anshi,王安石,3958,Wang Hui (8),王回,429,Sent letter to,致書Y,2,-1,,27134
+1762,Wang Anshi,王安石,3958,Wang Hui (8),王回,431,Replied to letter from,答Y書,3,-1,,27134
+1762,Wang Anshi,王安石,3965,Wang Guanzhi,王貫之,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,3967,Wang Ling,王令,18,Praised or admired,欣賞/器重,1,-1,,7596
+1762,Wang Anshi,王安石,3967,Wang Ling,王令,44,Epitaph written for,為Y作墓誌銘,1,-1,,7596
+1762,Wang Anshi,王安石,3967,Wang Ling,王令,46,Postface written for book by,為Y所著書作跋,1,0,,7596
+1762,Wang Anshi,王安石,3967,Wang Ling,王令,429,Sent letter to,致書Y,11,-1,,27134
+1762,Wang Anshi,王安石,3967,Wang Ling,王令,430,Was sent  letter by,被致書由Y,1,-1,,27134
+1762,Wang Anshi,王安石,3967,Wang Ling,王令,430,Was sent  letter by,被致書由Y,1,-1,,27134
+1762,Wang Anshi,王安石,3967,Wang Ling,王令,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,3967,Wang Ling,王令,432,Was sent a reply by,收到Y的答書,1,-1,,27134
+1762,Wang Anshi,王安石,3967,Wang Ling,王令,469,wrote colophon to the writings of,為Y之詩文作跋,1,0,,7596
+1762,Wang Anshi,王安石,3968,Wang Pang,王雱,32,Prefaced book by,為Y所著書作序,1,0,,7596
+1762,Wang Anshi,王安石,3968,Wang Pang,王雱,32,Prefaced book by,為Y所著書作序,1,0,,7596
+1762,Wang Anshi,王安石,3970,Wang Boqi,王伯起,23,Student was,學生為Y,1,1080,,0
+1762,Wang Anshi,王安石,3971,Wang Bohu,王伯虎,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,4001,Wei Liaoweng,魏了翁,33,Preface of book by,書序由Y所作,1,1080,,7596
+1762,Wang Anshi,王安石,4001,Wei Liaoweng,魏了翁,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,4001,Wei Liaoweng,魏了翁,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,4017,Wu Min,吳敏,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,4020,Wu Fen,吳蕡,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,4020,Wu Fen,吳蕡,429,Sent letter to,致書Y,2,-1,,27134
+1762,Wang Anshi,王安石,4058,Yao Pi,姚闢,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,4154,Cai Tiao,蔡鞗,26,Supported by,得到Y的支持,1,-1,,7596
+1762,Wang Anshi,王安石,4220,Cao Shi (Wife of Zhao Zhen ),曹氏(趙禎妻),137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,0
+1762,Wang Anshi,王安石,5011,Wang Wenshu,王文淑,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,5026,Wang Shi (Wife of Zhou Yan Xian ),王氏(周彥先妻),44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,5051,Xiahou Shi (Wife of Xie Jiang ),夏侯氏(謝絳妻),44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,5101,Zhai Shi (Daughter of Zhai Xi Yan),翟氏(翟希言女),44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,5112,Wang Shi (Wife of Sun Chang Qing ),王氏(孫長卿妻),44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,5124,Wu Shi (Wife of Ceng Yi Zhan ),吳氏(曾易占妻),44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,5130,Liu Shi (Wife of Wang Zhi ),劉氏(王贄妻),44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,5219,Li Shi (Wife of Zheng Shu ),李氏(鄭紓妻),44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,5252,Jiang Shi (Wife of Qian Ye ),蔣氏(錢冶妻),44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,5258,Huang Shi (Wife of Ceng Zhi Yao ),黃氏(曾致堯妻),44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,5262,Li Shi (Wife of Zhao Shi Yue ),李氏(趙世岳妻),44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,5354,Yang Shi (Mother of Sun Chang Ling),楊氏(孫昌齡母),44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,5399,Qi Shi (2),齊氏,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,5424,Xu Shi (Mother of Jin Jun Qing),徐氏(金君卿母),44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,7005,Chen Xiang,陳襄,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,7596
+1762,Wang Anshi,王安石,7053,Lv Hui,呂誨,16,Opposed by or attacked by,遭到Y的反對/攻訐,1,-1,,0
+1762,Wang Anshi,王安石,7076,Wang Anguo,王安國,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,7082,Wang Yi,王益,32,Prefaced book by,為Y所著書作序,1,0,,7596
+1762,Wang Anshi,王安石,7082,Wang Yi,王益,133,Biographer of,為Y作傳,1,0,,7596
+1762,Wang Anshi,王安石,7099,Yang Chen,楊忱,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,7099,Yang Chen,楊忱,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,7102,Chen Jiansu,陳見素,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,7111,Huang Tingjian,黃庭堅,18,Praised or admired,欣賞/器重,1,-1,,0
+1762,Wang Anshi,王安石,7111,Huang Tingjian,黃庭堅,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,7111,Huang Tingjian,黃庭堅,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,7111,Huang Tingjian,黃庭堅,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,7111,Huang Tingjian,黃庭堅,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,7111,Huang Tingjian,黃庭堅,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,7111,Huang Tingjian,黃庭堅,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,7111,Huang Tingjian,黃庭堅,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,7173,Zhang Yanbo,張彥博,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,7174,Zhang Yuan (2),張瑗,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,7177,Zhao Xie,趙卨,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,7197,Zhou Bida,周必大,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,7197,Zhou Bida,周必大,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,7197,Zhou Bida,周必大,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,7239,Xie Jingchu,謝景初,443,Composed Building inscription for,為Y之建築物題詠、記、命名,1,0,,7596
+1762,Wang Anshi,王安石,7240,Xie Jingping,謝景平,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,7286,Lian Hengfu,練亨甫,4,Patron of (= Client was),是Y的恩主,1,1080,,0
+1762,Wang Anshi,王安石,7286,Lian Hengfu,練亨甫,13,Recommended,推薦,1,-1,,7596
+1762,Wang Anshi,王安石,7304,Lv Gongchuo,呂公綽,145,Sacrificial prayer written for,為Y作祭文,1,1080,,7596
+1762,Wang Anshi,王安石,7323,Shen Zhou,沈周,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,7324,Shen Fu,沈扶,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,7326,Shen Bo,沈播,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,7326,Shen Bo,沈播,410,Wrote Tomb stone (mubiao) for,為Y作墓表,1,0,,7596
+1762,Wang Anshi,王安石,7343,Sun Di,孫覿,530,writings evaluated by,著作被Y評論,1,0,,7596
+1762,Wang Anshi,王安石,7363,Zeng Yizhan,曾易占,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,7363,Zeng Yizhan,曾易占,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,7363,Zeng Yizhan,曾易占,145,Sacrificial prayer written for,為Y作祭文,1,0,,7596
+1762,Wang Anshi,王安石,7364,Zeng Gong,曾鞏,9,Friend of,友,1,-1,,9602
+1762,Wang Anshi,王安石,7364,Zeng Gong,曾鞏,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,7364,Zeng Gong,曾鞏,430,Was sent  letter by,被致書由Y,1,-1,,27134
+1762,Wang Anshi,王安石,7364,Zeng Gong,曾鞏,430,Was sent  letter by,被致書由Y,1,-1,,27134
+1762,Wang Anshi,王安石,7364,Zeng Gong,曾鞏,430,Was sent  letter by,被致書由Y,1,-1,,27134
+1762,Wang Anshi,王安石,7364,Zeng Gong,曾鞏,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,7374,Wang Feng,王逢,44,Epitaph written for,為Y作墓誌銘,1,1063,,0
+1762,Wang Anshi,王安石,7374,Wang Feng,王逢,44,Epitaph written for,為Y作墓誌銘,1,1063,,0
+1762,Wang Anshi,王安石,7383,Wang Zishao,王子韶,4,Patron of (= Client was),是Y的恩主,1,1080,,0
+1762,Wang Anshi,王安石,7383,Wang Zishao,王子韶,13,Recommended,推薦,1,-1,,7596
+1762,Wang Anshi,王安石,7384,Wang Wujiu,王無咎,23,Student was,學生為Y,1,1080,,0
+1762,Wang Anshi,王安石,7384,Wang Wujiu,王無咎,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,7398,Yang Xun,楊訓,20,Menren was,門人為Y,1,1080,,0
+1762,Wang Anshi,王安石,7404,Ye Tao,葉濤,23,Student was,學生為Y,1,-1,,7596
+1762,Wang Anshi,王安石,8016,Zhang Bian,張昪,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,8031,Jia Changchao,賈昌朝,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,8031,Jia Changchao,賈昌朝,406,Wrote Funerary stele for,為Y作神道碑,1,0,,7596
+1762,Wang Anshi,王安石,8033,Zhou Qi,周起,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,8033,Zhou Qi,周起,406,Wrote Funerary stele for,為Y作神道碑,1,0,,7596
+1762,Wang Anshi,王安石,8043,Fan Zhongyan,范仲淹,145,Sacrificial prayer written for,為Y作祭文,1,1080,,7596
+1762,Wang Anshi,王安石,8051,Han Wei,韓維,430,Was sent  letter by,被致書由Y,1,-1,,27134
+1762,Wang Anshi,王安石,8079,Li Guang,李光,554,was memorialized about by,被Y奏論,1,0,,7596
+1762,Wang Anshi,王安石,8089,Liu Zhi,劉摯,18,Praised or admired,欣賞/器重,1,-1,,7596
+1762,Wang Anshi,王安石,8098,Lu Dian,陸佃,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,8098,Lu Dian,陸佃,146,Sacrificial prayer written by,祭文由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,8098,Lu Dian,陸佃,146,Sacrificial prayer written by,祭文由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,8098,Lu Dian,陸佃,218,Transmitted the classics to,傳經於Y,1,-1,,7596
+1762,Wang Anshi,王安石,8103,Ma Zhijie,馬知節,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,8103,Ma Zhijie,馬知節,406,Wrote Funerary stele for,為Y作神道碑,1,0,,7596
+1762,Wang Anshi,王安石,8109,Sheng Du,盛度,145,Sacrificial prayer written for,為Y作祭文,1,0,,7596
+1762,Wang Anshi,王安石,8118,Sun Mian,孫沔,430,Was sent  letter by,被致書由Y,1,-1,,7596
+1762,Wang Anshi,王安石,8118,Sun Mian,孫沔,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,8119,Song Xiang,宋庠,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,8119,Song Xiang,宋庠,443,Composed Building inscription for,為Y之建築物題詠、記、命名,1,0,,7596
+1762,Wang Anshi,王安石,8131,Cai Bian,蔡卞,23,Student was,學生為Y,1,-1,,7596
+1762,Wang Anshi,王安石,8135,Cao Wei,曹瑋,426,Wrote account of conduct (xingzhuang) for,為Y作行狀,1,1030,,7596
+1762,Wang Anshi,王安石,8136,Zeng Gongliang,曾公亮,145,Sacrificial prayer written for,為Y作祭文,1,1080,,7596
+1762,Wang Anshi,王安石,8136,Zeng Gongliang,曾公亮,197,Served in the same bureau with,同僚,1,-1,,7596
+1762,Wang Anshi,王安石,8136,Zeng Gongliang,曾公亮,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,8136,Zeng Gongliang,曾公亮,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,8162,Wu Kui,吳奎,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,7596
+1762,Wang Anshi,王安石,9001,Zhao Kuangyin,趙匡胤,147,Invocation prayer written for,為Y作祝詞,1,0,,7596
+1762,Wang Anshi,王安石,9001,Zhao Kuangyin,趙匡胤,147,Invocation prayer written for,為Y作祝詞,1,0,,7596
+1762,Wang Anshi,王安石,9002,Zhao Jiong,趙炅,147,Invocation prayer written for,為Y作祝詞,1,0,,7596
+1762,Wang Anshi,王安石,9003,Zhao Heng,趙恆,147,Invocation prayer written for,為Y作祝詞,1,0,,7596
+1762,Wang Anshi,王安石,9005,Zhao Shu,趙曙,147,Invocation prayer written for,為Y作祝詞,1,0,,7596
+1762,Wang Anshi,王安石,9005,Zhao Shu,趙曙,147,Invocation prayer written for,為Y作祝詞,1,0,,7596
+1762,Wang Anshi,王安石,9006,Zhao Xu,趙頊,26,Supported by,得到Y的支持,1,-1,,7596
+1762,Wang Anshi,王安石,10084,Wu Cheng,吳澄,33,Preface of book by,書序由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,10178,Zhou Tao,周濤,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,10178,Zhou Tao,周濤,145,Sacrificial prayer written for,為Y作祭文,1,0,,7596
+1762,Wang Anshi,王安石,10186,Zhou Maoxian,周茂先,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,10346,Wang Yuanji,汪元吉,68,Recognized the virtue of,節行為Y所稱道,1,1080,,0
+1762,Wang Anshi,王安石,10389,Yuan Jue (2),袁桷,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,10414,Zhao Shireng,趙世仍,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,10532,Zhao Zongshu,趙宗述,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,10565,Hu Quan,胡銓,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,10566,Yang Wanli,楊萬里,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,10660,Liu Jing,劉涇,13,Recommended,推薦,1,1080,,0
+1762,Wang Anshi,王安石,10801,Yu Ji (2),虞集,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,10801,Yu Ji (2),虞集,561,Shrine inscription written by,祠記由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,11030,Zheng Qian,鄭蒨,8,Coalition leader of,黨魁為Y,1,1080,,0
+1762,Wang Anshi,王安石,11030,Zheng Qian,鄭蒨,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,7596
+1762,Wang Anshi,王安石,11135,Yu Xiang,余象,12,Impeached by,被Y彈劾,1,-1,,7596
+1762,Wang Anshi,王安石,11247,Fang Weishen,方惟深,71,Knew or praised poetry of,稱道Y的詩作,1,1080,,7596
+1762,Wang Anshi,王安石,11337,Xue Lihe,薛利和,29,Purged,排擠,1,1080,,0
+1762,Wang Anshi,王安石,11337,Xue Lihe,薛利和,107,Offer of office refused by,拒絕在Y的主政期出仕,1,-1,,7596
+1762,Wang Anshi,王安石,11337,Xue Lihe,薛利和,131,Retainer (客) was,門客為Y,1,0,,0
+1762,Wang Anshi,王安石,11688,Gao Shi (Wife of Zhao Shu),高氏(趙曙妻),16,Opposed by or attacked by,遭到Y的反對/攻訐,1,-1,,7596
+1762,Wang Anshi,王安石,11791,Sun Xi,孫錫,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,11817,Xiong Fan,熊蕃,35,Member of his school was,該學派的成員為Y,1,1080,,0
+1762,Wang Anshi,王安石,11817,Xiong Fan,熊蕃,209,Descent line of teaching to,其學為Y所宗,1,-1,,7596
+1762,Wang Anshi,王安石,11940,Diao A,刁A,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,11941,Diao Yi (2),刁繹,145,Sacrificial prayer written for,為Y作祭文,1,0,,7596
+1762,Wang Anshi,王安石,11941,Diao Yi (2),刁繹,443,Composed Building inscription for,為Y之建築物題詠、記、命名,1,0,,7596
+1762,Wang Anshi,王安石,12124,Sheng Tao,盛陶,16,Opposed by or attacked by,遭到Y的反對/攻訐,1,-1,,7596
+1762,Wang Anshi,王安石,12125,Cheng Fang,程昉,4,Patron of (= Client was),是Y的恩主,1,1080,,0
+1762,Wang Anshi,王安石,12125,Cheng Fang,程昉,11,Impeached,彈劾,1,-1,,7596
+1762,Wang Anshi,王安石,12157,Liu Yan,劉弇,146,Sacrificial prayer written by,祭文由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,12236,Xu Xuan,徐鉉,529,evaluated the writings of,評論Y之著作,1,0,,7596
+1762,Wang Anshi,王安石,12272,Xiao Huaji,蕭化基,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,12278,Xiao Ruwei,蕭汝為,18,Praised or admired,欣賞/器重,1,1080,,0
+1762,Wang Anshi,王安石,12278,Xiao Ruwei,蕭汝為,172,Praised the literary style of,稱道Y之文風,1,-1,,7596
+1762,Wang Anshi,王安石,12297,Xiao Xun,蕭洵,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,12313,Li Ding,李定,95,Knew,相識,1,-1,,0
+1762,Wang Anshi,王安石,12313,Li Ding,李定,459,Wrote School stele for,為Y作學記（書院記）,1,0,,7596
+1762,Wang Anshi,王安石,12319,Yu Jing,余靖,420,Wrote Tomb stone preface for,為Y墓表作序,1,-1,,7596
+1762,Wang Anshi,王安石,12319,Yu Jing,余靖,443,Composed Building inscription for,為Y之建築物題詠、記、命名,1,-1,,0
+1762,Wang Anshi,王安石,12988,Yang Jie,楊傑,50,followed by,從遊者為Y,1,1080,,0
+1762,Wang Anshi,王安石,12989,Pan Xingsi,潘興嗣,9,Friend of,友,1,1080,,0
+1762,Wang Anshi,王安石,13377,Zheng Yu (3),鄭紆,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,13378,Zheng Xie,鄭獬,29,Purged,排擠,1,1080,,0
+1762,Wang Anshi,王安石,13378,Zheng Xie,鄭獬,83,Disliked or hated,忌/惡,1,-1,,7596
+1762,Wang Anshi,王安石,13378,Zheng Xie,鄭獬,131,Retainer (客) was,門客為Y,1,0,,0
+1762,Wang Anshi,王安石,13574,Zhang Bosun,張伯孫,9,Friend of,友,1,1080,,0
+1762,Wang Anshi,王安石,13578,Zhang Ji (6),張幾,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,13916,Zhang Jian,張戩,12,Impeached by,被Y彈劾,1,-1,,7596
+1762,Wang Anshi,王安石,14074,Zhang Youzhi,章友直,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,14111,Lu Guang (2),陸廣,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,14381,Chen Shichang,陳世昌,162,Departure note sent to,為Y作臨別贈言(送別詩、序),1,1080,,7596
+1762,Wang Anshi,王安石,14607,Chen Du,陳度,23,Student was,學生為Y,1,-1,,7596
+1762,Wang Anshi,王安石,14787,Zhao Shiyao,趙世耀,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,15014,Lu Youkai,魯有開,516,was insulted by,被Y得罪,1,-1,,7596
+1762,Wang Anshi,王安石,15074,Chen Min,陳敏,13,Recommended,推薦,1,1080,,0
+1762,Wang Anshi,王安石,15296,Zheng Xia,鄭俠,23,Student was,學生為Y,1,1080,,0
+1762,Wang Anshi,王安石,15296,Zheng Xia,鄭俠,43,Epitaph written by,墓誌銘由Y所作,1,1080,,0
+1762,Wang Anshi,王安石,15296,Zheng Xia,鄭俠,89,Explanation of capping name (zixu or zishuo) composed by,字說、名述由Y所作,1,1080,,0
+1762,Wang Anshi,王安石,15296,Zheng Xia,鄭俠,430,Was sent  letter by,被致書由Y,1,-1,,27134
+1762,Wang Anshi,王安石,15449,Huang Cishan,黃次山,33,Preface of book by,書序由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,15532,Jin Xchen,金X臣,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,15744,Sun Fu,孫甫,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,15744,Sun Fu,孫甫,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,15854,Jia Qiao,郟僑,18,Praised or admired,欣賞/器重,1,-1,,0
+1762,Wang Anshi,王安石,15939,Kong Daofu,孔道輔,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,15946,Kong Min,孔旼,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,15992,Huang Yin,黃隱,228,Scholarship denounced by,其學為Y所排,1,1080,,7596
+1762,Wang Anshi,王安石,16173,Qian Ye,錢冶,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,16211,Qian Jingchen,錢景諶,4,Patron of (= Client was),是Y的恩主,1,1080,,0
+1762,Wang Anshi,王安石,16211,Qian Jingchen,錢景諶,29,Purged,排擠,1,1080,,0
+1762,Wang Anshi,王安石,16211,Qian Jingchen,錢景諶,131,Retainer (客) was,門客為Y,1,0,,0
+1762,Wang Anshi,王安石,16211,Qian Jingchen,錢景諶,194,Honored by,受Y之弟子禮,1,-1,,7596
+1762,Wang Anshi,王安石,16400,Zhou Chang,周常,18,Praised or admired,欣賞/器重,1,-1,,0
+1762,Wang Anshi,王安石,16400,Zhou Chang,周常,293,Menren associated with,稱道Y之文章、學問,1,-1,,7596
+1762,Wang Anshi,王安石,16579,Zeng Zhiyao,曾致堯,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,16579,Zeng Zhiyao,曾致堯,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,16594,Yang Shen,楊申,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,7596
+1762,Wang Anshi,王安石,16667,Zhu Shouchang,朱壽昌,17,Praised or admired by,被Y欣賞/器重,1,-1,,0
+1762,Wang Anshi,王安石,16667,Zhu Shouchang,朱壽昌,18,Praised or admired,欣賞/器重,1,-1,,7596
+1762,Wang Anshi,王安石,16871,Han Zongshu,韓宗恕,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,17517,Yu Rushang,俞汝尚,107,Offer of office refused by,拒絕在Y的主政期出仕,1,0,,7596
+1762,Wang Anshi,王安石,18268,Zhong Ne,仲訥,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,18436,Song Minxiu,宋敏修,424,Wrote Elegy for,為Y作挽詩、詞,1,0,,7596
+1762,Wang Anshi,王安石,18537,Xie Jinghui,謝景回,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,18643,Xu Gui,許規,32,Prefaced book by,為Y所著書作序,1,0,,7596
+1762,Wang Anshi,王安石,18644,Xu Sui,許遂,133,Biographer of,為Y作傳,1,0,,7596
+1762,Wang Anshi,王安石,18645,Xu Jiong,許迥,133,Biographer of,為Y作傳,1,0,,7596
+1762,Wang Anshi,王安石,18647,Xu Hui,許恢,32,Prefaced book by,為Y所著書作序,1,0,,7596
+1762,Wang Anshi,王安石,18648,Xu Ping,許平,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,18648,Xu Ping,許平,133,Biographer of,為Y作傳,1,0,,7596
+1762,Wang Anshi,王安石,18649,Xu Yu,許俞,133,Biographer of,為Y作傳,1,0,,7596
+1762,Wang Anshi,王安石,18873,Wu Fan,吳藩,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,18876,Wu Xiandao,吳顯道,114,Poems composed with,相唱和,1,-1,,0
+1762,Wang Anshi,王安石,18944,Huang Yan,黃彥,499,recruited Y to be instructor at school or academy,聘Y執教官學、書院,1,-1,,7596
+1762,Wang Anshi,王安石,19266,Guo Fengyuan,郭逢原,50,followed by,從遊者為Y,1,1080,,0
+1762,Wang Anshi,王安石,19349,Ge Yuan,葛源,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,19350,Ge Liangsi,葛良嗣,18,Praised or admired,欣賞/器重,1,-1,,7596
+1762,Wang Anshi,王安石,19350,Ge Liangsi,葛良嗣,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,19561,Li Zhang,李璋,18,Praised or admired,欣賞/器重,1,1080,,0
+1762,Wang Anshi,王安石,19611,Li Zhi (8),李陟,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,19611,Li Zhi (8),李陟,406,Wrote Funerary stele for,為Y作神道碑,1,0,,7596
+1762,Wang Anshi,王安石,19871,Wang Gai (3),王該,9,Friend of,友,1,0,,7596
+1762,Wang Anshi,王安石,19871,Wang Gai (3),王該,431,Replied to letter from,答Y書,2,-1,,27134
+1762,Wang Anshi,王安石,19904,Wang Wenliang,王文亮,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,20419,Liu Shu,劉恕,107,Offer of office refused by,拒絕在Y的主政期出仕,1,0,,7596
+1762,Wang Anshi,王安石,20450,Liu Jisun,劉季孫,71,Knew or praised poetry of,稱道Y的詩作,1,-1,,7596
+1762,Wang Anshi,王安石,20691,Ma Zhongshu,馬仲舒,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,20691,Ma Zhongshu,馬仲舒,117,Tongxue was,同學、同門,1,1040,,0
+1762,Wang Anshi,王安石,20691,Ma Zhongshu,馬仲舒,232,Taught to,教授Y,1,-1,,0
+1762,Wang Anshi,王安石,20691,Ma Zhongshu,馬仲舒,269,Critic of,批評,1,-1,,7596
+1762,Wang Anshi,王安石,20840,Shao Cai,邵材,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,7596
+1762,Wang Anshi,王安石,20849,Shao Jingxian,邵景先,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,20884,Shen Zhu,沈銖,23,Student was,學生為Y,1,-1,,7596
+1762,Wang Anshi,王安石,20884,Shen Zhu,沈銖,232,Taught to,教授Y,1,1103,,0
+1762,Wang Anshi,王安石,20899,Shen Jian,沈兼,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,20899,Shen Jian,沈兼,145,Sacrificial prayer written for,為Y作祭文,1,1080,,7596
+1762,Wang Anshi,王安石,21072,Shi Geng,石賡,13,Recommended,推薦,1,1080,,0
+1762,Wang Anshi,王安石,21275,Sun Guanzhi,孫貫之,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,21345,Sun Shi,孫適,23,Student was,學生為Y,1,-1,,7596
+1762,Wang Anshi,王安石,21345,Sun Shi,孫適,50,followed by,從遊者為Y,1,1080,,0
+1762,Wang Anshi,王安石,21346,Sun Miao,孫邈,141,Praised scholarship of,其學得到Y之讚揚,1,1080,,0
+1762,Wang Anshi,王安石,21346,Sun Miao,孫邈,172,Praised the literary style of,稱道Y之文風,1,-1,,7596
+1762,Wang Anshi,王安石,21365,Cai Yuan (3),蔡淵,23,Student was,學生為Y,1,1080,,7596
+1762,Wang Anshi,王安石,21429,Gou Xizhong,句希仲,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,21484,Tan Fang,譚昉,22,Student of,為Y之學生,1,1030,,60240
+1762,Wang Anshi,王安石,21619,Ding Baochen,丁寶臣,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,21619,Ding Baochen,丁寶臣,145,Sacrificial prayer written for,為Y作祭文,1,1080,,7596
+1762,Wang Anshi,王安石,21619,Ding Baochen,丁寶臣,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,21820,Qian Yi (4),錢顗,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,7596
+1762,Wang Anshi,王安石,21944,Wang Anren,王安仁,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,22199,Wang Yi (17),王乙,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,22202,Wang Yueshi,王越石,10,Friend in the same graduating class,同年友,1,1080,,0
+1762,Wang Anshi,王安石,22230,Wang Junyu,王君玉,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,22230,Wang Junyu,王君玉,410,Wrote Tomb stone (mubiao) for,為Y作墓表,1,0,,7596
+1762,Wang Anshi,王安石,22566,Yang Ao,楊翱,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,22566,Yang Ao,楊翱,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,24101,Tan Bi,譚必,95,Knew,相識,1,1030,,60240
+1762,Wang Anshi,王安石,24263,Li Xing,李興,406,Wrote Funerary stele for,為Y作神道碑,1,999,,0
+1762,Wang Anshi,王安石,24276,Sun Mou,孫侔,32,Prefaced book by,為Y所著書作序,1,-1,,0
+1762,Wang Anshi,王安石,24276,Sun Mou,孫侔,50,followed by,從遊者為Y,1,1080,,0
+1762,Wang Anshi,王安石,24276,Sun Mou,孫侔,162,Departure note sent to,為Y作臨別贈言(送別詩、序),1,0,,7596
+1762,Wang Anshi,王安石,24276,Sun Mou,孫侔,429,Sent letter to,致書Y,3,-1,,27134
+1762,Wang Anshi,王安石,24276,Sun Mou,孫侔,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,24412,Li Shangyin,李商隱,71,Knew or praised poetry of,稱道Y的詩作,1,1080,,0
+1762,Wang Anshi,王安石,24811,Chang Zhi,常秩,13,Recommended,推薦,1,1080,,0
+1762,Wang Anshi,王安石,24811,Chang Zhi,常秩,26,Supported by,得到Y的支持,1,1080,,0
+1762,Wang Anshi,王安石,24811,Chang Zhi,常秩,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,24811,Chang Zhi,常秩,410,Wrote Tomb stone (mubiao) for,為Y作墓表,1,0,,7596
+1762,Wang Anshi,王安石,25203,Zhao Cuizhong,趙粹中,16,Opposed by or attacked by,遭到Y的反對/攻訐,1,-1,,7596
+1762,Wang Anshi,王安石,25459,Zhao Shidan,趙師旦,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,25979,Zhao Zongbian,趙宗辯,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,26418,Jia Qinguo,家勤國,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,0
+1762,Wang Anshi,王安石,26418,Jia Qinguo,家勤國,228,Scholarship denounced by,其學為Y所排,1,-1,,7596
+1762,Wang Anshi,王安石,26610,Wang Jie (7),王介,117,Tongxue was,同學、同門,1,1091,,7596
+1762,Wang Anshi,王安石,26614,Wang Yanzhi,王沇之,23,Student was,學生為Y,1,-1,,7596
+1762,Wang Anshi,王安石,26614,Wang Yanzhi,王沇之,232,Taught to,教授Y,1,0,,7596
+1762,Wang Anshi,王安石,27078,Chen Shu (7),陳樞,13,Recommended,推薦,1,0,,7596
+1762,Wang Anshi,王安石,27097,Zheng Yi (5),鄭詒,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,27097,Zheng Yi (5),鄭詒,410,Wrote Tomb stone (mubiao) for,為Y作墓表,1,0,,7596
+1762,Wang Anshi,王安石,27109,Yang Gongshi (zi),楊公適,44,Epitaph written for,為Y作墓誌銘,1,1080,,0
+1762,Wang Anshi,王安石,27110,Zhang Wengang,張文剛,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,27115,Zhang Tao,張祹,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,27385,Wei Yanzhi,魏掞之,16,Opposed by or attacked by,遭到Y的反對/攻訐,1,-1,,7596
+1762,Wang Anshi,王安石,27397,Yuan Xingzong,員興宗,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,27577,Ma Ximeng,馬希孟,23,Student was,學生為Y,1,1080,,0
+1762,Wang Anshi,王安石,27578,Meng Hou,孟厚,23,Student was,學生為Y,1,1080,,0
+1762,Wang Anshi,王安石,27580,Wang Xie,汪澥,23,Student was,學生為Y,1,1080,,0
+1762,Wang Anshi,王安石,27727,Fang Hui (3),方回,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,27727,Fang Hui (3),方回,530,writings evaluated by,著作被Y評論,1,0,,7596
+1762,Wang Anshi,王安石,27762,Guo Wei (2),郭維,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,27769,Guo Xiangzheng,郭祥正,429,Sent letter to,致書Y,5,-1,,27134
+1762,Wang Anshi,王安石,27770,Deng Su,鄧肅,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,27957,Wu Shidao,吳師道,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,27957,Wu Shidao,吳師道,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,29551,Wu Hao,吳豪,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,30223,Huang Chaoying,黃朝英,35,Member of his school was,該學派的成員為Y,1,1080,,0
+1762,Wang Anshi,王安石,30223,Huang Chaoying,黃朝英,209,Descent line of teaching to,其學為Y所宗,1,-1,,7596
+1762,Wang Anshi,王安石,30727,Shi Huihong,釋惠洪,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,37205,Zeng Lei,曾耒,45,Postface of book written by,書跋由Y所作,1,0,,7596
+1762,Wang Anshi,王安石,37684,Wang Zhaoyu,王昭禹,209,Descent line of teaching to,其學為Y所宗,1,-1,,7596
+1762,Wang Anshi,王安石,37903,Wang Shi (Wife of Zhao Kuang Yin ),王氏(趙匡胤妻),147,Invocation prayer written for,為Y作祝詞,1,0,,7596
+1762,Wang Anshi,王安石,37969,Wang Kaizu,王開祖,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,38062,Wang Shixi,王師錫,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,38062,Wang Shixi,王師錫,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,38106,Wang Zhi,王致,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,38223,Wang Shouqing,王壽卿,228,Scholarship denounced by,其學為Y所排,1,0,,7596
+1762,Wang Anshi,王安石,38678,Shi Ruli,石汝礪,29,Purged,排擠,1,-1,,7596
+1762,Wang Anshi,王安石,38678,Shi Ruli,石汝礪,227,Denounced scholarship of,排Y之學,1,0,,7596
+1762,Wang Anshi,王安石,38772,Wang Ji,王伋,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,7596
+1762,Wang Anshi,王安石,39051,Rao Ziyi,饒子儀,13,Recommended,推薦,1,0,,7596
+1762,Wang Anshi,王安石,39075,Rao Song,饒竦,9,Friend of,友,1,0,,7596
+1762,Wang Anshi,王安石,39075,Rao Song,饒竦,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,0,,7596
+1762,Wang Anshi,王安石,39228,Yuan Jizhong,元積中,459,Wrote School stele for,為Y作學記（書院記）,1,0,,7596
+1762,Wang Anshi,王安石,39625,Quan Ziming,全自明,443,Composed Building inscription for,為Y之建築物題詠、記、命名,1,0,,7596
+1762,Wang Anshi,王安石,39625,Quan Ziming,全自明,556,Wrote Inscription for Daoist institution for,為Y作道觀記,1,0,,7596
+1762,Wang Anshi,王安石,40029,Wei Shi ( Mother of Shen Zun),魏氏(沈遵母),44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,40134,Qiu Zhonggong,求仲弓,9,Friend of,友,1,-1,,0
+1762,Wang Anshi,王安石,40154,Gu Tang,顧棠,20,Menren was,門人為Y,1,-1,,0
+1762,Wang Anshi,王安石,40154,Gu Tang,顧棠,23,Student was,學生為Y,1,-1,,7596
+1762,Wang Anshi,王安石,40156,Zhang Jin,張僅,20,Menren was,門人為Y,1,-1,,7596
+1762,Wang Anshi,王安石,40158,Cheng Zhuo,成倬,13,Recommended,推薦,1,-1,,0
+1762,Wang Anshi,王安石,40158,Cheng Zhuo,成倬,67,Staff member was,幕僚為Y,1,-1,,7596
+1762,Wang Anshi,王安石,40169,Wang Qi,汪齊,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,0
+1762,Wang Anshi,王安石,40169,Wang Qi,汪齊,516,was insulted by,被Y得罪,1,-1,,7596
+1762,Wang Anshi,王安石,40266,Du Ziye,杜子野,22,Student of,為Y之學生,1,-1,,7596
+1762,Wang Anshi,王安石,40266,Du Ziye,杜子野,36,Disciple (dizi) of,為Y之弟子,1,-1,,0
+1762,Wang Anshi,王安石,40401,Shi Zanyuan,釋贊元,9,Friend of,友,1,-1,,0
+1762,Wang Anshi,王安石,40401,Shi Zanyuan,釋贊元,145,Sacrificial prayer written for,為Y作祭文,1,0,,7596
+1762,Wang Anshi,王安石,40419,Shi Huailian,釋懷璉,239,Buddhist temple stele written for,為Y作佛寺記,1,0,,7596
+1762,Wang Anshi,王安石,40419,Shi Huailian,釋懷璉,443,Composed Building inscription for,為Y之建築物題詠、記、命名,1,-1,,0
+1762,Wang Anshi,王安石,40470,Du Huan,杜渙,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,40750,Li Buyi,李不疑,38,Eulogized,為Y作哀辭 [併入167],1,-1,,0
+1762,Wang Anshi,王安石,40750,Li Buyi,李不疑,167,Lamentation prayer written for,為Y作哀辭,1,0,,7596
+1762,Wang Anshi,王安石,40759,Du Chun,杜醇,429,Sent letter to,致書Y,2,-1,,27134
+1762,Wang Anshi,王安石,40759,Du Chun,杜醇,429,Sent letter to,致書Y,1,0,,7596
+1762,Wang Anshi,王安石,40759,Du Chun,杜醇,459,Wrote School stele for,為Y作學記（書院記）,1,0,,7596
+1762,Wang Anshi,王安石,40839,Li Shiyun,李士雲,437,Presented literary composition as gift to,贈詩、文,1,-1,,0
+1762,Wang Anshi,王安石,40839,Li Shiyun,李士雲,504,was presented painting by,得到贈畫,1,-1,,7596
+1762,Wang Anshi,王安石,40914,Li Wen,李問,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,41353,Wu Shen,吳申,44,Epitaph written for,為Y作墓誌銘,1,-1,,0
+1762,Wang Anshi,王安石,41356,Wu Mou,吳某(吳申父),44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,41650,Shu Xiang,束向,145,Sacrificial prayer written for,為Y作祭文,1,0,,7596
+1762,Wang Anshi,王安石,41650,Shu Xiang,束向,145,Sacrificial prayer written for,為Y作祭文,1,-1,,0
+1762,Wang Anshi,王安石,41668,Wu Xiaozong,吳孝宗,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,41668,Wu Xiaozong,吳孝宗,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,41668,Wu Xiaozong,吳孝宗,516,was insulted by,被Y得罪,1,-1,,7596
+1762,Wang Anshi,王安石,41723,Li Shi (Fei of Zhao Gui ),李氏(趙炅妃),147,Invocation prayer written for,為Y作祝詞,1,0,,7596
+1762,Wang Anshi,王安石,41837,Wu Xingzong,吳興宗,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,41842,Yu Jing,余京,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,41927,Lv Chongzhi,呂冲之,443,Composed Building inscription for,為Y之建築物題詠、記、命名,1,0,,7596
+1762,Wang Anshi,王安石,42396,Lin Zhao,林肇,459,Wrote School stele for,為Y作學記（書院記）,1,0,,7596
+1762,Wang Anshi,王安石,42820,Zheng Ji,征集,44,Epitaph written for,為Y作墓誌銘,1,-1,,0
+1762,Wang Anshi,王安石,42820,Zheng Ji,征集,410,Wrote Tomb stone (mubiao) for,為Y作墓表,1,-1,,7596
+1762,Wang Anshi,王安石,42820,Zheng Ji,征集,410,Wrote Tomb stone (mubiao) for,為Y作墓表,1,0,,7596
+1762,Wang Anshi,王安石,43033,Sun Lijie,孫立節,107,Offer of office refused by,拒絕在Y的主政期出仕,1,-1,,0
+1762,Wang Anshi,王安石,43069,Zhou Xu,周諝,137,Policies attacked-not supported by,其政策被Y反對/不支持,1,-1,,0
+1762,Wang Anshi,王安石,43344,Hu Shunyuan,胡舜元,16,Opposed by or attacked by,遭到Y的反對/攻訐,1,-1,,0
+1762,Wang Anshi,王安石,43344,Hu Shunyuan,胡舜元,117,Tongxue was,同學、同門,1,-1,,0
+1762,Wang Anshi,王安石,43344,Hu Shunyuan,胡舜元,162,Departure note sent to,為Y作臨別贈言(送別詩、序),1,0,,7596
+1762,Wang Anshi,王安石,43352,Hu Mou,胡某(胡舜元父),44,Epitaph written for,為Y作墓誌銘,1,-1,,0
+1762,Wang Anshi,王安石,43523,Yu Zilin,俞紫琳,20,Menren was,門人為Y,1,0,,0
+1762,Wang Anshi,王安石,43524,Yu Zizhi,俞紫芝,50,followed by,從遊者為Y,1,0,,0
+1762,Wang Anshi,王安石,43524,Yu Zizhi,俞紫芝,431,Replied to letter from,答Y書,1,0,,27134
+1762,Wang Anshi,王安石,43953,Fan Jimei,范濟美,251,Co-authored book with,合撰(編)著作,1,-1,,7596
+1762,Wang Anshi,王安石,43955,Duan Chong,段充,13,Recommended,推薦,1,0,,7596
+1762,Wang Anshi,王安石,43985,Duan Feng,段縫,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,44306,Zhu Chang,祝常,516,was insulted by,被Y得罪,1,-1,,0
+1762,Wang Anshi,王安石,44766,Xia Xidao,夏希道,459,Wrote School stele for,為Y作學記（書院記）,1,0,,7596
+1762,Wang Anshi,王安石,44956,Sun Gao,孫鼛,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,44977,Sun Chong,孫冲,293,Menren associated with,稱道Y之文章、學問,1,0,,7596
+1762,Wang Anshi,王安石,45356,Xu Zun,許遵,431,Replied to letter from,答Y書,1,-1,,27134
+1762,Wang Anshi,王安石,45386,Xu Jun,許均,133,Biographer of,為Y作傳,1,0,,7596
+1762,Wang Anshi,王安石,45475,Xu Yuncheng,許允成,20,Menren was,門人為Y,1,-1,,0
+1762,Wang Anshi,王安石,45682,Zhang Shi,張式,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,45767,Ding Yongping,丁用平,556,Wrote Inscription for Daoist institution for,為Y作道觀記,1,0,,7596
+1762,Wang Anshi,王安石,45771,Diao Mou,刁某,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,46094,Hu Mou,胡某,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,46643,Zhang Ding,張定,459,Wrote School stele for,為Y作學記（書院記）,1,0,,7596
+1762,Wang Anshi,王安石,47455,Chen Xun,陳浚,145,Sacrificial prayer written for,為Y作祭文,1,0,,7596
+1762,Wang Anshi,王安石,47587,Chen Fu,陳輔,23,Student was,學生為Y,1,-1,,7596
+1762,Wang Anshi,王安石,48046,Chen Xingzhi,陳興之,162,Departure note sent to,為Y作臨別贈言(送別詩、序),1,0,,7596
+1762,Wang Anshi,王安石,48199,Cui Gongdu,崔公度,24,"Directly recruited (bi, zoubi, etc)",辟,1,-1,,7596
+1762,Wang Anshi,王安石,48199,Cui Gongdu,崔公度,429,Sent letter to,致書Y,1,-1,,27134
+1762,Wang Anshi,王安石,48355,Feng Shouxin,馮守信,406,Wrote Funerary stele for,為Y作神道碑,1,0,,7596
+1762,Wang Anshi,王安石,49184,Cheng Weixiang,程惟象,437,Presented literary composition as gift to,贈詩、文,1,-1,,7596
+1762,Wang Anshi,王安石,49245,Yong Xiucai,雍秀才,75,Criticized via poetry by,被Y以詩諷忤,1,-1,,7596
+1762,Wang Anshi,王安石,49380,Yang Ji,楊跡,228,Scholarship denounced by,其學為Y所排,1,-1,,7596
+1762,Wang Anshi,王安石,49501,Yang Wenxu,楊文詡,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,49662,Yu Jingzhi,虞靖之,145,Sacrificial prayer written for,為Y作祭文,1,0,,7596
+1762,Wang Anshi,王安石,50532,Zhao Zhongxing,趙仲行,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,50543,Zhao Zhongmang,趙仲厖,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,50556,Wu Shi (Wife of Zhao Zhong Yan ),武氏(趙仲焉妻),44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,50591,Zhao Zhongkui,趙仲夔,44,Epitaph written for,為Y作墓誌銘,1,0,,7596
+1762,Wang Anshi,王安石,51204,Pan Wenzhi,潘溫之,18,Praised or admired,欣賞/器重,1,-1,,7596
+1762,Wang Anshi,王安石,51446,Deng Quan,鄧佺,277,proceeded with (friendship),與Y遊,1,-1,,7596
+1762,Wang Anshi,王安石,51446,Deng Quan,鄧佺,556,Wrote Inscription for Daoist institution for,為Y作道觀記,1,0,,7596
+1762,Wang Anshi,王安石,51813,Liu Yuan,劉愿,228,Scholarship denounced by,其學為Y所排,1,-1,,7596
+1762,Wang Anshi,王安石,53511,Shi Qingshun,釋清順,71,Knew or praised poetry of,稱道Y的詩作,1,0,,7596
+1762,Wang Anshi,王安石,53691,Shi Zhifu,釋智福,239,Buddhist temple stele written for,為Y作佛寺記,1,0,,7596
+1762,Wang Anshi,王安石,53771,Shi Ruixin,釋瑞新,9,Friend of,友,1,-1,,7596
+1762,Wang Anshi,王安石,53856,Shi Huili,釋慧禮,239,Buddhist temple stele written for,為Y作佛寺記,1,0,,7596
+1762,Wang Anshi,王安石,444889,Wu Fan,吳蕃,44,Epitaph written for,為Y作墓誌銘,1,1054,,26381
+1762,Wang Anshi,王安石,508177,Wu Gao,伍誥,13,Recommended,推薦,1,-1,,4554
+1762,Wang Anshi,王安石,556944,Fang Zhongyong,方仲永,95,Knew,相識,1,1033,,60240
+1762,Wang Anshi,王安石,556945,Li Tongshu,李通叔,9,Friend of,友,1,1039,,60240

@@ -1,0 +1,277 @@
+﻿c_personid,c_name,c_name_chn,c_index_year,c_sex,c_addr_id,c_dy,c_status_code,c_status_desc,c_status_desc_chn,c_source,c_index_year_type_code,c_sequence
+991,Li Jining,李繼凝,948,M,100658,15,40,civil office,[為官者：文],0,2112,0
+1120,Li Yingji,李應機,995,M,100658,15,40,civil office,[為官者：文],0,23,0
+1294,Lv Jiawen,呂嘉問,1059,M,100658,15,40,civil office,[為官者：文],0,27,0
+1304,Lv Xichun,呂希純,1048,M,100658,15,40,civil office,[為官者：文],0,11,0
+1306,Lv Xidao,呂希道,1025,M,100658,15,40,civil office,[為官者：文],0,01,0
+1473,Shi Yan,時彥,1044,M,100658,15,40,civil office,[為官者：文],0,29,0
+1732,Duan Shaolian,段少連,994,M,100658,15,40,civil office,[為官者：文],0,01,0
+3000,An Fu,安扶,1063,M,100658,15,40,civil office,[為官者：文],0,29,1
+3001,An Rihua,安日華,1035,M,100658,15,40,civil office,[為官者：文],0,29,1
+3015,Chao Gou,晁遘,977,M,100658,15,40,civil office,[為官者：文],0,13,1
+3023,Chao Duanli,晁端禮,1043,M,100658,15,40,civil office,[為官者：文],0,05,1
+3028,Chao Yongzhi,晁詠之,1064,M,100658,15,40,civil office,[為官者：文],0,05,1
+3034,Qian Hui,錢晦,1007,M,100658,15,40,civil office,[為官者：文],0,11,1
+3053,Chen Zhihe,陳知和,1024,M,100658,15,40,civil office,[為官者：文],0,01,1
+3055,Chen Zhigu,陳執古,992,M,100658,15,40,civil office,[為官者：文],0,19,1
+3056,Chen Zhili,陳執禮,995,M,100658,15,40,civil office,[為官者：文],0,01,1
+3090,Chen Zongyuan,陳宗元,969,M,100658,15,40,civil office,[為官者：文],0,11,1
+3114,Cheng Yu,程瑜,1015,M,100658,15,40,civil office,[為官者：文],0,24,1
+3141,Zhang Xiyi,張希一,1020,M,100658,15,40,civil office,[為官者：文],0,1312,1
+3194,Zhao Ji (2),趙積,963,M,100658,15,40,civil office,[為官者：文],0,1312,1
+3209,Zhao Shien,趙世恩,1041,M,100658,15,40,civil office,[為官者：文],0,01,1
+3210,Zhao Shoujie,趙守節,996,M,100658,15,40,civil office,[為官者：文],0,11,1
+3212,Zhao Zongdan,趙宗旦,1004,M,100658,15,40,civil office,[為官者：文],0,13,1
+3213,Zhao Zisong,趙子崧,1076,M,100658,15,40,civil office,[為官者：文],0,05,1
+3215,Zhao Weiji,趙惟吉,966,M,100658,15,40,civil office,[為官者：文],0,01,1
+3217,Jia Changqi,賈昌期,992,M,100658,15,40,civil office,[為官者：文],0,11,1
+3218,Jia Changfu,賈昌符,981,M,100658,15,40,civil office,[為官者：文],0,23,1
+3219,Jia Zhu,賈注,962,M,100658,15,40,civil office,[為官者：文],0,01,1
+3261,Zhu Bocai,朱伯材,1074,M,100658,15,40,civil office,[為官者：文],0,23,1
+3280,Fan Yisun,范貽孫,960,M,100658,15,40,civil office,[為官者：文],0,01,1
+3351,Xiang Jing,向經,1023,M,100658,15,40,civil office,[為官者：文],0,01,1
+3353,Xiang Zhuanzheng,向傳正,978,M,100658,15,40,civil office,[為官者：文],0,11,1
+3354,Xiang Zhuanliang,向傳亮,978,M,100658,15,40,civil office,[為官者：文],0,11,1
+3356,Xiang Hong,向紘,1046,M,100658,15,40,civil office,[為官者：文],0,01,1
+3359,Xiang Zishao,向子韶,1079,M,100658,15,40,civil office,[為官者：文],0,01,1
+3449,Gao Shijian,高仕戩,1062,M,100658,15,40,civil office,[為官者：文],0,01,1
+3479,Li Jizhi,李及之,998,M,100658,15,40,civil office,[為官者：文],0,19,1
+3501,Li Xiaocheng,李孝稱,1018,M,100658,15,40,civil office,[為官者：文],0,19,1
+3503,Li Xiaoshou,李孝壽,1028,M,100658,15,40,civil office,[為官者：文],0,1912,1
+3509,Li Hanchen (zi),李漢臣,996,M,100658,15,40,civil office,[為官者：文],0,01,1
+3518,Li Maoxian,李茂先,1012,M,100658,15,40,civil office,[為官者：文],0,11,1
+3543,Li Duanyi,李端懿,1013,M,100658,15,40,civil office,[為官者：文],0,01,1
+3580,Liu Chang,劉敞,1019,M,100658,15,40,civil office,[為官者：文],0,01,1
+3638,Lu Shen,陸詵,1012,M,100658,15,40,civil office,[為官者：文],0,01,1
+3657,Lv Zongjian,呂宗簡,979,M,100658,15,40,civil office,[為官者：文],0,1312,1
+3739,Sheng Jing,盛京,968,M,100658,15,40,civil office,[為官者：文],0,05,1
+3752,Su Ji,蘇繼,931,M,100658,15,40,civil office,[為官者：文],0,13,1
+3755,Su Zhu,蘇注,1036,M,100658,15,40,civil office,[為官者：文],0,11,1
+3760,Su Xianxi,蘇咸熙,961,M,100658,15,40,civil office,[為官者：文],0,01,1
+3855,Cai Zhuang,蔡莊,1059,M,100658,15,40,civil office,[為官者：文],0,0512,1
+3884,Cui Zunyong,崔遵用,958,M,100658,15,40,civil office,[為官者：文],0,01,1
+3890,Zu Zhongjun,祖仲雋,927,M,100658,15,40,civil office,[為官者：文],0,14,1
+3916,Du Hao,杜鎬,938,M,100658,15,40,civil office,[為官者：文],0,01,1
+3987,Wang Duan,王端,999,M,100658,15,40,civil office,[為官者：文],0,13,1
+7000,Chang Anmin,常安民,1043,M,100658,15,40,civil office,[為官者：文],0,01,1
+7010,Qian Yanyuan,錢彥遠,994,M,100658,15,40,civil office,[為官者：文],0,01,1
+7020,Jia Fan,賈蕃,1020,M,100658,15,40,civil office,[為官者：文],0,01,1
+7024,Fan Gao,范杲,1039,M,100658,15,40,civil office,[為官者：文],0,14,1
+7042,Li Wei,李維,955,M,100658,15,40,civil office,[為官者：文],0,05,1
+7052,Lv Xizhe,呂希哲,1048,M,100658,15,40,civil office,[為官者：文],0,11,1
+7054,Lv Menghen,呂蒙亨,949,M,100658,15,40,civil office,[為官者：文],0,13,1
+7064,Su Shunqin,蘇舜欽,1008,M,100658,15,40,civil office,[為官者：文],0,01,1
+7074,Du Shu,杜樞,1007,M,100658,15,40,civil office,[為官者：文],0,19,1
+7079,Wang Zhi,王質,1001,M,100658,15,40,civil office,[為官者：文],0,01,1
+7091,Wang Yong,王雍,988,M,100658,15,40,civil office,[為官者：文],0,01,1
+7119,Chao Zhongyan,晁仲衍,1012,M,100658,15,40,civil office,[為官者：文],0,01,1
+7121,Chao Zongke,晁宗恪,1007,M,100658,15,40,civil office,[為官者：文],0,01,1
+7142,Qian Xuan,錢暄,1018,M,100658,15,40,civil office,[為官者：文],0,01,1
+7149,Zhang Zhaoyun,張昭允,945,M,100658,15,40,civil office,[為官者：文],0,29,1
+7237,Xia Boqing,夏伯卿,1045,M,100658,15,40,civil office,[為官者：文],0,1112,1
+7238,Xiang Zhuanfan,向傳範,1010,M,100658,15,40,civil office,[為官者：文],0,01,1
+7292,Liu Fangshan,劉方山,1046,M,100658,15,40,civil office,[為官者：文],0,0512,1
+7302,Lv Qiewen,呂切問,1066,M,100658,15,40,civil office,[為官者：文],0,19,1
+7304,Lv Gongchuo,呂公綽,999,M,100658,15,40,civil office,[為官者：文],0,01,1
+7340,Su Bi,蘇泌,1038,M,100658,15,40,civil office,[為官者：文],0,11,1
+7377,Wang Yi (6),王毅,1059,M,100658,15,40,civil office,[為官者：文],0,11,1
+7385,Wang Yuan (3),王元,1029,M,100658,15,40,civil office,[為官者：文],0,01,1
+8001,Chao Zongque,晁宗愨,985,M,100658,15,40,civil office,[為官者：文],0,01,0
+8069,Geng Nanzhong,耿南仲,1052,M,100658,15,40,civil office,[為官者：文],0,05,0
+10124,Wang Xiang (5),王瓖,1048,M,100658,15,40,civil office,[為官者：文],0,14,1
+10125,Wang Fou,王阜,1078,M,100658,15,40,civil office,[為官者：文],0,14,1
+10474,Chen Zongzuan,陳宗纘,969,M,100658,15,40,civil office,[為官者：文],0,131212,1
+10475,Chen Zongshou,陳宗綬,969,M,100658,15,40,civil office,[為官者：文],0,131212,1
+11629,Chen Chengdao,陳承道,933,M,100658,15,40,civil office,[為官者：文],0,14,1
+11630,Chen Zi,陳諮,1009,M,100658,15,40,civil office,[為官者：文],0,13,1
+11631,Chen Yong,陳詠,963,M,100658,15,40,civil office,[為官者：文],0,23,1
+11657,Zhang Di,張迪,990,M,100658,15,40,civil office,[為官者：文],0,13,1
+11674,Gao Gongyan,高公嚴,1048,M,100658,15,40,civil office,[為官者：文],0,111212,1
+11749,Jia Fen,賈汾,944,M,100658,15,40,civil office,[為官者：文],0,2912,1
+11750,Jia Changling,賈昌齡,977,M,100658,15,40,civil office,[為官者：文],0,29,1
+11752,Li Zhaoxuan,李昭選,1001,M,100658,15,40,civil office,[為官者：文],0,23,1
+11753,Jia Gui,賈圭,1028,M,100658,15,40,civil office,[為官者：文],0,01,1
+11754,Jia Zhang,賈章,1028,M,100658,15,40,civil office,[為官者：文],0,11,1
+11757,Jia Gongwang,賈公望,1058,M,100658,15,40,civil office,[為官者：文],0,27,1
+11768,Pei Lize,裴麗澤,932,M,100658,15,40,civil office,[為官者：文],0,22,1
+11770,Pei Deyu,裴德裕,964,M,100658,15,40,civil office,[為官者：文],0,23,1
+11771,Pei Shilun,裴士倫,993,M,100658,15,40,civil office,[為官者：文],0,23,1
+11772,Pei Shilin,裴士林,994,M,100658,15,40,civil office,[為官者：文],0,2312,1
+11773,Pei Shijie,裴士傑,994,M,100658,15,40,civil office,[為官者：文],0,2312,1
+11774,Pei Lizheng,裴麗正,958,M,100658,15,40,civil office,[為官者：文],0,13,1
+11775,Pei Deji,裴德基,964,M,100658,15,40,civil office,[為官者：文],0,1412,1
+11776,Pei Defeng,裴德豐,964,M,100658,15,40,civil office,[為官者：文],0,1412,1
+11777,Pei Deyu (2),裴德輿,988,M,100658,15,40,civil office,[為官者：文],0,01,1
+11779,Pei Shiyu,裴士禹,1018,M,100658,15,40,civil office,[為官者：文],0,11,1
+11788,Ding Yin,丁諲,1020,M,100658,15,40,civil office,[為官者：文],0,11,1
+11940,Diao A,刁A,1005,M,100658,15,40,civil office,[為官者：文],0,01,1
+12428,Zhang Shicheng,張士程,977,M,100658,15,40,civil office,[為官者：文],0,11,1
+12846,Ju Qiqing,鞠齊卿,998,M,100658,15,40,civil office,[為官者：文],0,2912,1
+13097,Lv Mengsun,呂蒙巽,960,M,100658,15,40,civil office,[為官者：文],0,13,1
+13098,Lv Mengzhou,呂蒙周,962,M,100658,15,40,civil office,[為官者：文],0,05,1
+13105,Qian Xie (2),錢燮,1045,M,100658,15,40,civil office,[為官者：文],0,01,1
+13109,Qian Mingyi,錢明逸,1015,M,100658,15,40,civil office,[為官者：文],0,01,1
+13518,Chao Zhongxi,晁仲熙,1019,M,100658,15,40,civil office,[為官者：文],0,01,1
+13533,Chao Duanlin,晁端稟,1045,M,100658,15,40,civil office,[為官者：文],0,01,1
+13534,Chao Guanzhi,晁貫之,1075,M,100658,15,40,civil office,[為官者：文],0,11,1
+13596,Zhang Kejian,張克戩,1063,M,100658,15,40,civil office,[為官者：文],0,29,1
+13597,Zhang Kegong,張克公,1066,M,100658,15,40,civil office,[為官者：文],0,19,1
+13649,Cai Ni,蔡薿,1076,M,100658,15,40,civil office,[為官者：文],0,05,1
+13740,Zhang Minzhong,張敏中,970,M,100658,15,40,civil office,[為官者：文],0,11,2
+13742,Zhang Xian,張先,992,M,100658,15,40,civil office,[為官者：文],0,01,1
+14004,Zhang Weijian,張惟簡,989,M,100658,15,40,civil office,[為官者：文],0,13,1
+14093,Ge Lizhong,葛立中,1084,M,100658,15,40,civil office,[為官者：文],0,13,1
+14379,Chen Zhifang (2),陳執方,977,M,100658,15,40,civil office,[為官者：文],0,0512,1
+14380,Chen Shiru,陳世懦,1020,M,100658,15,40,civil office,[為官者：文],0,11,1
+14381,Chen Shichang,陳世昌,1022,M,100658,15,40,civil office,[為官者：文],0,1912,1
+14677,Zhao Kebo,趙克播,1045,M,100658,15,40,civil office,[為官者：文],0,01,1
+14705,Shen Shouli,慎守禮,922,M,100658,15,40,civil office,[為官者：文],0,1312,1
+14706,Shen Congji,慎從吉,952,M,100658,15,40,civil office,[為官者：文],0,11,1
+14707,Shen Jun,慎鈞,967,M,100658,15,40,civil office,[為官者：文],0,13,1
+14708,Shen Huiji,慎暉吉,1002,M,100658,15,40,civil office,[為官者：文],0,14,1
+14709,Shen Yong,慎鏞,982,M,100658,15,40,civil office,[為官者：文],0,1112,1
+14710,Shen Duo,慎鐸,982,M,100658,15,40,civil office,[為官者：文],0,1112,1
+14711,Shen Gao,慎暠,997,M,100658,15,40,civil office,[為官者：文],0,01,1
+15042,Chen Bing (4),陳并,1055,M,100658,15,40,civil office,[為官者：文],0,05,1
+15164,Zhu Gong,朱鞏,1033,M,100658,15,40,civil office,[為官者：文],0,05,1
+15165,Zhu Boxiong,朱伯熊,1035,M,100658,15,40,civil office,[為官者：文],0,05,1
+15166,Zhu Dang,朱讜,1073,M,100658,15,40,civil office,[為官者：文],0,05,1
+15266,Cao Zhiqi,曹之器,1061,M,100658,15,40,civil office,[為官者：文],0,14,1
+15272,Zheng Jiuzhong,鄭久中,1061,M,100658,15,40,civil office,[為官者：文],0,19,1
+15274,Zheng Yinian,鄭億年,1089,M,100658,15,40,civil office,[為官者：文],0,11,1
+15282,Zhao Lingmu,趙令毣,1061,M,100658,15,40,civil office,[為官者：文],0,11,1
+15349,Zheng Ke (2),鄭克,1094,M,100658,15,40,civil office,[為官者：文],0,05,1
+15698,Cheng Xizhen,程希振,943,M,100658,15,40,civil office,[為官者：文],0,11,1
+15733,Chen Jing (10),陳京,962,M,100658,15,40,civil office,[為官者：文],0,13,1
+16211,Qian Jingchen,錢景諶,1037,M,100658,15,40,civil office,[為官者：文],0,27,1
+16229,Qian Jingxiang,錢景祥,1043,M,100658,15,40,civil office,[為官者：文],0,13,1
+16387,Lv Quan,呂全,1027,M,100658,15,40,civil office,[為官者：文],0,05,1
+16388,Lv Kui,呂奎,1043,M,100658,15,40,civil office,[為官者：文],0,05,1
+16389,Lv Yirou,呂益柔,1058,M,100658,15,40,civil office,[為官者：文],0,05,1
+16825,Li Zongren,李宗任,1074,M,100658,15,40,civil office,[為官者：文],0,13,1
+17070,Gao Shilan,高,1052,M,100658,15,40,civil office,[為官者：文],0,14,1
+17271,Li Zhaohui,李昭迴,979,M,100658,15,40,civil office,[為官者：文],0,11,1
+17272,Li Zhaofeng,李昭逢,995,M,100658,15,40,civil office,[為官者：文],0,11,1
+17273,Li Zhaomo,李昭邈,985,M,100658,15,40,civil office,[為官者：文],0,27,1
+17275,Li Yiqing,李宜卿,1021,M,100658,15,40,civil office,[為官者：文],0,11,1
+17288,Li Shiyan,李士彥,1044,M,100658,15,40,civil office,[為官者：文],0,13,1
+17291,Xiang Zhuanshi (2),向傳師,978,M,100658,15,40,civil office,[為官者：文],7596,11,0
+17293,Xiang Hui,向繪,1040,M,100658,15,40,civil office,[為官者：文],0,11,1
+17296,Xiang Zongqi,向宗琦,1059,M,100658,15,40,civil office,[為官者：文],0,01,1
+17297,Xiang Zonghui,向宗回,1053,M,100658,15,40,civil office,[為官者：文],0,11,1
+17322,Xiang Yu (2),向昱,985,M,100658,15,40,civil office,[為官者：文],0,05,1
+17324,Xiang Yue (2),向悅,972,M,100658,15,40,civil office,[為官者：文],0,27,1
+17402,Bao Renshuang,鮑仁爽,975,M,100658,15,40,civil office,[為官者：文],0,1412,1
+17567,Xiang Zizhang,向子章,1059,M,100658,15,40,civil office,[為官者：文],0,13,1
+17738,Zhang Zhongzhuang,張仲莊,1014,M,100658,15,40,civil office,[為官者：文],0,0512,1
+17739,Zhang Baowei,張保微,1044,M,100658,15,40,civil office,[為官者：文],0,051212,1
+17740,Zhang Baoheng,張保衡,1044,M,100658,15,40,civil office,[為官者：文],0,051212,1
+17742,Chao Mingzhi,晁明之,1085,M,100658,15,40,civil office,[為官者：文],0,2328,1
+17770,Li Xianxi,李咸熙,1025,M,100658,15,40,civil office,[為官者：文],0,2312,1
+17779,Wang Shiyan,王世彥,995,M,100658,15,40,civil office,[為官者：文],0,13,1
+17826,Xiang Xun,向紃,1008,M,100658,15,40,civil office,[為官者：文],0,27,1
+17830,Xiang Wei,向緯,1008,M,100658,15,40,civil office,[為官者：文],0,27,1
+17831,Xiang Zong,向綜,1025,M,100658,15,40,civil office,[為官者：文],0,19,1
+17833,Xiang Yi,向繹,1040,M,100658,15,40,civil office,[為官者：文],0,11,1
+17834,Xiang Yi (2),向繹,972,M,100658,15,40,civil office,[為官者：文],0,27,1
+17838,Wang Xu,王旭,954,M,100658,15,40,civil office,[為官者：文],0,11,1
+17840,Wang Chong (6),王冲,987,M,100658,15,40,civil office,[為官者：文],0,11,1
+17841,Wang Liang (2),王諒,994,M,100658,15,40,civil office,[為官者：文],0,13,1
+17842,Wang Ke,王克,1024,M,100658,15,40,civil office,[為官者：文],0,01,1
+17920,Lv Xipu,呂希樸,1068,M,100658,15,40,civil office,[為官者：文],0,13,1
+18249,Lv Yanwen,呂延問,1055,M,100658,15,40,civil office,[為官者：文],0,11,1
+18366,Song Yixu,宋貽序,947,M,100658,15,40,civil office,[為官者：文],0,11,1
+18367,Song Yixiu,宋貽庥,947,M,100658,15,40,civil office,[為官者：文],0,11,1
+18408,Fan Zude,范祖德,1060,M,100658,15,40,civil office,[為官者：文],0,11,1
+18410,Song Biaowei,宋表微,1049,M,100658,15,40,civil office,[為官者：文],0,11,1
+18419,Song Zongliang,宋宗諒,977,M,100658,15,40,civil office,[為官者：文],0,27,1
+18438,Xia Bosun,夏伯孫,1031,M,100658,15,40,civil office,[為官者：文],0,13,1
+18927,Gao Yangzhi,高愓之,1087,M,100658,15,40,civil office,[為官者：文],0,23,1
+19149,Li Xiaoji,李孝基,1016,M,100658,15,40,civil office,[為官者：文],0,01,1
+19154,Li Buzhi,李補之,1001,M,100658,15,40,civil office,[為官者：文],0,11,1
+19230,Liu Weiji,劉惟吉,945,M,100658,15,40,civil office,[為官者：文],0,14,1
+19266,Guo Fengyuan,郭逢原,1040,M,100658,15,40,civil office,[為官者：文],0,01,1
+19267,Su Shou (2),蘇壽,988,M,100658,15,40,civil office,[為官者：文],0,11,1
+19274,Su Sou,蘇叟,993,M,100658,15,40,civil office,[為官者：文],0,01,1
+19282,Zhao Shichan,趙世闡,1040,M,100658,15,40,civil office,[為官者：文],0,11,1
+19376,Geng Yanxi,耿延禧,1082,M,100658,15,40,civil office,[為官者：文],0,0512,1
+19550,Li Bing,李炳,913,M,100658,15,40,civil office,[為官者：文],0,29,1
+19559,Li Zhi (7),李贄,966,M,100658,15,40,civil office,[為官者：文],0,13,1
+19607,Fan Xiaosun,范孝孫,971,M,100658,15,40,civil office,[為官者：文],0,27,1
+19638,Li Xiaoyou,李孝友,1006,M,100658,15,40,civil office,[為官者：文],0,27,1
+19710,Zhao Lingcheng,趙令?,1064,M,100658,15,40,civil office,[為官者：文],0,29,1
+19711,Zhao Lingjin,趙令衿,1095,M,100658,15,40,civil office,[為官者：文],0,29,1
+19721,Li Gongjin,李公謹,985,M,100658,15,40,civil office,[為官者：文],0,0512,1
+19999,Li Qingqing,李清卿,1025,M,100658,15,40,civil office,[為官者：文],0,1112,1
+20499,Lu Dunyan,陸惇彥,1069,M,100658,15,40,civil office,[為官者：文],0,01,1
+20500,Lu Dan,陸旦,1091,M,100658,15,40,civil office,[為官者：文],0,01,1
+20712,Meng Yanqing,孟彥卿,1066,M,100658,15,40,civil office,[為官者：文],0,29,1
+20973,Sheng Shenfu,盛申甫,998,M,100658,15,40,civil office,[為官者：文],0,11,1
+21167,Du Zhao,杜炤,1042,M,100658,15,40,civil office,[為官者：文],0,29,1
+21178,Zhang Jin (3),張近,1064,M,100658,15,40,civil office,[為官者：文],0,1312,1
+21238,Su Su,蘇宿,988,M,100658,15,40,civil office,[為官者：文],0,11,1
+21429,Gou Xizhong,句希仲,981,M,100658,15,40,civil office,[為官者：文],0,01,1
+21432,Gou Zhongzheng,句中正,929,M,100658,15,40,civil office,[為官者：文],0,01,1
+21434,Gou Chen,句諶,1011,M,100658,15,40,civil office,[為官者：文],0,11,1
+21593,Tian Zhian,田至安,1033,M,100658,15,40,civil office,[為官者：文],0,22,1
+21596,Tian Yuan,田淵,1002,M,100658,15,40,civil office,[為官者：文],0,11,1
+21597,Tian Xun,田洵,1002,M,100658,15,40,civil office,[為官者：文],0,11,1
+21598,Tian Xia,田浹,1002,M,100658,15,40,civil office,[為官者：文],0,11,1
+21599,Tian Zhou,田晝,1069,M,100658,15,40,civil office,[為官者：文],0,01,1
+21834,Duan Ziang,段子昂,959,M,100658,15,40,civil office,[為官者：文],0,05,1
+21951,Wang Lv,王履,1055,M,100658,15,40,civil office,[為官者：文],0,05,1
+21952,Wang Fan (2),王蕃,1086,M,100658,15,40,civil office,[為官者：文],0,13,1
+22072,Wang Yiju,王貽矩,977,M,100658,15,40,civil office,[為官者：文],0,01,1
+23114,Zhao Bufu,趙不傅,1092,M,100658,15,40,civil office,[為官者：文],0,13,1
+23126,Zhao Gongjin,趙公搢,1079,M,100658,15,40,civil office,[為官者：文],0,13,1
+23364,Fan Wo,范渥,1083,M,100658,15,40,civil office,[為官者：文],0,13,1
+23365,Fan Zuren,范祖仁,1038,M,100658,15,40,civil office,[為官者：文],0,0512,1
+23366,Fan Hong (3),范洪,1075,M,100658,15,40,civil office,[為官者：文],0,13,1
+23613,Zhao Zijiao (2),趙子校,1090,M,100658,15,40,civil office,[為官者：文],0,13,1
+23623,Zhao Zizhao (2),趙子照,1091,M,100658,15,40,civil office,[為官者：文],0,13,1
+23986,Zhang Zhongrong,張仲容,1030,M,100658,15,40,civil office,[為官者：文],0,14,1
+23987,Zhang Xunfu,張遜夫,1060,M,100658,15,40,civil office,[為官者：文],0,14,1
+23988,Zhang Mian (2),張勉,1090,M,100658,15,40,civil office,[為官者：文],0,13,1
+24180,Zhao Lingtao,趙令韜,1037,M,100658,15,40,civil office,[為官者：文],0,14,1
+24181,Zhao Zimian,趙子勉,1067,M,100658,15,40,civil office,[為官者：文],0,14,1
+24182,Zhao Boda,趙伯達,1097,M,100658,15,40,civil office,[為官者：文],0,13,1
+24278,Chao Zongzao,晁宗藻,981,M,100658,15,40,civil office,[為官者：文],0,11,1
+24405,Sheng Cizhong,盛次仲,1031,M,100658,15,40,civil office,[為官者：文],0,05,1
+24930,Gao Zunke,高遵恪,995,M,100658,15,40,civil office,[為官者：文],0,27,1
+25001,Hu Qian,胡潛,1022,M,100658,15,40,civil office,[為官者：文],0,23,1
+25264,Zhao Shiyan (5),趙士嵃,1094,M,100658,15,40,civil office,[為官者：文],0,14,1
+25514,Zhao Xunzhi (2),趙訓之,1082,M,100658,15,40,civil office,[為官者：文],0,05,1
+25623,Meng Rixin,孟日新,959,M,100658,15,40,civil office,[為官者：文],0,05,1
+25625,Meng Zhifang,孟之方,1058,M,100658,15,40,civil office,[為官者：文],0,14,1
+25659,Zhu Gao (2),朱杲,955,M,100658,15,40,civil office,[為官者：文],0,29,1
+26369,Hu Meng,扈蒙,911,M,100658,15,40,civil office,[為官者：文],0,05,1
+26439,Fan Zuxiu,范祖修,1060,M,100658,15,40,civil office,[為官者：文],0,11,1
+26495,Chen Mingzhi,陳明之,938,M,100658,15,40,civil office,[為官者：文],0,14,1
+26496,Chen Yi (27),陳易,968,M,100658,15,40,civil office,[為官者：文],0,14,1
+26564,Ai Jun,艾均,1093,M,100658,15,40,civil office,[為官者：文],0,14,1
+26999,Qian Ye (2),錢曄,1007,M,100658,15,40,civil office,[為官者：文],0,11,1
+27000,Liu Yu (13),劉敔,1008,M,100658,15,40,civil office,[為官者：文],0,13,1
+27137,Hu Gui (2),胡規,992,M,100658,15,40,civil office,[為官者：文],0,14,1
+27343,Zhang Zongwang,張宗望,1034,M,100658,15,40,civil office,[為官者：文],0,13,1
+30535,Xia Chen (2),夏忱,1075,M,100658,15,40,civil office,[為官者：文],0,1128,1
+33300,Gou Qing,句請,1011,M,100658,15,40,civil office,[為官者：文],0,11,1
+34045,Jia Gongzhi (2),賈公直,1050,M,100658,15,40,civil office,[為官者：文],0,11,1
+34046,Jia Gongdan,賈公亶,1050,M,100658,15,40,civil office,[為官者：文],0,11,1
+36781,Chao Duanbi,晁端弼,1049,M,100658,15,40,civil office,[為官者：文],0,11,1
+36783,Chao Duanxiu,晁端修,1049,M,100658,15,40,civil office,[為官者：文],0,11,1
+36784,Chao Duancui,晁端粹,1049,M,100658,15,40,civil office,[為官者：文],0,11,1
+36789,Gao Daohua,高道華,1060,M,100658,15,40,civil office,[為官者：文],0,11,1
+36793,Chen Kuo (3),陳适,1054,M,100658,15,40,civil office,[為官者：文],0,11,1
+36794,Chen Yu (14),陳逾,1054,M,100658,15,40,civil office,[為官者：文],0,11,1
+36795,Chen Shi (25),陳適,1054,M,100658,15,40,civil office,[為官者：文],0,11,1
+36843,Luo Yizhi,羅易直,1006,M,100658,15,40,civil office,[為官者：文],0,13,1
+36844,Li Ning,李寧,1036,M,100658,15,40,civil office,[為官者：文],0,01,1
+36845,Li Shixiong,李士雄,1066,M,100658,15,40,civil office,[為官者：文],0,11,1
+36882,Lu Fangyan,陸方彥,1025,M,100658,15,40,civil office,[為官者：文],0,29,1
+37414,Li Chizheng (2),李持正,1045,M,100658,15,40,civil office,[為官者：文],0,11,1
+37449,Shen Zongjie,慎宗傑,1027,M,100658,15,40,civil office,[為官者：文],0,11,1
+37486,Jia Gongding,賈公定,1058,M,100658,15,40,civil office,[為官者：文],0,11,1
+37487,Jia Gongsheng,賈公盛,1058,M,100658,15,40,civil office,[為官者：文],0,11,1
+37984,Wang Xunyu,王珣瑜,1005,M,100658,15,40,civil office,[為官者：文],7596,01,0
+41343,Li Zhe,李嚞,1083,M,100658,15,40,civil office,[為官者：文],0,29,0
+45446,Xu Huaizhong,許懷忠,974,M,100658,15,40,civil office,[為官者：文],0,2912,0

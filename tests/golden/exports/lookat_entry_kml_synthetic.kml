@@ -1,0 +1,123 @@
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document>
+	<name>ExtendedData+SchemaData</name>
+	<open>1</open>
+	<!-- Create a balloon template referring to the user-defined type -->
+	<Style id="entry-balloon-template">
+		<BalloonStyle>
+			<text>
+				<![CDATA[
+				$[EntryPerson/PersonNameHZ] <br/>
+				ID: $[EntryPerson/PersonID] <br/>
+				Index Year: $[EntryPerson/IndexYear] <br/>
+				Entry Year: $[EntryPerson/EntryYear] <br/>
+				Entry Desc: $[EntryPerson/EntryDesc] <br/>
+				Entry Chn: $[EntryPerson/EntryDescHZ] <br/>
+				Entry Rank: $[EntryPerson/EntryRank] <br/>
+				Address: $[EntryPerson/AddrName] $[EntryPerson/AddrNameHZ] <br/>
+				XY Count: $[EntryPerson/XYCount] <br/><br/>
+				]]>
+			</text>
+		</BalloonStyle>
+	</Style>
+	<!-- Declare the type "EntryPerson" with 10 fields -->
+	<Schema name="EntryPerson" id="EntryPersonId">
+		<SimpleField type="string" name="PersonNameHZ">
+			<displayName><![CDATA[<b>Person</b>]]></displayName>
+		</SimpleField>
+		<SimpleField type="string" name="AddrName">
+			<displayName><![CDATA[<b>Person</b>]]></displayName>
+		</SimpleField>
+		<SimpleField type="string" name="AddrNameHZ">
+			<displayName><![CDATA[<b>Person</b>]]></displayName>
+		</SimpleField>
+		<SimpleField type="uint" name="PersonID">
+			<displayName><![CDATA[ID]]></displayName>
+		</SimpleField>
+		<SimpleField type="string" name="IndexYear">
+			<displayName><![CDATA[Index Year]]></displayName>
+		</SimpleField>
+		<SimpleField type="int" name="EntryYear">
+			<displayName><![CDATA[Entry Year]]></displayName>
+		</SimpleField>
+		<SimpleField type="string" name="EntryDesc">
+			<displayName><![CDATA[Entry Desc]]></displayName>
+		</SimpleField>
+		<SimpleField type="string" name="EntryDescHZ">
+			<displayName><![CDATA[Entry Chn]]></displayName>
+		</SimpleField>
+		<SimpleField type="int" name="EntryRank">
+			<displayName><![CDATA[Entry Rank]]></displayName>
+		</SimpleField>
+		<SimpleField type="int" name="XYCount">
+			<displayName><![CDATA[XY Count]]></displayName>
+		</SimpleField>
+	</Schema>
+	<Placemark>
+		<name>Chen Zhihong</name>
+		<styleUrl>#entry-balloon-template</styleUrl>
+		<TimeStamp> 1049</TimeStamp>
+		<ExtendedData>
+			<SchemaData schemaUrl="#EntryPersonId">
+				<SimpleData name="PersonID"> 1762</SimpleData>
+				<SimpleData name="PersonNameHZ">陳執中</SimpleData>
+				<SimpleData name="IndexYear"> 1049</SimpleData>
+				<SimpleData name="EntryYear"> 1019</SimpleData>
+				<SimpleData name="EntryDesc">yin privilege: general</SimpleData>
+				<SimpleData name="EntryDescHZ">恩蔭(籠統)</SimpleData>
+				<SimpleData name="EntryRank">1</SimpleData>
+				<SimpleData name="AddrName">Kaifeng</SimpleData>
+				<SimpleData name="AddrNameHZ">開封</SimpleData>
+				<SimpleData name="XYCount"> 30</SimpleData>
+			</SchemaData>
+		</ExtendedData>
+		<Point>
+			<coordinates> 114, 34</coordinates>
+		</Point>
+	</Placemark>
+	<Placemark>
+		<name>[Bad Data]</name>
+		<styleUrl>#entry-balloon-template</styleUrl>
+		<TimeStamp>N/A</TimeStamp>
+		<ExtendedData>
+			<SchemaData schemaUrl="#EntryPersonId">
+				<SimpleData name="PersonID"> 99999</SimpleData>
+				<SimpleData name="PersonNameHZ"> 99999[Bad Data]</SimpleData>
+				<SimpleData name="IndexYear">N/A</SimpleData>
+				<SimpleData name="EntryYear">-2000</SimpleData>
+				<SimpleData name="EntryDesc">[Missing Data]</SimpleData>
+				<SimpleData name="EntryDescHZ">[Missing Data]</SimpleData>
+				<SimpleData name="EntryRank">0</SimpleData>
+				<SimpleData name="AddrName">[?]</SimpleData>
+				<SimpleData name="AddrNameHZ">[?]</SimpleData>
+				<SimpleData name="XYCount">0</SimpleData>
+			</SchemaData>
+		</ExtendedData>
+		<Point>
+			<coordinates>0,0</coordinates>
+		</Point>
+	</Placemark>
+	<Placemark>
+		<name>Test</name>
+		<styleUrl>#entry-balloon-template</styleUrl>
+		<TimeStamp> 1100</TimeStamp>
+		<ExtendedData>
+			<SchemaData schemaUrl="#EntryPersonId">
+				<SimpleData name="PersonID"> 200</SimpleData>
+				<SimpleData name="PersonNameHZ">[?]</SimpleData>
+				<SimpleData name="IndexYear"> 1100</SimpleData>
+				<SimpleData name="EntryYear"> 1080</SimpleData>
+				<SimpleData name="EntryDesc">examination: jinshi</SimpleData>
+				<SimpleData name="EntryDescHZ">科舉: 進士</SimpleData>
+				<SimpleData name="EntryRank">5</SimpleData>
+				<SimpleData name="AddrName">[?]</SimpleData>
+				<SimpleData name="AddrNameHZ">[?]</SimpleData>
+				<SimpleData name="XYCount"> 1</SimpleData>
+			</SchemaData>
+		</ExtendedData>
+		<Point>
+			<coordinates> 116, 39</coordinates>
+		</Point>
+	</Placemark>
+</Document>
+</kml>

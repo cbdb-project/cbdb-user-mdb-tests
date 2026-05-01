@@ -1,0 +1,4 @@
+PersonID	Name	NameChn	IndexYear	EntryDesc	EntryDescChn	ExamRank	KinName	KinNameChn	KinshipRel	AddrName	AddrNameChn	x_coord	y_coord	XY	xy_count	EntryAddrName	EntryAddrChn	Entry_xcoord	Entry_ycoord	Entry_xy_count
+ 1762	Chen Zhihong	陳執中	 1049	yin privilege: general	恩蔭(籠統)	[ ]	Chen Shu	陳恕	Father	Kaifeng	開封	114.34333	34.785477	114.34333,34.785477	 30	Kaifeng	開封	114.34333	34.785477	 1
+[Person ID Missing]	[Name Missing]	[Name Missing]	 1080	examination: jinshi (general)	科舉: 進士(籠統)	1	[ ]	[ ]	[ ]	[Addr Name Missing]	[Addr Chn Missing]	[ ]	[ ]	[ ]	[ ]	[ ]	[ ]	[ ]	[ ]	[ ]
+ 99999	Test Wang	王測試	 1100	examination: jinshi	科舉: 進士	5				Beijing	北京	116	39.9	116,39.9	 1	Beijing	北京	116	39.9	 1
