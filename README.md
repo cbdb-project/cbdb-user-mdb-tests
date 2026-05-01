@@ -9,7 +9,7 @@ scratch tables and exports, and compares them against frozen goldens —
 catching regressions in queries, column backfills, and exports after
 each `.mdb` data refresh.
 
-> 中文版說明請見 [§ 中文簡介](#-中文簡介-traditional-chinese)。
+> 中文版說明請見 [§ 中文簡介](#中文簡介-traditional-chinese)。
 
 ---
 
