@@ -188,30 +188,10 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 | 9 | ⏳ open | Auto-run `discover_test_inputs.py` from `conftest.py` when `analysis/dump/test_inputs.json` is older than `data/CBDB_BJ_User.mdb` |
 | 10 | ⏳ open | Picker-dialog tests for `frmPickEntry_multi` etc. (currently bypassed by direct `ZZ_SCRATCH_*` writes) |
 | 11 | ⏳ open | Bilingual UI test for `changeDisplayLanguage` |
-| 12 | ⏳ open | **Meta-tests** — see [§ Should the test project test itself?](#should-the-test-project-test-itself) |
-| 13 | ⏳ open | Cross-check the `index year` and `index address` derivations in the User MDB against the equivalents produced by [`cbdb-online-main-server`](https://github.com/cbdb-project/cbdb-online-main-server), and assert per-person consistency between the two implementations |
-| 14 | ⏳ open | Import-list buttons — `CmdImportEntryCodes` / `CmdImportPlaces` / `CmdImportOffices` / `CmdImportAssociations` / `CmdImportPeople` / `CmdImportPlacePeople` / `CmdImportPlaceOffice` / `CmdImportTextCategories` / `CmdImportStatusCodes` / `CmdImportList` / `CmdImport` (Kinship, GroupData). Drive each via `Form_Timer`, point at a fixture file, assert the corresponding `ZZ_SCRATCH_*` table contents match the file contents (and that the right `gUse*` global is set) |
-| 15 | ⏳ open | Save-list buttons — `CmdSaveEntryCodes` / `CmdSaveOffices` / `CmdSaveAssociations` / `CmdSaveStatusCodes` / `CmdSaveTextCategories`. Reuse the byte-level export diff pattern from item 3 / 8: pre-populate `ZZ_SCRATCH_*`, intercept `FileDialog(msoFileDialogSaveAs)` via `vba.patch_filedialog`, byte-diff against frozen golden |
-| 16 | ⏳ open | `CmdStoreID` / `CmdRecallID` round-trip — after `CmdQuery`, click `CmdStoreID` and assert `ZZ_STORE_PERSON_ID` rows equal `ZZ_SCRATCH_*.c_personid`; then on a second form open, click `CmdRecallID` and assert the downstream `ZZ_SCRATCH_*` is repopulated from the stored set |
-
-### Should the test project test itself?
-
-Short answer: yes, but lightly. The Access COM driver is fragile in
-ways that don't show up until a real form run, and the real-VBA matrix
-is too slow (~2 min) to use as a CI smoke test. Useful meta-tests:
-
-- **Fixture-discovery smoke**: every `LookAt*` form in
-  `form_specs.py` has at least one fixture in `_all_fixtures()`.
-- **VBA-injection sanity**: `_inject_autodetect`'s regex round-trip
-  doesn't break a control sample of `Form_*.vb` files.
-- **Schema drift trip-wire**: `tests/golden/dump/schema_snapshot.json`
-  vs. `analysis/dump/tables.json` — fail loud if column counts change.
-- **Path / config sanity**: `data/CBDB_BJ_User.mdb` exists, the ACE
-  driver is registered, `test_inputs.json` is newer than the MDB.
-
-These run in <2 s and would catch the most common "I broke a fixture
-loader" or "I forgot to refresh inputs" mistakes before the slow VBA
-run. Tracked as item 12 in the roadmap.
+| 12 | ⏳ open | Cross-check the `index year` and `index address` derivations in the User MDB against the equivalents produced by [`cbdb-online-main-server`](https://github.com/cbdb-project/cbdb-online-main-server), and assert per-person consistency between the two implementations |
+| 13 | ⏳ open | Import-list buttons — `CmdImportEntryCodes` / `CmdImportPlaces` / `CmdImportOffices` / `CmdImportAssociations` / `CmdImportPeople` / `CmdImportPlacePeople` / `CmdImportPlaceOffice` / `CmdImportTextCategories` / `CmdImportStatusCodes` / `CmdImportList` / `CmdImport` (Kinship, GroupData). Drive each via `Form_Timer`, point at a fixture file, assert the corresponding `ZZ_SCRATCH_*` table contents match the file contents (and that the right `gUse*` global is set) |
+| 14 | ⏳ open | Save-list buttons — `CmdSaveEntryCodes` / `CmdSaveOffices` / `CmdSaveAssociations` / `CmdSaveStatusCodes` / `CmdSaveTextCategories`. Reuse the byte-level export diff pattern from item 3 / 8: pre-populate `ZZ_SCRATCH_*`, intercept `FileDialog(msoFileDialogSaveAs)` via `vba.patch_filedialog`, byte-diff against frozen golden |
+| 15 | ⏳ open | `CmdStoreID` / `CmdRecallID` round-trip — after `CmdQuery`, click `CmdStoreID` and assert `ZZ_STORE_PERSON_ID` rows equal `ZZ_SCRATCH_*.c_personid`; then on a second form open, click `CmdRecallID` and assert the downstream `ZZ_SCRATCH_*` is repopulated from the stored set |
 
 ---
 
@@ -329,11 +309,10 @@ python -m pytest tests/test_vba_export.py -v -W ignore -s
 - ✅ 已確認 3 個 bug（詳見 `findings.md`）
 - ⏳ 剩 3 個表單因遞迴展開太慢暫跳過
 - ⏳ 其他匯出按鈕（Neo4j/KML/Pajek/GUESS/Gephi）尚未涵蓋
-- ⏳ 「測試專案自己的測試」（meta-tests）— 規劃在 roadmap 第 12 項
-- ⏳ 比對 User MDB 的 `index year` / `index address` 算法與 [`cbdb-online-main-server`](https://github.com/cbdb-project/cbdb-online-main-server) 所產生結果的一致性 — roadmap 第 13 項
-- ⏳ Import-list 按鈕（`CmdImportEntryCodes` / `CmdImportPlaces` / `CmdImportOffices` / `CmdImportAssociations` 等）從檔案載入清單到 `ZZ_SCRATCH_*` — roadmap 第 14 項
-- ⏳ Save-list 按鈕（`CmdSaveEntryCodes` / `CmdSaveOffices` 等）寫出清單檔的位元組級對比 — roadmap 第 15 項
-- ⏳ `CmdStoreID` / `CmdRecallID` 跨 form round-trip 測試 — roadmap 第 16 項
+- ⏳ 比對 User MDB 的 `index year` / `index address` 算法與 [`cbdb-online-main-server`](https://github.com/cbdb-project/cbdb-online-main-server) 所產生結果的一致性 — roadmap 第 12 項
+- ⏳ Import-list 按鈕（`CmdImportEntryCodes` / `CmdImportPlaces` / `CmdImportOffices` / `CmdImportAssociations` 等）從檔案載入清單到 `ZZ_SCRATCH_*` — roadmap 第 13 項
+- ⏳ Save-list 按鈕（`CmdSaveEntryCodes` / `CmdSaveOffices` 等）寫出清單檔的位元組級對比 — roadmap 第 14 項
+- ⏳ `CmdStoreID` / `CmdRecallID` 跨 form round-trip 測試 — roadmap 第 15 項
 
 ## 貢獻
 
