@@ -189,6 +189,7 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 | 10 | ⏳ open | Picker-dialog tests for `frmPickEntry_multi` etc. (currently bypassed by direct `ZZ_SCRATCH_*` writes) |
 | 11 | ⏳ open | Bilingual UI test for `changeDisplayLanguage` |
 | 12 | ⏳ open | **Meta-tests** — see [§ Should the test project test itself?](#should-the-test-project-test-itself) |
+| 13 | ⏳ open | Cross-check the `index year` and `index address` derivations in the User MDB against the equivalents produced by [`cbdb-online-main-server`](https://github.com/cbdb-project/cbdb-online-main-server), and assert per-person consistency between the two implementations |
 
 ### Should the test project test itself?
 
@@ -326,6 +327,7 @@ python -m pytest tests/test_vba_export.py -v -W ignore -s
 - ⏳ 剩 3 個表單因遞迴展開太慢暫跳過
 - ⏳ 其他匯出按鈕（Neo4j/KML/Pajek/GUESS/Gephi）尚未涵蓋
 - ⏳ 「測試專案自己的測試」（meta-tests）— 規劃在 roadmap 第 12 項
+- ⏳ 比對 User MDB 的 `index year` / `index address` 算法與 [`cbdb-online-main-server`](https://github.com/cbdb-project/cbdb-online-main-server) 所產生結果的一致性 — roadmap 第 13 項
 
 ## 貢獻
 
