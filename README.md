@@ -190,6 +190,9 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 | 11 | ⏳ open | Bilingual UI test for `changeDisplayLanguage` |
 | 12 | ⏳ open | **Meta-tests** — see [§ Should the test project test itself?](#should-the-test-project-test-itself) |
 | 13 | ⏳ open | Cross-check the `index year` and `index address` derivations in the User MDB against the equivalents produced by [`cbdb-online-main-server`](https://github.com/cbdb-project/cbdb-online-main-server), and assert per-person consistency between the two implementations |
+| 14 | ⏳ open | Import-list buttons — `CmdImportEntryCodes` / `CmdImportPlaces` / `CmdImportOffices` / `CmdImportAssociations` / `CmdImportPeople` / `CmdImportPlacePeople` / `CmdImportPlaceOffice` / `CmdImportTextCategories` / `CmdImportStatusCodes` / `CmdImportList` / `CmdImport` (Kinship, GroupData). Drive each via `Form_Timer`, point at a fixture file, assert the corresponding `ZZ_SCRATCH_*` table contents match the file contents (and that the right `gUse*` global is set) |
+| 15 | ⏳ open | Save-list buttons — `CmdSaveEntryCodes` / `CmdSaveOffices` / `CmdSaveAssociations` / `CmdSaveStatusCodes` / `CmdSaveTextCategories`. Reuse the byte-level export diff pattern from item 3 / 8: pre-populate `ZZ_SCRATCH_*`, intercept `FileDialog(msoFileDialogSaveAs)` via `vba.patch_filedialog`, byte-diff against frozen golden |
+| 16 | ⏳ open | `CmdStoreID` / `CmdRecallID` round-trip — after `CmdQuery`, click `CmdStoreID` and assert `ZZ_STORE_PERSON_ID` rows equal `ZZ_SCRATCH_*.c_personid`; then on a second form open, click `CmdRecallID` and assert the downstream `ZZ_SCRATCH_*` is repopulated from the stored set |
 
 ### Should the test project test itself?
 
@@ -328,6 +331,9 @@ python -m pytest tests/test_vba_export.py -v -W ignore -s
 - ⏳ 其他匯出按鈕（Neo4j/KML/Pajek/GUESS/Gephi）尚未涵蓋
 - ⏳ 「測試專案自己的測試」（meta-tests）— 規劃在 roadmap 第 12 項
 - ⏳ 比對 User MDB 的 `index year` / `index address` 算法與 [`cbdb-online-main-server`](https://github.com/cbdb-project/cbdb-online-main-server) 所產生結果的一致性 — roadmap 第 13 項
+- ⏳ Import-list 按鈕（`CmdImportEntryCodes` / `CmdImportPlaces` / `CmdImportOffices` / `CmdImportAssociations` 等）從檔案載入清單到 `ZZ_SCRATCH_*` — roadmap 第 14 項
+- ⏳ Save-list 按鈕（`CmdSaveEntryCodes` / `CmdSaveOffices` 等）寫出清單檔的位元組級對比 — roadmap 第 15 項
+- ⏳ `CmdStoreID` / `CmdRecallID` 跨 form round-trip 測試 — roadmap 第 16 項
 
 ## 貢獻
 
