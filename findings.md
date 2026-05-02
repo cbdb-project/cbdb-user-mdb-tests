@@ -175,6 +175,41 @@ python analysis/audit_missing_controls.py
 #     line  2308: If ChkIDs.Value Then
 ```
 
+**注**：除了 `ChkIDs` 控件不存在，`analysis/audit_sql_columns.py` 还发现 `LookAtStatus.CmdPajek_Click` 的 SQL 同时引用了三个不存在的列：
+
+```vba
+"SELECT ZZ_SCRATCH_STATUS.c_person_id, ZZ_SCRATCH_STATUS.c_status_id, "
+"Sum(ZZ_SCRATCH_STATUS.c_status_count) AS SumOfc_status_count INTO tmp_pajek_edge "
+"FROM ZZ_SCRATCH_STATUS GROUP BY ZZ_SCRATCH_STATUS.c_person_id, ZZ_SCRATCH_STATUS.c_status_id"
+```
+
+ZZ_SCRATCH_STATUS 实际有 `c_personid`（无下划线）、`c_status_code`，没有 `c_status_count` 列。这段 SQL 是从 `LookAtAssociations.CmdPajek_Click` 整段拷过来的，对方用 `ZZ_SCRATCH_ASSOC.c_person_id` / `c_assoc_id` / `c_assoc_count`（这些列在 ZZ_SCRATCH_ASSOC 是真实存在的），简单文本替换 `ASSOC` → `STATUS` 之后，**没有人 verify 替换后的列名是否真存在**。所以即便修了 ChkIDs（Bug #5 workaround），CmdPajek 的 SQL 仍然会立刻报 "no such field"。**Bug #5 实际上需要 CBDB 团队彻底重写 LookAtStatus.CmdPajek_Click**，不是简单把 ChkIDs 加上就能修。
+
+---
+
+### Bug #6 — `LookAtGroupData.queryEntry` 引用了不存在的列 `ENTRY_DATA.c_parental_status`（应为 `c_parental_status_code`）— 用户勾「Entry 子类型」点 Run 必报错
+
+🟡 **MEDIUM** —— 用户可见的 SQL 错误，没有沉默数据腐蚀。
+
+`Form_LookAtGroupData.vb:2621`（在 `Sub queryEntry()` 里）：
+
+```vba
+"INSERT INTO ZZ_SCRATCH_ENTRY ( c_inst_code, c_inst_name_code, c_entry_addr_id, c_source, c_parental_status_code ) "
+"SELECT ... ENTRY_DATA.c_inst_code, ENTRY_DATA.c_inst_name_code, ENTRY_DATA.c_entry_addr_id, ENTRY_DATA.c_source, ENTRY_DATA.c_parental_status "
+```
+
+INSERT 目标列是 `c_parental_status_code`，但 SELECT 源列写成了 `c_parental_status`（少了 `_code` 后缀）。`ENTRY_DATA` 真实 schema 只有 `c_parental_status_code` 这一个相关列，所以这段 SQL 一执行就报 "no such field"。
+
+`queryEntry()` 由 `CmdRun_Click` 在 `If ChkEntry.Value Then Call queryEntry` 时调用 —— 用户在 LookAtGroupData 勾「Entry 子类型」复选框、点「Run」按钮就会触发。
+
+**对比同样的 SQL 在 `Form_LookAtEntry.vb:1650`**：用的是 `ENTRY_DATA.c_parental_status_code`（正确）。所以是 LookAtGroupData 这边的拷贝没跟上 ENTRY_DATA 的列重命名。
+
+发现路径：`analysis/audit_sql_columns.py`（新增静态扫描器，扫 VBA SQL 字符串里的 `<Table>.<Column>` 引用对照 `analysis/dump/tables.json` 里的真实 schema）。
+
+**修复方向**：把 `ENTRY_DATA.c_parental_status` 改成 `ENTRY_DATA.c_parental_status_code`。一行修复。
+
+**测试 workaround**：暂未加 —— LookAtGroupData 的 CmdRun 在矩阵测试里就是 skip 状态（`_xfail_marks` 标了 "recursive expansion 太重"），加了 workaround 也跑不到。文档先行。
+
 ---
 
 ## 已归档：差异性测试结果（不是 bug）

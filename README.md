@@ -183,31 +183,47 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 
 ### Confirmed bugs
 
-1. **Bug #3** (`findings.md`) — `LookAtEntry.CmdQuery_Click` backfill
-   `UPDATE` silently fails on the multi-table join (only this form;
-   confirmed by cross-form matrix).
-2. **Bug #1** — `View_StatusData` alias swap (`c_fy_range_*` columns
-   show last-year values).
-3. **Bug #2** — `dao360.dll` reference broken on Office 2016+ (one-time
-   manual fix).
-4. **Bug #4** (NEW, found 2026-05-02) —
+Tagged by user-impact priority: 🔴 silent data issue (no user
+warning); 🟡 visible crash with no data corruption; 🟢 setup-time
+or dead-code only.
+
+1. 🔴 **Bug #3** (`findings.md`) — `LookAtEntry.CmdQuery_Click`
+   backfill `UPDATE` silently fails on the multi-table join (only
+   this form; confirmed by cross-form matrix). Wrong columns show
+   NULL.
+2. 🔴 **Bug #1** — `View_StatusData` alias swap (`c_fy_range_*`
+   columns show last-year values). Silent — wrong data shown.
+3. 🟢 **Bug #2** — `dao360.dll` reference broken on Office 2016+
+   (one-time manual fix).
+4. 🟡 **Bug #4** (NEW, found 2026-05-02) —
    `Form_LookAtPlace.CmdGIS_Click` references a non-existent control
-   `GISFrame` (the right control on this form is `CodeFrame`).
-   Real users clicking the GIS button on LookAtPlace see "Object
-   required" + no file written. Found by repeated `cmdgis_other_forms`
-   test failures, surfaced after fixing the silent-Err-handler SQL
-   bug. Test driver applies a `GISFrame.Value → CodeFrame.Value`
-   rewrite as a workaround; the underlying CBDB code remains broken.
-5. **Bug #5** (NEW, found 2026-05-02) —
-   `Form_LookAtStatus.CmdPajek_Click` references a non-existent
-   control `ChkIDs`. Other forms have either `ChkIDs`
-   (LookAtAssociations) or `ChkIncludeID` (Networks / Kinship /
-   AssociationPairs); LookAtStatus has neither. Real users clicking
-   the Pajek export button on LookAtStatus see "Object required" +
-   no file written. Found by `analysis/audit_missing_controls.py`
-   (static scan of every VBA control reference vs the form's actual
-   inventory). Test driver applies a `ChkIDs.Value → False` rewrite
-   so the export still runs (omits the per-node person-id label).
+   `GISFrame` (should be `CodeFrame`). Real users clicking GIS on
+   LookAtPlace see "Object required" + no file written. Visible
+   crash, no data corruption. Test driver rewrites `GISFrame.Value
+   → CodeFrame.Value` as a workaround.
+5. 🟡 **Bug #5** (NEW, found 2026-05-02) —
+   `Form_LookAtStatus.CmdPajek_Click` is broken at multiple levels:
+   references non-existent control `ChkIDs` AND its INSERT SQL
+   projects three columns that don't exist on `ZZ_SCRATCH_STATUS`
+   (`c_person_id` / `c_status_id` / `c_status_count` — the actual
+   names are `c_personid` / `c_status_code` / no count column at
+   all). The whole sub was copy-pasted from
+   `LookAtAssociations.CmdPajek_Click` and the column names were
+   text-replaced `ASSOC → STATUS` without verifying the renamed
+   columns existed on the Status side. Real users see "Object
+   required". Test driver only patches the `ChkIDs` reference; the
+   SQL still fails — proper fix is for CBDB to rewrite the sub.
+   Found by `analysis/audit_missing_controls.py` +
+   `analysis/audit_sql_columns.py`.
+6. 🟡 **Bug #6** (NEW, found 2026-05-02) —
+   `Form_LookAtGroupData.queryEntry` (called by `CmdRun_Click` when
+   `ChkEntry` is checked) projects `ENTRY_DATA.c_parental_status`
+   into `ZZ_SCRATCH_ENTRY.c_parental_status_code`. The actual
+   ENTRY_DATA column is `c_parental_status_code` — the one-line SQL
+   was never updated when ENTRY_DATA's column was renamed. Compare
+   `Form_LookAtEntry.vb:1650` which uses the right name. SQL
+   crashes with "no such field" when user runs the GroupData
+   "Entry" subtype. Found by `analysis/audit_sql_columns.py`.
 
 ### Roadmap
 
