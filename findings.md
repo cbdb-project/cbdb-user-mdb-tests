@@ -115,6 +115,33 @@ YEAR_RANGE_CODES.c_range_chn AS c_fy_range_chn
 
 ---
 
+### Bug #4 — `LookAtPlace.CmdGIS_Click` 引用了不存在的控件 `GISFrame`（**用户点 GIS 必报错**）
+
+`Form_LookAtPlace.vb:1539` 写：
+
+```vba
+If GISFrame.Value = 1 Then
+    tStream.Charset = "utf-8"
+    ...
+Else
+    tStream.Charset = "gb18030"
+End If
+```
+
+但 LookAtPlace 表单上**没有名为 `GISFrame` 的控件** —— 只有 `CodeFrame` (OptionGroup, ControlType=107) 和 `GephiFrame`。整个 `Form_LookAtPlace.vb` 中 `GISFrame` 只出现这一次。
+
+显然是开发者从其他 form（Status/Texts/Associations 用 `GISFrame`）拷贝 `CmdGIS_Click` 时漏改了控件名 —— 同一个文件的 `CmdNeo4j_Click` / `CmdGephi_Click` / `CmdPajek_Click` 都用 `CodeFrame.Value`，证明 Place 的 encoding 选择器就是 `CodeFrame`。
+
+**症状**：用户在 LookAtPlace 跑完查询，点 **GIS** 按钮 → VBA 抛 "Object required" → MsgBox 弹出 "Object required" → 用户按确定 → `Resume Exit_CmdGIS_Click`（不写文件）。**LookAtPlace 的 GIS 导出功能在所有用户机器上都是坏的**。
+
+发现路径：`tests/test_vba_cmdgis_other_forms.py::test_cmd_gis_produces_file[place_addr_7213]` 反复失败 → 注入 step markers + 修好 Err handler 的 SQL 注入 bug（之前 Err handler 自身因 SQL 语法错误而沉默） → ZZ_TEST_DEBUG 显示 `LookAtPlace:STEP1 → STEP2 → STEP3 → ERR Object required`，对应到代码就是 `Set tStream = New ADODB.Stream` 和 `Set dlgSaveAs = ...` 之间唯一的语句 `If GISFrame.Value = 1 Then`。
+
+**修复方向**：把 `GISFrame.Value` 改成 `CodeFrame.Value`（与 Place 上其他 export 子保持一致）。然后 GIS 输出会按 CodeFrame 的 1=UTF-8 / 2=BIG5 / 3=GB2312 切换编码（注意 Place 的 CodeFrame 用 BIG5/GB2312，而其他 form 的 GISFrame 用 GB18030 —— 修的时候要保证用户预期）。
+
+**测试 workaround**：`tests/cbdb_driver/vba_session.py` 的 inject 在 Place 加载时把 CmdGIS_Click 里的 `GISFrame.Value` 替换成 `CodeFrame.Value`。打勾 `tests/test_vba_cmdgis_other_forms.py::test_cmd_gis_produces_file[place_addr_7213]`。
+
+---
+
 ## 启发式扫描结论（无问题）
 
 | 扫描器 | 结果 |
@@ -167,3 +194,7 @@ YEAR_RANGE_CODES.c_range_chn AS c_fy_range_chn
 | LookAtGroupData | ⏭ skip | — | 同上 |
 
 **当前总计**: 7/10 forms 真 VBA matrix-tested + 1 form 真 export-tested。Matrix run 12 passed + 3 skipped in 114s。
+
+**更新（2026-05-02）**: README "Plan & status" 表格是单一真相来源；findings.md 这一节滞后了。最新覆盖请见
+[`README.md` § Plan & status](README.md#plan--status)。
+本会话期间发现并已确认 Bug #4（LookAtPlace 的 CmdGIS 引用 GISFrame 笔误），见上文。

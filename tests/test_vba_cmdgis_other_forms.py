@@ -58,24 +58,14 @@ _FORMS_WITH_CMDGIS_TESTABLE_HERE = {
 # (frmZZ_SCRATCH_KIN); the chain block now requeries it via
 # cbdb_driver.vba_session._SUBFORMS_TO_REQUERY → it passes.
 #
-# LookAtPlace's CmdGIS reads frmZZZ_PLACE which sits INSIDE
-# `TabPlaces` / `PlacePage` (a tab control).  Subforms inside tab
-# pages don't materialise their `.Form` object until the page is
-# activated AND the subform actually renders — programmatically
-# setting TabPlaces.Value = 0 isn't sufficient on its own.  CmdGIS
-# then errors with "Object required" reading
-# `frmZZZ_PLACE.Form.Recordset.RecordCount`.  Logged thanks to the
-# fixed Err-insert SQL in this PR; the actual fix (force the
-# subform to load) is left as follow-up.
+# LookAtPlace's CmdGIS used to fail with "Object required" — root
+# cause was Bug #4 in findings.md (CBDB code references a non-
+# existent `GISFrame` control).  The driver now applies a per-form
+# rewrite (`_PER_FORM_CMDGIS_PATCHES["Form_LookAtPlace"]`) that
+# substitutes the correct control name `CodeFrame` so the test
+# passes.  The underlying CBDB bug remains — production users
+# clicking GIS on LookAtPlace still see "Object required".
 def _skip_marks(fx: CrossFixture):
-    if fx.spec.name == "LookAtPlace":
-        return pytest.mark.skip(
-            reason="LookAtPlace's frmZZZ_PLACE subform is nested in "
-                   "TabPlaces / PlacePage and doesn't load until the "
-                   "tab is rendered; CmdGIS errors with `Object "
-                   "required` reading its recordset.  Setting "
-                   "TabPlaces.Value=0 isn't enough."
-        )
     return ()
 
 
@@ -181,13 +171,18 @@ def test_cmd_gis_produces_file(vba: VbaSession, fx: CrossFixture, tmp_path):
     lines = [ln for ln in text.replace("\r\n", "\n").split("\n") if ln.strip()]
     assert lines, f"[{spec.name}] file decoded to no lines: {raw[:80]!r}"
     header = lines[0]
-    cols = header.split("\t")
+    # Per-form separator: most forms use tab (Chr(9)); LookAtPlace
+    # uses comma (Chr(44) — see Form_LookAtPlace.vb:1582).  Detect
+    # rather than hard-code so the test stays portable if CBDB ever
+    # standardises.
+    sep = "," if ("\t" not in header and "," in header) else "\t"
+    cols = header.split(sep)
     # `NameChn` is the strongest cross-form anchor — Status / Texts /
     # Associations / Office / Place / Kinship / Entry all carry it in
     # the non-Pinyin branch.  Catch a column drop or rename.
     assert "NameChn" in cols, (
-        f"[{spec.name}] CmdGIS header has no `NameChn` column: "
-        f"{cols!r}"
+        f"[{spec.name}] CmdGIS header has no `NameChn` column "
+        f"(sep={sep!r}): {cols!r}"
     )
     # Sanity: at least 4 columns (every CmdGIS variant emits
     # ≥ Name / NameChn / IndexYear / something-else).
