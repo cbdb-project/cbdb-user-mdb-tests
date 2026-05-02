@@ -240,6 +240,74 @@ def test_bug9_lookat_entry_cmdneo4j_with_wrong_var():
     )
 
 
+def test_bug10_event_addr_subform_uses_unaliased_columns():
+    """Bug #10 (candidate, found by audit_subform_control_sources):
+    EVENT_ADDR_2 Subform's TxtAddrCHN/TxtAddrPY controls have
+    ControlSource `c_name_chn` / `c_name`, but its RecordSource
+    View_EventAddrData aliases ADDR_CODES.c_name AS c_event_addr_name
+    and ADDR_CODES.c_name_chn AS c_event_addr_chn.  The address
+    columns silently render blank in the events-with-address sub.
+    """
+    import json
+    inv = json.loads((REPO / "analysis" / "dump"
+                       / "control_inventory.json").read_text(encoding="utf-8"))
+    form = inv.get("EVENT_ADDR_2 Subform", {})
+    cs_by_name = {c["name"]: c.get("control_source", "")
+                   for c in form.get("controls", [])}
+    assert cs_by_name.get("TxtAddrCHN") == "c_name_chn", (
+        "Bug #10 may be FIXED — TxtAddrCHN no longer points at the "
+        "wrong column (was 'c_name_chn', should be 'c_event_addr_chn')."
+    )
+    assert cs_by_name.get("TxtAddrPY") == "c_name", (
+        "Bug #10 may be FIXED — TxtAddrPY no longer points at "
+        "'c_name'."
+    )
+
+
+def test_bug11_events_data_subform_references_missing_column():
+    """Bug #11 (candidate): EVENTS_DATA_2 Subform has a control with
+    ControlSource `c_event_record_id`, but neither the EVENTS_DATA
+    table nor View_EventsData (the form's RecordSource) has that
+    column."""
+    import json
+    inv = json.loads((REPO / "analysis" / "dump"
+                       / "control_inventory.json").read_text(encoding="utf-8"))
+    form = inv.get("EVENTS_DATA_2 Subform", {})
+    cs_values = {c.get("control_source", "")
+                  for c in form.get("controls", [])}
+    assert "c_event_record_id" in cs_values, (
+        "Bug #11 may be FIXED — no control on EVENTS_DATA_2 references "
+        "the non-existent `c_event_record_id` column anymore."
+    )
+    # Also assert it really doesn't exist on EVENTS_DATA.
+    tables = json.loads((REPO / "analysis" / "dump"
+                          / "tables.json").read_text(encoding="utf-8"))
+    events_data = next((t for t in tables
+                         if t.get("name") == "EVENTS_DATA"), {})
+    cols = {c.get("name") for c in events_data.get("columns", [])}
+    assert "c_event_record_id" not in cols, (
+        "Bug #11 may be FIXED — EVENTS_DATA gained the "
+        "`c_event_record_id` column, so the control now resolves."
+    )
+
+
+def test_bug12_posting_office_subform_wrong_appt_column():
+    """Bug #12 (candidate): POSTED_TO_OFFICE_DATA_2 Subform has a
+    control `c_appt_type_code` with ControlSource `c_appt_type_code`,
+    but View_PostingOfficeData projects `c_appt_code` (no `_type`
+    infix)."""
+    import json
+    inv = json.loads((REPO / "analysis" / "dump"
+                       / "control_inventory.json").read_text(encoding="utf-8"))
+    form = inv.get("POSTED_TO_OFFICE_DATA_2 Subform", {})
+    cs_values = {c.get("control_source", "")
+                  for c in form.get("controls", [])}
+    assert "c_appt_type_code" in cs_values, (
+        "Bug #12 may be FIXED — no control on POSTED_TO_OFFICE_DATA_2 "
+        "references the non-projected `c_appt_type_code` column."
+    )
+
+
 def test_bug_dao_reference_broken_in_user_mdb():
     """The shipped .mdb references DAO 3.6 (C:\\Program Files\\Common
     Files\\Microsoft Shared\\DAO\\dao360.dll) which is not installed on
