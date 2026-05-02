@@ -803,7 +803,7 @@ class VbaSession:
     )
 
     # ---------- FileDialog patch (for export tests) ----------
-    _FILEDIALOG_PATCH_MARKER = "FILEDIALOG_PATCH v5"
+    _FILEDIALOG_PATCH_MARKER = "FILEDIALOG_PATCH v6"
 
     def patch_filedialog(self, form: str) -> None:
         """Patch every `Application.FileDialog(msoFileDialogSaveAs)`
@@ -841,19 +841,51 @@ class VbaSession:
             body,
         )
 
-        # 1b. CmdImport*_Click subs use a `With dlgX` block, so the
-        # If looks like `If .Show = -1 Then` (no var prefix).  The
-        # SelectedItems iterator sits INSIDE that branch, so the
-        # cleanest patch is If/ElseIf at the top: when the test path
-        # is set, assign tFileName from it; otherwise fall through to
-        # the original `.Show = -1` branch unchanged.  The next regex
-        # below targets only the `<var>.SelectedItems` pattern (export
-        # subs), so we don't need a second pass for the import case.
+        # 1b. With-block `.Show = -1` pattern (CmdImport / CmdGUESS /
+        # CmdPajek / CmdGephi / CmdUCInet) — `dlgSaveAs` is the With
+        # subject, so `.Show` has no var prefix.
+        #
+        # Use the SAME `doExpFlag` strategy as the var-prefix pattern
+        # above so the original IF body still runs when the test path
+        # is set.  This matters for subs whose write+SaveToFile is
+        # INSIDE the `If .Show = -1 Then` block (CmdGUESS / CmdPajek
+        # etc.) — an If/ElseIf rewrite would skip the write entirely
+        # in test mode.  CmdImport's body is OUTSIDE the .Show block
+        # so it would have worked either way.
         body2 = re.sub(
             r"(?P<indent>[ \t]*)If\s+\.Show\s*=\s*-1\s+Then",
+            f"\\g<indent>Dim doExpFlagB As Boolean : doExpFlagB = False\n"
+            f"\\g<indent>If GetTestExportPath() <> {Q}{Q} Then\n"
+            f"\\g<indent>    doExpFlagB = True\n"
+            f"\\g<indent>ElseIf .Show = -1 Then\n"
+            f"\\g<indent>    doExpFlagB = True\n"
+            f"\\g<indent>End If\n"
+            f"\\g<indent>If doExpFlagB Then",
+            body2,
+        )
+
+        # 2b. With-block `.SelectedItems` iterator — companion to 1b.
+        # Same shape as the var-prefix `<var>.SelectedItems` regex
+        # below but for no-prefix `.SelectedItems`.
+        body2 = re.sub(
+            r"(?P<indent>[ \t]*)tFileName\s*=\s*\"\"\s*\n"
+            r"(?P=indent)For\s+Each\s+tFN\s+In\s+\.SelectedItems\s*\n"
+            r"(?P=indent)[ \t]*tFileName\s*=\s*tFN\s*\n"
+            r"(?P=indent)[ \t]*If\s+Not\s+tFileName\s*=\s*\"\"\s+Then\s*\n"
+            r"(?P=indent)[ \t]*[ \t]*Exit\s+For\s*\n"
+            r"(?P=indent)[ \t]*End\s+If\s*\n"
+            r"(?P=indent)Next",
             f"\\g<indent>If GetTestExportPath() <> {Q}{Q} Then\n"
             f"\\g<indent>    tFileName = GetTestExportPath()\n"
-            f"\\g<indent>ElseIf .Show = -1 Then",
+            f"\\g<indent>Else\n"
+            f"\\g<indent>    tFileName = {Q}{Q}\n"
+            f"\\g<indent>    For Each tFN In .SelectedItems\n"
+            f"\\g<indent>        tFileName = tFN\n"
+            f"\\g<indent>        If Not tFileName = {Q}{Q} Then\n"
+            f"\\g<indent>            Exit For\n"
+            f"\\g<indent>        End If\n"
+            f"\\g<indent>    Next\n"
+            f"\\g<indent>End If",
             body2,
         )
 
