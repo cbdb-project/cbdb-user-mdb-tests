@@ -692,6 +692,11 @@ class VbaSession:
         "CmdImportTextCategories", "CmdImportAssociations",
         "CmdImportOffices", "CmdImportPlaces", "CmdImportPlaceOffice",
         "CmdImportPlacePeople", "CmdImportPeople", "CmdImportList",
+        # CmdSave family (roadmap 14).
+        "CmdSaveEntryCodes", "CmdSaveStatusCodes",
+        "CmdSaveTextCategories", "CmdSaveAssociations", "CmdSaveOffices",
+        # Bilingual toggle buttons (roadmap 11).
+        "CmdFanti", "CmdJianti",
     )
 
     # ---------- FileDialog patch (for export tests) ----------
