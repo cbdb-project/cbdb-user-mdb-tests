@@ -31,6 +31,35 @@ def vba():
     yield from make_fixture(SRC, WORK)
 
 
+_MISSING_FORM_CASES = [
+    ("frmPickNIAN_HAO", 13),
+    ("frmPickKINSHIP_CODES", 14),
+]
+
+
+@pytest.mark.parametrize(
+    "missing_form,bug",
+    _MISSING_FORM_CASES,
+    ids=[f"bug{b}_{f}" for f, b in _MISSING_FORM_CASES],
+)
+def test_picker_form_truly_missing_from_mdb(vba: VbaSession,
+                                              missing_form: str,
+                                              bug: int):
+    """Bug #13 / #14: BIOG_MAIN_2_Subform / KIN_DATA_Subform reference
+    picker forms via DoCmd.OpenForm, but those forms aren't in the
+    .mdb.  Verify by enumerating CurrentProject.AllForms — the live
+    Access object model — and confirming the missing form name isn't
+    there."""
+    all_forms = vba.app.CurrentProject.AllForms
+    names_lc = {all_forms.Item(i).Name.lower()
+                 for i in range(all_forms.Count)}
+    assert missing_form.lower() not in names_lc, (
+        f"Bug #{bug} appears to be FIXED — `{missing_form}` is now "
+        f"in CurrentProject.AllForms.  The cross-form references "
+        f"in BIOG_MAIN_2_Subform / KIN_DATA_Subform now resolve."
+    )
+
+
 # (form, missing_button, bug_number)
 _CASES = [
     ("LookAtPlace", "CmdGIS", 15),
