@@ -239,3 +239,141 @@ ALL_SPECS = {
     "LookAtNetworks": LOOKATNETWORKS,
     "LookAtGroupData": LOOKATGROUPDATA,
 }
+
+
+# ----------------------------------------------------------------------
+# CmdImport* spec table (roadmap item 13)
+#
+# Every LookAt form has one or more `CmdImport*_Click` handlers that:
+#   1. Pop `Application.FileDialog(msoFileDialogOpen)` for a delimited
+#      text file.
+#   2. `DoCmd.TransferText acImportDelim, "<spec>", "TempImportList",
+#      tFileName, 0` to load it into TempImportList(ImportID, ...).
+#   3. `INSERT INTO InputErrorList (c_ID) SELECT TempImportList.ImportID
+#      FROM <source_table> RIGHT JOIN TempImportList ON
+#      <source_table>.<source_col> = TempImportList.ImportID WHERE
+#      <source_table>.<source_col> IS NULL`  -- the unmatched IDs.
+#   4. `INSERT INTO <target_table> (<target_col>) SELECT DISTINCT
+#      TempImportList.ImportID FROM <source_table> INNER JOIN
+#      TempImportList ON ...` -- the matched IDs.
+#   5. (Sometimes) sets a `gUse*` global and/or enables follow-up
+#      buttons / changes a TxtXxx caption to "[Imported List]".
+#
+# The seven distinct TransferText specs (saved in MSysIMEXSpecs) imply
+# three file formats:
+#   - "EntryListImport / AssocCodeListImport / OfficeListImport /
+#      StatusCodeListImport / TextBiblcatListImport Specification"
+#      → tab-separated, three columns (ImportID, ImportDesc, ImportDescChn)
+#   - "ImportPeopleList_Space" → space-separated, one column (ImportID)
+#   - "ImportPlaceList_Space"  → comma-separated, one column (ImportID)
+# ----------------------------------------------------------------------
+
+
+@dataclass
+class ImportSpec:
+    form: str                  # form name (LookAtEntry, ...)
+    button: str                # button name (CmdImportEntryCodes, ...)
+    target_table: str          # ZZ_SCRATCH_<X>
+    target_col: str            # c_entry_code, c_person_id, c_addr_id, ...
+    source_table: str          # validation source (ENTRY_CODES, BIOG_MAIN, ...)
+    source_col: str            # join column on source side
+    file_sep: str              # "\t" / " " / ","
+    file_extra_cols: int = 0   # 0 (one-col files) or 2 (tab specs)
+    # `expected_global` is documented for reference (which gUse* the
+    # handler is supposed to flip).  The test does NOT assert it — see
+    # cbdb_driver.vba_session._inject_autodetect for why an inject-
+    # based reader had to be backed out (JET re-entrancy).  The data
+    # assertion (target table + InputErrorList) is the meaningful
+    # contract; the global is set in the same code path.
+    expected_global: tuple[str, bool] | None = None   # ("gUseADDRID", True)
+
+
+# Auto-detected by reading every `Sub CmdImport*_Click` body in
+# analysis/dump/vba/Form_LookAt*.vb.  17 buttons total.
+ALL_IMPORTS: list[ImportSpec] = [
+    # ---- LookAtEntry ----
+    ImportSpec("LookAtEntry", "CmdImportEntryCodes",
+               "ZZ_SCRATCH_ENTRY_CODE", "c_entry_code",
+               "ENTRY_CODES", "c_entry_code",
+               file_sep="\t", file_extra_cols=2),
+    ImportSpec("LookAtEntry", "CmdImportPlaces",
+               "ZZ_SCRATCH_ADDR", "c_addr_id",
+               "ADDR_CODES", "c_addr_id",
+               file_sep=",", expected_global=("gUseADDRID", True)),
+    # ---- LookAtStatus ----
+    ImportSpec("LookAtStatus", "CmdImportStatusCodes",
+               "ZZ_STATUS_CODE", "c_status_code",
+               "STATUS_CODES", "c_status_code",
+               file_sep="\t", file_extra_cols=2),
+    ImportSpec("LookAtStatus", "CmdImportPlaces",
+               "ZZ_SCRATCH_ADDR_LIST", "c_addr_id",
+               "ADDR_CODES", "c_addr_id",
+               file_sep=","),
+    # ---- LookAtTexts ----
+    ImportSpec("LookAtTexts", "CmdImportTextCategories",
+               "ZZ_TEXT_BIBLCAT_CODES", "c_text_cat_code",
+               "TEXT_BIBLCAT_CODES", "c_text_cat_code",
+               file_sep="\t", file_extra_cols=2),
+    ImportSpec("LookAtTexts", "CmdImportPlaces",
+               "ZZ_SCRATCH_ADDR_LIST", "c_addr_id",
+               "ADDR_CODES", "c_addr_id",
+               file_sep=","),
+    # ---- LookAtAssociations ----
+    ImportSpec("LookAtAssociations", "CmdImportAssociations",
+               "ZZ_ASSOC_CODE", "c_assoc_code",
+               "ASSOC_CODES", "c_assoc_code",
+               file_sep="\t", file_extra_cols=2),
+    ImportSpec("LookAtAssociations", "CmdImportPlaces",
+               "ZZ_SCRATCH_ADDR_LIST", "c_addr_id",
+               "ADDR_CODES", "c_addr_id",
+               file_sep=","),
+    # ---- LookAtOffice ----
+    ImportSpec("LookAtOffice", "CmdImportOffices",
+               "ZZ_OFFICE_CODE", "c_office_id",
+               "OFFICE_CODES", "c_office_id",
+               file_sep="\t", file_extra_cols=2),
+    ImportSpec("LookAtOffice", "CmdImportPlaceOffice",
+               "ZZ_SCRATCH_ADDR_OFFICE", "c_addr_id",
+               "ADDR_CODES", "c_addr_id",
+               file_sep=",",
+               expected_global=("gUseOfficeADDRID", True)),
+    ImportSpec("LookAtOffice", "CmdImportPlacePeople",
+               "ZZ_SCRATCH_ADDR_PEOPLE", "c_addr_id",
+               "ADDR_CODES", "c_addr_id",
+               file_sep=",",
+               expected_global=("gUsePeopleADDRID", True)),
+    # ---- LookAtPlace ----
+    ImportSpec("LookAtPlace", "CmdImportPlaces",
+               "ZZ_SCRATCH_ADDR", "c_addr_id",
+               "ADDR_CODES", "c_addr_id",
+               file_sep=",",
+               expected_global=("gUseADDRID", True)),
+    # ---- LookAtKinship ----
+    ImportSpec("LookAtKinship", "CmdImport",
+               "ZZ_SCRATCH_IMPORT_PEOPLE", "c_person_id",
+               "BIOG_MAIN", "c_personid",
+               file_sep=" "),
+    # ---- LookAtGroupData ----
+    ImportSpec("LookAtGroupData", "CmdImport",
+               "ZZ_SCRATCH_IMPORT_PEOPLE", "c_person_id",
+               "BIOG_MAIN", "c_personid",
+               file_sep=" "),
+    # ---- LookAtAssociationPairs ----
+    ImportSpec("LookAtAssociationPairs", "CmdImportList",
+               "ZZ_SCRATCH_IMPORT_PEOPLE", "c_person_id",
+               "BIOG_MAIN", "c_personid",
+               file_sep=" "),
+    # ---- LookAtNetworks ---- (form open hangs in this driver — see
+    # findings.md / matrix `_xfail_marks` — but we still record the
+    # spec so the test file can mark them skip without re-deriving.)
+    ImportSpec("LookAtNetworks", "CmdImportPeople",
+               "ZZ_SCRATCH_IMPORT_PEOPLE", "c_person_id",
+               "BIOG_MAIN", "c_personid",
+               file_sep=" ",
+               expected_global=("gUsePersonID", True)),
+    ImportSpec("LookAtNetworks", "CmdImportPlaces",
+               "ZZ_SCRATCH_ADDR_LIST", "c_addr_id",
+               "ADDR_CODES", "c_addr_id",
+               file_sep=",",
+               expected_global=("gUseADDRID", True)),
+]

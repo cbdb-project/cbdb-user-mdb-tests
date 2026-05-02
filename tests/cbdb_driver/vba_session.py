@@ -378,6 +378,18 @@ class VbaSession:
                 flags=re.MULTILINE,
             )
 
+            # NOTE: an earlier iteration injected per-assignment
+            # markers for `g<X> = True/False` lines so a Python-side
+            # `read_form_global()` could recover form-module Public
+            # values (which Application.Run / Eval can't reach).  Even
+            # whitelisted to just the four `gUse*` globals it caused
+            # CmdQuery on Status / Office to hang for >10 minutes —
+            # likely a JET re-entrancy issue when CurrentDb.Execute
+            # writes from inside Form_Open while subform recordsets
+            # are still binding.  Removed; the import-list test now
+            # relies on the table-shape assertion (target + error list)
+            # alone, which is the meaningful contract.
+
             # First pass: find Sub start + first On Error to inject
             # autodetect; also find Exit_<name>_Click: label to inject
             # the DONE marker right before it.
@@ -634,6 +646,15 @@ class VbaSession:
         if wait_after:
             time.sleep(wait_after)
 
+    # NOTE: an earlier `read_form_global` lived here, paired with an
+    # assignment-logger inject in `_inject_autodetect`.  Both removed
+    # because the inject re-entered JET enough to hang CmdQuery on
+    # Status / Office.  See the comment in `_inject_autodetect` for
+    # full context.  Tests that need to verify a global side-effect
+    # should instead exercise the downstream behaviour the global
+    # gates (e.g. run CmdQuery and assert the address-filter actually
+    # narrowed the result set).
+
     def _invoke_via_wrapper(self, form: str, ctl: str) -> None:
         """Last-resort path when the button stays disabled: inject a
         Public wrapper Sub into the form module that calls the private
@@ -664,10 +685,17 @@ class VbaSession:
         "CmdGIS", "CmdNeo4j", "CmdGephi", "CmdPajek",
         "CmdGUESS", "CmdGISPeople",
         "CmdStoreID", "CmdRecallID",
+        # CmdImport family (roadmap 13).  Names vary across forms; only
+        # the subs that actually exist in a given form module make it
+        # into the chain dispatch (see `_inject_timer_trigger` filter).
+        "CmdImport", "CmdImportEntryCodes", "CmdImportStatusCodes",
+        "CmdImportTextCategories", "CmdImportAssociations",
+        "CmdImportOffices", "CmdImportPlaces", "CmdImportPlaceOffice",
+        "CmdImportPlacePeople", "CmdImportPeople", "CmdImportList",
     )
 
     # ---------- FileDialog patch (for export tests) ----------
-    _FILEDIALOG_PATCH_MARKER = "FILEDIALOG_PATCH v4"
+    _FILEDIALOG_PATCH_MARKER = "FILEDIALOG_PATCH v5"
 
     def patch_filedialog(self, form: str) -> None:
         """Patch every `Application.FileDialog(msoFileDialogSaveAs)`
@@ -703,6 +731,22 @@ class VbaSession:
             f"\\g<indent>End If\n"
             f"\\g<indent>If doExpFlag Then",
             body,
+        )
+
+        # 1b. CmdImport*_Click subs use a `With dlgX` block, so the
+        # If looks like `If .Show = -1 Then` (no var prefix).  The
+        # SelectedItems iterator sits INSIDE that branch, so the
+        # cleanest patch is If/ElseIf at the top: when the test path
+        # is set, assign tFileName from it; otherwise fall through to
+        # the original `.Show = -1` branch unchanged.  The next regex
+        # below targets only the `<var>.SelectedItems` pattern (export
+        # subs), so we don't need a second pass for the import case.
+        body2 = re.sub(
+            r"(?P<indent>[ \t]*)If\s+\.Show\s*=\s*-1\s+Then",
+            f"\\g<indent>If GetTestExportPath() <> {Q}{Q} Then\n"
+            f"\\g<indent>    tFileName = GetTestExportPath()\n"
+            f"\\g<indent>ElseIf .Show = -1 Then",
+            body2,
         )
 
         # 2. Replace the SelectedItems extraction block.
