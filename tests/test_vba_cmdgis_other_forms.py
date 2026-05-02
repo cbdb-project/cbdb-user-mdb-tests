@@ -54,28 +54,27 @@ _FORMS_WITH_CMDGIS_TESTABLE_HERE = {
     "LookAtOffice", "LookAtPlace", "LookAtKinship",
 }
 
-# LookAtPlace and LookAtKinship's CmdGIS reads their subform recordset
-# directly (frmZZZ_PLACE / frmZZ_SCRATCH_KIN — both bound to a saved
-# query as their RecordSource at design time).  After CmdQuery / CmdRun
-# populates the underlying table, the subform's CACHED recordset still
-# reports 0 rows until an explicit `.Form.Requery`, so CmdGIS bails to
-# its "There are no records to save." branch.  The other four forms
-# (Status / Texts / Associations / Office) reset their subform
-# recordset via `Set <subform>.Form.Recordset = CurrentDb.OpenRecordset(...)`
-# in their Exit_ cleanup section, which sidesteps the staleness.
-# Until we add a `_requery_subforms` hook, skip these two.
-_NEEDS_SUBFORM_REQUERY = {"LookAtPlace", "LookAtKinship"}
+# LookAtPlace and LookAtKinship both read a saved-query-bound subform
+# (frmZZZ_PLACE / frmZZ_SCRATCH_KIN) in their CmdGIS.  The chain block
+# now requeries those subforms before dispatching CmdGIS via
+# cbdb_driver.vba_session._SUBFORMS_TO_REQUERY — that unblocked
+# Kinship.  LookAtPlace remains skipped because its CmdGIS uses a
+# different stream pattern (writes the text stream directly to
+# `tStream.SaveToFile`, no `Position=3 → CopyTo binary` BOM-strip
+# intermediate that the other forms use).  With our test_export_path
+# correctly applied, SaveToFile silently fails to materialise the
+# file — separate driver issue, leave for follow-up.
+_PLACE_SKIP_FORMS = {"LookAtPlace"}
 
 
 def _skip_marks(fx: CrossFixture):
-    if fx.spec.name in _NEEDS_SUBFORM_REQUERY:
+    if fx.spec.name in _PLACE_SKIP_FORMS:
         return pytest.mark.skip(
-            reason=f"{fx.spec.name} CmdGIS reads a subform whose "
-                   "RecordSource is a saved query — its cached "
-                   "recordset stays at 0 rows after CmdQuery without "
-                   "an explicit `<subform>.Form.Requery` we don't "
-                   "currently inject.  Other forms reset the subform "
-                   "recordset directly and don't have this issue."
+            reason=f"{fx.spec.name} CmdGIS uses tStream.SaveToFile "
+                   "directly (no binary CopyTo BOM strip) and silently "
+                   "doesn't write the file under our patched path. "
+                   "Subform requery shim ✅; output-stream pattern "
+                   "needs separate handling."
         )
     return ()
 

@@ -282,6 +282,19 @@ class VbaSession:
         ],
     }
 
+    # Subform controls whose `RecordSource` is a saved query at design
+    # time and whose cached recordset stays stale after CmdQuery /
+    # CmdRun INSERTs into the underlying table.  Chained CmdGIS /
+    # CmdNeo4j / etc. read `<subform>.Form.Recordset.RecordCount` and
+    # bail out at "There are no records to save." otherwise.  Other
+    # forms reset their subform recordset directly with `Set <subform>
+    # .Form.Recordset = CurrentDb.OpenRecordset(...)` and don't need
+    # the requery.
+    _SUBFORMS_TO_REQUERY = {
+        "Form_LookAtPlace": ["frmZZZ_PLACE"],
+        "Form_LookAtKinship": ["frmZZ_SCRATCH_KIN"],
+    }
+
     def _inject_autodetect(self) -> None:
         """Prepend an autodetect block to CmdQuery_Click in each LookAt
         form so picker globals reflect actual scratch-table state.
@@ -309,6 +322,16 @@ class VbaSession:
             for s in self._TIMER_DISPATCH_SUBS:
                 if f"Sub {s}_Click(" in body:
                     chain_cases.append(f'                Case "{s}": Call {s}_Click')
+
+            # Subform requery shim — for forms whose downstream chain
+            # subs (CmdGIS / CmdNeo4j / etc.) read a saved-query-bound
+            # subform's recordset.  Runs ONCE before the dispatch loop;
+            # safe under `On Error Resume Next` if the subform is
+            # absent.  See _SUBFORMS_TO_REQUERY for the full reasoning.
+            requery_lines = "".join(
+                f"    {sf}.Form.Requery\n"
+                for sf in self._SUBFORMS_TO_REQUERY.get(module_name, ())
+            )
             done_insert = (
                 "    ' Test mode: chain to next ctl in Me.Tag\n"
                 "    On Error Resume Next\n"
@@ -318,6 +341,7 @@ class VbaSession:
                 "    chnIdx = InStr(chnStr, \"|\")\n"
                 "    If chnIdx > 0 Then chnStr = Left(chnStr, chnIdx - 1)\n"
                 "    chnParts = Split(chnStr, \",\")\n"
+                + requery_lines +
                 "    For chnI = 1 To UBound(chnParts)\n"
                 "        Select Case Trim(chnParts(chnI))\n"
                 + "\n".join(chain_cases) + "\n"
