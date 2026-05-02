@@ -246,6 +246,11 @@ or dead-code only.
    (a new 7th static auditor that pairs runtime-built SQL with
    subsequent recordset field reads — also catches Bugs #7 and #8).
 
+**Regression coverage**: `tests/test_known_bugs.py` now has a CI
+marker for every bug above — when the source dump changes (a fix
+lands), the corresponding test fails with a "Bug #N appears to be
+FIXED — flip the assertion" message.
+
 ### Roadmap
 
 | # | Status | Item |
@@ -256,7 +261,7 @@ or dead-code only.
 | 4 | ✅ done | 12-dimension data-integrity battery (`test_vba_integrity.py`) |
 | 5 | ✅ done | Independent SQL replay layer (`tests/cbdb_replay/`) for differential checking |
 | 6 | ✅ done | Auto-discovery of fresh fixtures (`analysis/discover_test_inputs.py`) |
-| 7 | ⏳ open | Get `LookAtAssociationPairs` / `LookAtNetworks` / `LookAtGroupData` running — needs smaller-fixture search or VBA query rewrite (see `findings.md`) |
+| 7 | 🟡 partial | `tests/test_vba_matrix_hard_forms.py` (added 2026-05-02) handles 2 of the 3 forms with hand-picked tiny fixtures: LookAtGroupData (c_person_id=1, 2 entries / 2 statuses — backfill check on ZZ_SCRATCH_IMPORT_PEOPLE) and LookAtAssociationPairs (4 × 5 — CmdQuery completes, ZZ_SOCIAL_NETWORK readable). **Still open:** LookAtNetworks Form_Open hangs even before CmdRun fires — that's a driver / Form_Open issue, not a fixture-size one. Tried a per-form rewrite of `Forms!LookAtNetworks!<sub>` → `Me!<sub>` self-references in Form_Open; didn't unblock it (hang is somewhere deeper) |
 | 8 | 🟡 partial | First slice landed: `tests/test_vba_cmdgis_other_forms.py` extends real-`CmdGIS` coverage from LookAtEntry (`test_vba_export.py`, byte-diff) to Status / Texts / Associations / Office / Place / Kinship (6 added). Uses **structural** assertions rather than byte-diff. **Subsequent slices** (added 2026-05-02): `test_vba_cmdguess_cross_form.py` (Kinship + Office), `test_vba_pajek_gephi_cross_form.py` (5 passing, 2 Status skipped), `test_vba_cmdgispeople_office.py`, `test_vba_cmdneo4j_cross_form.py` (3 passing, 4 skipped — surfaced **3 new bugs** in the CmdNeo4j family: Bugs #7 / #8 / #9). Driver gained: `patch_filedialog` v8 with directory mode (counter-suffixed unique file per call) for multi-dialog subs like CmdNeo4j. **Still open:** CmdKML / CmdUCInet (only on the 3 skipped forms — depend on item 7) |
 | 9 | ✅ done | `tests/conftest.py::pytest_configure` re-runs `analysis/discover_test_inputs.py` automatically at session start when `analysis/dump/test_inputs.json` is missing or older than `data/CBDB_BJ_User.mdb`. Opt-out via `pytest --no-discover-inputs` |
 | 10 | 🟡 partial | First slice landed: `tests/test_vba_pickers_smoke.py` opens each of the 10 `frmPick*` pickers and verifies it loads + has a commit/cancel button (CmdSelect/CmdSelectAll/CmdOK + CmdCancel/CmdExit/CmdClose). 9 pass, 1 skipped (`frmPickTEXT_BIBLCAT` is orphan — 0 callers anywhere in VBA / macros, end users can't reach it). Smoke-only — doesn't drive Treeview/ListBox interaction yet; that's depth-pass work. **Still open for depth pass:** drive a Select+Commit through e.g. `frmPickEntry_multi` and verify the resulting `ZZ_ENTRY_CODE` table contents match the picker's selected items |
