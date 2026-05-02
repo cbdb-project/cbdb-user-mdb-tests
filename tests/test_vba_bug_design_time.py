@@ -41,6 +41,52 @@ _CASES = [
 ]
 
 
+# (subform name, control name with bad ControlSource, bad ControlSource value, bug)
+_SUBFORM_CASES = [
+    ("EVENTS_DATA_2 Subform", "c_event_record_id",
+     "c_event_record_id", 11),
+    ("POSTED_TO_OFFICE_DATA_2 Subform", "c_appt_type_code",
+     "c_appt_type_code", 12),
+]
+
+
+@pytest.mark.parametrize(
+    "subform,ctl,bad_source,bug",
+    _SUBFORM_CASES,
+    ids=[f"bug{b}_{ctl}" for _, ctl, _, b in _SUBFORM_CASES],
+)
+def test_subform_control_source_unresolved(vba: VbaSession,
+                                             subform: str, ctl: str,
+                                             bad_source: str, bug: int):
+    """Open the sub-form hidden, read the control's ControlSource
+    property, assert it still points at the unresolved column.
+
+    When the form designer fixes the ControlSource to a name in the
+    saved query's projection, this test fails — flip the assertion."""
+    # acFormView = 0, WindowMode = 1 (acHidden).
+    vba.app.DoCmd.OpenForm(subform, 0, "", "", 0, 1)
+    try:
+        f = vba.app.Forms(subform)
+        try:
+            ctl_obj = f.Controls(ctl)
+        except Exception:
+            pytest.fail(
+                f"Bug #{bug}: control {ctl!r} is missing from "
+                f"{subform!r} entirely (was expected to exist with "
+                f"a stale ControlSource)."
+            )
+        live_source = (ctl_obj.ControlSource or "").strip()
+        assert live_source == bad_source, (
+            f"Bug #{bug} appears to be FIXED — {subform}.{ctl}'s "
+            f"ControlSource is now {live_source!r}, was {bad_source!r}."
+        )
+    finally:
+        try:
+            vba.app.DoCmd.Close(2, subform, 2)
+        except Exception:
+            pass
+
+
 @pytest.mark.parametrize(
     "form,btn,bug",
     _CASES,
