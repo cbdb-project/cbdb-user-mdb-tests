@@ -96,6 +96,35 @@ def _chain_via_tag(vba: VbaSession, form: str, *,
     return _read_debug_log(vba)
 
 
+def test_bug5_lookat_status_cmdpajek_sql_blocked_by_chain():
+    """Bug #5 (SQL side) needs CmdPajek to actually fire.  In this
+    driver, chaining `CmdQuery,CmdPajek` on LookAtStatus is silently
+    dropped (same root family as the Pajek/Gephi cross-form Status
+    skips in PR #24): CmdQuery's cleanup section rebinds
+    ZZ_SCRATCH_STATUS / ZZ_SCRATCH_P_STATUS via direct
+    `Set <subform>.Form.Recordset = CurrentDb.OpenRecordset(...)` and
+    something about that rebind keeps the chain dispatch from
+    actually invoking CmdPajek_Click.
+
+    Static `test_known_bugs.test_bug5` already covers the ChkIDs +
+    SQL code-grep side.  A behavioral repro for the SQL half would
+    need either:
+      - direct VBA `Application.Run "Form_LookAtStatus.CmdPajek_Click"`
+        (form-module subs aren't reachable that way — see AGENTS.md
+        Application.Run note),
+      - a separate timer-fire after CmdQuery completes (driver
+        currently fires once per OpenForm session), or
+      - a fresh OpenForm + pre-populate ZZ_SCRATCH_STATUS directly,
+        then fire CmdPajek standalone (next-step deeper test idea).
+
+    Documented as skip for now."""
+    pytest.skip("Bug #5 SQL repro blocked by Status's CmdQuery cleanup "
+                "rebind + single-fire timer; static marker covers the "
+                "code-side, behavioral repro requires deeper driver "
+                "work (separate-timer trigger after pre-populated "
+                "ZZ_SCRATCH_STATUS).")
+
+
 def test_bug6_lookat_groupdata_query_entry_fires_no_such_field(vba: VbaSession):
     """Bug #6: LookAtGroupData.queryEntry projects
     `ENTRY_DATA.c_parental_status` (no `_code` suffix) but the actual
