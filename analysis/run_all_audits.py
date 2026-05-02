@@ -52,6 +52,7 @@ AUDITS = [
     "audit_error_label_targets.py",
     "audit_blocking_msgbox.py",
     "audit_control_row_sources.py",
+    "audit_dynamic_record_source.py",
 ]
 
 
