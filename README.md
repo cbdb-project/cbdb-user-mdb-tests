@@ -189,7 +189,7 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 | 6 | ✅ done | Auto-discovery of fresh fixtures (`analysis/discover_test_inputs.py`) |
 | 7 | ⏳ open | Get `LookAtAssociationPairs` / `LookAtNetworks` / `LookAtGroupData` running — needs smaller-fixture search or VBA query rewrite (see `findings.md`) |
 | 8 | ⏳ open | Real-export tests for the other buttons: `CmdNeo4j`, `CmdKML`, `CmdPajek`, `CmdGUESS`, `CmdGephi` (chain pattern already proven) |
-| 9 | ⏳ open | Auto-run `discover_test_inputs.py` from `conftest.py` when `analysis/dump/test_inputs.json` is older than `data/CBDB_BJ_User.mdb` |
+| 9 | ✅ done | `tests/conftest.py::pytest_configure` re-runs `analysis/discover_test_inputs.py` automatically at session start when `analysis/dump/test_inputs.json` is missing or older than `data/CBDB_BJ_User.mdb`. Opt-out via `pytest --no-discover-inputs` |
 | 10 | ⏳ open | Picker-dialog tests for `frmPickEntry_multi` etc. (currently bypassed by direct `ZZ_SCRATCH_*` writes) |
 | 11 | ⏳ open | Bilingual UI test for `changeDisplayLanguage` |
 | 12 | ⏳ open | Cross-check the `index year` and `index address` derivations in the User MDB against the equivalents produced by [`cbdb-online-main-server`](https://github.com/cbdb-project/cbdb-online-main-server), and assert per-person consistency between the two implementations |
@@ -313,6 +313,7 @@ python -m pytest tests/test_vba_export.py -v -W ignore -s
 - ✅ 已確認 3 個 bug（詳見 `findings.md`）
 - ⏳ 剩 3 個表單因遞迴展開太慢暫跳過
 - ⏳ 其他匯出按鈕（Neo4j/KML/Pajek/GUESS/Gephi）尚未涵蓋
+- ✅ pytest 啟動時自動偵測 `test_inputs.json` 是否過時並重跑 `discover_test_inputs.py`（`pytest --no-discover-inputs` 可關閉）— roadmap 第 9 項
 - ⏳ 比對 User MDB 的 `index year` / `index address` 算法與 [`cbdb-online-main-server`](https://github.com/cbdb-project/cbdb-online-main-server) 所產生結果的一致性 — roadmap 第 12 項
 - ✅ Import-list 按鈕（`tests/test_vba_import_lists.py`，11 種按鈕跨 8 個表單，15 passed + 2 skipped；只有 LookAtNetworks 兩項因 Form_Open 卡住而 skip）— roadmap 第 13 項
 - ⏳ Save-list 按鈕（`CmdSaveEntryCodes` / `CmdSaveOffices` 等）寫出清單檔的位元組級對比 — roadmap 第 14 項
