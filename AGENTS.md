@@ -321,6 +321,10 @@ cheap (seconds) and they keep finding bugs:
 - `analysis/audit_sql_table_names.py` — table-name typos in SQL
   strings; currently surfaces only `frmIndexAddr` (orphan
   maintenance form, end users can't reach), filed as 🟢 LOW
+- `analysis/audit_saved_queries.py` — same `<Table>.<Column>` check
+  as `audit_sql_columns.py` but applied to the 21 saved queries in
+  `queries.json`.  Currently clean; guards against view definitions
+  drifting away from the underlying table schema.
 
 These are guarded by `tests/test_known_bugs.py`; if those tests start
 failing, it means upstream fixed the bug (good — flip the asserts).
