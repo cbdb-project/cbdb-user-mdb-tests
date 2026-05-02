@@ -377,6 +377,18 @@ cheap (seconds) and they keep finding bugs:
   Bugs #15-#19** (LookAtPlace / LookAtStatus / LookAtOffice each
   have export-button event handlers with no matching button on
   the form design — silent missing UI).
+- `analysis/audit_blocking_msgbox.py` — list every
+  `If MsgBox(...) = vb<Yes|No|...>` confirmation prompt.  Not bugs;
+  informational guard so `tests/cbdb_driver/vba_session._inject_autodetect`
+  knows which prompts to pre-arrange.
+- `analysis/audit_control_row_sources.py` — for every ListBox /
+  ComboBox with a non-empty RowSource SQL, verify each
+  `<Table>.<Column>` reference is in the schema.  Currently clean —
+  third leg of the SQL-column-resolution stool.
+
+**Runner**: `analysis/run_all_audits.py` runs every static audit and
+prints a FLAGGED / CLEAN summary.  Per-release workflow.  Latest run
+on the shipped dump: 6 of 19 audits flagged, 6.5 s total.
 
 All audits share `analysis/audit_lib.read_vba_lines` for proper
 `\\r\\r\\n` handling so reported line numbers match grep / VBE.
