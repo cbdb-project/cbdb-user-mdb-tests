@@ -76,7 +76,10 @@ def _form_inventory(form_short: str) -> set[str] | None:
     if entry is None:
         return None
     ctls = entry.get("controls", [])
-    return {c["name"] for c in ctls if c.get("name")}
+    # Lowercase — Access form / control identifiers are case-insensitive
+    # at runtime (e.g. `TxtToDynastyPY` resolves to control
+    # `TxtToDYnastyPY` without complaint).
+    return {c["name"].lower() for c in ctls if c.get("name")}
 
 
 def _file_for_form(form_short: str) -> Path:
@@ -104,7 +107,7 @@ def _scan_form(form_short: str) -> list[tuple[int, str, str]]:
             ident = m.group(0)
             if SUB_SUFFIX_RE.match(ident):
                 continue
-            if ident in inv:
+            if ident.lower() in inv:
                 continue
             if ident in KNOWN_NON_CONTROL_IDENTIFIERS:
                 continue
