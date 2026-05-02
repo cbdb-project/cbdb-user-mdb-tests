@@ -296,6 +296,18 @@ class VbaSession:
         # sub on the same form).  Without this rewrite CmdGIS bails
         # with "Object required" the moment it executes.
         "Form_LookAtPlace": [(r"\bGISFrame\.Value\b", "CodeFrame.Value")],
+
+        # Bug #5 (findings.md): Form_LookAtStatus.CmdPajek_Click
+        # references a non-existent `ChkIDs` control.  Other forms
+        # have either `ChkIDs` (Associations) or `ChkIncludeID`
+        # (Networks/Kinship/AssociationPairs); LookAtStatus has
+        # neither.  Without this rewrite CmdPajek bails with "Object
+        # required" the moment it hits the `If ChkIDs.Value Then`
+        # check that decides whether to emit person ids in the node
+        # label.  Workaround: pretend ChkIDs is unchecked → omit
+        # person ids → Pajek export still runs.  Real fix is for CBDB
+        # to add the missing checkbox to Status's form design.
+        "Form_LookAtStatus": [(r"\bChkIDs\.Value\b", "False")],
     }
 
     # Subform controls whose `RecordSource` is a saved query at design

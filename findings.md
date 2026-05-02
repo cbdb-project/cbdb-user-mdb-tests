@@ -142,6 +142,41 @@ End If
 
 ---
 
+### Bug #5 — `LookAtStatus.CmdPajek_Click` 引用了不存在的控件 `ChkIDs`（**用户点 Pajek 必报错**）
+
+`Form_LookAtStatus.vb:2308`（在 `CmdPajek_Click` body 里）写：
+
+```vba
+If ChkIDs.Value Then
+    tStream.WriteText " (" + Trim(Str(!c_person_id)) + ")"
+End If
+```
+
+但 LookAtStatus 表单上**没有名为 `ChkIDs` 的控件**。它的 `Chk*` 控件只有 `ChkXYRef` / `ChkKML` / `ChkSubUnits`。
+
+跨表单对比：
+- `LookAtAssociations` 有 `ChkIDs`（控件存在，CmdPajek 工作正常）
+- `LookAtNetworks` / `LookAtKinship` / `LookAtAssociationPairs` 用 `ChkIncludeID`（控件存在）
+- **`LookAtStatus` 既没 `ChkIDs` 也没 `ChkIncludeID`** — CmdPajek 是从 LookAtAssociations 拷过来的，但漏加 checkbox。
+
+**症状**：用户在 LookAtStatus 跑完查询，点 **Pajek** 按钮 → VBA 抛 "Object required" → MsgBox → 用户按确定 → `Resume Exit_CmdPajek_Click`（不写文件）。**LookAtStatus 的 Pajek 导出在所有用户机器上都是坏的**。
+
+发现路径：`analysis/audit_missing_controls.py` 静态扫描 `Form_LookAt*.vb` 中所有 `<Name>.<Member>` 引用，跟 `analysis/dump/control_inventory.json` 里的实际控件清单比对，几秒钟就跑完。该脚本同时找出了 4 个「孤儿 Click 子」（`ChkUseYears_Click` 在 LookAtEntry，`ChkIndexYears_Click` 在 AssociationPairs / Place，`ChkIndexYear_Click` 在 LookAtNetworks）—— 都是控件被删但 VBA 没清理的代码气味，非 bug（没有触发控件就永远不会调用）。
+
+**修复方向**：CBDB 团队应该在 LookAtStatus 的设计视图中添加 `ChkIDs` 复选框，或把 CmdPajek 中的 `If ChkIDs.Value Then` 删掉（去掉该可选行为）。
+
+**测试 workaround**：`tests/cbdb_driver/vba_session.py` 的 `_PER_FORM_CMDGIS_PATCHES` 把 `ChkIDs.Value` 替换成 `False`（视作未勾选） —— Pajek 导出能跑完，只是节点 label 不带 person id。
+
+**复现**：
+```bash
+python analysis/audit_missing_controls.py
+# [FLAG] LookAtStatus — 1 unknown identifiers, 1 references:
+#   'ChkIDs':
+#     line  2308: If ChkIDs.Value Then
+```
+
+---
+
 ## 已归档：差异性测试结果（不是 bug）
 
 ### Note #1 — User MDB vs cbdb-online-main-server 的 `c_index_year` / `c_index_addr_id` 差异：算法一致，仅数据快照不同步

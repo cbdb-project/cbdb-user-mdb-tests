@@ -198,6 +198,16 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
    test failures, surfaced after fixing the silent-Err-handler SQL
    bug. Test driver applies a `GISFrame.Value → CodeFrame.Value`
    rewrite as a workaround; the underlying CBDB code remains broken.
+5. **Bug #5** (NEW, found 2026-05-02) —
+   `Form_LookAtStatus.CmdPajek_Click` references a non-existent
+   control `ChkIDs`. Other forms have either `ChkIDs`
+   (LookAtAssociations) or `ChkIncludeID` (Networks / Kinship /
+   AssociationPairs); LookAtStatus has neither. Real users clicking
+   the Pajek export button on LookAtStatus see "Object required" +
+   no file written. Found by `analysis/audit_missing_controls.py`
+   (static scan of every VBA control reference vs the form's actual
+   inventory). Test driver applies a `ChkIDs.Value → False` rewrite
+   so the export still runs (omits the per-node person-id label).
 
 ### Roadmap
 

@@ -276,6 +276,14 @@ with INDEPENDENT source SQL (not the Python replay).
    `GISFrame`** — should be `CodeFrame`. Real users clicking GIS on
    LookAtPlace see "Object required". Test driver workaround in
    `cbdb_driver.vba_session._PER_FORM_CMDGIS_PATCHES`.
+5. **`LookAtStatus.CmdPajek_Click` references a non-existent control
+   `ChkIDs`** — Status has neither `ChkIDs` nor `ChkIncludeID` (the
+   variant other forms use). Real users clicking Pajek on LookAtStatus
+   see "Object required". Test driver rewrites `ChkIDs.Value → False`
+   in `_PER_FORM_CMDGIS_PATCHES` so export runs without the per-node
+   id label. Found by `analysis/audit_missing_controls.py` —
+   re-run that auditor on every CBDB release to catch similar
+   copy-paste/rename slips quickly.
 
 These are guarded by `tests/test_known_bugs.py`; if those tests start
 failing, it means upstream fixed the bug (good — flip the asserts).
