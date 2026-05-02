@@ -265,25 +265,52 @@ with INDEPENDENT source SQL (not the Python replay).
 
 ## Confirmed bugs in the live .mdb (findings.md)
 
-1. **`View_StatusData` alias swap** — `c_fy_range_desc` /
+Each bug is tagged with **user-impact priority**:
+- 🔴 **HIGH** = silent data corruption / wrong query results the user
+  can't easily detect.
+- 🟡 **MEDIUM** = feature crashes with a visible error message but no
+  data corruption — user notices and can avoid the broken button.
+- 🟢 **LOW** = setup-time annoyance, dead code, code smell — no
+  runtime impact on either data or workflow.
+
+When triaging future findings, weight HIGH bugs heavier than MEDIUM /
+LOW. Static scans tend to surface a lot of LOW-priority noise — flag
+it, but don't let it crowd out the HIGH stuff.
+
+1. 🔴 **`View_StatusData` alias swap** (Bug #1) — `c_fy_range_desc` /
    `c_fy_range_chn` pull from `YEAR_RANGE_CODES_1` (the LY join).
    First-year range value displayed is actually the LY value.
-2. **DAO 3.6 reference broken** — see #7 above.
-3. **Backfill `UPDATE` silently fails on LookAtEntry CmdQuery for
-   >10k-row results** — Bug #3 in findings.md. xfailed in
-   `tests/test_vba_matrix.py`.
-4. **`LookAtPlace.CmdGIS_Click` references a non-existent control
-   `GISFrame`** — should be `CodeFrame`. Real users clicking GIS on
-   LookAtPlace see "Object required". Test driver workaround in
-   `cbdb_driver.vba_session._PER_FORM_CMDGIS_PATCHES`.
-5. **`LookAtStatus.CmdPajek_Click` references a non-existent control
-   `ChkIDs`** — Status has neither `ChkIDs` nor `ChkIncludeID` (the
-   variant other forms use). Real users clicking Pajek on LookAtStatus
-   see "Object required". Test driver rewrites `ChkIDs.Value → False`
-   in `_PER_FORM_CMDGIS_PATCHES` so export runs without the per-node
-   id label. Found by `analysis/audit_missing_controls.py` —
-   re-run that auditor on every CBDB release to catch similar
-   copy-paste/rename slips quickly.
+   *Silent — wrong values surfaced through any query that uses this
+   view.*
+2. 🟢 **DAO 3.6 reference broken** (Bug #2) — see #7 above. *One-time
+   setup fix for new machines; no runtime impact once fixed.*
+3. 🔴 **Backfill `UPDATE` silently fails on LookAtEntry CmdQuery for
+   >10k-row results** (Bug #3) — xfailed in `tests/test_vba_matrix.py`.
+   *Silent — c_entry_desc / c_addr_name etc. show NULL when they
+   should have values. Easy to miss unless the user stares at the
+   result table.*
+4. 🟡 **`LookAtPlace.CmdGIS_Click` references a non-existent control
+   `GISFrame`** (Bug #4) — should be `CodeFrame`. Real users clicking
+   GIS on LookAtPlace see "Object required". Test driver workaround
+   in `cbdb_driver.vba_session._PER_FORM_CMDGIS_PATCHES`. *Visible
+   crash, no data corruption.*
+5. 🟡 **`LookAtStatus.CmdPajek_Click` is broken at multiple levels**
+   (Bug #5) — references non-existent control `ChkIDs` AND its SQL
+   projects three columns that don't exist on `ZZ_SCRATCH_STATUS`.
+   Whole sub was bad-copy from `LookAtAssociations.CmdPajek_Click`.
+   Test driver only patches the control ref; the SQL is still broken
+   and CBDB needs to rewrite the sub. *Visible crash, no data
+   corruption.*
+6. 🟡 **`LookAtGroupData.queryEntry` references non-existent column
+   `ENTRY_DATA.c_parental_status`** (Bug #6) — should be
+   `c_parental_status_code` (which is what `LookAtEntry.vb:1650`
+   uses correctly). One-line SQL fix on the CBDB side. Crashes
+   when user runs the GroupData "Entry" subtype. *Visible crash, no
+   data corruption.*
+
+Re-run BOTH static auditors (`analysis/audit_missing_controls.py`,
+`analysis/audit_sql_columns.py`) on every CBDB release — they're
+cheap (seconds) and they keep finding bugs.
 
 These are guarded by `tests/test_known_bugs.py`; if those tests start
 failing, it means upstream fixed the bug (good — flip the asserts).
