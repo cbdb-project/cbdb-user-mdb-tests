@@ -354,6 +354,59 @@ def test_bug14_kin_data_subform_picks_missing_form():
     )
 
 
+def test_bugs_15_to_19_orphan_export_handlers():
+    """Bugs #15-#19 (candidate, found by audit_orphan_event_handlers):
+    several LookAt forms have export-button event handlers
+    (CmdGIS_Click / CmdPajek_Click / CmdGephi_Click / CmdUCINet_Click /
+    CmdGUESS_Click) defined in VBA but **no matching button on the
+    form design**.  End users in the UI never see those export options
+    even though the underlying code is fully functional (and our
+    timer-trigger tests exercise it).
+
+    Five distinct gaps:
+      Bug #15: LookAtPlace.CmdGIS — no GIS button on Place
+      Bug #16: LookAtStatus.CmdPajek — no Pajek button on Status
+      Bug #17: LookAtStatus.CmdGephi — no Gephi button on Status
+      Bug #18: LookAtStatus.CmdUCINet — no UCINet button on Status
+      Bug #19: LookAtOffice.CmdGUESS — no GUESS button on Office
+    """
+    import json
+    inv = json.loads((REPO / "analysis" / "dump"
+                       / "control_inventory.json").read_text(encoding="utf-8"))
+
+    def _has_ctl(form: str, ctl: str) -> bool:
+        info = inv.get(form, {})
+        ctls = {(c.get("name") or "").lower()
+                for c in info.get("controls", [])}
+        return ctl.lower() in ctls
+
+    def _has_sub(form: str, sub: str) -> bool:
+        body = ((REPO / "analysis" / "dump" / "vba"
+                  / f"Form_{form}.vb").read_bytes()
+                 .decode("utf-8"))
+        return f"Sub {sub}(" in body
+
+    cases = [
+        ("LookAtPlace", "CmdGIS", 15),
+        ("LookAtStatus", "CmdPajek", 16),
+        ("LookAtStatus", "CmdGephi", 17),
+        ("LookAtStatus", "CmdUCINet", 18),
+        ("LookAtOffice", "CmdGUESS", 19),
+    ]
+    for form, ctl, bug_num in cases:
+        # Sub still exists in VBA module.
+        assert _has_sub(form, f"{ctl}_Click"), (
+            f"Bug #{bug_num} may be FIXED — {form}.{ctl}_Click no "
+            f"longer exists in the VBA module."
+        )
+        # Control still missing from form design.
+        assert not _has_ctl(form, ctl), (
+            f"Bug #{bug_num} may be FIXED — {form} now has a {ctl} "
+            f"button on its design.  Drop the relevant skip in the "
+            f"cross-form export test or expand fixture coverage."
+        )
+
+
 def test_bug_dao_reference_broken_in_user_mdb():
     """The shipped .mdb references DAO 3.6 (C:\\Program Files\\Common
     Files\\Microsoft Shared\\DAO\\dao360.dll) which is not installed on
