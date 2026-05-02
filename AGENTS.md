@@ -308,9 +308,19 @@ it, but don't let it crowd out the HIGH stuff.
    when user runs the GroupData "Entry" subtype. *Visible crash, no
    data corruption.*
 
-Re-run BOTH static auditors (`analysis/audit_missing_controls.py`,
-`analysis/audit_sql_columns.py`) on every CBDB release — they're
-cheap (seconds) and they keep finding bugs.
+Re-run ALL FOUR static auditors on every CBDB release — they're
+cheap (seconds) and they keep finding bugs:
+- `analysis/audit_missing_controls.py` — control-name typos
+  (found Bug #5)
+- `analysis/audit_sql_columns.py` — SQL `<Table>.<Column>` typos
+  (found Bug #6, also expanded scope of Bug #5)
+- `analysis/audit_sql_columns.py`-style INSERT/SELECT cardinality
+  check is in `analysis/audit_insert_select_columns.py` — currently
+  clean (0 findings on 295 pure-literal INSERT statements);
+  guards against future regressions
+- `analysis/audit_sql_table_names.py` — table-name typos in SQL
+  strings; currently surfaces only `frmIndexAddr` (orphan
+  maintenance form, end users can't reach), filed as 🟢 LOW
 
 These are guarded by `tests/test_known_bugs.py`; if those tests start
 failing, it means upstream fixed the bug (good — flip the asserts).

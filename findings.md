@@ -212,6 +212,24 @@ INSERT 目标列是 `c_parental_status_code`，但 SELECT 源列写成了 `c_par
 
 ---
 
+### 🟢 LOW: `Form_frmIndexAddr` 引用了 6 个不存在的 `ZZZ_*` 表（17 处 UPDATE）
+
+`analysis/audit_sql_table_names.py` 在 `Form_frmIndexAddr.vb` 找到 17 个 UPDATE 语句引用以下 6 个**完全不在 schema 里**的表：
+- `ZZZ_BIOG_MAIN` (line 1625)
+- `ZZZ_ENTRY_DATA` (lines 1691, 1713)
+- `ZZZ_KIN_BIOG_ADDR` (5 处: 1877, 1915, 1937, 1959, 1975)
+- `ZZZ_NONKIN_BIOG_ADDR` (5 处)
+- `ZZZ_POSTED_TO_ADDR_DATA` (2 处)
+- `ZZZ_STATUS_DATA` (2 处)
+
+CBDB 实际只有 4 个 `ZZZ_*` 表 (`ZZZ_ADDRESSES` / `ZZZ_BELONGS_TO` / `ZZZ_DISTANCE_DATA` / `ZZZ_NAMES`)，跟上面 6 个完全不重合。
+
+**不算 bug** —— `frmIndexAddr` 是个 orphan 维护表单：没有任何 VBA `DoCmd.OpenForm` 引用它，也没任何 Access macro 引用。终端用户走标准 UI 流程绝对触发不到，只有 CBDB 维护者按 F11 打开导航面板手动双击才能打开。形式上是已废弃的代码。
+
+按用户的优先级标准（不报错／不影响查询结果的 bug 调低优先级），这是 🟢 LOW —— 留作 audit-tool 回归参考但不需要修。如果未来 CBDB 把 `frmIndexAddr` 重新挂到 UI 上，audit 会立刻报警。
+
+---
+
 ## 已归档：差异性测试结果（不是 bug）
 
 ### Note #1 — User MDB vs cbdb-online-main-server 的 `c_index_year` / `c_index_addr_id` 差异：算法一致，仅数据快照不同步
