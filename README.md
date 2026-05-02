@@ -146,22 +146,23 @@ This section is the source of truth for what's done, what's in flight,
 and what's intentionally deferred. **Update it whenever a milestone
 moves** — `AGENTS.md` enforces this as a contributor rule.
 
-### Coverage as of 2026-05-01
+### Coverage as of 2026-05-02
 
-| Form | Real-VBA matrix | Real export | Notes |
-|------|-----------------|-------------|-------|
-| LookAtEntry            | ✅ `test_vba_matrix.py` | ✅ CmdGIS | Bug #3 confirmed in this form only |
-| LookAtStatus           | ✅ 3 fixtures | — | 17 023 + 4 931 rows |
-| LookAtTexts            | ✅ biblcat 1 | — | 15 774 rows |
-| LookAtAssociations     | ✅ 3 fixtures | — | 11 867 rows |
-| LookAtOffice           | ✅ 2 fixtures | — | 37 429 + 35 748 rows |
-| LookAtPlace            | ✅ 2 fixtures | — | 5 962 + 3 528 rows |
-| LookAtKinship          | ✅ 1 fixture | — | 949 rows (Zhao Tingmei) |
-| LookAtAssociationPairs | ⏭ skipped | — | `Link1stOrder` ASSOC_DATA self-join too slow |
-| LookAtNetworks         | ⏭ skipped | — | recursive expansion (Zhu Xi 2 471 assocs) |
-| LookAtGroupData        | ⏭ skipped | — | similar recursion |
+| Form | Real-VBA matrix | Real export | StoreID / RecallID | Notes |
+|------|-----------------|-------------|---------------------|-------|
+| LookAtEntry            | ✅ `test_vba_matrix.py` | ✅ CmdGIS | ✅ Store; round-trip → Kinship ✅ | Bug #3 confirmed in this form only |
+| LookAtStatus           | ✅ 3 fixtures | — | ✅ Store | 17 023 + 4 931 rows |
+| LookAtTexts            | ✅ biblcat 1 | — | ✅ Store | 15 774 rows |
+| LookAtAssociations     | ✅ 3 fixtures | — | ✅ Store | 11 867 rows |
+| LookAtOffice           | ✅ 2 fixtures | — | ✅ Store | 37 429 + 35 748 rows |
+| LookAtPlace            | ✅ 2 fixtures | — | ✅ Store | 5 962 + 3 528 rows |
+| LookAtKinship          | ✅ 1 fixture | — | ✅ Store + ✅ Recall | 949 rows (Zhao Tingmei) |
+| LookAtAssociationPairs | ⏭ skipped | — | ✅ Recall | `Link1stOrder` ASSOC_DATA self-join too slow |
+| LookAtNetworks         | ⏭ skipped | — | ⏭ Recall (Form_Open hangs) | recursive expansion (Zhu Xi 2 471 assocs) |
+| LookAtGroupData        | ⏭ skipped | — | ✅ Recall | similar recursion |
 
 **Latest matrix run**: `12 passed, 3 skipped in 110.22s`.
+**Latest Store/Recall run** (`tests/test_vba_storeid_recallid.py`): `11 passed, 1 skipped in 142.82s`.
 
 ### Confirmed bugs
 
@@ -191,7 +192,7 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 | 12 | ⏳ open | Cross-check the `index year` and `index address` derivations in the User MDB against the equivalents produced by [`cbdb-online-main-server`](https://github.com/cbdb-project/cbdb-online-main-server), and assert per-person consistency between the two implementations |
 | 13 | ⏳ open | Import-list buttons — `CmdImportEntryCodes` / `CmdImportPlaces` / `CmdImportOffices` / `CmdImportAssociations` / `CmdImportPeople` / `CmdImportPlacePeople` / `CmdImportPlaceOffice` / `CmdImportTextCategories` / `CmdImportStatusCodes` / `CmdImportList` / `CmdImport` (Kinship, GroupData). Drive each via `Form_Timer`, point at a fixture file, assert the corresponding `ZZ_SCRATCH_*` table contents match the file contents (and that the right `gUse*` global is set) |
 | 14 | ⏳ open | Save-list buttons — `CmdSaveEntryCodes` / `CmdSaveOffices` / `CmdSaveAssociations` / `CmdSaveStatusCodes` / `CmdSaveTextCategories`. Reuse the byte-level export diff pattern from item 3 / 8: pre-populate `ZZ_SCRATCH_*`, intercept `FileDialog(msoFileDialogSaveAs)` via `vba.patch_filedialog`, byte-diff against frozen golden |
-| 15 | ⏳ open | `CmdStoreID` / `CmdRecallID` round-trip — after `CmdQuery`, click `CmdStoreID` and assert `ZZ_STORE_PERSON_ID` rows equal `ZZ_SCRATCH_*.c_personid`; then on a second form open, click `CmdRecallID` and assert the downstream `ZZ_SCRATCH_*` is repopulated from the stored set |
+| 15 | ✅ done | `CmdStoreID` / `CmdRecallID` round-trip (`tests/test_vba_storeid_recallid.py`) — covers all 7 query-runnable forms for Store, 3 of 4 forms for Recall (Networks Form_Open hangs in this driver — same family as the matrix Networks skip), plus an end-to-end Entry → Kinship round-trip. Driver gained: `MsgBox "literal"` neutralizer in `_inject_autodetect`; chain+DONE block moved to *after* `Exit_<name>:` so it survives the `Resume Exit` from the form's Err handler |
 
 ---
 
@@ -312,7 +313,7 @@ python -m pytest tests/test_vba_export.py -v -W ignore -s
 - ⏳ 比對 User MDB 的 `index year` / `index address` 算法與 [`cbdb-online-main-server`](https://github.com/cbdb-project/cbdb-online-main-server) 所產生結果的一致性 — roadmap 第 12 項
 - ⏳ Import-list 按鈕（`CmdImportEntryCodes` / `CmdImportPlaces` / `CmdImportOffices` / `CmdImportAssociations` 等）從檔案載入清單到 `ZZ_SCRATCH_*` — roadmap 第 13 項
 - ⏳ Save-list 按鈕（`CmdSaveEntryCodes` / `CmdSaveOffices` 等）寫出清單檔的位元組級對比 — roadmap 第 14 項
-- ⏳ `CmdStoreID` / `CmdRecallID` 跨 form round-trip 測試 — roadmap 第 15 項
+- ✅ `CmdStoreID` / `CmdRecallID` 跨 form round-trip 測試（`tests/test_vba_storeid_recallid.py`，11 passed + 1 skipped；含 Entry → Kinship 完整 round-trip）— roadmap 第 15 項
 
 ## 貢獻
 
