@@ -47,6 +47,66 @@ behaviour as instructed in their docstrings.
 
 ---
 
+### Bug #3 — `LookAtPlace.CmdNeo4j_Click` SQL projection is missing fields the loop reads (silent runtime "Item not found")
+
+🔴 silent: Neo4j export from LookAtPlace dies mid-stream and the
+user gets a vague "Item not found in this collection." popup.
+
+`Form_LookAtPlace.vb:322` builds a People-CSV for the Neo4j export:
+
+```sql
+SELECT DISTINCT
+    ZZ_SCRATCH_P_TEXT.c_person_id,
+    ZZ_SCRATCH_P_TEXT.c_name,
+    ZZ_SCRATCH_P_TEXT.c_name_chn,
+    ZZ_SCRATCH_P_TEXT.c_index_year
+FROM ZZ_SCRATCH_P_TEXT
+INNER JOIN (DYNASTIES RIGHT JOIN BIOG_MAIN ON DYNASTIES.c_dy = BIOG_MAIN.c_dy)
+    ON ZZ_SCRATCH_P_TEXT.c_person_id = BIOG_MAIN.c_personid
+```
+
+But the per-row loop at lines 379-393 reads `!c_dynasty`,
+`!c_dynasty_chn`, and `!c_female` from the recordset — none of
+which are projected.  As soon as the loop hits a row, JET raises
+"Item not found in this collection" → the `Err_CmdNeo4j_Click`
+handler silences itself with `MsgBox Err.Description` → the
+SaveToFile never runs and downstream files (PeopleIndexAddr,
+Place, PeoplePlaceRelations, ...) never write either.
+
+**Fix**: extend the SELECT projection to include the three fields:
+
+```sql
+SELECT DISTINCT
+    ZZ_SCRATCH_P_TEXT.c_person_id,
+    ZZ_SCRATCH_P_TEXT.c_name,
+    ZZ_SCRATCH_P_TEXT.c_name_chn,
+    ZZ_SCRATCH_P_TEXT.c_index_year,
+    DYNASTIES.c_dynasty,
+    DYNASTIES.c_dynasty_chn,
+    BIOG_MAIN.c_female
+FROM ...
+```
+
+(`c_dynasty` / `c_dynasty_chn` live on `DYNASTIES`, not `BIOG_MAIN`
+— the existing join already exposes them; `c_female` is on
+`BIOG_MAIN`.)
+
+**Regression test**: `tests/test_vba_cmdneo4j_cross_form.py::
+test_cmd_neo4j_produces_files[LookAtPlace]` — currently skipped
+with this bug as the documented reason; once the fix lands, remove
+the `LookAtPlace` arm of `_spec_skip_marks` and the test will pass.
+
+**Why none of the static auditors caught this**: the SQL is built
+at runtime via VBA string concatenation (`tQueryStr = "SELECT ..."
++ _ "FROM ..."`).  The per-Sub recordset-field auditor
+(`analysis/audit_recordset_fields.py`) deliberately only tracks
+recordsets opened on a *literal* table name; it can't reason about
+runtime SQL projections.  Catching this needs a separate scanner
+that pairs `OpenRecordset(<sql_string>)` with subsequent
+`<rstvar>!<field>` reads against the projected column list.
+
+---
+
 ### Bug #2 — VBA reference to `dao360.dll` is broken (blocks form automation and breaks new machines)
 
 The VBA project in `CBDB_BJ_User.mdb` carries a reference to
