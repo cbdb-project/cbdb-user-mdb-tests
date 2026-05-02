@@ -148,23 +148,24 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 
 ### Coverage as of 2026-05-02
 
-| Form | Real-VBA matrix | Real export | StoreID / RecallID | Import-list | Notes |
-|------|-----------------|-------------|---------------------|-------------|-------|
-| LookAtEntry            | ✅ `test_vba_matrix.py` | ✅ CmdGIS | ✅ Store; round-trip → Kinship ✅ | ✅ EntryCodes + Places | Bug #3 confirmed in this form only |
-| LookAtStatus           | ✅ 3 fixtures | — | ✅ Store | ✅ StatusCodes + Places | 17 023 + 4 931 rows |
-| LookAtTexts            | ✅ biblcat 1 | — | ✅ Store | ✅ TextCategories + Places | 15 774 rows |
-| LookAtAssociations     | ✅ 3 fixtures | — | ✅ Store | ✅ Associations + Places | 11 867 rows |
-| LookAtOffice           | ✅ 2 fixtures | — | ✅ Store | ✅ Offices + PlaceOffice + PlacePeople | 37 429 + 35 748 rows |
-| LookAtPlace            | ✅ 2 fixtures | — | ✅ Store | ✅ Places | 5 962 + 3 528 rows |
-| LookAtKinship          | ✅ 1 fixture | — | ✅ Store + ✅ Recall | ✅ CmdImport | 949 rows (Zhao Tingmei) |
-| LookAtAssociationPairs | ⏭ skipped | — | ✅ Recall | ✅ CmdImportList | `Link1stOrder` ASSOC_DATA self-join too slow |
-| LookAtNetworks         | ⏭ skipped | — | ⏭ Recall (Form_Open hangs) | ⏭ ImportPeople / ImportPlaces (Form_Open) | recursive expansion (Zhu Xi 2 471 assocs) |
-| LookAtGroupData        | ⏭ skipped | — | ✅ Recall | ✅ CmdImport | similar recursion |
+| Form | Real-VBA matrix | Real export | StoreID / RecallID | Import-list | Save-list | Notes |
+|------|-----------------|-------------|---------------------|-------------|-----------|-------|
+| LookAtEntry            | ✅ `test_vba_matrix.py` | ✅ CmdGIS | ✅ Store; round-trip → Kinship ✅ | ✅ EntryCodes + Places | ✅ EntryCodes (3-col) | Bug #3 confirmed in this form only |
+| LookAtStatus           | ✅ 3 fixtures | — | ✅ Store | ✅ StatusCodes + Places | ✅ StatusCodes (3-col) | 17 023 + 4 931 rows |
+| LookAtTexts            | ✅ biblcat 1 | — | ✅ Store | ✅ TextCategories + Places | ✅ TextCategories (3-col) | 15 774 rows |
+| LookAtAssociations     | ✅ 3 fixtures | — | ✅ Store | ✅ Associations + Places | ✅ Associations (3-col) | 11 867 rows |
+| LookAtOffice           | ✅ 2 fixtures | — | ✅ Store | ✅ Offices + PlaceOffice + PlacePeople | ✅ Offices (3-col) | 37 429 + 35 748 rows |
+| LookAtPlace            | ✅ 2 fixtures | — | ✅ Store | ✅ Places | — (no save button) | 5 962 + 3 528 rows |
+| LookAtKinship          | ✅ 1 fixture | — | ✅ Store + ✅ Recall | ✅ CmdImport | — (no save button) | 949 rows (Zhao Tingmei) |
+| LookAtAssociationPairs | ⏭ skipped | — | ✅ Recall | ✅ CmdImportList | — (no save button) | `Link1stOrder` ASSOC_DATA self-join too slow |
+| LookAtNetworks         | ⏭ skipped | — | ⏭ Recall (Form_Open hangs) | ⏭ ImportPeople / ImportPlaces (Form_Open) | — (no save button) | recursive expansion (Zhu Xi 2 471 assocs) |
+| LookAtGroupData        | ⏭ skipped | — | ✅ Recall | ✅ CmdImport | — (no save button) | similar recursion |
 
 **Latest matrix run**: `12 passed, 3 skipped in 110.22s`.
 **Latest Store/Recall run** (`tests/test_vba_storeid_recallid.py`): `11 passed, 1 skipped in 142.82s`.
 **Latest Import-list run** (`tests/test_vba_import_lists.py`): `15 passed, 2 skipped in 142.04s`.
-**Combined regression** (import + storeid + matrix): `38 passed, 6 skipped in 399.05s`.
+**Latest Save-list run** (`tests/test_vba_save_lists.py`): `5 passed in 43.31s`.
+**Combined regression** (save + import + storeid + matrix_all + matrix-entry): `45 passed, 6 skipped, 4 xfailed in 559.74s`.
 
 ### Confirmed bugs
 
@@ -193,7 +194,7 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 | 11 | ⏳ open | Bilingual UI test for `changeDisplayLanguage` |
 | 12 | ⏳ open | Cross-check the `index year` and `index address` derivations in the User MDB against the equivalents produced by [`cbdb-online-main-server`](https://github.com/cbdb-project/cbdb-online-main-server), and assert per-person consistency between the two implementations |
 | 13 | ✅ done | Import-list buttons (`tests/test_vba_import_lists.py`) — covers all 11 unique button names across 8 forms (15 of 17 tests pass; the 2 LookAtNetworks ones are skipped for the same Form_Open hang as items 7/15). Drives each via `Form_Timer`, points at a fixture file (whose delimiter / column count matches the saved `MSysIMEXSpecs`), and asserts: (a) the target `ZZ_SCRATCH_*` table contains exactly the valid IDs, (b) `InputErrorList` contains exactly the invalid IDs. The `gUse*` global side-effect is documented per spec but not asserted — an early inject-based reader caused JET re-entrancy hangs in matrix CmdQuery; the table-shape assertion is the meaningful contract. Driver gained: `patch_filedialog` now also handles the `With dlgX` block's `If .Show = -1 Then` (used in import subs) |
-| 14 | ⏳ open | Save-list buttons — `CmdSaveEntryCodes` / `CmdSaveOffices` / `CmdSaveAssociations` / `CmdSaveStatusCodes` / `CmdSaveTextCategories`. Reuse the byte-level export diff pattern from item 3 / 8: pre-populate `ZZ_SCRATCH_*`, intercept `FileDialog(msoFileDialogSaveAs)` via `vba.patch_filedialog`, byte-diff against frozen golden |
+| 14 | ✅ done | Save-list buttons (`tests/test_vba_save_lists.py`) — covers all 5 `CmdSave*_Click` handlers. Pre-populates the source `ZZ_SCRATCH_<X>` table directly (skips CmdQuery), patches `FileDialog(msoFileDialogSaveAs)` via the existing `vba.patch_filedialog`, fires the button, and asserts the resulting tab-separated UTF-8 (BOM-stripped) file contains exactly the seeded IDs — and for the 3-column specs (Entry, Associations, Office, Status, TextCategories) also that the desc / desc_chn fields match an INNER JOIN against the codes table. Latest run: `5 passed in 43.31s`. **Important:** several Form_Open handlers wipe their picker scratch table on form load; the test seeds AFTER `open_form` to avoid this |
 | 15 | ✅ done | `CmdStoreID` / `CmdRecallID` round-trip (`tests/test_vba_storeid_recallid.py`) — covers all 7 query-runnable forms for Store, 3 of 4 forms for Recall (Networks Form_Open hangs in this driver — same family as the matrix Networks skip), plus an end-to-end Entry → Kinship round-trip. Driver gained: `MsgBox "literal"` neutralizer in `_inject_autodetect`; chain+DONE block moved to *after* `Exit_<name>:` so it survives the `Resume Exit` from the form's Err handler |
 
 ---
