@@ -325,6 +325,12 @@ cheap (seconds) and they keep finding bugs:
   as `audit_sql_columns.py` but applied to the 21 saved queries in
   `queries.json`.  Currently clean; guards against view definitions
   drifting away from the underlying table schema.
+- `analysis/audit_recordset_fields.py` — tracks `Set <var> =
+  CurrentDb.OpenRecordset("<TABLE>", ...)` per Sub and flags
+  `<var>!<field>` references where `<field>` isn't on `<TABLE>`.
+  Per-sub scope, invalidates on any `Set <var> = ...` reassignment
+  (including reassignment to a SQL string we can't statically
+  evaluate).  Currently clean.
 
 These are guarded by `tests/test_known_bugs.py`; if those tests start
 failing, it means upstream fixed the bug (good — flip the asserts).
