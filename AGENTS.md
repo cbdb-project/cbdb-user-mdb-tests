@@ -338,6 +338,28 @@ cheap (seconds) and they keep finding bugs:
   AND bare `!field` (inside `With <var>`) reads where `field` isn't
   projected.  **Found Bugs #7 / #8 / #9** (CmdNeo4j family across
   LookAtPlace / LookAtNetworks / LookAtEntry).  Run on every release.
+- `analysis/audit_subform_control_sources.py` — for every sub-form
+  whose RecordSource is a saved query (View_*), check each bound
+  control's ControlSource exists in the saved query's SELECT
+  projection.  **Found Bugs #10 / #11 / #12** (silent display bugs
+  in EVENT_ADDR_2 / EVENTS_DATA_2 / POSTED_TO_OFFICE_DATA_2 sub-
+  forms).
+- `analysis/audit_error_label_targets.py` — every `On Error GoTo
+  <label>` / `Resume <label>` / `GoTo <label>` must point at a
+  label defined in the same Sub.  Currently clean — long-term
+  guard for typo'd error-handler renames.
+- `analysis/audit_event_handlers_exist.py` — every form-control
+  event handler named in `control_inventory.json` must have a
+  matching `Sub <name>()` defined in the form's VBA module.
+  Currently clean — long-term guard for "renamed Sub but forgot to
+  update OnClick property" silent-no-op bugs.
+- `analysis/audit_dcount_where_columns.py` — every D-aggregate
+  call (DCount / DLookup / DSum / etc.) with a literal table+criteria
+  must reference columns that exist on the named table.  Currently
+  clean — long-term guard for stale-criteria silent-False bugs.
+
+All audits share `analysis/audit_lib.read_vba_lines` for proper
+`\\r\\r\\n` handling so reported line numbers match grep / VBE.
 
 These are guarded by `tests/test_known_bugs.py`; if those tests start
 failing, it means upstream fixed the bug (good — flip the asserts).
