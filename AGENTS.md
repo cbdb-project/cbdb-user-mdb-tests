@@ -357,6 +357,26 @@ cheap (seconds) and they keep finding bugs:
   call (DCount / DLookup / DSum / etc.) with a literal table+criteria
   must reference columns that exist on the named table.  Currently
   clean — long-term guard for stale-criteria silent-False bugs.
+- `analysis/audit_cross_form_references.py` — every
+  `Forms!<form>!<ctl>` reference must resolve to an existing form
+  AND existing control on that form (case-insensitive).  Skips
+  Form__TMPCLP*.vb auto-backup snapshots.  **Found Bugs #13 / #14**
+  (BIOG_MAIN_2_Subform / KIN_DATA_Subform reference picker forms
+  that don't exist in the .mdb).
+- `analysis/audit_doc_md_open_form.py` — every literal
+  `DoCmd.OpenForm "<form>"` must resolve.  Currently clean — Bug
+  #13's reference uses a string variable so it's caught by the
+  cross-form-references audit instead.  Long-term guard for direct-
+  literal regressions.
+- `analysis/audit_dlookup_fields.py` — every `DLookup("<field>",
+  "<table>", ...)` literal call must reference a valid field on
+  the table.  Currently clean — companion to dcount-where-columns.
+- `analysis/audit_orphan_event_handlers.py` — find Subs named
+  like `<Control>_<Event>` where `<Control>` doesn't exist on the
+  form.  Code-smell signal (exit 0, informational).  **Found
+  Bugs #15-#19** (LookAtPlace / LookAtStatus / LookAtOffice each
+  have export-button event handlers with no matching button on
+  the form design — silent missing UI).
 
 All audits share `analysis/audit_lib.read_vba_lines` for proper
 `\\r\\r\\n` handling so reported line numbers match grep / VBE.
