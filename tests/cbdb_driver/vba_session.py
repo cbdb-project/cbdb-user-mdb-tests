@@ -809,7 +809,7 @@ class VbaSession:
     )
 
     # ---------- FileDialog patch (for export tests) ----------
-    _FILEDIALOG_PATCH_MARKER = "FILEDIALOG_PATCH v7"
+    _FILEDIALOG_PATCH_MARKER = "FILEDIALOG_PATCH v8"
 
     def patch_filedialog(self, form: str) -> None:
         """Patch every `Application.FileDialog(msoFileDialogSaveAs)`
@@ -921,14 +921,28 @@ class VbaSession:
         helper = (
             f"\n' {self._FILEDIALOG_PATCH_MARKER}\n"
             "Public Function GetTestExportPath() As String\n"
+            "    Static counter As Long\n"
             "    On Error Resume Next\n"
-            "    Dim t As String, idx As Integer\n"
+            "    Dim t As String, idx As Integer, base As String, lastCh As String\n"
             "    t = Nz(Me.Tag, \"\")\n"
             "    idx = InStr(t, \"|\")\n"
-            "    If idx > 0 Then\n"
-            "        GetTestExportPath = Mid(t, idx + 1)\n"
-            "    Else\n"
+            "    If idx <= 0 Then\n"
             "        GetTestExportPath = \"\"\n"
+            "        Exit Function\n"
+            "    End If\n"
+            "    base = Mid(t, idx + 1)\n"
+            "    If Len(base) = 0 Then\n"
+            "        GetTestExportPath = \"\"\n"
+            "        Exit Function\n"
+            "    End If\n"
+            "    lastCh = Right(base, 1)\n"
+            "    If lastCh = \"\\\" Or lastCh = \"/\" Then\n"
+            "        ' Directory mode: counter-suffixed unique file per call\n"
+            "        ' (CmdNeo4j etc. open multiple SaveAs dialogs in one Sub).\n"
+            "        counter = counter + 1\n"
+            "        GetTestExportPath = base & \"f\" & counter & \".out\"\n"
+            "    Else\n"
+            "        GetTestExportPath = base\n"
             "    End If\n"
             "End Function\n"
         )
