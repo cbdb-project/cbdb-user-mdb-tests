@@ -137,7 +137,23 @@ def _build_lookatentry_fixtures(inputs: dict) -> list[Fixture]:
             """,
         ))
 
-    # 5-6. Two (entry × addr) combos with year filter
+    # 5-6. Two (entry × addr) combos with year filter.
+    #
+    # NOTE: this fixture explicitly selects index-year mode
+    # (FrameYears=2) with range [-2000, 2000].  The source_sql must
+    # mirror that filter, otherwise the diff check expects NULL-year
+    # persons that VBA legitimately excludes — `c_index_year BETWEEN
+    # -2000 AND 2000` evaluates to NULL (≈ False) under SQL three-
+    # valued logic when c_index_year IS NULL.
+    #
+    # Concrete numbers (entry=110, addr=7213, current data):
+    #   - baseline join:                           2176 persons
+    #   - + c_index_year IS NULL:                  2170 persons
+    #   - + c_index_year BETWEEN -2000 AND 2000:      6 persons
+    # VBA returns the 6.  The pre-fix `expected_min_rows = n_persons//5
+    # = 435` and a year-filter-less source_sql made the test claim
+    # "VBA filter is too aggressive"; in fact VBA was correct and the
+    # test was checking against the wrong baseline.
     for combo in le_data.get("entry_x_address_combos", [])[:2]:
         c = int(combo["c_entry_code"])
         addr = int(combo["c_index_addr_id"])
@@ -158,13 +174,18 @@ def _build_lookatentry_fixtures(inputs: dict) -> list[Fixture]:
                 "TxtEntryDesc": "[selected]",
                 "TxtTypeCode": "N/A",
             },
-            expected_min_rows=max(1, int(combo["n_persons"]) // 5),
+            # Most persons in CBDB have c_index_year IS NULL, so any
+            # index-year filter dramatically narrows the pool.  Use a
+            # conservative floor; the source_sql diff check below is
+            # the strong correctness assertion.
+            expected_min_rows=1,
             source_sql=f"""
                 SELECT DISTINCT BIOG_MAIN.c_personid
                 FROM BIOG_MAIN INNER JOIN ENTRY_DATA
                   ON BIOG_MAIN.c_personid = ENTRY_DATA.c_personid
                 WHERE ENTRY_DATA.c_entry_code = {c}
                   AND BIOG_MAIN.c_index_addr_id = {addr}
+                  AND BIOG_MAIN.c_index_year BETWEEN -2000 AND 2000
             """,
             py_replay=le.run,
             py_inputs=le.EntryQueryInputs(
