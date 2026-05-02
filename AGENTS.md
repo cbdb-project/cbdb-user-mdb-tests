@@ -331,6 +331,13 @@ cheap (seconds) and they keep finding bugs:
   Per-sub scope, invalidates on any `Set <var> = ...` reassignment
   (including reassignment to a SQL string we can't statically
   evaluate).  Currently clean.
+- `analysis/audit_recordset_sql_projection.py` — sister scanner to
+  the above for the SQL-string case.  Tracks `tQueryStr = "SELECT
+  ..."` literal-only concats and `Set <var> = CurrentDb.OpenRecordset
+  (tQueryStr)`, parses the SELECT projection, and flags `<var>!field`
+  AND bare `!field` (inside `With <var>`) reads where `field` isn't
+  projected.  **Found Bugs #3 / #4 / #5** (CmdNeo4j family across
+  LookAtPlace / LookAtNetworks / LookAtEntry).  Run on every release.
 
 These are guarded by `tests/test_known_bugs.py`; if those tests start
 failing, it means upstream fixed the bug (good — flip the asserts).
