@@ -96,6 +96,47 @@ def _chain_via_tag(vba: VbaSession, form: str, *,
     return _read_debug_log(vba)
 
 
+def test_bug4_lookat_place_cmdgis_fires_object_required(monkeypatch):
+    """Bug #4: Form_LookAtPlace.CmdGIS_Click references the
+    non-existent control `GISFrame` (the actual control on Place is
+    `CodeFrame`).  Driver autopatch via `_PER_FORM_CMDGIS_PATCHES`
+    rewrites `GISFrame.Value` → `CodeFrame.Value` so the integration
+    tests pass; this deep test temporarily disables that patch and
+    confirms the un-patched code still throws 'Object required'.
+    """
+    from cbdb_driver.form_specs import LOOKATPLACE
+    # Empty out the per-form patches dict for the duration of this
+    # test only (monkeypatch undoes after teardown).
+    monkeypatch.setattr(VbaSession, "_PER_FORM_CMDGIS_PATCHES", {})
+
+    work_unpatched = WORK.parent / "_bug4_unpatched.mdb"
+    if work_unpatched.exists():
+        try:
+            work_unpatched.unlink()
+        except PermissionError:
+            import time
+            time.sleep(1); work_unpatched.unlink()
+    vba_local = VbaSession(SRC, work_unpatched)
+    vba_local.open()
+    try:
+        spec = LOOKATPLACE
+        fx = next((f for f in _all_fixtures()
+                    if f.spec.name == "LookAtPlace"), None)
+        assert fx is not None, "no LookAtPlace fixture in matrix"
+        _seed(vba_local, fx)
+        msgs = _chain_via_tag(vba_local, "LookAtPlace",
+                                chain="CmdQuery,CmdGIS",
+                                target_table="ZZ_SCRATCH_PLACE")
+        print(f"\nDEBUG log: {msgs}", flush=True)
+        err_msgs = [m for m in msgs if ":ERR " in m]
+        assert any("Object required" in m for m in err_msgs), (
+            f"Bug #4 may be FIXED — un-patched LookAtPlace.CmdGIS "
+            f"no longer raises 'Object required'.  err_msgs={err_msgs}"
+        )
+    finally:
+        vba_local.close()
+
+
 def test_bug5_lookat_status_cmdpajek_sql_fires_field_error(vba: VbaSession):
     """Bug #5 (SQL side): CmdPajek_Click body has a SELECT that
     references columns missing from ZZ_SCRATCH_STATUS.  Trigger by:
