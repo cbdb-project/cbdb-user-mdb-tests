@@ -142,6 +142,46 @@ End If
 
 ---
 
+## 待分类的发现（差异性测试）
+
+### Open Question #1 — User MDB vs cbdb-online-main-server 的 `c_index_year` / `c_index_addr_id` 不一致
+
+`tests/test_index_year_xcheck.py` 在最新一次全量跑（657246 共有 person id）发现：
+- **83 個 `c_index_year` 差异**（0.013%）
+- **492 個 `c_index_addr_id` 差异**（0.075%）
+
+样例（`(c_personid, MDB(year, addr_id), SQLite(year, addr_id))`）：
+
+```
+c_index_year 差异：
+  (1455, (1001, 12887), (1008, 12887))   ← 7 年差
+  (3501, (1018, 100658), (1028, 100658)) ← 10 年差
+  (16266, (1004, 12723), (992, 12723))   ← 12 年差
+  (31573, (585, 15294), (1056, 15294))   ← 471 年差！可能 Tang vs Song
+  (40258, (1157, 12780), (None, None))   ← MDB 有，SQLite 全空
+  (40848, (985, None), (None, None))
+  (46642, (999, 100409), (None, None))
+
+c_index_addr_id 差异：
+  (1, (1042, 101117), (1042, None))      ← MDB 有 addr，SQLite 空
+  (470, (1012, 12879), (1012, 12785))    ← addr 不同
+  (481, (1043, 100416), (1043, 12785))   ← 100416 → 12785（同一模式）
+  (485, (1046, 100416), (1046, 12785))   ← 100416 → 12785
+  (562, (1067, 100658), (1067, 13292))   ← 开封 → 别处
+  (927, (None, 100658), (None, 12449))
+  (1005, (1128, 12793), (1128, 11232))
+```
+
+**待分类**：每条差异可能是 (a) 派生规则差异 — 两边对 "index year" 的优先级定义不同（生年 vs 进士年 vs 卒年）；(b) 数据时序差异 — 两个快照不同时间生成，中间有源数据更新；(c) 一边有 bug。第一步：抽样 10-20 个差异手工验证 BIOG_MAIN 和派生源（YEAR_RANGE_CODES、ENTRY_DATA、KIN_DATA 等），把多数差异归到 (a) 或 (b)，剩下的标记为可能的 bug。
+
+**复现**：
+```bash
+python analysis/download_hf_sqlite.py
+CBDB_FULL_XCHECK=1 python -m pytest tests/test_index_year_xcheck.py -v -s
+```
+
+---
+
 ## 启发式扫描结论（无问题）
 
 | 扫描器 | 结果 |
