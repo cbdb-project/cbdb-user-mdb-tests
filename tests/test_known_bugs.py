@@ -308,6 +308,52 @@ def test_bug12_posting_office_subform_wrong_appt_column():
     )
 
 
+def test_bug13_biog_main_2_subform_picks_missing_form():
+    """Bug #13 (candidate, found by audit_cross_form_references):
+    Form_BIOG_MAIN_2_Subform's `c_fl_ey_notes_Click` does
+    `DoCmd.OpenForm "frmPickNIAN_HAO"`, but no form named
+    `frmPickNIAN_HAO` exists in the .mdb.  Clicking that field on
+    the person-detail subform throws 'Item not found in this
+    collection.' instead of opening a picker."""
+    body = ((REPO / "analysis" / "dump" / "vba"
+              / "Form_BIOG_MAIN_2_Subform.vb")
+             .read_bytes().decode("utf-8"))
+    assert 'frmPickNIAN_HAO' in body, (
+        "Bug #13 may be FIXED — `frmPickNIAN_HAO` no longer "
+        "referenced in Form_BIOG_MAIN_2_Subform.  Re-run "
+        "`analysis/audit_cross_form_references.py`."
+    )
+    # Confirm the form really doesn't exist.
+    import json
+    inv = json.loads((REPO / "analysis" / "dump"
+                       / "control_inventory.json").read_text(encoding="utf-8"))
+    keys_lc = {k.lower() for k in inv.keys()}
+    assert "frmpicknian_hao" not in keys_lc, (
+        "Bug #13 may be FIXED — `frmPickNIAN_HAO` was added to the "
+        ".mdb.  The cross-form reference now resolves."
+    )
+
+
+def test_bug14_kin_data_subform_picks_missing_form():
+    """Bug #14 (candidate): Form_KIN_DATA_Subform similarly
+    references `frmPickKINSHIP_CODES`, which doesn't exist in the
+    .mdb.  The kinship-code picker on the kinship subform fails."""
+    body = ((REPO / "analysis" / "dump" / "vba"
+              / "Form_KIN_DATA_Subform.vb")
+             .read_bytes().decode("utf-8"))
+    assert 'frmPickKINSHIP_CODES' in body, (
+        "Bug #14 may be FIXED — `frmPickKINSHIP_CODES` no longer "
+        "referenced in Form_KIN_DATA_Subform."
+    )
+    import json
+    inv = json.loads((REPO / "analysis" / "dump"
+                       / "control_inventory.json").read_text(encoding="utf-8"))
+    keys_lc = {k.lower() for k in inv.keys()}
+    assert "frmpickkinship_codes" not in keys_lc, (
+        "Bug #14 may be FIXED — `frmPickKINSHIP_CODES` form added."
+    )
+
+
 def test_bug_dao_reference_broken_in_user_mdb():
     """The shipped .mdb references DAO 3.6 (C:\\Program Files\\Common
     Files\\Microsoft Shared\\DAO\\dao360.dll) which is not installed on
