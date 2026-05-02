@@ -67,6 +67,100 @@ def test_bug_view_statusdata_fy_value_equals_ly_value(ro_conn):
     )
 
 
+def test_bug3_lookat_entry_cmdquery_backfill_silent_fail():
+    """Bug #3 — LookAtEntry.CmdQuery_Click's backfill UPDATE silently
+    fails on multi-table joins when the result set is large enough,
+    leaving c_entry_desc / c_addr_name etc. NULL.  Confirmed only on
+    LookAtEntry (Status / Texts / Associations all backfill correctly
+    at similar row counts).  Real fix is for CBDB to split the big
+    UPDATE into smaller ones (one per lookup table).
+
+    This regression test is structural: it confirms the giant 7+
+    table JOIN UPDATE is still in the dump.  When CBDB rewrites it
+    into smaller UPDATEs, this assertion fires.  The behavioural
+    side of the bug is tested by `test_vba_matrix.py::
+    test_vba_full_matrix[top_entry_code_36_unfiltered]` which
+    is currently expected-to-fail (xfail-style).
+    """
+    vba_path = (REPO / "analysis" / "dump" / "vba"
+                / "Form_LookAtEntry.vb")
+    body = vba_path.read_bytes().decode("utf-8")
+    # The buggy UPDATE chain joins 6+ tables before SET.
+    # Look for the distinctive run of LEFT JOINs in CmdQuery_Click.
+    assert ("KINSHIP_CODES" in body
+            and "SOCIAL_INSTITUTION_NAME_CODES" in body
+            and "BIOG_MAIN_1" in body), (
+        "Bug #3 may be FIXED — the giant multi-table UPDATE in "
+        "Form_LookAtEntry.CmdQuery_Click no longer references "
+        "KINSHIP_CODES / BIOG_MAIN_1 / SOCIAL_INSTITUTION_NAME_CODES "
+        "together.  Re-run the matrix test "
+        "[top_entry_code_36_unfiltered] to verify; if it now passes, "
+        "flip this assertion."
+    )
+
+
+def test_bug4_lookat_place_cmdgis_references_nonexistent_gisframe():
+    """Bug #4 — Form_LookAtPlace.CmdGIS_Click references `GISFrame.
+    Value` but the form has no `GISFrame` control (only `CodeFrame`).
+    The driver works around this via _PER_FORM_CMDGIS_PATCHES.
+    """
+    vba_path = (REPO / "analysis" / "dump" / "vba"
+                / "Form_LookAtPlace.vb")
+    body = vba_path.read_bytes().decode("utf-8")
+    assert "GISFrame.Value" in body, (
+        "Bug #4 appears to be FIXED — `GISFrame.Value` no longer "
+        "appears in Form_LookAtPlace.vb.  Drop the workaround in "
+        "tests/cbdb_driver/vba_session.py::_PER_FORM_CMDGIS_PATCHES "
+        "and flip this assertion."
+    )
+
+
+def test_bug5_lookat_status_cmdpajek_references_nonexistent_chkids():
+    """Bug #5 — Form_LookAtStatus.CmdPajek_Click references
+    `ChkIDs.Value` but Status has no `ChkIDs` control.  AND the SQL
+    inside CmdPajek references three columns that don't exist on
+    ZZ_SCRATCH_STATUS (`c_person_id`, `c_status_id`, `c_status_count`).
+    """
+    vba_path = (REPO / "analysis" / "dump" / "vba"
+                / "Form_LookAtStatus.vb")
+    body = vba_path.read_bytes().decode("utf-8")
+    assert "ChkIDs.Value" in body, (
+        "Bug #5 (ChkIDs side) appears to be FIXED in Form_LookAtStatus."
+    )
+    # The SQL bug is independent — flip when both halves clear.
+    assert "ZZ_SCRATCH_STATUS.c_status_count" in body, (
+        "Bug #5 (SQL side) appears to be FIXED — the ZZ_SCRATCH_STATUS"
+        ".c_status_count reference is gone.  The CmdPajek SQL was "
+        "copy-pasted from LookAtAssociations and the column names "
+        "weren't updated to match Status's schema.  Real fix needs a "
+        "rewrite, not just a workaround."
+    )
+
+
+def test_bug8_lookat_networks_cmdneo4j_select_missing_xy():
+    """Bug #8 — Form_LookAtNetworks.CmdNeo4j_Click builds tRstPlace
+    from a SELECT projecting only c_index_addr_id / c_index_addr_name
+    / c_index_addr_chn, but the loop reads `!x_coord` / `!y_coord`.
+    Same pattern as Bug #7 (LookAtPlace.CmdNeo4j) and Bug #9
+    (LookAtEntry.CmdNeo4j) — the CmdNeo4j family-of-three.
+    """
+    vba_path = (REPO / "analysis" / "dump" / "vba"
+                / "Form_LookAtNetworks.vb")
+    body = vba_path.read_bytes().decode("utf-8")
+    # The buggy SELECT for the People-Place file has 3 cols and joins
+    # ADDR_CODES but doesn't project x_coord / y_coord.
+    buggy_select = (
+        "SELECT DISTINCT BIOG_MAIN.c_index_addr_id, "
+        "ADDR_CODES.c_name AS c_index_addr_name, "
+        "BIOG_MAIN.c_name_chn AS c_index_addr_chn"
+    )
+    assert buggy_select in body, (
+        "Bug #8 appears to be FIXED — the LookAtNetworks.CmdNeo4j "
+        "tRstPlace SELECT no longer matches the buggy 3-col form. "
+        "Flip this assertion."
+    )
+
+
 def test_bug6_groupdata_query_entry_wrong_field():
     """Bug #6 (findings.md) — Form_LookAtGroupData.queryEntry projects
     `ENTRY_DATA.c_parental_status` (no `_code` suffix), but the actual
