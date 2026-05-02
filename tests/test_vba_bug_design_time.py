@@ -43,6 +43,11 @@ _CASES = [
 
 # (subform name, control name with bad ControlSource, bad ControlSource value, bug)
 _SUBFORM_CASES = [
+    # Bug #10 actually has TWO controls with bad ControlSource;
+    # picking the more user-visible one (TxtAddrCHN — Chinese
+    # address rendered blank).
+    ("EVENT_ADDR_2 Subform", "TxtAddrCHN",
+     "c_name_chn", 10),
     ("EVENTS_DATA_2 Subform", "c_event_record_id",
      "c_event_record_id", 11),
     ("POSTED_TO_OFFICE_DATA_2 Subform", "c_appt_type_code",
