@@ -96,6 +96,46 @@ def _chain_via_tag(vba: VbaSession, form: str, *,
     return _read_debug_log(vba)
 
 
+def test_bug6_lookat_groupdata_query_entry_fires_no_such_field(vba: VbaSession):
+    """Bug #6: LookAtGroupData.queryEntry projects
+    `ENTRY_DATA.c_parental_status` (no `_code` suffix) but the actual
+    column is `c_parental_status_code`.  Triggers when the user
+    checks ChkEntry and clicks Run.
+
+    The matrix hard-forms test already exercises CmdRun without
+    ChkEntry (just IMPORT_PEOPLE backfill).  This test enables
+    ChkEntry first to force `Call queryEntry` from CmdRun_Click.
+    """
+    from cbdb_driver.form_specs import LOOKATGROUPDATA
+    spec = LOOKATGROUPDATA
+    fx = CrossFixture(
+        name="bug6_groupdata",
+        spec=spec,
+        picker_ids=[1],
+        controls={"ChkEntry": True},
+        expected_min_rows=1,
+        source_sql=None,
+    )
+    _seed(vba, fx)
+    msgs = _chain_via_tag(vba, "LookAtGroupData",
+                           chain="CmdRun",
+                           target_table="")
+    print(f"\nDEBUG log: {msgs}", flush=True)
+    err_msgs = [m for m in msgs if ":ERR " in m]
+    # The bad SQL fires Access JET 'No value given for one or more
+    # required parameters.' / 'Could not find field' / similar — the
+    # exact wording differs by ODBC vs DAO path.  Accept any of them.
+    field_err = any(
+        ("field" in m.lower() or "parameter" in m.lower()
+         or "no such" in m.lower() or "c_parental_status" in m.lower())
+        for m in err_msgs
+    )
+    assert field_err, (
+        f"Bug #6 may be FIXED — LookAtGroupData.CmdRun with ChkEntry "
+        f"no longer raises a field-related ERR.  err_msgs={err_msgs}"
+    )
+
+
 def test_bug7_lookat_place_cmdneo4j_fires_item_not_found(vba: VbaSession):
     """Bug #7: LookAtPlace.CmdNeo4j hits 'Item not found in this
     collection' on the first row of the People-CSV loop because
