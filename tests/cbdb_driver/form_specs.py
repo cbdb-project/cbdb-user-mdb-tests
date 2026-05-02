@@ -377,3 +377,66 @@ ALL_IMPORTS: list[ImportSpec] = [
                file_sep=",",
                expected_global=("gUseADDRID", True)),
 ]
+
+
+# ----------------------------------------------------------------------
+# CmdSave* spec table (roadmap item 14)
+#
+# Each `CmdSave*_Click` handler pops `Application.FileDialog(
+# msoFileDialogSaveAs)`, opens an ADODB.Stream (utf-8, BOM stripped via
+# `Position = 3` + binary CopyTo), runs a `SELECT ... FROM ZZ_SCRATCH_<X>
+# INNER JOIN <source_codes>` and writes one tab-separated line per row.
+#
+# Two output formats observed in the dump:
+#   - 3-column: `<id>\t<desc>\t<desc_chn>`
+#     (CmdSaveEntryCodes, CmdSaveAssociations)
+#   - 1-column-with-trailing-tab: `<id>\t`
+#     (CmdSaveOffices, CmdSaveStatusCodes, CmdSaveTextCategories)
+#
+# The file is UTF-8 without BOM.  `tStream.Position = 3` skips the
+# 3-byte UTF-8 BOM that ADODB.Stream prepends when Charset="utf-8";
+# the CopyTo to a binary stream then writes the rest verbatim.
+# ----------------------------------------------------------------------
+
+
+@dataclass
+class SaveSpec:
+    form: str                  # form name (LookAtEntry, ...)
+    button: str                # button name (CmdSaveEntryCodes, ...)
+    source_table: str          # ZZ_SCRATCH_<X> the save reads from
+    source_col: str            # the id column being written
+    codes_table: str           # joined-against table for desc lookup
+    desc_cols: tuple[str, ...] = ()  # desc columns the SQL projects
+    initial_filename: str = ""       # the form's default name
+
+
+ALL_SAVES: list[SaveSpec] = [
+    SaveSpec("LookAtEntry", "CmdSaveEntryCodes",
+             "ZZ_SCRATCH_ENTRY_CODE", "c_entry_code",
+             "ENTRY_CODES",
+             desc_cols=("c_entry_desc", "c_entry_desc_chn"),
+             initial_filename="entry_id_list.txt"),
+    SaveSpec("LookAtAssociations", "CmdSaveAssociations",
+             "ZZ_ASSOC_CODE", "c_assoc_code",
+             "ASSOC_CODES",
+             desc_cols=("c_assoc_desc", "c_assoc_desc_chn"),
+             initial_filename="assoc_code_list.txt"),
+    # CmdSaveOffices SELECTs (id, c_office_chn, c_office_trans) but
+    # WRITES `id\t<trans-or-empty>\t<chn>` — note the trans/chn swap
+    # between SELECT and output.  The check uses output order.
+    SaveSpec("LookAtOffice", "CmdSaveOffices",
+             "ZZ_OFFICE_CODE", "c_office_id",
+             "OFFICE_CODES",
+             desc_cols=("c_office_trans", "c_office_chn"),
+             initial_filename="office_id_list.txt"),
+    SaveSpec("LookAtStatus", "CmdSaveStatusCodes",
+             "ZZ_STATUS_CODE", "c_status_code",
+             "STATUS_CODES",
+             desc_cols=("c_status_desc", "c_status_desc_chn"),
+             initial_filename="status_code_list.txt"),
+    SaveSpec("LookAtTexts", "CmdSaveTextCategories",
+             "ZZ_TEXT_BIBLCAT_CODES", "c_text_cat_code",
+             "TEXT_BIBLCAT_CODES",
+             desc_cols=("c_text_cat_desc", "c_text_cat_desc_chn"),
+             initial_filename="text_bilblcat_list.txt"),  # note: typo 'bilblcat' is in CBDB
+]

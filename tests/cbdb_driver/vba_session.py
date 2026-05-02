@@ -793,6 +793,14 @@ class VbaSession:
         # Apply
         cm.DeleteLines(1, cm.CountOfLines)
         cm.AddFromString(body2 + helper)
+        # Test-only diagnostic dump — same opt-in as _inject_autodetect.
+        import os as _os
+        if _os.environ.get("CBDB_VBA_DEBUG"):
+            dump_dir = self.work.parent / "_vba_post_filedialog"
+            dump_dir.mkdir(exist_ok=True)
+            (dump_dir / f"Form_{form}.vb").write_text(
+                body2 + helper, encoding="utf-8"
+            )
 
     def _inject_timer_trigger(self, form: str, ctl: str = "CmdQuery") -> None:
         """Inject a Form_Timer sub into the form module that reads
