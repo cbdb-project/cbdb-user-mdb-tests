@@ -147,8 +147,17 @@ python -m pytest tests/test_vba_export.py -v -W ignore -s
 python analysis/dump_metadata.py        # refreshes analysis/dump/*.json
 python analysis/dump_vba.py             # refreshes analysis/dump/vba/
 python analysis/discover_test_inputs.py # picks fresh fixtures
+python analysis/run_all_audits.py       # one-shot regression sweep
+                                         # — 19 static audits, ~6.5s
 python -m pytest tests/ -W ignore       # full run
 ```
+
+`run_all_audits.py` prints a FLAGGED / CLEAN summary.  As of the
+shipped dump (2026-05-02): 6 of 19 audits flag known bugs (#1-#19);
+the remaining 13 act as long-term regression guards.  When a CBDB
+release adds new code, anything that newly flags is your investigation
+queue; anything that newly drops back to clean means a bug was
+fixed (also flip the matching marker in `tests/test_known_bugs.py`).
 
 ---
 
