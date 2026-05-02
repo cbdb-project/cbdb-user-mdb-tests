@@ -142,11 +142,15 @@ End If
 
 ---
 
-## 待分类的发现（差异性测试）
+## 已归档：差异性测试结果（不是 bug）
 
-### Open Question #1 — User MDB vs cbdb-online-main-server 的 `c_index_year` / `c_index_addr_id` 不一致
+### Note #1 — User MDB vs cbdb-online-main-server 的 `c_index_year` / `c_index_addr_id` 差异：算法一致，仅数据快照不同步
 
-**TL;DR（2026-05-02 更新）**：两边跑的是同一个算法（cbdb-online-main-server 的 `IndexYearRebuildService.php`），但有 12 个 person 的 source 数据本身就分歧（MDB 知道生卒年，SQLite 不知道，或两边都知道但不同），那 12 个又向下游连带让 `c_index_year` 算出不一样。剩下的 ~70 个 `c_index_year` 差异和 492 个 `c_index_addr_id` 差异是 Phase C kinship 传播 loop 里的 tiebreak。**核心分歧不在算法上，而在源数据 sync gap 上**。
+**TL;DR**：两边跑的是同一个算法（cbdb-online-main-server 的 `IndexYearRebuildService.php`）。线上系统的源数据是持续更新的，发布到 HuggingFace 的 SQLite 是某个时间点的快照；User MDB 是另一个（通常更旧的）快照。两个快照之间 ~12 个 person 的源数据（生卒年）已经被人编辑过但还没同步，再向下游连带让 `c_index_year` 算出不一样。剩下的派生差异是 Phase C kinship 传播 loop 里的 tiebreak。
+
+**已与维护者确认：这不是 bug**，是两个 snapshot 时点不同的预期表现。`tests/test_index_year_xcheck.py` 的角色是**当算法本身出现分歧时立刻报警**（per-rule type-code 分布飘移、source 字段超过 0.1% drift、derived 字段超过 0.5% drift）。单条 person 的差异不需要往 CBDB 报 issue。
+
+详情如下，作为参考存档：
 
 `tests/test_index_year_xcheck.py` 在 657246 个共有 person id 上跑全量比对：
 
