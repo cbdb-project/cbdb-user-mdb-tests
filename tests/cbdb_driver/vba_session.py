@@ -349,6 +349,35 @@ class VbaSession:
                 body,
             )
 
+            # Neutralize standalone informational MsgBox calls of the
+            # form `MsgBox "literal"` (statement form, no return value
+            # consumed).  These otherwise block the COM thread for
+            # Cmd*_Click subs we drive from tests — e.g.
+            # `MsgBox "Person IDs successfully stored..."` at the end
+            # of every CmdStoreID_Click handler.  Yes/no prompts in
+            # function-call form (`If MsgBox(...) = vbNo Then`) are
+            # NOT touched: tests pre-clean the gating tables so the
+            # `DCount > 0` branch isn't entered in the first place.
+            def _msgbox_replace(m: re.Match) -> str:
+                indent = m.group(1)
+                return (
+                    f'{indent}CurrentDb.Execute '
+                    + Q + 'INSERT INTO ZZ_TEST_DEBUG (msg) VALUES ('
+                    + "'" + short + ":MSGBOX'" + ')' + Q
+                )
+            # cm.Lines(...) returns CRLF-terminated text.  In MULTILINE
+            # `$` matches the position immediately before the `\n`, so
+            # the trailing `\r` must be eaten by the regex or the match
+            # fails on every Access-supplied line.  (\s in the
+            # Err.Description regex above already matches \r — only the
+            # statement-end anchored regex below needs to handle it.)
+            body = re.sub(
+                r'^([ \t]*)MsgBox[ \t]+"[^"]*"[ \t\r]*$',
+                _msgbox_replace,
+                body,
+                flags=re.MULTILINE,
+            )
+
             # First pass: find Sub start + first On Error to inject
             # autodetect; also find Exit_<name>_Click: label to inject
             # the DONE marker right before it.
@@ -369,9 +398,16 @@ class VbaSession:
                     new_lines.append(line)
                     continue
                 if in_sub and stripped.startswith("Exit_") and stripped.endswith(":"):
-                    # Inject DONE marker right before the Exit label
-                    new_lines.append(done_insert)
+                    # Inject chain+DONE block AFTER the Exit_ label so
+                    # it runs on both fall-through (success) and
+                    # `Resume Exit_<name>` from the Err handler — the
+                    # latter would otherwise skip a block placed
+                    # before the label.  Tests that exercise a form
+                    # whose CmdQuery hits Bug #3 (backfill UPDATE
+                    # silently fails on >10k-row sets) used to lose
+                    # the DONE marker entirely; now they don't.
                     new_lines.append(line)
+                    new_lines.append(done_insert)
                     in_sub = False
                     continue
                 new_lines.append(line)
@@ -391,6 +427,17 @@ class VbaSession:
             if injected_pre:
                 cm.DeleteLines(1, cm.CountOfLines)
                 cm.AddFromString("\n".join(new_lines))
+                # Test-only: dump the post-inject module to disk so
+                # tests that fail with "marker never appeared" can be
+                # diagnosed without a hung VBE inspection.  Keyed off
+                # CBDB_VBA_DEBUG=1 to keep production runs clean.
+                import os as _os
+                if _os.environ.get("CBDB_VBA_DEBUG"):
+                    dump_dir = self.work.parent / "_vba_post_inject"
+                    dump_dir.mkdir(exist_ok=True)
+                    (dump_dir / f"{module_name}.vb").write_text(
+                        "\n".join(new_lines), encoding="utf-8"
+                    )
 
     def close(self) -> None:
         if self.conn is not None:
@@ -616,6 +663,7 @@ class VbaSession:
         "CmdQuery", "CmdRun",
         "CmdGIS", "CmdNeo4j", "CmdGephi", "CmdPajek",
         "CmdGUESS", "CmdGISPeople",
+        "CmdStoreID", "CmdRecallID",
     )
 
     # ---------- FileDialog patch (for export tests) ----------
@@ -792,7 +840,12 @@ class VbaSession:
         ctls_list = list(ctls)
         self._inject_timer_trigger(form, ctl=ctls_list[0])
         f = self.app.Forms(form)
+        # Re-bind OnTimer the same way click_via_timer does — clearing
+        # then re-setting forces Access to refresh its event-procedure
+        # binding.  Without the clear step, some forms (LookAtEntry
+        # observed) silently fail to fire Form_Timer.
         try:
+            f.OnTimer = ""
             f.OnTimer = "[Event Procedure]"
         except Exception:
             pass
@@ -803,6 +856,15 @@ class VbaSession:
         self.set_timer_target(chain)
         if export_path:
             self.set_export_path(export_path)
+        # Match click_via_timer's row_count probe — issuing a pyodbc
+        # SELECT here forces JET to flush picker writes before VBA
+        # reads them.  Without this, CmdQuery has been observed to
+        # see an empty ZZ_SCRATCH_ENTRY_CODE on the chain path even
+        # though set_picker_codes already called _refresh_access_cache.
+        try:
+            self.row_count("ZZ_TEST_DEBUG")
+        except Exception:
+            pass
         f.TimerInterval = 100
         time.sleep(sleep_after)
 

@@ -31,6 +31,21 @@ class FormSpec:
     insert_cols: set[str] = field(default_factory=set)
     person_id_col: str = "c_personid"      # some forms use c_person_id
 
+    # CmdStoreID_Click writes:
+    #   INSERT INTO ZZ_STORE_PERSON_ID (c_personid)
+    #   SELECT DISTINCT <storeid_source_col> FROM <storeid_source_table>
+    #   [<storeid_source_filter>]
+    # then UPDATE PersonIDSource SET SourceForm = '<personid_source_label>'.
+    # If storeid_source_table is None the form has no CmdStoreID button.
+    storeid_source_table: str | None = None
+    storeid_source_col: str = "c_personid"
+    storeid_source_filter: str = ""        # e.g. " WHERE c_person_id > 0"
+    personid_source_label: str | None = None  # GroupData omits the UPDATE
+
+    # CmdRecallID_Click reads ZZ_STORE_PERSON_ID and INSERTs into this table.
+    # Only 4 forms have a CmdRecallID button.
+    recallid_target_table: str | None = None
+
 
 # Per Form_LookAt<X>.vb INSERT INTO ZZ_SCRATCH_<Y> ( ... ):
 
@@ -49,6 +64,9 @@ LOOKATENTRY = FormSpec(
         "c_parental_status_code", "c_entry_addr_id", "c_source",
         "c_inst_code", "c_inst_name_code", "c_addr_type",
     },
+    storeid_source_table="ZZ_SCRATCH_ENTRY",
+    storeid_source_col="c_personid",
+    personid_source_label="Entry",
 )
 
 LOOKATSTATUS = FormSpec(
@@ -64,6 +82,9 @@ LOOKATSTATUS = FormSpec(
         "c_status_desc", "c_status_desc_chn", "c_source",
         "c_index_year_type_code", "c_sequence",
     },
+    storeid_source_table="ZZ_SCRATCH_P_STATUS",
+    storeid_source_col="c_person_id",
+    personid_source_label="Status",
 )
 
 LOOKATTEXTS = FormSpec(
@@ -79,6 +100,9 @@ LOOKATTEXTS = FormSpec(
         "c_textid", "c_title", "c_title_chn", "c_role_id",
         "c_role_desc", "c_role_desc_chn", "c_source",
     },
+    storeid_source_table="ZZ_SCRATCH_P_TEXT",
+    storeid_source_col="c_person_id",
+    personid_source_label="Texts",
 )
 
 LOOKATASSOCIATIONS = FormSpec(
@@ -96,6 +120,9 @@ LOOKATASSOCIATIONS = FormSpec(
         "c_assoc_kin_code", "c_assoc_kin_id", "c_assoc_count",
         "c_assoc_first_year", "c_assoc_last_year", "c_source",
     },
+    storeid_source_table="ZZ_SCRATCH_P_ASSOC",
+    storeid_source_col="c_person_id",
+    personid_source_label="Associations",
 )
 
 LOOKATOFFICE = FormSpec(
@@ -110,6 +137,9 @@ LOOKATOFFICE = FormSpec(
         "c_lastyear", "c_appt_code", "c_assume_office_code",
         "c_inst_code",
     },
+    storeid_source_table="ZZ_SCRATCH_P_OFFICE",
+    storeid_source_col="c_personid",
+    personid_source_label="Office",
 )
 
 LOOKATPLACE = FormSpec(
@@ -122,6 +152,9 @@ LOOKATPLACE = FormSpec(
         "c_female", "c_dy", "c_addr_id", "c_addr_name",
         "c_firstyear", "c_lastyear", "c_rel_type", "c_source",
     },
+    storeid_source_table="ZZ_PLACE",
+    storeid_source_col="c_personid",
+    personid_source_label="Place",
 )
 
 LOOKATASSOCIATIONPAIRS = FormSpec(
@@ -135,6 +168,11 @@ LOOKATASSOCIATIONPAIRS = FormSpec(
         "c_assoc_claimer_id",
     },
     person_id_col="c_person_id",
+    storeid_source_table="ZZ_SCRATCH_PEOPLE",
+    storeid_source_col="c_person_id",
+    storeid_source_filter=" WHERE c_person_id > 0",
+    personid_source_label="AssocPairs",
+    recallid_target_table="ZZ_SCRATCH_IMPORT_PEOPLE",
 )
 
 LOOKATKINSHIP = FormSpec(
@@ -148,6 +186,10 @@ LOOKATKINSHIP = FormSpec(
         "c_person_id", "c_kin_id", "c_kin_rel",
     },
     person_id_col="c_person_id",
+    storeid_source_table="ZZ_SCRATCH_PEOPLE",
+    storeid_source_col="c_person_id",
+    personid_source_label="Kinship",
+    recallid_target_table="ZZ_SCRATCH_IMPORT_PEOPLE",
 )
 
 LOOKATNETWORKS = FormSpec(
@@ -161,6 +203,10 @@ LOOKATNETWORKS = FormSpec(
         "c_person_id", "c_node_id",
     },
     person_id_col="c_person_id",
+    storeid_source_table="ZZ_SCRATCH_PEOPLE",
+    storeid_source_col="c_person_id",
+    personid_source_label="Networks",
+    recallid_target_table="ZZ_SCRATCH_IMPORT_PEOPLE",
 )
 
 LOOKATGROUPDATA = FormSpec(
@@ -174,6 +220,11 @@ LOOKATGROUPDATA = FormSpec(
         "c_person_id", "c_name", "c_name_chn",
     },
     person_id_col="c_person_id",
+    storeid_source_table="ZZ_SCRATCH_IMPORT_PEOPLE",
+    storeid_source_col="c_person_id",
+    # Form_LookAtGroupData.CmdStoreID_Click does NOT update PersonIDSource.
+    personid_source_label=None,
+    recallid_target_table="ZZ_SCRATCH_IMPORT_PEOPLE",
 )
 
 ALL_SPECS = {
