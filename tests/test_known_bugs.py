@@ -67,6 +67,85 @@ def test_bug_view_statusdata_fy_value_equals_ly_value(ro_conn):
     )
 
 
+def test_bug6_groupdata_query_entry_wrong_field():
+    """Bug #6 (findings.md) — Form_LookAtGroupData.queryEntry projects
+    `ENTRY_DATA.c_parental_status` (no `_code` suffix), but the actual
+    schema column is `c_parental_status_code`.  The INSERT...SELECT
+    statement must reference `ENTRY_DATA.c_parental_status_code` to be
+    valid.  Until CBDB fixes this, the SQL string in the dump should
+    contain the buggy form.  When fixed, this assertion fires.
+    """
+    vba_path = (REPO / "analysis" / "dump" / "vba"
+                / "Form_LookAtGroupData.vb")
+    body = vba_path.read_bytes().decode("utf-8")
+    assert "ENTRY_DATA.c_parental_status " in body, (
+        "Bug #6 appears to be FIXED — `ENTRY_DATA.c_parental_status` "
+        "no longer appears in Form_LookAtGroupData.vb (likely renamed "
+        "to `c_parental_status_code`).  Update this test to assert the "
+        "corrected form."
+    )
+    # The corrected form should be `c_parental_status_code`.  In the
+    # buggy state both the INSERT col list AND the SELECT projection
+    # mention `c_parental_status_code` once each (target-col mention
+    # is fine; the bug is the SELECT side missing the suffix).
+    n_buggy = body.count("ENTRY_DATA.c_parental_status ")
+    assert n_buggy >= 1, (
+        f"expected at least 1 buggy `ENTRY_DATA.c_parental_status ` "
+        f"reference; found {n_buggy}"
+    )
+
+
+def test_bug7_lookat_place_cmdneo4j_select_missing_dynasty_female():
+    """Bug #7 (findings_en.md) — Form_LookAtPlace.CmdNeo4j builds a
+    People-CSV from a SELECT that omits c_dynasty / c_dynasty_chn /
+    c_female, but the loop reads them.  Detected by
+    `analysis/audit_recordset_sql_projection.py`.  This regression
+    test just confirms the buggy SQL string still matches the audit's
+    expectation."""
+    vba_path = (REPO / "analysis" / "dump" / "vba"
+                / "Form_LookAtPlace.vb")
+    body = vba_path.read_bytes().decode("utf-8")
+    # The buggy SELECT has exactly 4 ZZ_SCRATCH_P_TEXT.* columns and
+    # no DYNASTIES / BIOG_MAIN columns in the projection (they're
+    # joined but not selected).
+    buggy_select = (
+        "SELECT DISTINCT ZZ_SCRATCH_P_TEXT.c_person_id, "
+        "ZZ_SCRATCH_P_TEXT.c_name, ZZ_SCRATCH_P_TEXT.c_name_chn, "
+        "ZZ_SCRATCH_P_TEXT.c_index_year"
+    )
+    assert buggy_select in body, (
+        "Bug #7 appears to be FIXED — the LookAtPlace.CmdNeo4j SELECT "
+        "no longer matches the buggy 4-col projection.  Re-run "
+        "`analysis/audit_recordset_sql_projection.py` to confirm; if "
+        "clean, flip this assertion."
+    )
+
+
+def test_bug9_lookat_entry_cmdneo4j_with_wrong_var():
+    """Bug #9 — Form_LookAtEntry.CmdNeo4j has `With tRstAssocCodes`
+    where `With tRstInstitutions` was intended (the `!c_inst_*` reads
+    that follow only make sense against the institutions recordset).
+    """
+    vba_path = (REPO / "analysis" / "dump" / "vba"
+                / "Form_LookAtEntry.vb")
+    body = vba_path.read_bytes().decode("utf-8")
+    # The pattern: a `Set tRstInstitutions = ...` line, then a few
+    # lines later `With tRstAssocCodes` followed by `!c_inst_code`
+    # within a few lines.  Loose check via two substrings being close.
+    set_idx = body.find("Set tRstInstitutions = CurrentDb.OpenRecordset")
+    if set_idx < 0:
+        pytest.fail("setup line `Set tRstInstitutions = ...` missing — "
+                    "bug context changed; review.")
+    tail = body[set_idx:set_idx + 3000]
+    assert ("With tRstAssocCodes" in tail
+            and "!c_inst_code" in tail), (
+        "Bug #9 appears to be FIXED — `With tRstAssocCodes` immediately "
+        "following the tRstInstitutions OpenRecordset is no longer "
+        "present (likely renamed to `With tRstInstitutions`).  Flip "
+        "this assertion."
+    )
+
+
 def test_bug_dao_reference_broken_in_user_mdb():
     """The shipped .mdb references DAO 3.6 (C:\\Program Files\\Common
     Files\\Microsoft Shared\\DAO\\dao360.dll) which is not installed on
