@@ -358,11 +358,27 @@ class VbaSession:
             # because Err handler raised a MsgBox we couldn't see).
             # VBA: Replace single quotes in Err.Description so the SQL
             # string stays valid; close/reopen string literals around &.
+            #
+            # IMPORTANT: an earlier version of this string had an extra
+            # closing `'` between `:ERR ` and the `& Replace(...)`,
+            # producing SQL like
+            #   VALUES ('LookAtX:ERR '<desc>')
+            # i.e. a CLOSED string literal `'LookAtX:ERR '` followed by
+            # bare `<desc>` then `')` — invalid SQL the moment Err
+            # fires with any non-empty Description.  JET silently
+            # rejected the INSERT, the Err handler errored out
+            # mid-handler, and Form_Timer's outer `On Error Resume
+            # Next` swallowed everything.  Result: every error in
+            # CmdQuery / CmdGIS / etc. went un-logged for several
+            # PRs, hiding the actual root cause of "tests pass but
+            # the file isn't there" / similar.  The fix omits the
+            # spurious closing quote so the literal opens on the left
+            # and closes on the right.
             Q = '"'
             err_replace = (
                 'CurrentDb.Execute '
                 + Q + 'INSERT INTO ZZ_TEST_DEBUG (msg) VALUES (' + "'"
-                + short + ":ERR " + "'" + Q
+                + short + ":ERR " + Q
                 + ' & Replace(Nz(Err.Description, ' + Q + Q + '), '
                 + Q + "'" + Q + ', ' + Q + "''" + Q + ')'
                 + ' & ' + Q + "'" + ')' + Q

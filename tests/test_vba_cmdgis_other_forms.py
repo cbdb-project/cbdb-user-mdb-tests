@@ -54,27 +54,27 @@ _FORMS_WITH_CMDGIS_TESTABLE_HERE = {
     "LookAtOffice", "LookAtPlace", "LookAtKinship",
 }
 
-# LookAtPlace and LookAtKinship both read a saved-query-bound subform
-# (frmZZZ_PLACE / frmZZ_SCRATCH_KIN) in their CmdGIS.  The chain block
-# now requeries those subforms before dispatching CmdGIS via
-# cbdb_driver.vba_session._SUBFORMS_TO_REQUERY — that unblocked
-# Kinship.  LookAtPlace remains skipped because its CmdGIS uses a
-# different stream pattern (writes the text stream directly to
-# `tStream.SaveToFile`, no `Position=3 → CopyTo binary` BOM-strip
-# intermediate that the other forms use).  With our test_export_path
-# correctly applied, SaveToFile silently fails to materialise the
-# file — separate driver issue, leave for follow-up.
-_PLACE_SKIP_FORMS = {"LookAtPlace"}
-
-
+# LookAtKinship's CmdGIS reads a saved-query-bound subform
+# (frmZZ_SCRATCH_KIN); the chain block now requeries it via
+# cbdb_driver.vba_session._SUBFORMS_TO_REQUERY → it passes.
+#
+# LookAtPlace's CmdGIS reads frmZZZ_PLACE which sits INSIDE
+# `TabPlaces` / `PlacePage` (a tab control).  Subforms inside tab
+# pages don't materialise their `.Form` object until the page is
+# activated AND the subform actually renders — programmatically
+# setting TabPlaces.Value = 0 isn't sufficient on its own.  CmdGIS
+# then errors with "Object required" reading
+# `frmZZZ_PLACE.Form.Recordset.RecordCount`.  Logged thanks to the
+# fixed Err-insert SQL in this PR; the actual fix (force the
+# subform to load) is left as follow-up.
 def _skip_marks(fx: CrossFixture):
-    if fx.spec.name in _PLACE_SKIP_FORMS:
+    if fx.spec.name == "LookAtPlace":
         return pytest.mark.skip(
-            reason=f"{fx.spec.name} CmdGIS uses tStream.SaveToFile "
-                   "directly (no binary CopyTo BOM strip) and silently "
-                   "doesn't write the file under our patched path. "
-                   "Subform requery shim ✅; output-stream pattern "
-                   "needs separate handling."
+            reason="LookAtPlace's frmZZZ_PLACE subform is nested in "
+                   "TabPlaces / PlacePage and doesn't load until the "
+                   "tab is rendered; CmdGIS errors with `Object "
+                   "required` reading its recordset.  Setting "
+                   "TabPlaces.Value=0 isn't enough."
         )
     return ()
 
@@ -98,6 +98,17 @@ def _seed_query_inputs(vba: VbaSession, fx: CrossFixture) -> None:
     the header bytes are predictable."""
     spec = fx.spec
     vba.open_form(spec.name)
+    # LookAtPlace's frmZZZ_PLACE subform sits inside TabPlaces /
+    # PlacePage; subforms inside Tab controls don't materialise their
+    # `.Form` object until the page is activated.  Force the active
+    # page to PlacePage so the chain block's `frmZZZ_PLACE.Form.Requery`
+    # has something to operate on (otherwise CmdGIS later errors with
+    # "Object required" reading the recordset).
+    if spec.name == "LookAtPlace":
+        try:
+            vba.set_control("LookAtPlace", "TabPlaces", 0)
+        except Exception as e:
+            print(f"  warn TabPlaces=0: {e}")
     for ctl, val in fx.controls.items():
         try:
             vba.set_control(spec.name, ctl, val)
