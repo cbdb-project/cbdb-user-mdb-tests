@@ -100,6 +100,18 @@ data/CBDB_<YYYYMMDD>_DATA.mdb    # the linked data backend
 data/HelpFiles/                  # CBDB Users Guide + per-form HelpFile_*.pdf
 ```
 
+### (Optional) Pull the cbdb-online-main-server SQLite snapshot
+
+For the cross-check test (`tests/test_index_year_xcheck.py`,
+roadmap item 12) you also need the upstream weekly SQLite dump:
+
+```bash
+python analysis/download_hf_sqlite.py
+# downloads ~130 MB into data/cbdb_online_sqlite/, extracts ~550 MB
+```
+
+Re-run weekly when CBDB pushes a new dump.
+
 ### One-time setup of the User MDB
 
 `CBDB_BJ_User.mdb` ships with a broken VBA reference to legacy DAO
@@ -202,7 +214,7 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 | 9 | ✅ done | `tests/conftest.py::pytest_configure` re-runs `analysis/discover_test_inputs.py` automatically at session start when `analysis/dump/test_inputs.json` is missing or older than `data/CBDB_BJ_User.mdb`. Opt-out via `pytest --no-discover-inputs` |
 | 10 | ⏳ open | Picker-dialog tests for `frmPickEntry_multi` etc. (currently bypassed by direct `ZZ_SCRATCH_*` writes) |
 | 11 | ✅ done | Bilingual UI test (`tests/test_vba_bilingual_ui.py`) — for each of the 9 forms with the standard `CmdFanti` / `CmdJianti` toggle pair (Networks uses different names + Form_Open hangs), opens the form, drives one Fanti round-trip to force captions through `changeDisplayLanguage` (so the FormLabels-derived state, not design-time captions, is the baseline), then asserts each toggle changes ≥5 captions and the second toggle restores the baseline exactly. Latest: `9 passed in 145.73s`. **Caveat surfaced:** a few forms (LookAtPlace, LookAtGroupData) ship with design-time captions that don't match `FormLabels` (e.g. `LblFrom = "  From"` with leading spaces vs `FormLabels.c_fanti = "From"`); the design-time text is replaced on the first `changeDisplayLanguage` call. Pre-existing CBDB UX nit, documented in the test |
-| 12 | ⏳ open | Cross-check the `index year` and `index address` derivations in the User MDB against the equivalents produced by [`cbdb-online-main-server`](https://github.com/cbdb-project/cbdb-online-main-server), and assert per-person consistency between the two implementations. **Reference snapshot:** the online server's recomputed index year / address (and the rest of the upstream data) are republished weekly as a SQLite dump at <https://huggingface.co/datasets/cbdb/cbdb-sqlite/blob/main/latest.zip>, so the cross-check can pull a stable baseline without booting the live server |
+| 12 | 🟡 partial | First slice landed: `tests/test_index_year_xcheck.py` plus `analysis/download_hf_sqlite.py` to fetch the weekly SQLite snapshot from <https://huggingface.co/datasets/cbdb/cbdb-sqlite/blob/main/latest.zip>. The test compares `c_index_year` and `c_index_addr_id` between the User MDB's `BIOG_MAIN` and the online-server SQLite's `BIOG_MAIN` — sample of 1000 by default (~2 s), or full 657 k-person sweep with `CBDB_FULL_XCHECK=1` (~12 s). Latest full sweep: **83 `c_index_year` disagreements + 492 `c_index_addr_id` disagreements out of 657 246 common persons** (passes the 0.5 %-threshold gate but the absolute disagreements are real findings worth investigating per-person). **Still open:** classify each disagreement (rule-difference vs stale-data vs real bug); add a per-table xcheck for the other derived columns CBDB recomputes weekly |
 | 13 | ✅ done | Import-list buttons (`tests/test_vba_import_lists.py`) — covers all 11 unique button names across 8 forms (15 of 17 tests pass; the 2 LookAtNetworks ones are skipped for the same Form_Open hang as items 7/15). Drives each via `Form_Timer`, points at a fixture file (whose delimiter / column count matches the saved `MSysIMEXSpecs`), and asserts: (a) the target `ZZ_SCRATCH_*` table contains exactly the valid IDs, (b) `InputErrorList` contains exactly the invalid IDs. The `gUse*` global side-effect is documented per spec but not asserted — an early inject-based reader caused JET re-entrancy hangs in matrix CmdQuery; the table-shape assertion is the meaningful contract. Driver gained: `patch_filedialog` now also handles the `With dlgX` block's `If .Show = -1 Then` (used in import subs) |
 | 14 | ✅ done | Save-list buttons (`tests/test_vba_save_lists.py`) — covers all 5 `CmdSave*_Click` handlers. Pre-populates the source `ZZ_SCRATCH_<X>` table directly (skips CmdQuery), patches `FileDialog(msoFileDialogSaveAs)` via the existing `vba.patch_filedialog`, fires the button, and asserts the resulting tab-separated UTF-8 (BOM-stripped) file contains exactly the seeded IDs — and for the 3-column specs (Entry, Associations, Office, Status, TextCategories) also that the desc / desc_chn fields match an INNER JOIN against the codes table. Latest run: `5 passed in 43.31s`. **Important:** several Form_Open handlers wipe their picker scratch table on form load; the test seeds AFTER `open_form` to avoid this |
 | 15 | ✅ done | `CmdStoreID` / `CmdRecallID` round-trip (`tests/test_vba_storeid_recallid.py`) — covers all 7 query-runnable forms for Store, 3 of 4 forms for Recall (Networks Form_Open hangs in this driver — same family as the matrix Networks skip), plus an end-to-end Entry → Kinship round-trip. Driver gained: `MsgBox "literal"` neutralizer in `_inject_autodetect`; chain+DONE block moved to *after* `Exit_<name>:` so it survives the `Resume Exit` from the form's Err handler |
@@ -324,7 +336,7 @@ python -m pytest tests/test_vba_export.py -v -W ignore -s
 - ⏳ 剩 3 個表單因遞迴展開太慢暫跳過
 - ⏳ 其他匯出按鈕（Neo4j/KML/Pajek/GUESS/Gephi）尚未涵蓋
 - ✅ pytest 啟動時自動偵測 `test_inputs.json` 是否過時並重跑 `discover_test_inputs.py`（`pytest --no-discover-inputs` 可關閉）— roadmap 第 9 項
-- ⏳ 比對 User MDB 的 `index year` / `index address` 算法與 [`cbdb-online-main-server`](https://github.com/cbdb-project/cbdb-online-main-server) 所產生結果的一致性 — roadmap 第 12 項；線上版本每週重算的快照在 <https://huggingface.co/datasets/cbdb/cbdb-sqlite/blob/main/latest.zip>（SQLite dump）
+- 🟡 比對 User MDB 的 `index year` / `index address` 算法與 [`cbdb-online-main-server`](https://github.com/cbdb-project/cbdb-online-main-server) — roadmap 第 12 項首切已上：`tests/test_index_year_xcheck.py` + `analysis/download_hf_sqlite.py`，從 <https://huggingface.co/datasets/cbdb/cbdb-sqlite/blob/main/latest.zip> 下載每週重算的 SQLite，跨 657k 人比對。最新一次全量跑：83 個 `c_index_year` 差异 + 492 個 `c_index_addr_id` 差异（在 657246 共有人 ID 中），分别在 0.5% 阈值之内，但绝对值得逐条查清是规则差异 vs 数据陈旧 vs 真 bug
 - ✅ Import-list 按鈕（`tests/test_vba_import_lists.py`，11 種按鈕跨 8 個表單，15 passed + 2 skipped；只有 LookAtNetworks 兩項因 Form_Open 卡住而 skip）— roadmap 第 13 項
 - ⏳ Save-list 按鈕（`CmdSaveEntryCodes` / `CmdSaveOffices` 等）寫出清單檔的位元組級對比 — roadmap 第 14 項
 - ✅ `CmdStoreID` / `CmdRecallID` 跨 form round-trip 測試（`tests/test_vba_storeid_recallid.py`，11 passed + 1 skipped；含 Entry → Kinship 完整 round-trip）— roadmap 第 15 項
