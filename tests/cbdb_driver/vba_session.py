@@ -321,6 +321,12 @@ class VbaSession:
     _SUBFORMS_TO_REQUERY = {
         "Form_LookAtPlace": ["frmZZZ_PLACE"],
         "Form_LookAtKinship": ["frmZZ_SCRATCH_KIN"],
+        # Status doesn't need a requery here — its CmdQuery cleanup
+        # block at Exit_Run_Query already rebinds both subforms via
+        # `Set ZZ_SCRATCH_STATUS.Form.Recordset = CurrentDb.
+        # OpenRecordset(...)`.  An extra `.Form.Requery` after that
+        # rebind invalidates the freshly-assigned Recordset and the
+        # downstream CmdPajek / CmdGephi reads .RecordCount=0.
     }
 
     def _inject_autodetect(self) -> None:
@@ -331,7 +337,7 @@ class VbaSession:
         AND chain a follow-up sub (e.g. CmdGIS) without needing
         Form_Timer to fire twice."""
         proj = self.app.VBE.VBProjects(1)
-        marker = "AUTO-DETECT PICKER STATE v6"
+        marker = "AUTO-DETECT PICKER STATE v8"
         for module_name, body_lines in self._AUTODETECT.items():
             try:
                 comp = proj.VBComponents(module_name)
@@ -803,7 +809,7 @@ class VbaSession:
     )
 
     # ---------- FileDialog patch (for export tests) ----------
-    _FILEDIALOG_PATCH_MARKER = "FILEDIALOG_PATCH v6"
+    _FILEDIALOG_PATCH_MARKER = "FILEDIALOG_PATCH v7"
 
     def patch_filedialog(self, form: str) -> None:
         """Patch every `Application.FileDialog(msoFileDialogSaveAs)`
@@ -828,10 +834,13 @@ class VbaSession:
         # short-circuits the dialog when GetTestExportPath() is set.
         # VBA `Or` is NOT short-circuited — both sides evaluate, so
         # the dialog still pops even when test path is set.  Use a
-        # boolean temp variable instead.
+        # boolean temp instead — declared MODULE-LEVEL (Public, see
+        # `helper` below) so re-injecting per match doesn't trigger
+        # "Duplicate declaration in current scope" in subs that have
+        # multiple `<var>.Show = -1` sites (CmdNeo4j has 3+).
         body2 = re.sub(
             r"(?P<indent>[ \t]*)If\s+(?P<v>[A-Za-z_]\w*)\.Show\s*=\s*-1\s+Then",
-            f"\\g<indent>Dim doExpFlag As Boolean : doExpFlag = False\n"
+            f"\\g<indent>doExpFlag = False\n"
             f"\\g<indent>If GetTestExportPath() <> {Q}{Q} Then\n"
             f"\\g<indent>    doExpFlag = True\n"
             f"\\g<indent>ElseIf \\g<v>.Show = -1 Then\n"
@@ -845,22 +854,16 @@ class VbaSession:
         # CmdPajek / CmdGephi / CmdUCInet) — `dlgSaveAs` is the With
         # subject, so `.Show` has no var prefix.
         #
-        # Use the SAME `doExpFlag` strategy as the var-prefix pattern
-        # above so the original IF body still runs when the test path
-        # is set.  This matters for subs whose write+SaveToFile is
-        # INSIDE the `If .Show = -1 Then` block (CmdGUESS / CmdPajek
-        # etc.) — an If/ElseIf rewrite would skip the write entirely
-        # in test mode.  CmdImport's body is OUTSIDE the .Show block
-        # so it would have worked either way.
+        # Same module-level `doExpFlag` (no Dim) — see 1.
         body2 = re.sub(
             r"(?P<indent>[ \t]*)If\s+\.Show\s*=\s*-1\s+Then",
-            f"\\g<indent>Dim doExpFlagB As Boolean : doExpFlagB = False\n"
+            f"\\g<indent>doExpFlag = False\n"
             f"\\g<indent>If GetTestExportPath() <> {Q}{Q} Then\n"
-            f"\\g<indent>    doExpFlagB = True\n"
+            f"\\g<indent>    doExpFlag = True\n"
             f"\\g<indent>ElseIf .Show = -1 Then\n"
-            f"\\g<indent>    doExpFlagB = True\n"
+            f"\\g<indent>    doExpFlag = True\n"
             f"\\g<indent>End If\n"
-            f"\\g<indent>If doExpFlagB Then",
+            f"\\g<indent>If doExpFlag Then",
             body2,
         )
 
