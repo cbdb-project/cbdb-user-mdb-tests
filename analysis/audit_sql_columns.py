@@ -88,7 +88,8 @@ def _scan(form_path: Path, schema: dict[str, set[str]]
     """Return list of (line_no, table, column, snippet) for table.col
     references in `form_path` whose column isn't in the table's
     schema."""
-    raw = form_path.read_text(encoding="utf-8").splitlines()
+    from audit_lib import read_vba_lines
+    raw = read_vba_lines(form_path)
     diagnostics: list[tuple[int, str, str, str]] = []
     seen_per_pair: dict[tuple[str, str], int] = {}
 

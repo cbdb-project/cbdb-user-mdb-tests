@@ -170,15 +170,9 @@ def _parse_projection(sql: str) -> set[str] | None:
 
 
 def _read_lines(path: Path) -> list[str]:
-    """Dump files use `\\r\\r\\n` line endings (Windows double-CR
-    quirk).  Python's universal-newlines mode translates each `\\r`
-    into a `\\n` and inflates the line count 2x.  Read raw bytes,
-    decode, then split on `\\r\\n` (the actual record separator) so
-    line numbers match grep / VBE."""
-    text = path.read_bytes().decode("utf-8")
-    # Some lines have `\r\r\n`, some `\r\n`, some `\n` — split on \n
-    # then strip trailing \r per line (handles all three).
-    return [ln.rstrip("\r") for ln in text.split("\n")]
+    """Thin wrapper around the shared `_audit_lib.read_vba_lines`."""
+    from audit_lib import read_vba_lines
+    return read_vba_lines(path)
 
 
 def _scan(path: Path) -> list[tuple[int, str, str, str]]:

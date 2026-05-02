@@ -94,8 +94,8 @@ def _scan_form(form_short: str) -> list[tuple[int, str, str]]:
         return []
     out: list[tuple[int, str, str]] = []
     seen_per_id: dict[str, int] = {}
-    for ln_no, line in enumerate(f.read_text(encoding="utf-8").splitlines(),
-                                 1):
+    from audit_lib import read_vba_lines
+    for ln_no, line in enumerate(read_vba_lines(f), 1):
         # Skip comment-only lines — VBA comment is leading `'`.
         stripped = line.lstrip()
         if stripped.startswith("'"):
