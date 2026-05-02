@@ -31,6 +31,29 @@ def vba():
     yield from make_fixture(SRC, WORK)
 
 
+def test_bug2_dao360_reference_is_broken(vba: VbaSession):
+    """Bug #2: the .mdb ships with a broken VBA reference to
+    dao360.dll which we used to autopatch in `vba.open()` (replaces
+    with ACEDAO.DLL).  This deep test inspects the working-copy
+    .mdb's VBE references AFTER our autopatch ran and confirms NO
+    broken reference remains — i.e. the workaround works.
+
+    A future fix would have CBDB ship without the broken reference
+    in the first place, in which case this test still passes (the
+    file just never had it to begin with).
+    """
+    proj = vba.app.VBE.VBProjects(1)
+    broken = []
+    for r in list(proj.References):
+        if getattr(r, "IsBroken", False):
+            broken.append((getattr(r, "Name", "?"),
+                           getattr(r, "FullPath", "?")))
+    assert not broken, (
+        f"Bug #2 workaround failed — {len(broken)} broken VBA "
+        f"reference(s) remain after vba.open(): {broken}"
+    )
+
+
 _MISSING_FORM_CASES = [
     ("frmPickNIAN_HAO", 13),
     ("frmPickKINSHIP_CODES", 14),
