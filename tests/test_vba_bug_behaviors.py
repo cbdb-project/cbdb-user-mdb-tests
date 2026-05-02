@@ -96,33 +96,70 @@ def _chain_via_tag(vba: VbaSession, form: str, *,
     return _read_debug_log(vba)
 
 
-def test_bug5_lookat_status_cmdpajek_sql_blocked_by_chain():
-    """Bug #5 (SQL side) needs CmdPajek to actually fire.  In this
-    driver, chaining `CmdQuery,CmdPajek` on LookAtStatus is silently
-    dropped (same root family as the Pajek/Gephi cross-form Status
-    skips in PR #24): CmdQuery's cleanup section rebinds
-    ZZ_SCRATCH_STATUS / ZZ_SCRATCH_P_STATUS via direct
-    `Set <subform>.Form.Recordset = CurrentDb.OpenRecordset(...)` and
-    something about that rebind keeps the chain dispatch from
-    actually invoking CmdPajek_Click.
+def test_bug5_lookat_status_cmdpajek_sql_fires_field_error(vba: VbaSession):
+    """Bug #5 (SQL side): CmdPajek_Click body has a SELECT that
+    references columns missing from ZZ_SCRATCH_STATUS.  Trigger by:
+      1. Pre-populating ZZ_SCRATCH_STATUS via pyodbc with a minimal
+         row so the early `RecordCount = 0` bail is skipped.
+      2. Open LookAtStatus (Form_Open wipes IMPORT_PEOPLE but NOT
+         the SCRATCH_STATUS data we just inserted IF we reinsert
+         after open).
+      3. Direct timer-fire `CmdPajek` (no chain — Status's CmdQuery
+         cleanup interferes with chain dispatch).
+    """
+    from cbdb_driver.form_specs import LOOKATSTATUS
+    spec = LOOKATSTATUS
+    # Open the form first — Form_Open wipes ZZ_SCRATCH_STATUS.
+    vba.open_form(spec.name)
+    # Seed via Access's OWN connection (not pyodbc) — pyodbc writes
+    # are invisible to Access's cached subform recordset until much
+    # later, defeating the test's Requery.  CurrentDb.Execute writes
+    # are visible immediately.
+    db = vba.app.CurrentDb()
+    db.Execute(
+        "INSERT INTO ZZ_SCRATCH_STATUS "
+        "(c_personid, c_sequence, c_status_code) VALUES (4, 1, 1)"
+    )
+    db.Execute(
+        "INSERT INTO ZZ_SCRATCH_P_STATUS (c_person_id, c_addr_id) "
+        "VALUES (4, 100658)"
+    )
+    f = vba.app.Forms(spec.name)
+    try:
+        f.Controls("ZZ_SCRATCH_STATUS").Form.Requery()
+        f.Controls("ZZ_SCRATCH_P_STATUS").Form.Requery()
+    except Exception as e:
+        print(f"  warn requery: {e}")
 
-    Static `test_known_bugs.test_bug5` already covers the ChkIDs +
-    SQL code-grep side.  A behavioral repro for the SQL half would
-    need either:
-      - direct VBA `Application.Run "Form_LookAtStatus.CmdPajek_Click"`
-        (form-module subs aren't reachable that way — see AGENTS.md
-        Application.Run note),
-      - a separate timer-fire after CmdQuery completes (driver
-        currently fires once per OpenForm session), or
-      - a fresh OpenForm + pre-populate ZZ_SCRATCH_STATUS directly,
-        then fire CmdPajek standalone (next-step deeper test idea).
-
-    Documented as skip for now."""
-    pytest.skip("Bug #5 SQL repro blocked by Status's CmdQuery cleanup "
-                "rebind + single-fire timer; static marker covers the "
-                "code-side, behavioral repro requires deeper driver "
-                "work (separate-timer trigger after pre-populated "
-                "ZZ_SCRATCH_STATUS).")
+    # Direct timer-fire CmdPajek (NO CmdQuery chain).
+    vba.click_via_timer(spec.name, ctl="CmdPajek",
+                         result_table=None, timeout=60)
+    msgs = _read_debug_log(vba)
+    print(f"\nDEBUG log: {msgs}", flush=True)
+    err_msgs = [m for m in msgs if ":ERR " in m]
+    # Bug #5 covers a cluster: ChkIDs control + 3 missing SQL columns +
+    # potentially other knock-on issues from the broader copy-paste
+    # mistake.  ANY ERR fired by CmdPajek under a fresh ZZ_SCRATCH_STATUS
+    # row is the bug — a clean form would complete and write a .net file.
+    # We check err is non-empty AND specific to the family.
+    assert err_msgs, (
+        f"Bug #5 may be FIXED — LookAtStatus.CmdPajek now completes "
+        f"without errors.  msgs={msgs}"
+    )
+    expected_kinds = (
+        "object required",       # ChkIDs control side
+        "field",                 # c_person_id / c_status_id / c_status_count
+        "c_person_id",
+        "c_status_id",
+        "c_status_count",
+        "no such",
+    )
+    matched = any(any(k in m.lower() for k in expected_kinds)
+                   for m in err_msgs)
+    assert matched, (
+        f"Bug #5 fired an unexpected error type — investigate.  "
+        f"err_msgs={err_msgs}"
+    )
 
 
 def test_bug6_lookat_groupdata_query_entry_fires_no_such_field(vba: VbaSession):
