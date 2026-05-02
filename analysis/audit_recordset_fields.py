@@ -80,7 +80,8 @@ BANG_RE = re.compile(
 def _scan(form_path: Path, schema: dict[str, set[str]]
           ) -> list[tuple[int, str, str, str, str]]:
     """Per-file diagnostics: (line_no, sub, var, field, table)."""
-    raw = form_path.read_text(encoding="utf-8").splitlines()
+    from audit_lib import read_vba_lines
+    raw = read_vba_lines(form_path)
     diagnostics: list[tuple[int, str, str, str, str]] = []
 
     cur_sub = ""

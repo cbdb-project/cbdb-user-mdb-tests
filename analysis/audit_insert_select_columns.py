@@ -231,7 +231,8 @@ def main() -> int:
     sql_examined = 0
     print(f"=== Auditing {len(forms)} VBA modules ===\n")
     for form_path in forms:
-        raw = form_path.read_text(encoding="utf-8").splitlines()
+        from audit_lib import read_vba_lines
+        raw = read_vba_lines(form_path)
         per_file: list[tuple[int, str, int, int, str, str]] = []
         for ln_no, logical in _stitch_continuations(raw):
             stripped = logical.lstrip()

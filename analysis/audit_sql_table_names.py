@@ -172,7 +172,8 @@ def main() -> int:
     print(f"=== Auditing {len(forms)} VBA modules vs "
           f"{len(known)} known tables/queries/aliases ===\n")
     for form_path in forms:
-        raw = form_path.read_text(encoding="utf-8").splitlines()
+        from audit_lib import read_vba_lines
+        raw = read_vba_lines(form_path)
         per_file: dict[tuple[str, str], list[int]] = defaultdict(list)
         for ln_no, logical in _stitch_continuations(raw):
             if logical.lstrip().startswith("'"):
