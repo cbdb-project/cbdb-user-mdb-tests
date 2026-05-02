@@ -398,6 +398,7 @@ class VbaSession:
             seen_sub = False
             err_label = "Err_CmdQuery_Click"
             in_sub = False
+            seen_exit_label = False
 
             for line in body.splitlines():
                 stripped = line.strip()
@@ -410,17 +411,43 @@ class VbaSession:
                     new_lines.append(line)
                     continue
                 if in_sub and stripped.startswith("Exit_") and stripped.endswith(":"):
-                    # Inject chain+DONE block AFTER the Exit_ label so
-                    # it runs on both fall-through (success) and
-                    # `Resume Exit_<name>` from the Err handler — the
-                    # latter would otherwise skip a block placed
-                    # before the label.  Tests that exercise a form
-                    # whose CmdQuery hits Bug #3 (backfill UPDATE
-                    # silently fails on >10k-row sets) used to lose
-                    # the DONE marker entirely; now they don't.
+                    # Mark that we've passed the Exit_ label.  We DON'T
+                    # inject the chain here — the chain has to run
+                    # AFTER the cleanup that follows the label, otherwise
+                    # forms that rebind their subform recordsets in
+                    # cleanup (Status / Texts / Associations) hand the
+                    # chained CmdGIS / CmdNeo4j a stale empty subform.
+                    # Forms that rebind in the body (Entry / Office /
+                    # Place) don't care.  See `seen_exit_label` branch
+                    # below for the actual chain insertion point.
+                    #
+                    # We DO inject `On Error Resume Next` right after
+                    # the label, though — the surrounding sub still
+                    # has `On Error GoTo Err_<name>` from its prologue,
+                    # so any error during cleanup (LookAtKinship's
+                    # `frmZZ_SCRATCH_KIN.Form.OrderBy = "c_up,..."`
+                    # observed) jumps back to Err_<name>, whose `Resume
+                    # Exit_<name>` then loops back to this label and
+                    # re-runs cleanup forever.  Swallowing cleanup
+                    # errors lets the chain block + DONE marker still
+                    # fire.  The chain block re-enables proper error
+                    # trapping with its own `On Error GoTo 0`.
                     new_lines.append(line)
+                    new_lines.append(
+                        "    On Error Resume Next  ' test infra: "
+                        "swallow cleanup errors so chain block runs"
+                    )
+                    seen_exit_label = True
+                    continue
+                if in_sub and seen_exit_label and stripped == "Exit Sub":
+                    # Inject chain+DONE right BEFORE the Exit Sub that
+                    # ends the cleanup section.  Both success
+                    # fall-through and `Resume Exit_<name>` from the
+                    # Err handler reach this point after cleanup.
                     new_lines.append(done_insert)
+                    new_lines.append(line)
                     in_sub = False
+                    seen_exit_label = False
                     continue
                 new_lines.append(line)
                 if seen_sub and not injected_pre and stripped.startswith("On Error"):

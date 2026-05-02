@@ -150,13 +150,13 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 
 | Form | Real-VBA matrix | Real export | StoreID / RecallID | Import-list | Save-list | Notes |
 |------|-----------------|-------------|---------------------|-------------|-----------|-------|
-| LookAtEntry            | ✅ `test_vba_matrix.py` | ✅ CmdGIS | ✅ Store; round-trip → Kinship ✅ | ✅ EntryCodes + Places | ✅ EntryCodes (3-col) | Bug #3 confirmed in this form only |
-| LookAtStatus           | ✅ 3 fixtures | — | ✅ Store | ✅ StatusCodes + Places | ✅ StatusCodes (3-col) | 17 023 + 4 931 rows |
-| LookAtTexts            | ✅ biblcat 1 | — | ✅ Store | ✅ TextCategories + Places | ✅ TextCategories (3-col) | 15 774 rows |
-| LookAtAssociations     | ✅ 3 fixtures | — | ✅ Store | ✅ Associations + Places | ✅ Associations (3-col) | 11 867 rows |
-| LookAtOffice           | ✅ 2 fixtures | — | ✅ Store | ✅ Offices + PlaceOffice + PlacePeople | ✅ Offices (3-col) | 37 429 + 35 748 rows |
-| LookAtPlace            | ✅ 2 fixtures | — | ✅ Store | ✅ Places | — (no save button) | 5 962 + 3 528 rows |
-| LookAtKinship          | ✅ 1 fixture | — | ✅ Store + ✅ Recall | ✅ CmdImport | — (no save button) | 949 rows (Zhao Tingmei) |
+| LookAtEntry            | ✅ `test_vba_matrix.py` | ✅ CmdGIS (byte-diff) | ✅ Store; round-trip → Kinship ✅ | ✅ EntryCodes + Places | ✅ EntryCodes (3-col) | Bug #3 confirmed in this form only |
+| LookAtStatus           | ✅ 3 fixtures | ✅ CmdGIS (struct) | ✅ Store | ✅ StatusCodes + Places | ✅ StatusCodes (3-col) | 17 023 + 4 931 rows |
+| LookAtTexts            | ✅ biblcat 1 | ✅ CmdGIS (struct) | ✅ Store | ✅ TextCategories + Places | ✅ TextCategories (3-col) | 15 774 rows |
+| LookAtAssociations     | ✅ 3 fixtures | ✅ CmdGIS (struct) | ✅ Store | ✅ Associations + Places | ✅ Associations (3-col) | 11 867 rows |
+| LookAtOffice           | ✅ 2 fixtures | ✅ CmdGIS (struct) | ✅ Store | ✅ Offices + PlaceOffice + PlacePeople | ✅ Offices (3-col) | 37 429 + 35 748 rows |
+| LookAtPlace            | ✅ 2 fixtures | ⏭ CmdGIS (subform requery needed) | ✅ Store | ✅ Places | — (no save button) | 5 962 + 3 528 rows |
+| LookAtKinship          | ✅ 1 fixture | ⏭ CmdGIS (subform requery needed) | ✅ Store + ✅ Recall | ✅ CmdImport | — (no save button) | 949 rows (Zhao Tingmei) |
 | LookAtAssociationPairs | ⏭ skipped | — | ✅ Recall | ✅ CmdImportList | — (no save button) | `Link1stOrder` ASSOC_DATA self-join too slow |
 | LookAtNetworks         | ⏭ skipped | — | ⏭ Recall (Form_Open hangs) | ⏭ ImportPeople / ImportPlaces (Form_Open) | — (no save button) | recursive expansion (Zhu Xi 2 471 assocs) |
 | LookAtGroupData        | ⏭ skipped | — | ✅ Recall | ✅ CmdImport | — (no save button) | similar recursion |
@@ -166,7 +166,8 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 **Latest Import-list run** (`tests/test_vba_import_lists.py`): `15 passed, 2 skipped in 142.04s`.
 **Latest Save-list run** (`tests/test_vba_save_lists.py`): `5 passed in 43.31s`.
 **Latest Bilingual run** (`tests/test_vba_bilingual_ui.py`): `9 passed in 145.73s`.
-**Combined regression** (save + import + storeid + matrix_all + matrix-entry): `45 passed, 6 skipped, 4 xfailed in 559.74s`.
+**Latest CmdGIS-other-forms run** (`tests/test_vba_cmdgis_other_forms.py`): `4 passed, 2 skipped in 123.75s`.
+**Combined regression** (all 8 test files, 71 tests): `59 passed, 8 skipped, 4 xfailed in 837.76s`.
 
 ### Confirmed bugs
 
@@ -189,7 +190,7 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 | 5 | ✅ done | Independent SQL replay layer (`tests/cbdb_replay/`) for differential checking |
 | 6 | ✅ done | Auto-discovery of fresh fixtures (`analysis/discover_test_inputs.py`) |
 | 7 | ⏳ open | Get `LookAtAssociationPairs` / `LookAtNetworks` / `LookAtGroupData` running — needs smaller-fixture search or VBA query rewrite (see `findings.md`) |
-| 8 | ⏳ open | Real-export tests for the other buttons: `CmdNeo4j`, `CmdKML`, `CmdPajek`, `CmdGUESS`, `CmdGephi` (chain pattern already proven) |
+| 8 | 🟡 partial | First slice landed: `tests/test_vba_cmdgis_other_forms.py` extends real-`CmdGIS` coverage from LookAtEntry (`test_vba_export.py`) to Status / Texts / Associations / Office (4 added; LookAtPlace and LookAtKinship skipped — their CmdGIS reads a subform whose RecordSource is a saved query, the cached recordset stays at 0 rows after CmdQuery without an explicit `<subform>.Form.Requery` we don't yet inject). Uses **structural** assertions (file exists, header has `NameChn` column, ≥ 4 cols, ≥ 1 data row) rather than byte-diff — easier to maintain across data refreshes. **Driver fix bundled in:** the autodetect chain block was injected right after `Exit_<name>:` but several forms (Status / Texts / Associations) rebind their subform recordsets in the cleanup that follows the label, so a chained `CmdGIS` previously saw a stale empty subform — now injected after cleanup, before `Exit Sub`. **Still open:** the other export buttons (`CmdNeo4j`, `CmdKML`, `CmdPajek`, `CmdGUESS`, `CmdGephi`, `CmdUCInet`, `CmdGISPeople`) and the picker subform `Form.Requery` shim |
 | 9 | ✅ done | `tests/conftest.py::pytest_configure` re-runs `analysis/discover_test_inputs.py` automatically at session start when `analysis/dump/test_inputs.json` is missing or older than `data/CBDB_BJ_User.mdb`. Opt-out via `pytest --no-discover-inputs` |
 | 10 | ⏳ open | Picker-dialog tests for `frmPickEntry_multi` etc. (currently bypassed by direct `ZZ_SCRATCH_*` writes) |
 | 11 | ✅ done | Bilingual UI test (`tests/test_vba_bilingual_ui.py`) — for each of the 9 forms with the standard `CmdFanti` / `CmdJianti` toggle pair (Networks uses different names + Form_Open hangs), opens the form, drives one Fanti round-trip to force captions through `changeDisplayLanguage` (so the FormLabels-derived state, not design-time captions, is the baseline), then asserts each toggle changes ≥5 captions and the second toggle restores the baseline exactly. Latest: `9 passed in 145.73s`. **Caveat surfaced:** a few forms (LookAtPlace, LookAtGroupData) ship with design-time captions that don't match `FormLabels` (e.g. `LblFrom = "  From"` with leading spaces vs `FormLabels.c_fanti = "From"`); the design-time text is replaced on the first `changeDisplayLanguage` call. Pre-existing CBDB UX nit, documented in the test |
