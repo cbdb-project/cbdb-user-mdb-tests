@@ -75,28 +75,26 @@ def mdb() -> pyodbc.Connection:
     conn.close()
 
 
-def _fetch_index(conn, ids: list[int], dialect: str) -> dict[int, tuple]:
-    """Return {c_personid: (c_index_year, c_index_addr_id)} for the
-    given ids.  `dialect` is "mdb" or "sqlite" — used to format the
-    IN clause within the engines' max-parameter limits.
-
-    JET tops out at ~2100 parameters per query; SQLite at 999 by
-    default.  Chunk to be safe under both."""
+def _fetch_fields(conn, ids: list[int],
+                  fields: tuple[str, ...]) -> dict[int, tuple]:
+    """Return {c_personid: (field1, field2, ...)} for the given ids
+    and field list.  Chunked at 500 ids/query to stay under both
+    JET's ~2100-parameter and SQLite's 999-parameter limits."""
     out: dict[int, tuple] = {}
     chunk = 500
     cur = conn.cursor()
+    fields_sql = ", ".join(fields)
     for i in range(0, len(ids), chunk):
         batch = ids[i:i + chunk]
         in_clause = ",".join(str(int(b)) for b in batch)
         cur.execute(
-            f"SELECT c_personid, c_index_year, c_index_addr_id "
+            f"SELECT c_personid, {fields_sql} "
             f"FROM BIOG_MAIN WHERE c_personid IN ({in_clause})"
         )
         for r in cur.fetchall():
             pid = int(r[0])
-            iy = None if r[1] is None else int(r[1])
-            ia = None if r[2] is None else int(r[2])
-            out[pid] = (iy, ia)
+            vals = tuple(None if v is None else int(v) for v in r[1:])
+            out[pid] = vals
     cur.close()
     return out
 
@@ -111,7 +109,11 @@ def _all_ids(conn, dialect: str) -> set[int]:
 
 def test_index_year_addr_xcheck_sample(mdb, hf_sqlite):
     """Sample 1000 random common person ids and assert the User MDB
-    and HF SQLite agree on `c_index_year` AND `c_index_addr_id`.
+    and HF SQLite agree on `c_index_year` AND `c_index_addr_id` (the
+    DERIVED fields).  Also report disagreements on `c_birthyear` and
+    `c_deathyear` (the SOURCE fields) — those would indicate the two
+    pipelines have diverged on basic person data, not just on
+    derivation rules.
 
     Set `CBDB_FULL_XCHECK=1` to widen to all ~657k common ids."""
     full = bool(os.environ.get("CBDB_FULL_XCHECK"))
@@ -129,53 +131,59 @@ def test_index_year_addr_xcheck_sample(mdb, hf_sqlite):
         rng = random.Random(20260502)
         ids = rng.sample(sorted(common), min(1000, len(common)))
 
-    mdb_idx = _fetch_index(mdb, ids, "mdb")
-    sql_idx = _fetch_index(hf_sqlite, ids, "sqlite")
-    print(f"[xcheck] fetched {len(mdb_idx)} from MDB, "
-          f"{len(sql_idx)} from SQLite (asked for {len(ids)})", flush=True)
+    fields = ("c_index_year", "c_index_addr_id",
+              "c_birthyear", "c_deathyear")
+    mdb_rows = _fetch_fields(mdb, ids, fields)
+    sql_rows = _fetch_fields(hf_sqlite, ids, fields)
+    print(f"[xcheck] fetched {len(mdb_rows)} from MDB, "
+          f"{len(sql_rows)} from SQLite (asked for {len(ids)})",
+          flush=True)
 
-    iy_mismatch: list[tuple[int, tuple, tuple]] = []
-    ia_mismatch: list[tuple[int, tuple, tuple]] = []
+    by_col: dict[str, list[tuple[int, tuple, tuple]]] = {
+        c: [] for c in fields
+    }
     for pid in ids:
-        m = mdb_idx.get(pid)
-        s = sql_idx.get(pid)
+        m = mdb_rows.get(pid)
+        s = sql_rows.get(pid)
         if m is None or s is None:
             continue
-        if m[0] != s[0]:
-            iy_mismatch.append((pid, m, s))
-        if m[1] != s[1]:
-            ia_mismatch.append((pid, m, s))
+        for j, col in enumerate(fields):
+            if m[j] != s[j]:
+                by_col[col].append((pid, m, s))
 
-    print(f"[xcheck] c_index_year mismatches: {len(iy_mismatch)} "
-          f"/ {len(ids)}", flush=True)
-    print(f"[xcheck] c_index_addr_id mismatches: {len(ia_mismatch)} "
-          f"/ {len(ids)}", flush=True)
+    n = len(ids)
+    print(f"\n[xcheck] disagreement counts (out of {n} ids):", flush=True)
+    for col in fields:
+        cnt = len(by_col[col])
+        print(f"  {col:<20}  {cnt:>6}  "
+              f"({100.0 * cnt / max(1, n):.3f}%)", flush=True)
+        for row in by_col[col][:3]:
+            print(f"      {row}", flush=True)
+    print()
 
-    if iy_mismatch:
-        print(f"[xcheck] first {min(10, len(iy_mismatch))} "
-              f"c_index_year diffs (pid, MDB, SQLite):", flush=True)
-        for row in iy_mismatch[:10]:
-            print(f"    {row}", flush=True)
-    if ia_mismatch:
-        print(f"[xcheck] first {min(10, len(ia_mismatch))} "
-              f"c_index_addr_id diffs (pid, MDB, SQLite):", flush=True)
-        for row in ia_mismatch[:10]:
-            print(f"    {row}", flush=True)
-
-    # The two databases COULD legitimately disagree on a few persons
-    # (different snapshot dates, derivation rule changes mid-week).
-    # Treat substantial disagreement as a finding to flag.  Threshold
-    # tuned conservatively: any sample-level disagreement above 0.5%
-    # (so 5+ on a 1000-sample) is worth investigating.
-    iy_pct = 100.0 * len(iy_mismatch) / max(1, len(ids))
-    ia_pct = 100.0 * len(ia_mismatch) / max(1, len(ids))
-    assert iy_pct < 0.5, (
-        f"c_index_year disagreement {iy_pct:.2f}% "
-        f"({len(iy_mismatch)} / {len(ids)}) exceeds 0.5% threshold; "
-        f"investigate (sample examples printed above)"
+    # Failure threshold per column.  c_index_year / c_index_addr_id
+    # are derived and may differ on tiebreaks — we accept up to 0.5%.
+    # c_birthyear / c_deathyear are SOURCE data; any divergence above
+    # 0.1% would suggest the two CBDB pipelines have meaningfully
+    # diverged on basic person facts (Pattern B in findings.md
+    # Open Question #1) — surface as a hard failure so we notice.
+    derived_pct = lambda col: 100.0 * len(by_col[col]) / max(1, n)
+    source_pct = lambda col: 100.0 * len(by_col[col]) / max(1, n)
+    assert derived_pct("c_index_year") < 0.5, (
+        f"c_index_year disagreement {derived_pct('c_index_year'):.3f}% "
+        f"exceeds 0.5% threshold"
     )
-    assert ia_pct < 0.5, (
-        f"c_index_addr_id disagreement {ia_pct:.2f}% "
-        f"({len(ia_mismatch)} / {len(ids)}) exceeds 0.5% threshold; "
-        f"investigate (sample examples printed above)"
+    assert derived_pct("c_index_addr_id") < 0.5, (
+        f"c_index_addr_id disagreement {derived_pct('c_index_addr_id'):.3f}% "
+        f"exceeds 0.5% threshold"
+    )
+    assert source_pct("c_birthyear") < 0.1, (
+        f"c_birthyear disagreement {source_pct('c_birthyear'):.3f}% "
+        f"exceeds 0.1% threshold — pipelines have diverged on SOURCE "
+        f"data, not just derivation"
+    )
+    assert source_pct("c_deathyear") < 0.1, (
+        f"c_deathyear disagreement {source_pct('c_deathyear'):.3f}% "
+        f"exceeds 0.1% threshold — pipelines have diverged on SOURCE "
+        f"data, not just derivation"
     )

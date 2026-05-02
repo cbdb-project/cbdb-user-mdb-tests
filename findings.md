@@ -146,9 +146,56 @@ End If
 
 ### Open Question #1 — User MDB vs cbdb-online-main-server 的 `c_index_year` / `c_index_addr_id` 不一致
 
-`tests/test_index_year_xcheck.py` 在最新一次全量跑（657246 共有 person id）发现：
-- **83 個 `c_index_year` 差异**（0.013%）
-- **492 個 `c_index_addr_id` 差异**（0.075%）
+**TL;DR（2026-05-02 更新）**：两边跑的是同一个算法（cbdb-online-main-server 的 `IndexYearRebuildService.php`），但有 12 个 person 的 source 数据本身就分歧（MDB 知道生卒年，SQLite 不知道，或两边都知道但不同），那 12 个又向下游连带让 `c_index_year` 算出不一样。剩下的 ~70 个 `c_index_year` 差异和 492 个 `c_index_addr_id` 差异是 Phase C kinship 传播 loop 里的 tiebreak。**核心分歧不在算法上，而在源数据 sync gap 上**。
+
+`tests/test_index_year_xcheck.py` 在 657246 个共有 person id 上跑全量比对：
+
+| 字段 | 类型 | 不一致数 | % |
+|---|---|---:|---:|
+| `c_index_year` | derived | 83 | 0.013% |
+| `c_index_addr_id` | derived | 492 | 0.075% |
+| `c_birthyear` | source | 12 | 0.002% |
+| `c_deathyear` | source | 12 | 0.002% |
+
+#### 算法本身两边一致
+
+派生规则的算法源头：cbdb-online-main-server 仓库的
+[`app/Services/IndexYearRebuildService.php`](https://github.com/cbdb-project/cbdb-online-main-server/blob/develop/app/Services/IndexYearRebuildService.php)。
+分 Phase A（直接规则 01-11、29、30）+ Phase B（聚合规则 17、27）+ Phase C（最多 2 轮 kinship 传播：04、12、14、16、18、20、22、24、26、28）。组合代码（如 `1112`、`1312`、`2912`）来自 loop 阶段把父代码 CONCAT 上当前规则编号。
+
+本仓库的 User MDB **没有任何 VBA / saved query 自己派生 `c_index_year`** —— 它只读 BIOG_MAIN 里预先算好的值。`c_index_year` 应该是 CBDB 主数据库 pipeline（同一个 `RebuildIndexYear` 命令）算好后导出到 User MDB 的。
+
+按 `c_index_year_type_code` 分布对比，MDB 137 种 vs SQLite 136 种，每种 rule 的人数差异都在 5-100 人之间（`'05'` 64138 vs 64239，`'01'` 60094 vs 60089，`'11'` 16238 vs 16212 ...）。所以**两边跑的是同一个算法**，只是输入数据 / 快照时点略有差异。
+
+#### 12 条 source-data drift（Pattern B）
+
+```
+pid 1455: MDB birth=1001/death=1047  | SQLite birth=0/death=0
+pid 19149: MDB birth=1016/death=1076 | SQLite birth=0/death=0
+pid 40008: MDB birth=1239/death=1330 | SQLite birth=1173/death=1264
+```
+
+前两类是 MDB 比 SQLite "知道得更多"（可能 MDB 是更新的快照），第三类是两边都有数据但**不同**（更值得深查 —— 可能是有人对其中一边做了校订没有同步给另一边）。
+
+#### 大部分派生差异是 source-data drift 的下游影响
+
+`IndexYearRebuildService.php` 的 Rule 01 就是 `c_index_year = c_birthyear`。所以当 MDB 知道 birthyear=1001 而 SQLite 不知道，Rule 01 在 MDB 上触发（`type_code='01'` `index_year=1001`），在 SQLite 上不触发（fall through 到其他规则，`type_code='14'` 之类，`index_year=1008`）。这意味着 **83 个 `c_index_year` 差异里至少 12 个直接由 source drift 导致**。剩余 ~71 个 `c_index_year` 差异和大部分 `c_index_addr_id` 差异（492 个）是 Phase C 各 loop 规则的 tiebreak —— 当多个 candidate 同等 eligible 时，两个 pipeline snapshot 算出的次序可能不同。
+
+#### 测试现在的阈值
+
+- `c_index_year` / `c_index_addr_id` —— 0.5%（derived 字段，tiebreak 可接受）
+- `c_birthyear` / `c_deathyear` —— 0.1%（source 字段，drift 太多就警告）
+
+#### 可能的下一步
+
+- 写个 helper 列出全部 12 个 source-drift 人物，让 CBDB 团队人工 reconcile（可能他们已知，但有 listing 总是有用）。
+- 把 `c_index_year_source_id` 也加进比对，区分「选了同一个源记录但年份不同」（数据 drift）vs「选了不同源记录」（tiebreak）。
+
+---
+
+(以下是 2026-05-02 调查前的旧版本要点，作为存档，不再更新)
+
+最初发现：
 
 样例（`(c_personid, MDB(year, addr_id), SQLite(year, addr_id))`）：
 
