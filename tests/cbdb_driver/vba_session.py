@@ -282,6 +282,22 @@ class VbaSession:
         ],
     }
 
+    # Per-form ad-hoc rewrites of confirmed CBDB bugs that block our
+    # tests — applied during _inject_autodetect.  These are NOT fixes
+    # we'd ship into production CBDB; they're workarounds so tests can
+    # exercise the rest of the affected sub.  Each entry MUST also
+    # be documented as a Bug #N in findings.md so users / contributors
+    # know the underlying CBDB code is still broken.
+    _PER_FORM_CMDGIS_PATCHES = {
+        # Bug #4 (findings.md): Form_LookAtPlace.CmdGIS_Click references
+        # a non-existent `GISFrame` control — copy-paste from Status/
+        # Texts/Associations that wasn't updated.  The right control on
+        # Place is `CodeFrame` (used correctly by every other export
+        # sub on the same form).  Without this rewrite CmdGIS bails
+        # with "Object required" the moment it executes.
+        "Form_LookAtPlace": [(r"\bGISFrame\.Value\b", "CodeFrame.Value")],
+    }
+
     # Subform controls whose `RecordSource` is a saved query at design
     # time and whose cached recordset stays stale after CmdQuery /
     # CmdRun INSERTs into the underlying table.  Chained CmdGIS /
@@ -388,6 +404,14 @@ class VbaSession:
                 lambda m: err_replace,
                 body,
             )
+
+            # Per-form CmdGIS / etc. bug workarounds (see
+            # _PER_FORM_CMDGIS_PATCHES).  Apply each (pattern,
+            # replacement) tuple in order.
+            for pat, repl in self._PER_FORM_CMDGIS_PATCHES.get(
+                module_name, ()
+            ):
+                body = re.sub(pat, repl, body)
 
             # Neutralize standalone informational MsgBox calls of the
             # form `MsgBox "literal"` (statement form, no return value
