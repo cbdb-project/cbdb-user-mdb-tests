@@ -47,6 +47,66 @@ behaviour as instructed in their docstrings.
 
 ---
 
+### Bug #5 — `LookAtEntry.CmdNeo4j_Click` reads `!c_inst_*` from the wrong recordset (`tRstAssocCodes` instead of `tRstInstitutions`)
+
+🔴 silent: identical "Item not found in this collection" symptom as
+Bugs #3 / #4 — the InstitutionCodes file isn't written and the user
+gets a vague popup.
+
+`Form_LookAtEntry.vb:1415` opens the institutions recordset under
+the right name:
+
+```vba
+Set tRstInstitutions = CurrentDb.OpenRecordset(tQueryStr)
+```
+
+But the very next loop at line 1425 reaches for the wrong handle:
+
+```vba
+With tRstAssocCodes        ← typo, should be tRstInstitutions
+    .MoveFirst
+    Do While Not .EOF
+        If Not IsNull(!c_inst_code) Then
+            tStr = ... + Trim(Str(!c_inst_name_code)) + ...
+        ...
+```
+
+`tRstAssocCodes` was last bound much earlier (line 1335) to the
+AssocCodes SELECT — it doesn't have `c_inst_*` columns.
+
+**Fix**: change `With tRstAssocCodes` to `With tRstInstitutions`
+on line 1425.
+
+**Static detection**: `analysis/audit_recordset_sql_projection.py`
+catches this — same scanner as Bug #4.
+
+---
+
+### Bug #4 — `LookAtNetworks.CmdNeo4j_Click` SQL projections are missing fields the loops read
+
+🔴 silent: same family as Bug #3 — Networks's CmdNeo4j export dies
+mid-stream with "Item not found in this collection."
+
+Two distinct mismatches:
+
+1. `Form_LookAtNetworks.vb:2458` — `tRstPlace` SQL projects three
+   columns (`c_index_addr_id`, `c_index_addr_name`,
+   `c_index_addr_chn`).  The loop at lines 2495 / 2498 / 2502 / 2505
+   also reads `!x_coord` and `!y_coord`.
+
+2. The companion `tRstPeoplePlace` SQL similarly omits
+   `c_person_id` and `c_index_addr_id` that the loop at 2570 / 2572
+   / 2574 reads.
+
+**Fix**: extend each SELECT to project the columns the loop reads
+(use the appropriate JOIN to ADDR_CODES / BIOG_MAIN to expose
+`x_coord` / `y_coord` / `c_person_id` / `c_index_addr_id`).
+
+**Static detection**: `analysis/audit_recordset_sql_projection.py`
+flags both occurrences.
+
+---
+
 ### Bug #3 — `LookAtPlace.CmdNeo4j_Click` SQL projection is missing fields the loop reads (silent runtime "Item not found")
 
 🔴 silent: Neo4j export from LookAtPlace dies mid-stream and the
