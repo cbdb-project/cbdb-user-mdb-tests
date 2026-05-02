@@ -224,6 +224,27 @@ or dead-code only.
    `Form_LookAtEntry.vb:1650` which uses the right name. SQL
    crashes with "no such field" when user runs the GroupData
    "Entry" subtype. Found by `analysis/audit_sql_columns.py`.
+7. 🔴 **Bug #7** (NEW, found 2026-05-02 via behavioural test) —
+   `Form_LookAtPlace.CmdNeo4j_Click:322` builds People-CSV from a
+   SELECT projecting only 4 ZZ_SCRATCH_P_TEXT columns, but the loop
+   reads 7 fields including `c_dynasty` / `c_dynasty_chn` /
+   `c_female`. JET raises "Item not found in this collection" → Err
+   handler silences with MsgBox → SaveToFile never runs → NO files
+   produced for the entire Neo4j export from LookAtPlace. See
+   `findings_en.md` Bug #7.
+8. 🔴 **Bug #8** (NEW, 2026-05-02) —
+   `Form_LookAtNetworks.CmdNeo4j_Click` has the same shape on
+   `tRstPlace` (SQL projects 3 cols, loop reads `!x_coord` /
+   `!y_coord`) and `tRstPeoplePlace` (missing `c_person_id` /
+   `c_index_addr_id`). Same silent-fail symptom as Bug #7.
+9. 🔴 **Bug #9** (NEW, 2026-05-02) —
+   `Form_LookAtEntry.CmdNeo4j_Click:1425` says `With tRstAssocCodes`
+   but the loop reads `!c_inst_*` (institution columns). The
+   recordset variable is a typo from `tRstInstitutions` — bound
+   correctly 10 lines earlier with the right SELECT. Same silent
+   fail. Found by `analysis/audit_recordset_sql_projection.py`
+   (a new 7th static auditor that pairs runtime-built SQL with
+   subsequent recordset field reads — also catches Bugs #7 and #8).
 
 ### Roadmap
 
@@ -236,7 +257,7 @@ or dead-code only.
 | 5 | ✅ done | Independent SQL replay layer (`tests/cbdb_replay/`) for differential checking |
 | 6 | ✅ done | Auto-discovery of fresh fixtures (`analysis/discover_test_inputs.py`) |
 | 7 | ⏳ open | Get `LookAtAssociationPairs` / `LookAtNetworks` / `LookAtGroupData` running — needs smaller-fixture search or VBA query rewrite (see `findings.md`) |
-| 8 | 🟡 partial | First slice landed: `tests/test_vba_cmdgis_other_forms.py` extends real-`CmdGIS` coverage from LookAtEntry (`test_vba_export.py`, byte-diff) to Status / Texts / Associations / Office / Kinship (5 added). Uses **structural** assertions (file exists, header has `NameChn` column, ≥ 4 cols, ≥ 1 data row) rather than byte-diff — easier to maintain across data refreshes. **Driver fixes bundled in:** (1) chain block now injected right before `Exit Sub` (after cleanup) instead of right after `Exit_<name>:` — fixes Status/Texts/Associations whose subform rebind happens in cleanup; (2) `On Error Resume Next` injected at the start of the Exit handler so cleanup errors don't bounce into an infinite Resume loop (LookAtKinship's `OrderBy = "c_up,..."` observed); (3) per-form `_SUBFORMS_TO_REQUERY` map injects `<subform>.Form.Requery` into the chain block for forms whose CmdGIS reads a saved-query-bound subform (unblocked LookAtKinship). **Still skipped:** LookAtPlace's CmdGIS uses a different output pattern (text-stream `SaveToFile` directly, no binary CopyTo BOM-strip intermediate) and silently fails to materialise the file under our patched path. **Still open:** the other export buttons (`CmdNeo4j`, `CmdKML`, `CmdPajek`, `CmdGUESS`, `CmdGephi`, `CmdUCInet`, `CmdGISPeople`) and a fix for LookAtPlace's text-stream SaveToFile pattern |
+| 8 | 🟡 partial | First slice landed: `tests/test_vba_cmdgis_other_forms.py` extends real-`CmdGIS` coverage from LookAtEntry (`test_vba_export.py`, byte-diff) to Status / Texts / Associations / Office / Place / Kinship (6 added). Uses **structural** assertions rather than byte-diff. **Subsequent slices** (added 2026-05-02): `test_vba_cmdguess_cross_form.py` (Kinship + Office), `test_vba_pajek_gephi_cross_form.py` (5 passing, 2 Status skipped), `test_vba_cmdgispeople_office.py`, `test_vba_cmdneo4j_cross_form.py` (3 passing, 4 skipped — surfaced **3 new bugs** in the CmdNeo4j family: Bugs #7 / #8 / #9). Driver gained: `patch_filedialog` v8 with directory mode (counter-suffixed unique file per call) for multi-dialog subs like CmdNeo4j. **Still open:** CmdKML / CmdUCInet (only on the 3 skipped forms — depend on item 7) |
 | 9 | ✅ done | `tests/conftest.py::pytest_configure` re-runs `analysis/discover_test_inputs.py` automatically at session start when `analysis/dump/test_inputs.json` is missing or older than `data/CBDB_BJ_User.mdb`. Opt-out via `pytest --no-discover-inputs` |
 | 10 | 🟡 partial | First slice landed: `tests/test_vba_pickers_smoke.py` opens each of the 10 `frmPick*` pickers and verifies it loads + has a commit/cancel button (CmdSelect/CmdSelectAll/CmdOK + CmdCancel/CmdExit/CmdClose). 9 pass, 1 skipped (`frmPickTEXT_BIBLCAT` is orphan — 0 callers anywhere in VBA / macros, end users can't reach it). Smoke-only — doesn't drive Treeview/ListBox interaction yet; that's depth-pass work. **Still open for depth pass:** drive a Select+Commit through e.g. `frmPickEntry_multi` and verify the resulting `ZZ_ENTRY_CODE` table contents match the picker's selected items |
 | 11 | ✅ done | Bilingual UI test (`tests/test_vba_bilingual_ui.py`) — for each of the 9 forms with the standard `CmdFanti` / `CmdJianti` toggle pair (Networks uses different names + Form_Open hangs), opens the form, drives one Fanti round-trip to force captions through `changeDisplayLanguage` (so the FormLabels-derived state, not design-time captions, is the baseline), then asserts each toggle changes ≥5 captions and the second toggle restores the baseline exactly. Latest: `9 passed in 145.73s`. **Caveat surfaced:** a few forms (LookAtPlace, LookAtGroupData) ship with design-time captions that don't match `FormLabels` (e.g. `LblFrom = "  From"` with leading spaces vs `FormLabels.c_fanti = "From"`); the design-time text is replaced on the first `changeDisplayLanguage` call. Pre-existing CBDB UX nit, documented in the test |

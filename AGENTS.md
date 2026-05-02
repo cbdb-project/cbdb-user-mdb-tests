@@ -336,7 +336,7 @@ cheap (seconds) and they keep finding bugs:
   ..."` literal-only concats and `Set <var> = CurrentDb.OpenRecordset
   (tQueryStr)`, parses the SELECT projection, and flags `<var>!field`
   AND bare `!field` (inside `With <var>`) reads where `field` isn't
-  projected.  **Found Bugs #3 / #4 / #5** (CmdNeo4j family across
+  projected.  **Found Bugs #7 / #8 / #9** (CmdNeo4j family across
   LookAtPlace / LookAtNetworks / LookAtEntry).  Run on every release.
 
 These are guarded by `tests/test_known_bugs.py`; if those tests start

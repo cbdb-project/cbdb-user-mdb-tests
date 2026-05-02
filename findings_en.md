@@ -47,7 +47,7 @@ behaviour as instructed in their docstrings.
 
 ---
 
-### Bug #5 — `LookAtEntry.CmdNeo4j_Click` reads `!c_inst_*` from the wrong recordset (`tRstAssocCodes` instead of `tRstInstitutions`)
+### Bug #9 — `LookAtEntry.CmdNeo4j_Click` reads `!c_inst_*` from the wrong recordset (`tRstAssocCodes` instead of `tRstInstitutions`)
 
 🔴 silent: identical "Item not found in this collection" symptom as
 Bugs #3 / #4 — the InstitutionCodes file isn't written and the user
@@ -78,11 +78,11 @@ AssocCodes SELECT — it doesn't have `c_inst_*` columns.
 on line 1425.
 
 **Static detection**: `analysis/audit_recordset_sql_projection.py`
-catches this — same scanner as Bug #4.
+catches this — same scanner as Bug #8.
 
 ---
 
-### Bug #4 — `LookAtNetworks.CmdNeo4j_Click` SQL projections are missing fields the loops read
+### Bug #8 — `LookAtNetworks.CmdNeo4j_Click` SQL projections are missing fields the loops read
 
 🔴 silent: same family as Bug #3 — Networks's CmdNeo4j export dies
 mid-stream with "Item not found in this collection."
@@ -107,7 +107,7 @@ flags both occurrences.
 
 ---
 
-### Bug #3 — `LookAtPlace.CmdNeo4j_Click` SQL projection is missing fields the loop reads (silent runtime "Item not found")
+### Bug #7 — `LookAtPlace.CmdNeo4j_Click` SQL projection is missing fields the loop reads (silent runtime "Item not found")
 
 🔴 silent: Neo4j export from LookAtPlace dies mid-stream and the
 user gets a vague "Item not found in this collection." popup.

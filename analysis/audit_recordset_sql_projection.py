@@ -3,7 +3,7 @@ opened on a runtime-built SQL string, parse the SELECT projection,
 and verify every subsequent `<rstvar>!<field>` reference is in the
 projection.
 
-Catches the bug shape that found Bug #3
+Catches the bug shape that found Bug #7
 (`Form_LookAtPlace.CmdNeo4j_Click`):
 
     tQueryStr = "SELECT DISTINCT a.x, a.y FROM a"
