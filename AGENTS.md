@@ -269,9 +269,43 @@ with INDEPENDENT source SQL (not the Python replay).
    `c_fy_range_chn` pull from `YEAR_RANGE_CODES_1` (the LY join).
    First-year range value displayed is actually the LY value.
 2. **DAO 3.6 reference broken** — see #7 above.
+3. **Backfill `UPDATE` silently fails on LookAtEntry CmdQuery for
+   >10k-row results** — Bug #3 in findings.md. xfailed in
+   `tests/test_vba_matrix.py`.
+4. **`LookAtPlace.CmdGIS_Click` references a non-existent control
+   `GISFrame`** — should be `CodeFrame`. Real users clicking GIS on
+   LookAtPlace see "Object required". Test driver workaround in
+   `cbdb_driver.vba_session._PER_FORM_CMDGIS_PATCHES`.
 
 These are guarded by `tests/test_known_bugs.py`; if those tests start
 failing, it means upstream fixed the bug (good — flip the asserts).
+
+### NOT a bug: User MDB ≠ cbdb-online-main-server SQLite on a small handful of `c_index_year` / `c_index_addr_id` / `c_birthyear` / `c_deathyear` values
+
+`tests/test_index_year_xcheck.py` compares the User MDB's
+`BIOG_MAIN` against the weekly cbdb-online-main-server SQLite
+snapshot.  As of 2026-05-02 it reports ~12 source-data drifts and
+~575 derived-field drifts on a 657 246-person sweep.
+
+**These are not bugs.** Confirmed with the maintainer: the online
+system's source data is updated continuously, and the published
+SQLite snapshot is just whatever was current when the weekly export
+ran.  The User MDB is a different (typically older) snapshot.  Both
+sides run the SAME index-year derivation algorithm
+(cbdb-online-main-server's `IndexYearRebuildService.php`) — so any
+algorithm-level disagreement WOULD be a bug, but pure data drift
+between two snapshots is expected.
+
+The test's role is to catch it the moment that stops being true:
+- 0.5 % threshold on derived fields (`c_index_year`, `c_index_addr_id`)
+- 0.1 % threshold on source fields (`c_birthyear`, `c_deathyear`) —
+  if source drift suddenly jumps it likely means someone edited one
+  database without syncing to the other (worth flagging upstream).
+
+Don't open issues against CBDB for individual person diffs from this
+test unless the per-rule type-code distribution itself drifts (which
+WOULD indicate algorithm-version skew).  Full background and per-pid
+examples in `findings.md` Open Question #1.
 
 ## Test inventory snapshot (run this to get current state)
 
