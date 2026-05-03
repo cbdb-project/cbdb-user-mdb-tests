@@ -214,25 +214,25 @@ def _all_fixtures() -> list[Fixture]:
 def _xfail_marks(fx: Fixture):
     """Previously: marked top_entry_code_* fixtures as `xfail strict=True`
     on the theory that LookAtEntry's multi-table backfill UPDATE
-    silently failed at >30 k rows (Bug #3).
+    silently failed on >30 k-row results.  That theory was the
+    original "Bug #3", removed from the documented ISSUES set on
+    2026-05-03 — re-verification via timer-triggered CmdQuery + SQL
+    NULL-count probe found 0 / 92,514 rows missing c_entry_desc on
+    the original fixture, AND there was no upstream source-level fix
+    to point at, so per the marker-failure-≠-fix policy it was
+    treated as a fixture / driver false positive rather than a
+    CBDB-maintainer bug.
 
-    UNMARKED 2026-05-02 — the re-verification story:
-      - The matrix test fails BEFORE reaching backfill at all because
-        `click_button_and_wait_table` (which this file uses) raises
-        'Run Query button not found'.  That's a pywinauto / button-
-        locator regression, not Bug #3.  `xfail strict=True` was
-        happily passing on this unrelated failure, hiding from us
-        that we had never actually verified Bug #3 even once.
-      - Direct verification via `analysis/verify_bug3.py` (timer-
-        triggered CmdQuery, then SQL count of NULL-where-not-NULL-
-        expected rows) reports 0 / 92,514 rows missing c_entry_desc
-        on the original Bug #3 fixture.  The maintainer also confirmed
-        UI results look correct.
+    The xfail marks themselves were also misleading: the matrix test
+    actually failed BEFORE reaching the backfill step (pywinauto
+    button-locator regression in `click_button_and_wait_table`),
+    so `xfail strict=True` was passing on an unrelated failure and
+    we never actually verified the backfill claim through the matrix.
 
-    So we no longer xfail these fixtures.  The driver-level 'button
-    not found' issue still needs its own fix (migrate this file to
+    Returning no marks today.  The driver-level "button not found"
+    issue still needs its own fix (migrate this file to
     `click_via_timer` like `test_vba_matrix_all_forms.py` already
-    does), but that's a separate concern from Bug #3 itself.
+    does), but that's an internal driver concern, not a CBDB bug.
     """
     return ()
 

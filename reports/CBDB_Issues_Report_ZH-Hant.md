@@ -29,7 +29,6 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
   - [Issue #2 — VBA 工程引用了過時的 dao360.dll，Office 2016+ 機器上沒這個檔案](#issue-2--vba-工程引用了過時的-dao360dlloffice-2016-機器上沒這個檔案)
 - [P5 — 潛伏 / 不可達 / 當前無法復現](#p5--潛伏--不可達--當前無法復現)
   - [Issue #1 — View_StatusData 會把首年份範圍顯示成末年份範圍 — DORMANT（當前 dump 沒有源資料能觸發）](#issue-1--view_statusdata-會把首年份範圍顯示成末年份範圍--dormant當前-dump-沒有源資料能觸發)
-  - [Issue #3 — LookAtEntry.CmdQuery 回填 UPDATE — 歷史 Bug #3，當前 dump 上已無法復現](#issue-3--lookatentrycmdquery-回填-update--歷史-bug-3當前-dump-上已無法復現)
   - [Issue #4 — LookAtPlace.CmdGIS 會報「Object required」 — LATENT，被 Issue #15（表單上沒有 CmdGIS 按鈕）所遮蔽](#issue-4--lookatplacecmdgis-會報object-required--latent被-issue-15表單上沒有-cmdgis-按鈕所遮蔽)
   - [Issue #5 — LookAtStatus.CmdPajek 引用了不存在的控制元件，且 SQL 用了三個不存在的列](#issue-5--lookatstatuscmdpajek-引用了不存在的控制元件且-sql-用了三個不存在的列)
   - [Issue #14 — KIN_DATA 子表單的 CmdPickKinRel 呼叫不存在的 picker（frmPickKINSHIP_CODES）——但目前該子表單在主表中無入口（LATENT）](#issue-14--kin_data-子表單的-cmdpickkinrel-呼叫不存在的-pickerfrmpickkinship_codes但目前該子表單在主表中無入口latent)
@@ -436,32 +435,6 @@ _本層的條目作為歷史 / 潛伏記錄保留。可分為三類：(a) DORMAN
 #### 建議修復方案
 
 在 `View_StatusData` 中，把 `YEAR_RANGE_CODES_1.c_range AS c_fy_range_desc` 和 `YEAR_RANGE_CODES_1.c_range_chn AS c_fy_range_chn` 改成不帶別名的 `YEAR_RANGE_CODES.*`（FROM 子句已經按 `c_fy_range` JOIN 了它）。
-
-### Issue #3 — LookAtEntry.CmdQuery 回填 UPDATE — 歷史 Bug #3，當前 dump 上已無法復現
-
-**涉及位置:** `Form_LookAtEntry.CmdQuery_Click`
-
-**嚴重等級:** P5 — 已解決 / 當前 dump 上無法復現
-
-#### 問題描述
-
-歷史背景：早期某次 dump 的 `Form_LookAtEntry.vb`（第 1778-1789 行，用一條 UPDATE JOIN 七張以上 lookup 表回填 `c_entry_desc` / `c_addr_name` / `c_kin_name` 到 `ZZ_SCRATCH_ENTRY`）被報告在結果集 ~30000 行以上時靜默地讓這些欄位保持 NULL。
-
-**在當前 dump 上重新驗證（2026-05-02）：無法復現。** 我們用同樣的 fixture（入仕途徑 36 進士及第，不限年份，`ZZ_SCRATCH_ENTRY` 共 92,514 行）觸發 CmdQuery，精確統計 `c_entry_code IS NOT NULL` 且 `c_entry_desc IS NULL` 的行數為 **0**；`c_addr_id > 0` 且 `c_addr_name IS NULL` 也是 0。維護者本人也確認 UI 上 desc / addr 欄位顯示正確。
-
-那條龐大的多表 UPDATE SQL 仍在 VBA 模組裡（原始碼沒被重寫），所以結構上當時被懷疑的 SQL 寫法仍在；但在當前 dump 上，其執行時行為已能正確回填 —— 可能是某次 JET / Office 更新改善了複雜 UPDATE 的執行計畫，或當時的診斷本身就是假陽性。
-
-**建議：** 視為已解決，除非有人能在當前 dump 上重新提出可復現的反例。驗證指令碼：`analysis/verify_bug3.py`。
-
-#### 復現步驟
-
-1. 在 repo 根目錄執行 `python analysis/verify_bug3.py`。
-2. 指令碼會開啟 LookAtEntry，對入仕 36 不加年份篩選觸發 CmdQuery，並回報 `c_entry_code` 非空但 `c_entry_desc` 為 NULL 的行數。
-3. 在當前 dump 上這個數字是 0 —— bug 已不再可見。若未來 dump 回歸退化，同一個指令碼會報非零行數。
-
-#### 建議修復方案
-
-在當前 dump 上不需要任何動作。若未來再次回歸：把那條龐大的多表 UPDATE 拆成若干條小 UPDATE（每條只 JOIN 一張 lookup 表），與 Status / Texts / Associations 已使用的寫法一致。
 
 ### Issue #4 — LookAtPlace.CmdGIS 會報「Object required」 — LATENT，被 Issue #15（表單上沒有 CmdGIS 按鈕）所遮蔽
 

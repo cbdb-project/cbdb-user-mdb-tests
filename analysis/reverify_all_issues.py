@@ -97,9 +97,13 @@ def main() -> int:
     findings.append((2, "REAL", "shipped .mdb has broken dao360 ref; "
                      "driver autopatches it on open"))
 
-    # ---- Bug #3: backfill (already verified gone) ----------------
-    findings.append((3, "DORMANT",
-                     "verified 0 NULL backfills via verify_bug3.py"))
+    # ---- Bug #3 was removed from the documented ISSUES set on
+    # 2026-05-03 — re-verification on the current dump found 0 NULL
+    # backfills out of 92,514 rows, AND there's no upstream source-
+    # level fix to point at, so per the marker-failure-≠-fix policy
+    # it was treated as an early false positive (testing infrastructure
+    # / fixture / driver) rather than a CBDB-maintainer bug.  Kept
+    # this comment so the bug-id sequence is self-explanatory.
 
     # ---- Bug #4: LookAtPlace.CmdGIS GISFrame -----------------------
     # The control 'GISFrame' doesn't exist on LookAtPlace, so calling
