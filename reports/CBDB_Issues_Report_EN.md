@@ -101,6 +101,12 @@ Same silent-fail symptom as Issue #7.
 2. Run a query, then click **Neo4j**.
 3. When the export reaches the People-with-Place file, the same `Item not found` popup appears, and no further files are written.
 
+#### Screenshots
+
+![bug8_faux_popup.png](screenshots/bug8_faux_popup.png)
+
+_Reconstructed-in-PIL popup showing the JET 'Item not found in this collection' error users would see.  **Important caveat:** the backdrop in this image is LookAtPlace, NOT LookAtNetworks — LookAtNetworks's `Form_Open` currently hangs the COM test driver, so a real runtime view of the host form couldn't be captured.  The popup text is reconstructed from VBA static inspection of `Form_LookAtNetworks.vb:2458` / `:2475`._
+
 #### Suggested fix
 
 Extend each SELECT to project every field the loop reads. For tRstPlace: add `ADDR_CODES.x_coord`, `ADDR_CODES.y_coord`. For tRstPeoplePlace: add the missing `c_person_id` / `c_index_addr_id` columns from the joined tables.
@@ -122,6 +128,16 @@ Note: triggering this path requires entries with `c_inst_code > 0` (i.e. social-
 1. Open **LookAtEntry** with a query that produces entries with social institution codes (those are uncommon — most entries don't trigger this).
 2. Click **Neo4j**, accept all the SaveAs dialogs.
 3. When the export reaches the InstitutionCodes file, the same `Item not found` popup appears.
+
+#### Screenshots
+
+![bug9_form_annotated.png](screenshots/bug9_form_annotated.png)
+
+_Step 1 — open LookAtEntry, run any query, click **Neo4j**.  (Note: this code path only fires for queries whose result includes entries with `c_inst_code > 0` — see the summary's REAL_BUT_GATED note.)_
+
+![bug9_faux_popup.png](screenshots/bug9_faux_popup.png)
+
+_Step 2 — the popup users see when the With block on line 1425 reads `!c_inst_code` against the wrong-named recordset.  Reconstructed in PIL because the real popup would block the COM test driver; the error code (DAO 3265) and message text are JET's standard response to a recordset field that doesn't exist._
 
 #### Suggested fix
 
@@ -152,6 +168,16 @@ Use person 1 (安惇, An Dun) as the import list (small: only 2 entry row, fast 
 3. Click **Run**.
 4. A popup appears reporting that a field doesn't exist (JET reports this as 'No value given for one or more required parameters' / 'No such field' depending on the Office build — both mean the SQL referenced `ENTRY_DATA.c_parental_status` which doesn't exist).
 
+#### Screenshots
+
+![bug6_form_annotated.png](screenshots/bug6_form_annotated.png)
+
+_Step 1 — open LookAtGroupData, leave only the Entry checkbox ticked, click Run.  (Demo input from `reports/demo_persons.json`: import list = c_personid 1, 安惇.)_
+
+![bug6_faux_popup.png](screenshots/bug6_faux_popup.png)
+
+_Step 2 — the JET error popup users see.  The popup graphic is reconstructed in PIL because the real popup would block the COM test driver; the error code (3061) and message text come from JET's documented behaviour for unknown-identifier-as-parameter on the line cited in the summary._
+
 #### Suggested fix
 
 Change `ENTRY_DATA.c_parental_status` to `ENTRY_DATA.c_parental_status_code` on line 2621. One-line fix.
@@ -177,6 +203,16 @@ Open person 5 (查籥, Zha Yue). Their `c_fl_ey_notes` field has actual text in 
 1. Open the biographical detail form for **c_personid = 5 (Zha Yue 查籥)** — picked because his BIOG_MAIN row has a non-empty `c_fl_ey_notes` value, so the field is interactable (clicking an empty field doesn't fire the Sub).
 2. On the BIOG_MAIN_2 subform, click the `c_fl_ey_notes` field — that fires the `c_fl_ey_notes_Click` Sub.
 3. An `Item not found in this collection.` popup appears (because the Sub tries `DoCmd.OpenForm "frmPickNIAN_HAO"` and that form doesn't exist).
+
+#### Screenshots
+
+![bug13_browser_annotated.png](screenshots/bug13_browser_annotated.png)
+
+_Step 1 — open CBDB_Browser_2, navigate to c_personid=5 (查籥 Zha Yue), click the `c_fl_ey_notes` field on the Birth/Death sub-tab (this fires `c_fl_ey_notes_Click`)._
+
+![bug13_faux_popup.png](screenshots/bug13_faux_popup.png)
+
+_Step 2 — the popup users see.  Reconstructed in PIL because the real popup would block the COM test driver; error 2102 + 'misspelled or refers to a form that doesn't exist' is Access's standard message when DoCmd.OpenForm targets a form not in CurrentProject.AllForms._
 
 #### Suggested fix
 

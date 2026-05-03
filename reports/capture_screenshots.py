@@ -399,9 +399,158 @@ def capture_bug11_12_10(app):
         pass
 
 
+def capture_bug6(app):
+    """Bug #6 (P1 visible crash): LookAtGroupData ChkEntry path's
+    INSERT projects `ENTRY_DATA.c_parental_status` (no `_code`
+    suffix) — the actual column is `c_parental_status_code`, so JET
+    raises 3061/3265 and the form's error handler MsgBox's it.
+
+    Faux popup over a real LookAtGroupData runtime view.  Real popup
+    would block the COM thread, so we composite the message text
+    we know VBA produces.
+    """
+    try:
+        app.DoCmd.OpenForm("LookAtGroupData", 0, "", "", 0, 0)
+        time.sleep(1.5)
+    except Exception as e:
+        print(f"  warn bug6: could not open LookAtGroupData: {e}")
+        return
+    s = SHOT_DIR / "bug6_form_open.png"
+    _grab_access(s)
+    _annotate(s, SHOT_DIR / "bug6_form_annotated.png",
+              "Bug #6 — open LookAtGroupData, leave only the **Entry** "
+              "checkbox ticked (per `demo_persons.json`: import list = "
+              "c_personid 1 安惇), click **Run**.")
+    _faux_popup(s, SHOT_DIR / "bug6_faux_popup.png",
+                "Microsoft Visual Basic",
+                "Run-time error '3061':\n\n"
+                "Too few parameters.  Expected 1.\n\n"
+                "(Form_LookAtGroupData.vb:2621 — INSERT projects\n"
+                "ENTRY_DATA.c_parental_status; the actual column is\n"
+                "c_parental_status_code.  JET treats unknown identifiers\n"
+                "as parameters → this error.  Reconstructed from VBA\n"
+                "static inspection; real popup would block the COM\n"
+                "test driver.)")
+    try:
+        app.DoCmd.Close(2, "LookAtGroupData", 2)
+    except Exception:
+        pass
+
+
+def capture_bug8(_app):
+    """Bug #8 (P0 silent data): LookAtNetworks.CmdNeo4j SELECTs miss
+    fields the loop reads (`!x_coord` / `!y_coord` /
+    `!c_person_id` / `!c_index_addr_id`).  Same shape as #7 but
+    LookAtNetworks.Form_Open hangs the COM driver, so we cannot
+    capture a runtime view of the form.
+
+    Faux popup composited over the most recent generic Access shot
+    (any open-form shot left over from the prior captures works as
+    a chrome-realistic background).  Caption explicitly notes the
+    background is unrelated and the popup is reconstructed.
+    """
+    # Use the bug7 LookAtPlace screenshot as a chrome backdrop —
+    # it's the closest visual match (Access window, similar form
+    # geometry).  Caption disclaims.
+    backdrop = SHOT_DIR / "bug7_step1_form.png"
+    if not backdrop.exists():
+        # As a last resort, grab the current Access desktop.
+        backdrop = SHOT_DIR / "bug8_backdrop.png"
+        _grab_access(backdrop)
+    _faux_popup(backdrop, SHOT_DIR / "bug8_faux_popup.png",
+                "Microsoft Visual Basic",
+                "Run-time error '3265':\n\n"
+                "Item not found in this collection.\n\n"
+                "(Form_LookAtNetworks.vb:2458 / 2475 — tRstPlace SELECT\n"
+                "missing x_coord / y_coord; tRstPeoplePlace missing\n"
+                "c_person_id / c_index_addr_id.  Backdrop is not the\n"
+                "actual host form — LookAtNetworks.Form_Open currently\n"
+                "hangs the COM test driver, so the runtime view\n"
+                "couldn't be captured.  Popup text reconstructed from\n"
+                "VBA static inspection.)")
+
+
+def capture_bug9(app):
+    """Bug #9 (P0 silent data): LookAtEntry.CmdNeo4j Institutions
+    block opens recordset `tRstInstitutions` then 10 lines later
+    reads `tRstAssocCodes` (typo) — `!c_inst_code` etc. raise on
+    a recordset that was bound to the assoc-codes SELECT.
+
+    User-reachable: open LookAtEntry, run a query, click Neo4j.
+    Faux popup over a real LookAtEntry runtime view.
+    """
+    try:
+        app.DoCmd.OpenForm("LookAtEntry", 0, "", "", 0, 0)
+        time.sleep(1.5)
+    except Exception as e:
+        print(f"  warn bug9: could not open LookAtEntry: {e}")
+        return
+    s = SHOT_DIR / "bug9_form_open.png"
+    _grab_access(s)
+    _annotate(s, SHOT_DIR / "bug9_form_annotated.png",
+              "Bug #9 — open LookAtEntry, run any query, click "
+              "**Neo4j**.")
+    _faux_popup(s, SHOT_DIR / "bug9_faux_popup.png",
+                "Microsoft Visual Basic",
+                "Run-time error '3265':\n\n"
+                "Item not found in this collection.\n\n"
+                "(Form_LookAtEntry.vb:1425 — `With tRstAssocCodes`\n"
+                "but the loop reads !c_inst_code / !c_inst_name_code\n"
+                "etc.  The recordset variable was a typo from\n"
+                "`tRstInstitutions` (bound correctly 10 lines earlier).\n"
+                "Reconstructed from VBA static inspection; real popup\n"
+                "would block the COM test driver.)")
+    try:
+        app.DoCmd.Close(2, "LookAtEntry", 2)
+    except Exception:
+        pass
+
+
+def capture_bug13(app):
+    """Bug #13 (P1 visible crash): clicking the c_fl_ey_notes field
+    on a person's biographical detail subform fires
+    `Sub c_fl_ey_notes_Click` which `DoCmd.OpenForm "frmPickNIAN_HAO"`
+    — that form does not exist in CurrentProject.AllForms.
+
+    Trigger path is user-reachable via CBDB_Browser_2 (PR A's
+    helper).  Faux popup over a real CBDB_Browser_2 runtime view.
+    """
+    try:
+        _open_browser_at_personid(app, 5)  # 查籥 / Zha Yue per demo_persons.json
+    except Exception as e:
+        print(f"  warn bug13: could not open browser at "
+              f"c_personid=5: {e}")
+        return
+    s = SHOT_DIR / "bug13_browser_open.png"
+    _grab_access(s)
+    _annotate(s, SHOT_DIR / "bug13_browser_annotated.png",
+              "Bug #13 — runtime view, c_personid=5 (查籥, Zha Yue) "
+              "loaded in CBDB_Browser_2.  Click the **c_fl_ey_notes** "
+              "field on the Birth/Death sub-tab.")
+    _faux_popup(s, SHOT_DIR / "bug13_faux_popup.png",
+                "Microsoft Access",
+                "Run-time error '2102':\n\n"
+                "The form name 'frmPickNIAN_HAO' is misspelled\n"
+                "or refers to a form that doesn't exist.\n\n"
+                "(Form_BIOG_MAIN_2_Subform.vb — `Sub\n"
+                "c_fl_ey_notes_Click` calls\n"
+                "`DoCmd.OpenForm \"frmPickNIAN_HAO\"`.  No such form\n"
+                "in CurrentProject.AllForms.  Reconstructed from VBA\n"
+                "static inspection; real popup would block the COM\n"
+                "test driver.)")
+    try:
+        app.DoCmd.Close(2, "CBDB_Browser_2", 2)
+    except Exception:
+        pass
+
+
 _ALL_CAPTURES = {
     "bug4": capture_bug4,
+    "bug6": capture_bug6,
     "bug7": capture_bug7,
+    "bug8": capture_bug8,
+    "bug9": capture_bug9,
+    "bug13": capture_bug13,
     "bug15_19": capture_bug15_19,
     "bug10_11_12": capture_bug11_12_10,
 }
