@@ -29,7 +29,6 @@ The issues are ordered by severity (P0 highest). Each entry includes a concise d
   - [Issue #2 — VBA project references the legacy dao360.dll which isn't on Office 2016+ machines](#issue-2--vba-project-references-the-legacy-dao360dll-which-isnt-on-office-2016-machines)
 - [P5 — Dormant / latent / not currently reproducible](#p5--dormant--latent--not-currently-reproducible)
   - [Issue #1 — View_StatusData would display last-year range in the first-year column — DORMANT (no source rows trigger it on this dump)](#issue-1--view_statusdata-would-display-last-year-range-in-the-first-year-column--dormant-no-source-rows-trigger-it-on-this-dump)
-  - [Issue #3 — LookAtEntry.CmdQuery backfill UPDATE — historical Bug #3, NOT reproducible on the current dump](#issue-3--lookatentrycmdquery-backfill-update--historical-bug-3-not-reproducible-on-the-current-dump)
   - [Issue #4 — LookAtPlace.CmdGIS would abort with 'Object required' — LATENT, masked by Issue #15 (no CmdGIS button on the form)](#issue-4--lookatplacecmdgis-would-abort-with-object-required--latent-masked-by-issue-15-no-cmdgis-button-on-the-form)
   - [Issue #5 — LookAtStatus.CmdPajek references a missing control AND uses three columns that don't exist](#issue-5--lookatstatuscmdpajek-references-a-missing-control-and-uses-three-columns-that-dont-exist)
   - [Issue #14 — KIN_DATA Subform's CmdPickKinRel calls a missing picker (frmPickKINSHIP_CODES) — but the host sub-form is currently an orphan (LATENT)](#issue-14--kin_data-subforms-cmdpickkinrel-calls-a-missing-picker-frmpickkinship_codes--but-the-host-sub-form-is-currently-an-orphan-latent)
@@ -436,32 +435,6 @@ On this data snapshot the bug is **DORMANT** — STATUS_DATA has 70,761 rows, bu
 #### Suggested fix
 
 In `View_StatusData` change `YEAR_RANGE_CODES_1.c_range AS c_fy_range_desc` and `YEAR_RANGE_CODES_1.c_range_chn AS c_fy_range_chn` to use the un-aliased `YEAR_RANGE_CODES.*` fields (which the FROM clause already joins on `c_fy_range`).
-
-### Issue #3 — LookAtEntry.CmdQuery backfill UPDATE — historical Bug #3, NOT reproducible on the current dump
-
-**Affected sub:** `Form_LookAtEntry.CmdQuery_Click`
-
-**Severity:** P5 — Not currently reproducible on this dump (no upstream source-level fix observed)
-
-#### Description
-
-Historical context: an earlier dump of `Form_LookAtEntry.vb` (line 1778-1789, a single UPDATE joining seven+ lookup tables to backfill `c_entry_desc` / `c_addr_name` / `c_kin_name` etc. into `ZZ_SCRATCH_ENTRY`) was reported to silently leave those columns NULL on result sets above ~30 000 rows.
-
-**RE-VERIFIED on the current dump (2026-05-02): cannot reproduce.**  We fired CmdQuery on the same fixture (entry code 36 jinshi general, no year filter, 92,514 rows in `ZZ_SCRATCH_ENTRY`) and counted exactly **0 rows** with `c_entry_code IS NOT NULL` AND `c_entry_desc IS NULL`; same for `c_addr_id > 0` AND `c_addr_name IS NULL`.  The maintainer also confirmed the UI shows correct desc / addr columns.
-
-The giant multi-table UPDATE statement is still in the VBA module (the source code wasn't rewritten), so structurally the SQL pattern that was suspect remains.  But its runtime behaviour now produces correct backfills on this dump — likely because of a JET / Office update changing how it schedules complex UPDATE plans, or because the original diagnosis was a false positive.
-
-**Recommendation:** treat as not currently reproducible unless someone can produce a fresh repro on a current dump.  Verification script: `analysis/verify_bug3.py`.
-
-#### Steps to reproduce
-
-1. Run `python analysis/verify_bug3.py` from the repo root.
-2. It opens LookAtEntry, fires CmdQuery on entry code 36 with no year filter, and reports the count of rows whose `c_entry_desc` is NULL despite a non-null `c_entry_code`.
-3. On the current dump the count is 0 — the bug is no longer observable.  If a future dump regresses, this same script will report a non-zero count.
-
-#### Suggested fix
-
-No action required for this dump.  If a future regression is observed: split the giant multi-table UPDATE into several smaller ones — one per lookup join — matching the pattern Status / Texts / Associations already use.
 
 ### Issue #4 — LookAtPlace.CmdGIS would abort with 'Object required' — LATENT, masked by Issue #15 (no CmdGIS button on the form)
 

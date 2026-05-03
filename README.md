@@ -221,7 +221,7 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 
 | Form | Real-VBA matrix | Real export | StoreID / RecallID | Import-list | Save-list | Notes |
 |------|-----------------|-------------|---------------------|-------------|-----------|-------|
-| LookAtEntry            | ✅ `test_vba_matrix.py` | ✅ CmdGIS (byte-diff) | ✅ Store; round-trip → Kinship ✅ | ✅ EntryCodes + Places | ✅ EntryCodes (3-col) | Bug #3 was historically suspected here; re-verified 2026-05-02 as NOT REPRODUCIBLE |
+| LookAtEntry            | ✅ `test_vba_matrix.py` | ✅ CmdGIS (byte-diff) | ✅ Store; round-trip → Kinship ✅ | ✅ EntryCodes + Places | ✅ EntryCodes (3-col) | An early "Bug #3" suspected the multi-table backfill UPDATE here failed silently on >30k-row results; the 2026-05-02 re-verification found 0 NULL backfills on the original fixture (entry 36, 92,514 rows) and the issue was removed from the maintainer-facing report on 2026-05-03 as a false positive |
 | LookAtStatus           | ✅ 3 fixtures | ✅ CmdGIS (struct) | ✅ Store | ✅ StatusCodes + Places | ✅ StatusCodes (3-col) | 17 023 + 4 931 rows |
 | LookAtTexts            | ✅ biblcat 1 | ✅ CmdGIS (struct) | ✅ Store | ✅ TextCategories + Places | ✅ TextCategories (3-col) | 15 774 rows |
 | LookAtAssociations     | ✅ 3 fixtures | ✅ CmdGIS (struct) | ✅ Store | ✅ Associations + Places | ✅ Associations (3-col) | 11 867 rows |
@@ -242,7 +242,7 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 
 ### Confirmed bugs
 
-**19 documented issues**, all detail in
+**18 documented issues**, all detail in
 [`reports/CBDB_Issues_Report_EN.md`](./reports/CBDB_Issues_Report_EN.md)
 ([中文版](./reports/CBDB_Issues_Report_ZH-Hant.md) ·
 [.docx EN](./reports/CBDB_Issues_Report_EN.docx) ·
@@ -259,14 +259,22 @@ content elsewhere.
 | P2 — Silent display         | 1 | user-visible bound control renders blank where data exists |
 | P3 — Missing UI             | 5 | event handler exists in code but no button on the form |
 | P4 — Setup                  | 1 | one-time install fix (dao360.dll on Office 2016+) |
-| P5 — Dormant / latent / not currently reproducible | 7 | defect real but doesn't fire on the current dump or has no UI trigger today; **none have been verified as upstream-fixed** (#1, #3 dormant; #4, #5, #11, #12, #14 latent) |
+| P5 — Dormant / latent / not currently reproducible | 6 | defect real but doesn't fire on the current dump or has no UI trigger today; **none have been verified as upstream-fixed** (#1 dormant; #4, #5, #11, #12, #14 latent) |
 
 > **Re-verifications.** Issues that earlier snapshots graded 🔴/🟡
-> were re-checked end-to-end and demoted to P5 in two passes:
-> 2026-05-02 (#1, #3, #4, #5, #14) and 2026-05-03 (#11, #12 — COM
-> probe showed the blamed controls are `Visible=False` hidden
-> internal join-key holders, not user-facing).  The classifier
-> lives in [`analysis/reverify_all_issues.py`](./analysis/reverify_all_issues.py)
+> were re-checked end-to-end in three passes:
+> - 2026-05-02 — #1, #4, #5, #14 demoted to P5 (dormant/latent)
+> - 2026-05-03 — #11, #12 demoted to P5 (COM probe showed the blamed
+>   controls are `Visible=False` hidden internal join-key holders,
+>   not user-facing)
+> - 2026-05-03 — **#3 removed entirely** as an early false positive:
+>   re-verification found 0 NULL backfills on the original fixture
+>   (entry 36, 92,514 rows) AND there was no upstream source-level
+>   fix to point at, so per the marker-failure-≠-fix policy it was
+>   treated as a testing-infrastructure / fixture / driver artifact
+>   rather than a CBDB-maintainer bug
+>
+> The classifier lives in [`analysis/reverify_all_issues.py`](./analysis/reverify_all_issues.py)
 > and is cross-checked against `generate_report.py` so the report
 > can't drift back.
 
@@ -418,7 +426,7 @@ python -m pytest tests/test_vba_export.py -v -W ignore --include-vba
 - ✅ 7/10 LookAt 表單已納入真 VBA matrix（12 fixtures，110 秒跑完）
 - ✅ 1 個真實匯出位元組對比（`LookAtEntry.CmdGIS`）
 - ✅ 12 維度資料完整性檢查
-- ✅ 已確認 19 個 issue（詳見 [`reports/CBDB_Issues_Report_ZH-Hant.md`](./reports/CBDB_Issues_Report_ZH-Hant.md)；P0 ×3 / P1 ×2 / P2 ×1 / P3 ×5 / P4 ×1 / P5 dormant·latent ×7）
+- ✅ 已確認 18 個 issue（詳見 [`reports/CBDB_Issues_Report_ZH-Hant.md`](./reports/CBDB_Issues_Report_ZH-Hant.md)；P0 ×3 / P1 ×2 / P2 ×1 / P3 ×5 / P4 ×1 / P5 dormant·latent ×6。原 Bug #3 於 2026-05-03 從報告中移除——重新驗證 0 NULL backfill 且無上游源碼修復證據，視為早期 false positive）
 - 🟡 剩 1 個表單（LookAtNetworks）因 Form_Open hang 暫跳過；其餘 2 個（LookAtAssociationPairs / LookAtGroupData）已用 tiny fixture 覆蓋（`test_vba_matrix_hard_forms.py`）— roadmap 第 7 項
 - 🟡 其他匯出按鈕大多已部分涵蓋：CmdGIS（6 個 form, `test_vba_cmdgis_other_forms.py`）、CmdGUESS（Kinship+Office, `test_vba_cmdguess_cross_form.py`）、CmdPajek/Gephi（`test_vba_pajek_gephi_cross_form.py`，5 過 / 2 Status skip）、CmdGISPeople（Office）、CmdNeo4j（3 過 / 4 skip — 還順手挖出 Bug #7/#8/#9）。CmdKML 與 CmdUCInet 仍只在 LookAtNetworks 那 3 個跳過的 form 上未測（依賴 roadmap 第 7 項解凍）— roadmap 第 8 項
 - ✅ pytest 啟動時自動偵測 `test_inputs.json` 是否過時並重跑 `discover_test_inputs.py`（`pytest --no-discover-inputs` 可關閉）— roadmap 第 9 項

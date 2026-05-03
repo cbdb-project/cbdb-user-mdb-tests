@@ -74,43 +74,18 @@ def test_bug_view_statusdata_fy_value_equals_ly_value(ro_conn):
     )
 
 
-def test_bug3_lookat_entry_cmdquery_backfill_structurally_present():
-    """Bug #3 (HISTORICAL — re-verified 2026-05-02 as NOT REPRODUCIBLE
-    on the current dump).
-
-    The original report said LookAtEntry's multi-table backfill UPDATE
-    silently left c_entry_desc / c_addr_name etc. NULL on result sets
-    above ~30 k rows.  In May 2026 we re-verified by firing CmdQuery
-    on entry code 36 (no year filter, 92,514 rows) via the timer-
-    trigger path and counted 0 rows with c_entry_code NOT NULL but
-    c_entry_desc NULL.  The maintainer also confirmed the UI shows
-    correct desc / addr columns.
-
-    The giant multi-table UPDATE is still in the source code (this
-    test still asserts that), but its observable behaviour is correct
-    on the current dump.  Treat the entry as historical record.
-
-    See `analysis/verify_bug3.py` for a one-shot re-verification any
-    future maintainer can run; if it reports a non-zero NULL count,
-    the bug has regressed.
-    """
-    vba_path = (REPO / "analysis" / "dump" / "vba"
-                / "Form_LookAtEntry.vb")
-    body = vba_path.read_bytes().decode("utf-8")
-    # The historically-suspect UPDATE chain still in the source code.
-    # When CBDB rewrites it into smaller UPDATEs this assertion will
-    # fire — at which point this test is obsolete and can be removed.
-    assert ("KINSHIP_CODES" in body
-            and "SOCIAL_INSTITUTION_NAME_CODES" in body
-            and "BIOG_MAIN_1" in body), (
-        "The giant multi-table UPDATE in "
-        "Form_LookAtEntry.CmdQuery_Click no longer references "
-        "KINSHIP_CODES / BIOG_MAIN_1 / SOCIAL_INSTITUTION_NAME_CODES "
-        "together — the SQL has been refactored.  Bug #3 was already "
-        "marked as NOT REPRODUCIBLE on the current dump in May 2026; "
-        "now the structural marker is gone too.  This test is "
-        "obsolete and can be removed."
-    )
+# NOTE: There used to be a `test_bug3_lookat_entry_cmdquery_backfill_*`
+# here, asserting the giant multi-table UPDATE in
+# Form_LookAtEntry.CmdQuery_Click was still structurally present.
+# Bug #3 was removed from the documented ISSUES set on 2026-05-03 —
+# see PR E.  Re-verification on the current dump found 0 NULL
+# backfills out of 92,514 rows on the original fixture, AND there's
+# no upstream source-level fix to point at, so we treated the
+# original report as a false positive (testing infrastructure /
+# fixture / driver) rather than a CBDB-maintainer bug.  The
+# structural marker test would only have asserted "the legacy SQL
+# pattern is still here", which is not a useful guard now that the
+# issue isn't claimed.
 
 
 def test_bug4_lookat_place_cmdgis_references_nonexistent_gisframe():
