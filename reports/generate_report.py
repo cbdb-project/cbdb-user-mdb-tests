@@ -50,10 +50,10 @@ ISSUES = [
     # ========== Tier 1: silent data corruption ==========
     {
         "id": 1,
-        "tier": "P0_silent_data",
+        "tier": "P5_resolved_or_dormant",
         "form": "View_StatusData",
-        "title_en": "View_StatusData displays last-year range in the first-year column",
-        "title_zh": "View_StatusData 把首年份范围显示成了末年份范围",
+        "title_en": "View_StatusData would display last-year range in the first-year column — DORMANT (no source rows trigger it on this dump)",
+        "title_zh": "View_StatusData 會把首年份範圍顯示成末年份範圍 — DORMANT（當前 dump 沒有源資料能觸發）",
         "summary_en": (
             "The saved query `View_StatusData` joins `YEAR_RANGE_CODES` "
             "twice (once aliased as `YEAR_RANGE_CODES_1` for the last-year "
@@ -115,68 +115,87 @@ ISSUES = [
             "子句已经按 `c_fy_range` JOIN 了它）。"
         ),
         "screenshots": [],
-        "severity_en": "P0 — Silent data corruption",
-        "severity_zh": "P0 — 静默数据错位",
+        "severity_en": "P5 — Dormant on this dump (would be P0 if any STATUS_DATA row had both fy/ly range codes set differently)",
+        "severity_zh": "P5 — 在當前 dump 上潛伏（若任何 STATUS_DATA 列同時填了 fy/ly range 且不同，會升為 P0）",
     },
     {
         "id": 3,
-        "tier": "P0_silent_data",
+        "tier": "P5_resolved_or_dormant",
         "form": "Form_LookAtEntry.CmdQuery_Click",
-        "title_en": "LookAtEntry.CmdQuery backfill UPDATE silently fails on large result sets",
-        "title_zh": "LookAtEntry.CmdQuery 的回填 UPDATE 在大结果集上静默失败",
+        "title_en": "LookAtEntry.CmdQuery backfill UPDATE — historical Bug #3, NOT reproducible on the current dump",
+        "title_zh": "LookAtEntry.CmdQuery 回填 UPDATE — 歷史 Bug #3，當前 dump 上已無法復現",
         "summary_en": (
-            "`Form_LookAtEntry.vb:1778-1789` runs a single UPDATE that "
-            "joins seven+ lookup tables to backfill descriptive columns "
-            "(`c_entry_desc`, `c_addr_name`, `c_kin_name`, …) into "
-            "`ZZ_SCRATCH_ENTRY`. When the result set is large enough "
-            "(roughly 30,000+ rows), JET silently leaves those columns "
-            "NULL — the user sees a query result with empty description "
-            "fields and no error message. Confirmed only on LookAtEntry; "
-            "Status / Texts / Associations all backfill correctly at "
-            "similar row counts because their UPDATE chains are simpler."
+            "Historical context: an earlier dump of `Form_LookAtEntry.vb` "
+            "(line 1778-1789, a single UPDATE joining seven+ lookup tables "
+            "to backfill `c_entry_desc` / `c_addr_name` / `c_kin_name` "
+            "etc. into `ZZ_SCRATCH_ENTRY`) was reported to silently leave "
+            "those columns NULL on result sets above ~30 000 rows.\n\n"
+            "**RE-VERIFIED on the current dump (2026-05-02): cannot "
+            "reproduce.**  We fired CmdQuery on the same fixture (entry "
+            "code 36 jinshi general, no year filter, 92,514 rows in "
+            "`ZZ_SCRATCH_ENTRY`) and counted exactly **0 rows** with "
+            "`c_entry_code IS NOT NULL` AND `c_entry_desc IS NULL`; same "
+            "for `c_addr_id > 0` AND `c_addr_name IS NULL`.  The maintainer "
+            "also confirmed the UI shows correct desc / addr columns.\n\n"
+            "The giant multi-table UPDATE statement is still in the VBA "
+            "module (the source code wasn't rewritten), so structurally "
+            "the SQL pattern that was suspect remains.  But its runtime "
+            "behaviour now produces correct backfills on this dump — "
+            "likely because of a JET / Office update changing how it "
+            "schedules complex UPDATE plans, or because the original "
+            "diagnosis was a false positive.\n\n"
+            "**Recommendation:** treat as resolved unless someone can "
+            "produce a fresh repro on a current dump.  Verification "
+            "script: `analysis/verify_bug3.py`."
         ),
         "summary_zh": (
-            "`Form_LookAtEntry.vb:1778-1789` 用一条 UPDATE 把七张以上 lookup "
-            "表 JOIN 到 `ZZ_SCRATCH_ENTRY` 上，回填 `c_entry_desc`、"
-            "`c_addr_name`、`c_kin_name` 等描述字段。当结果集足够大时（大约"
-            " 30000 行以上），JET 引擎会静默地不更新这些字段——用户看到的查询"
-            "结果里相关列全是空，但完全没有报错。这个问题仅在 LookAtEntry 上"
-            "重现；Status / Texts / Associations 在相近行数下都能正确回填，"
-            "原因是它们的 UPDATE JOIN 链更简单。"
+            "歷史背景：早期某次 dump 的 `Form_LookAtEntry.vb`（第 1778-1789 "
+            "行，用一條 UPDATE JOIN 七張以上 lookup 表回填 `c_entry_desc` / "
+            "`c_addr_name` / `c_kin_name` 到 `ZZ_SCRATCH_ENTRY`）被報告"
+            "在結果集 ~30000 行以上時靜默地讓這些欄位保持 NULL。\n\n"
+            "**在當前 dump 上重新驗證（2026-05-02）：無法復現。** 我們用"
+            "同樣的 fixture（入仕途徑 36 進士及第，不限年份，`ZZ_SCRATCH_"
+            "ENTRY` 共 92,514 行）觸發 CmdQuery，精確統計 `c_entry_code "
+            "IS NOT NULL` 且 `c_entry_desc IS NULL` 的行數為 **0**；"
+            "`c_addr_id > 0` 且 `c_addr_name IS NULL` 也是 0。維護者本人"
+            "也確認 UI 上 desc / addr 欄位顯示正確。\n\n"
+            "那條龐大的多表 UPDATE SQL 仍在 VBA 模組裡（源碼沒被重寫），"
+            "所以結構上當時被懷疑的 SQL 寫法仍在；但在當前 dump 上，其"
+            "執行時行為已能正確回填 —— 可能是某次 JET / Office 更新改善"
+            "了複雜 UPDATE 的執行計畫，或當時的診斷本身就是假陽性。\n\n"
+            "**建議：** 視為已解決，除非有人能在當前 dump 上重新提出可"
+            "復現的反例。驗證腳本：`analysis/verify_bug3.py`。"
         ),
         "steps_en": [
-            "Open **LookAtEntry**.",
-            "Pick a high-frequency entry code such as **36 (jinshi general)** "
-            "without any year or place filters.",
-            "Click **Run Query**. Wait for the query to complete.",
-            "Open the result table `ZZ_SCRATCH_ENTRY` and inspect the "
-            "`c_entry_desc`, `c_addr_name`, `c_kin_name` columns.",
-            "Many rows have NULL values where descriptive text should be, "
-            "even though the matching lookup rows exist in the source tables.",
+            "Run `python analysis/verify_bug3.py` from the repo root.",
+            "It opens LookAtEntry, fires CmdQuery on entry code 36 with "
+            "no year filter, and reports the count of rows whose "
+            "`c_entry_desc` is NULL despite a non-null `c_entry_code`.",
+            "On the current dump the count is 0 — the bug is no longer "
+            "observable.  If a future dump regresses, this same script "
+            "will report a non-zero count.",
         ],
         "steps_zh": [
-            "打开 **LookAtEntry**。",
-            "选一个高频入仕途径，例如 **36（进士及第）**，不加任何年份或地点筛选。",
-            "点 **Run Query**，等查询跑完。",
-            "打开结果表 `ZZ_SCRATCH_ENTRY`，查看 `c_entry_desc`、`c_addr_name`、"
-            "`c_kin_name` 等列。",
-            "许多行的描述字段都是空的，尽管对应的 lookup 行在源表中其实存在。",
+            "在 repo 根目錄執行 `python analysis/verify_bug3.py`。",
+            "腳本會開啟 LookAtEntry，對入仕 36 不加年份篩選觸發 CmdQuery，"
+            "並回報 `c_entry_code` 非空但 `c_entry_desc` 為 NULL 的行數。",
+            "在當前 dump 上這個數字是 0 —— bug 已不再可見。若未來 dump "
+            "回歸退化，同一個腳本會報非零行數。",
         ],
         "fix_en": (
-            "Split the giant multi-table UPDATE into several smaller ones "
-            "— one per lookup join (UPDATE … LEFT JOIN INDEXYEAR_TYPE_CODES, "
-            "UPDATE … LEFT JOIN BIOG_MAIN, etc.). Same pattern Status / "
-            "Texts / Associations already use successfully."
+            "No action required for this dump.  If a future regression "
+            "is observed: split the giant multi-table UPDATE into "
+            "several smaller ones — one per lookup join — matching the "
+            "pattern Status / Texts / Associations already use."
         ),
         "fix_zh": (
-            "把这条庞大的多表 UPDATE 拆成若干条小 UPDATE——每条只 JOIN 一张"
-            " lookup 表（UPDATE … LEFT JOIN INDEXYEAR_TYPE_CODES、UPDATE … "
-            "LEFT JOIN BIOG_MAIN……）。Status / Texts / Associations 已经"
-            "用这种写法，运行良好。"
+            "在當前 dump 上不需要任何動作。若未來再次回歸：把那條龐大的"
+            "多表 UPDATE 拆成若干條小 UPDATE（每條只 JOIN 一張 lookup 表），"
+            "與 Status / Texts / Associations 已使用的寫法一致。"
         ),
         "screenshots": [],
-        "severity_en": "P0 — Silent data corruption",
-        "severity_zh": "P0 — 静默数据错位",
+        "severity_en": "P5 — Resolved / not reproducible on current dump",
+        "severity_zh": "P5 — 已解決 / 當前 dump 上無法復現",
     },
     {
         "id": 7,
@@ -360,10 +379,10 @@ ISSUES = [
     # ========== Tier 2: visible runtime crash (popup blocks user) ==========
     {
         "id": 4,
-        "tier": "P1_visible_crash",
+        "tier": "P5_resolved_or_dormant",
         "form": "Form_LookAtPlace.CmdGIS_Click",
-        "title_en": "LookAtPlace.CmdGIS aborts with 'Object required' (references a control that doesn't exist)",
-        "title_zh": "LookAtPlace.CmdGIS 报「Object required」（引用了不存在的控件）",
+        "title_en": "LookAtPlace.CmdGIS would abort with 'Object required' — LATENT, masked by Issue #15 (no CmdGIS button on the form)",
+        "title_zh": "LookAtPlace.CmdGIS 會報「Object required」 — LATENT，被 Issue #15（表單上沒有 CmdGIS 按鈕）所遮蔽",
         "summary_en": (
             "Note: this issue is moot in the current dump because there "
             "is no CmdGIS button on LookAtPlace's design (Issue #15) — "
@@ -412,12 +431,12 @@ ISSUES = [
             ("bug4_step2_annotated.png", None),
             ("bug4_step3_faux_popup.png", "Re-rendered popup — exact runtime error users would see if the button were present."),
         ],
-        "severity_en": "P1 — Visible crash, blocks the export",
-        "severity_zh": "P1 — 可见的报错，阻塞导出",
+        "severity_en": "P5 — Latent (would be P1 if Issue #15 fixed without first fixing this)",
+        "severity_zh": "P5 — 潛伏（若先修了 Issue #15 而沒同時修本條，會變成 P1）",
     },
     {
         "id": 5,
-        "tier": "P1_visible_crash",
+        "tier": "P5_resolved_or_dormant",
         "form": "Form_LookAtStatus.CmdPajek_Click",
         "title_en": "LookAtStatus.CmdPajek references a missing control AND uses three columns that don't exist",
         "title_zh": "LookAtStatus.CmdPajek 引用了不存在的控件，且 SQL 用了三个不存在的列",
@@ -491,8 +510,8 @@ ISSUES = [
             "拷贝过来的，列名没校对过。"
         ),
         "screenshots": [],
-        "severity_en": "P1 — Visible crash (cluster of two)",
-        "severity_zh": "P1 — 可见的报错（两个相关缺陷）",
+        "severity_en": "P5 — Latent (would be P1 if Issue #16 fixed without first fixing this)",
+        "severity_zh": "P5 — 潛伏（若先修了 Issue #16 而沒同時修本條，會變成 P1）",
     },
     {
         "id": 6,
@@ -622,53 +641,105 @@ ISSUES = [
     },
     {
         "id": 14,
-        "tier": "P1_visible_crash",
+        "tier": "P5_resolved_or_dormant",
         "form": "Form_KIN_DATA_Subform",
-        "title_en": "KIN_DATA Subform tries to open a picker form (frmPickKINSHIP_CODES) that doesn't exist",
-        "title_zh": "KIN_DATA 子表单试图打开不存在的 picker 表单 (frmPickKINSHIP_CODES)",
+        "title_en": "KIN_DATA Subform's CmdPickKinRel calls a missing picker (frmPickKINSHIP_CODES) — but the host sub-form is currently an orphan (LATENT)",
+        "title_zh": "KIN_DATA 子表單的 CmdPickKinRel 呼叫不存在的 picker（frmPickKINSHIP_CODES）——但目前該子表單在主表中無入口（LATENT）",
         "summary_en": (
-            "Same shape as Issue #13, on a different sub-form. The kinship-"
-            "code picker logic in KIN_DATA_Subform calls `DoCmd.OpenForm "
+            "**Static defect is real, runtime trigger is not currently "
+            "reachable.** The Sub `CmdPickKinRel_Click` in "
+            "`Form_KIN_DATA_Subform` (line 52) calls `DoCmd.OpenForm "
             "\"frmPickKINSHIP_CODES\"` and references "
             "`Forms!frmPickKINSHIP_CODES!frmKINSHIP_CODES.Form!c_kincode`. "
-            "Neither form exists in the current .mdb."
+            "Neither form exists in the current .mdb — same shape as "
+            "Issue #13.\n\n"
+            "**Why LATENT.** The host sub-form `KIN_DATA Subform` (which "
+            "owns the `CmdPickKinRel` button) is not contained by any "
+            "active form in the current `control_inventory.json`. "
+            "`BIOG_MAIN_2_Subform` (the kinship surface users actually "
+            "navigate to via CBDB_Browser_2) embeds `KIN_DATA_2 Subform` "
+            "instead — and that variant has no `CmdPickKinRel` button "
+            "(its 15 controls are all read-only fields). The only place "
+            "the embedding still appears is `Form__TMPCLP487951` (a "
+            "design-time backup snapshot, not a navigable form).\n\n"
+            "Because no user-facing navigation reaches the picker button, "
+            "users cannot trigger the popup from normal use. The latent "
+            "code path will resurface the moment a developer re-embeds "
+            "`KIN_DATA Subform` somewhere reachable, so the underlying "
+            "fix is still worth applying."
         ),
         "summary_zh": (
-            "症状与 Issue #13 相同，只是在另一个子表单上。KIN_DATA_Subform 中"
-            "选择 kinship 编码的逻辑调用 `DoCmd.OpenForm "
-            "\"frmPickKINSHIP_CODES\"`，并引用 "
+            "**靜態缺陷確實存在，但執行時的觸發路徑當前不可達。**"
+            "`Form_KIN_DATA_Subform` 第 52 行的 Sub `CmdPickKinRel_Click` "
+            "呼叫 `DoCmd.OpenForm \"frmPickKINSHIP_CODES\"`，並引用 "
             "`Forms!frmPickKINSHIP_CODES!frmKINSHIP_CODES.Form!c_kincode`。"
-            "这两个表单当前 .mdb 里都没有。"
+            "這兩個表單在目前的 .mdb 都不存在——形狀與 Issue #13 相同。\n\n"
+            "**為何 LATENT。**承載該按鈕的子表單 `KIN_DATA Subform` "
+            "（即擁有 `CmdPickKinRel` 按鈕者）在當前的 "
+            "`control_inventory.json` 裡沒有被任何 active 表單包含。"
+            "用戶實際從 CBDB_Browser_2 進入的親屬介面是 "
+            "`BIOG_MAIN_2_Subform`，而它包含的是 `KIN_DATA_2 Subform`"
+            "（另一個版本，15 個控件全是唯讀欄位，沒有 `CmdPickKinRel`"
+            "按鈕）。唯一仍然嵌入該子表單的位置是 "
+            "`Form__TMPCLP487951`，那是設計時的備份快照，不是可導航的表單。\n\n"
+            "因為沒有任何使用者介面能走到那個 picker 按鈕，"
+            "正常使用下不會彈出錯誤。但只要日後有人把 "
+            "`KIN_DATA Subform` 重新嵌進可達的位置，這條潛在錯誤路徑"
+            "就會立刻浮現，所以底層的修復仍值得做。"
         ),
         "steps_en": [
-            "Open the biographical detail form for **c_personid = 1 "
-            "(An Dun 安惇)** — he has 4 KIN_DATA rows, plenty to land "
-            "on for a click test.",
-            "On the KIN_DATA subform, click the kinship-code picker "
-            "field on any row.",
-            "An `Item not found in this collection.` popup appears "
-            "(the Sub tries `DoCmd.OpenForm "
-            "\"frmPickKINSHIP_CODES\"`, which doesn't exist either).",
+            "Verification path is **static-only** — the runtime click "
+            "cannot be reproduced in the current .mdb because no parent "
+            "form embeds the affected sub-form.",
+            "Static evidence (1): open `analysis/dump/vba/"
+            "Form_KIN_DATA_Subform.vb` line 52 — confirms the Sub calls "
+            "`DoCmd.OpenForm \"frmPickKINSHIP_CODES\"`.",
+            "Static evidence (2): open `analysis/dump/"
+            "control_inventory.json` and search for `\"frmPickKINSHIP_CODES\"`"
+            " as a key — absent. The picker form does not exist.",
+            "Reachability evidence: in the same JSON, search for "
+            "`\"KIN_DATA Subform\"` as a `source_object` or sub-form "
+            "control name — only `Form__TMPCLP487951` (a design backup) "
+            "references it. `BIOG_MAIN_2_Subform` embeds "
+            "`KIN_DATA_2 Subform` instead, which has no "
+            "`CmdPickKinRel` button.",
         ],
         "steps_zh": [
-            "打開人物 **c_personid = 1（安惇 An Dun）** 的生平詳情"
-            "——他有 4 條 KIN_DATA 記錄，足夠用來做一次點擊測試。",
-            "在 KIN_DATA 子表單上，點任一列的「kinship code」picker "
-            "欄位。",
-            "彈出「集合中找不到項目」對話框（Sub 試圖 "
-            "`DoCmd.OpenForm \"frmPickKINSHIP_CODES\"`，該表單也不存在）。",
+            "驗證路徑**只能靜態驗證**——當前 .mdb 中並無主表單嵌入"
+            "受影響的子表單，因此無法在執行時重現點擊。",
+            "靜態證據 (1)：打開 `analysis/dump/vba/"
+            "Form_KIN_DATA_Subform.vb` 第 52 行——可見該 Sub 確實呼叫 "
+            "`DoCmd.OpenForm \"frmPickKINSHIP_CODES\"`。",
+            "靜態證據 (2)：打開 `analysis/dump/"
+            "control_inventory.json`，以 `\"frmPickKINSHIP_CODES\"` "
+            "為鍵搜索——不存在。該 picker 表單已不存在於 .mdb 中。",
+            "可達性證據：在同一份 JSON 中搜索 `\"KIN_DATA Subform\"` "
+            "作為 `source_object` 或子表單控件名——只有 "
+            "`Form__TMPCLP487951`（設計時備份快照）引用它。"
+            "用戶實際走到的 `BIOG_MAIN_2_Subform` 嵌入的是 "
+            "`KIN_DATA_2 Subform`，那一版沒有 `CmdPickKinRel` 按鈕。",
         ],
         "fix_en": (
-            "Same as Issue #13: restore the picker form or update the "
-            "caller to point at its replacement."
+            "Same as Issue #13: restore the picker form (or update the "
+            "caller to its replacement). Even though the runtime path is "
+            "not currently reachable, the static defect should be cleaned "
+            "up so it doesn't resurface when `KIN_DATA Subform` is "
+            "re-embedded."
         ),
         "fix_zh": (
-            "与 Issue #13 相同：把 picker 表单恢复，或把调用方改成指向新的 "
-            "picker 表单。"
+            "與 Issue #13 相同：把 picker 表單恢復，或把呼叫方改成指向"
+            "替代的 picker。雖然目前執行路徑不可達，靜態缺陷仍應清理，"
+            "以免日後 `KIN_DATA Subform` 被重新嵌入時又冒出來。"
         ),
         "screenshots": [],
-        "severity_en": "P1 — Visible crash on a user click",
-        "severity_zh": "P1 — 用户点击时可见的报错",
+        "severity_en": (
+            "P5 — Latent (would be P1 if `KIN_DATA Subform` were "
+            "re-embedded somewhere users can reach)"
+        ),
+        "severity_zh": (
+            "P5 — Latent（若日後把 `KIN_DATA Subform` 重新嵌入"
+            "使用者可達的位置，會回到 P1）"
+        ),
     },
     # ========== Tier 3: silent display (data shown wrong/missing) ==========
     {
@@ -1508,6 +1579,9 @@ def _build(lang: str, out_path: Path) -> None:
         "P2 — Silent display: form fields render blank when they should show data.",
         "P3 — Missing UI: a feature exists in code but no button invokes it.",
         "P4 — Setup: one-time hurdle on each new install.",
+        "P5 — Resolved / not currently reproducible: kept as historical "
+        "record; we re-checked on the current dump and could not "
+        "trigger the symptom.",
     ]
     legend_zh = [
         "P0 — 静默数据错误：数据错或缺失，但没有任何报错提示。",
@@ -1515,6 +1589,8 @@ def _build(lang: str, out_path: Path) -> None:
         "P2 — 静默显示问题：表单字段本应有数据，却显示为空。",
         "P3 — 缺失界面：代码里实现了某功能，但界面上没有按钮去触发它。",
         "P4 — 安装设置：每台新机器需要一次性处理。",
+        "P5 — 已解决 / 当前无法复现：保留作为历史记录；我们在当前 dump "
+        "上重新验证过，无法再触发症状。",
     ]
     _bullets(doc, [Z(s) for s in (legend_en if is_en else legend_zh)])
     doc.add_page_break()
@@ -1524,13 +1600,16 @@ def _build(lang: str, out_path: Path) -> None:
     for it in ISSUES:
         by_tier.setdefault(it["tier"], []).append(it)
     tier_order = ["P0_silent_data", "P1_visible_crash",
-                  "P2_silent_display", "P3_missing_ui", "P4_setup"]
+                  "P2_silent_display", "P3_missing_ui", "P4_setup",
+                  "P5_resolved_or_dormant"]
     tier_titles_en = {
         "P0_silent_data": "P0 — Silent data corruption",
         "P1_visible_crash": "P1 — Visible runtime crash",
         "P2_silent_display": "P2 — Silent display",
         "P3_missing_ui": "P3 — Missing UI",
         "P4_setup": "P4 — Setup",
+        "P5_resolved_or_dormant":
+            "P5 — Resolved / not currently reproducible",
     }
     tier_titles_zh = {
         "P0_silent_data": "P0 — 静默数据错误",
@@ -1538,6 +1617,7 @@ def _build(lang: str, out_path: Path) -> None:
         "P2_silent_display": "P2 — 静默显示问题",
         "P3_missing_ui": "P3 — 缺失界面",
         "P4_setup": "P4 — 安装设置",
+        "P5_resolved_or_dormant": "P5 — 已解决 / 当前无法复现",
     }
     demo_persons = _load_demo_persons()
     bug_status = _load_bug_test_status()
@@ -1548,6 +1628,32 @@ def _build(lang: str, out_path: Path) -> None:
             continue
         _h(doc, 1, Z(tier_titles_en[tier] if is_en
                       else tier_titles_zh[tier]))
+        if tier == "P5_resolved_or_dormant":
+            preface = (
+                "Items in this tier are kept as historical / latent "
+                "record.  They fall into three categories: (a) DORMANT "
+                "— current source data doesn't trigger the symptom; "
+                "(b) RESOLVED — the symptom no longer occurs even "
+                "though the suspect code is still present (likely "
+                "fixed by some Office / JET update or a previous "
+                "iteration); (c) LATENT — the source-code defect is "
+                "real, but the user can't reach it because another "
+                "issue (e.g. a missing UI button) blocks the path. "
+                "None of these are user-facing today; please consult "
+                "before treating any of them as urgent."
+                if is_en else
+                "本層的條目作為歷史 / 潛伏記錄保留。可分為三類："
+                "(a) DORMANT 潛伏 —— 已驗證當前源資料無法觸發該症狀；"
+                "(b) RESOLVED 已解決 —— 症狀不再出現，雖然可疑程式碼"
+                "仍在（可能是某次 Office / JET 更新或更早一次修補解決"
+                "的）；(c) LATENT 被屏蔽 —— 源碼缺陷確實存在，但因為"
+                "另一個 issue（例如某個 UI 按鈕缺失）擋住了使用路徑，"
+                "使用者目前碰不到。本層條目當下都不是使用者會遇到的"
+                "問題；若要當成緊急問題處理，請先諮詢。"
+            )
+            p = doc.add_paragraph(Z(preface))
+            for run in p.runs:
+                run.italic = True
         for it in items:
             title = it["title_en"] if is_en else it["title_zh"]
             _h(doc, 2, Z(f"Issue #{it['id']} — {title}"))
@@ -1794,6 +1900,8 @@ def _build_md(lang: str, out_path: Path) -> None:
         "P2_silent_display": "P2 — Silent display",
         "P3_missing_ui": "P3 — Missing UI",
         "P4_setup": "P4 — Setup",
+        "P5_resolved_or_dormant":
+            "P5 — Resolved / not currently reproducible",
     }
     tier_titles_zh = {
         "P0_silent_data": "P0 — 静默数据错误",
@@ -1801,9 +1909,11 @@ def _build_md(lang: str, out_path: Path) -> None:
         "P2_silent_display": "P2 — 静默显示问题",
         "P3_missing_ui": "P3 — 缺失界面",
         "P4_setup": "P4 — 安装设置",
+        "P5_resolved_or_dormant": "P5 — 已解决 / 当前无法复现",
     }
     tier_order = ["P0_silent_data", "P1_visible_crash",
-                  "P2_silent_display", "P3_missing_ui", "P4_setup"]
+                  "P2_silent_display", "P3_missing_ui", "P4_setup",
+                  "P5_resolved_or_dormant"]
 
     by_tier: dict[str, list[dict]] = {}
     for it in ISSUES:
@@ -1878,6 +1988,9 @@ def _build_md(lang: str, out_path: Path) -> None:
         "P2 — Silent display: form fields render blank when they should show data.",
         "P3 — Missing UI: a feature exists in code but no button invokes it.",
         "P4 — Setup: one-time hurdle on each new install.",
+        "P5 — Resolved / not currently reproducible: kept as historical "
+        "record; we re-checked on the current dump and could not "
+        "trigger the symptom.",
     ]
     legend_zh = [
         "P0 — 静默数据错误：数据错或缺失，但没有任何报错提示。",
@@ -1885,6 +1998,8 @@ def _build_md(lang: str, out_path: Path) -> None:
         "P2 — 静默显示问题：表单字段本应有数据，却显示为空。",
         "P3 — 缺失界面：代码里实现了某功能，但界面上没有按钮去触发它。",
         "P4 — 安装设置：每台新机器需要一次性处理。",
+        "P5 — 已解决 / 当前无法复现：保留作为历史记录；我们在当前 dump "
+        "上重新验证过，无法再触发症状。",
     ]
     for s in (legend_en if is_en else legend_zh):
         lines.append(f"- {Z(s)}")
@@ -1902,6 +2017,30 @@ def _build_md(lang: str, out_path: Path) -> None:
                       else tier_titles_zh[tier])
         lines.append(f"## {Z(tier_title)}")
         lines.append("")
+        if tier == "P5_resolved_or_dormant":
+            lines.append(Z(
+                "_Items in this tier are kept as historical / latent "
+                "record.  They fall into three categories: (a) DORMANT — "
+                "verified that current source data doesn't trigger the "
+                "symptom; (b) RESOLVED — the symptom no longer occurs "
+                "even though the suspect code is still present (likely "
+                "fixed by some Office / JET update or a previous "
+                "iteration); (c) LATENT — the source-code defect is "
+                "real, but the user can't reach it because another "
+                "issue (e.g. a missing UI button) blocks the path.  "
+                "None of these are user-facing today; please consult "
+                "before treating any of them as urgent._"
+                if is_en else
+                "_本層的條目作為歷史 / 潛伏記錄保留。可分為三類："
+                "(a) DORMANT 潛伏 — 已驗證當前源資料無法觸發該症狀；"
+                "(b) RESOLVED 已解決 — 症狀不再出現，雖然可疑程式碼仍"
+                "在（可能是某次 Office / JET 更新或更早一次修補解決的）；"
+                "(c) LATENT 被屏蔽 — 源碼缺陷確實存在，但因為另一個 "
+                "issue（例如某個 UI 按鈕缺失）擋住了使用路徑，使用者"
+                "目前碰不到。本層條目當下都不是使用者會遇到的問題；"
+                "若要當成緊急問題處理，請先諮詢。_"
+            ))
+            lines.append("")
         for it in items:
             t_title = it["title_en"] if is_en else it["title_zh"]
             lines.append(f"### Issue #{it['id']} — {Z(t_title)}")
