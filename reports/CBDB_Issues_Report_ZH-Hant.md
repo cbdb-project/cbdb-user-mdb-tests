@@ -213,7 +213,7 @@ _The popup users see (re-rendered for the report; the real popup blocks the COM 
 
 ![bug10_subform_annotated.png](screenshots/bug10_subform_annotated.png)
 
-_EVENT_ADDR_2 in design view, annotated — TxtAddrCHN's ControlSource (`c_name_chn`) is not in the form's RecordSource projection._
+_Runtime view: CBDB_Browser_2 with c_personid=44872 (孫才) loaded.  EVENT_ADDR sub-tab shows blank Chinese / Pinyin address columns (control `TxtAddrCHN` is bound to `c_name_chn`, which the form's RecordSource — `View_EventAddrData` — doesn't project).  ADDR_CODES has the values — they're just unreachable from this sub-form._
 
 #### 建議修復方案
 
@@ -243,7 +243,7 @@ EVENTS_DATA_2 子表單上有一個控制元件，其 ControlSource 寫的是 `c
 
 ![bug11_subform_annotated.png](screenshots/bug11_subform_annotated.png)
 
-_EVENTS_DATA_2 in design view, annotated._
+_Runtime view: CBDB_Browser_2 with c_personid=44872 (孫才) loaded.  EVENTS_DATA sub-tab has a control bound to `c_event_record_id`, which doesn't exist in either EVENTS_DATA or `View_EventsData` — every row renders blank silently._
 
 #### 建議修復方案
 
@@ -275,7 +275,7 @@ POSTED_TO_OFFICE_DATA_2 子表單上 `c_appt_type_code` 控制元件的 ControlS
 
 ![bug12_subform_annotated.png](screenshots/bug12_subform_annotated.png)
 
-_POSTED_TO_OFFICE_DATA_2 in design view, annotated._
+_Runtime view: CBDB_Browser_2 with c_personid=2 (安邡, An Fang) loaded — picked because he has POSTING_DATA (Sun Cai 44872 has none).  Postings sub-tab is open; the appointment-type column is blank on every row — the bound control's ControlSource (`c_appt_type_code`) is missing from `View_PostingOfficeData`'s projection._
 
 #### 建議修復方案
 
