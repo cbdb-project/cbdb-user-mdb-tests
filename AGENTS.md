@@ -516,9 +516,11 @@ and `reports/index_year_drift_rule_classification.json`.  Headline:
                                           a single evidence row)
   - 18 `unclassified`
 
-Total 69, ~74 % bucketed into named patterns (still none labelled
-as confirmed bugs; the buckets are evidence categories for the
-maintainer).
+Total 69, all 69 in named buckets after K1 + K2 (still none
+labelled as confirmed bugs; PR Y then upgraded each bucket from a
+count to a cause hypothesis with confidence + next-action — see
+`analysis/index_drift_cause_analysis.md` and
+`reports/index_drift_cause_summary.json`).
 
 PR K2 (`analysis/triage_index_year_drift_groups.py` →
 `reports/index_year_drift_rule_groups.json`) does a second triage
@@ -551,6 +553,20 @@ priority / iteration-order triage** (not on missing source —
 that was PR M's job).  Re-run the comparator + classifier +
 triage after every fresh SQLite snapshot or any change to the
 index-recompute path on either side.
+
+PR Y synthesises the K1 / K2 / PR L / PR S outputs into a
+**cause analysis appendix** —
+`analysis/index_drift_cause_analysis.md` (prose) +
+`reports/index_drift_cause_summary.json` (machine-readable).
+Each c_index_year and c_index_addr_id bucket gets count, likely
+cause, supporting algorithm + row evidence, confidence, and
+next concrete investigation step.  The maintainer report
+(`reports/CBDB_Issues_Report_*.md`) gains a short "What
+currently explains the drift" section that summarises the
+cause+confidence tables; the detailed prose stays in the
+analysis md to keep the report compact.  Nothing yet labelled
+a confirmed CBDB bug; cause buckets are evidence-typed
+explanations, not verdicts.
 
 PR L (`analysis/classify_index_addr_drift.py` →
 `reports/index_addr_drift_classification.json`) classifies the

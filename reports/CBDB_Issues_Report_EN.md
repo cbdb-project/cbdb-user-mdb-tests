@@ -680,6 +680,40 @@ PR M (`analysis/dump_data_mdb_vba.py`) extracted `frmBaseMaintenance.CmdIndexAdd
 
 PR S (`analysis/deep_dive_addr_same_candidates.py`) confirmed the 10 `same_candidates_diff_winner` rows are all driven by MAX(c_sequence) ties (multiple BIOG_ADDR_DATA rows of the same (person, addr_type) sharing the same max c_sequence).  PHP, Access, and our recompute each pick non-deterministically.  Both sides follow the same documented rule; neither is wrong.  Candidate mitigation: add an explicit secondary tie-break (e.g. MIN(c_addr_id)) to both implementations.  Per-row evidence in `reports/index_addr_same_candidates_deep_dive.json`.
 
+### What currently explains the drift
+
+Per-bucket cause / supporting evidence / confidence / next action lives in `analysis/index_drift_cause_analysis.md`.  This section just summarises headline counts and confidence; no bucket is labelled a confirmed CBDB bug.
+
+**c_index_year cause buckets**
+
+| Bucket | Count | Confidence |
+|---|---:|---|
+| `php_returned_sentinel` | 1 | high |
+| `php_did_not_compute` | 19 | medium-high (for tcode 05 / cleanly testable); medium (for the others) |
+| `access_did_not_compute` | 7 | medium |
+| `iteration_order_diff` | 5 | medium |
+| `consistent_within_rule` | 14 | medium |
+| `candidate_algorithm_divergence` | 5 | low-medium |
+| `blocked_by_runtime_priority_triage_pending` | 17 | low (per-row causes); high (category label) |
+
+**c_index_addr_id cause buckets**
+
+| Bucket | Count | Confidence |
+|---|---:|---|
+| `mdb_stale_index_addr` | 412 | high |
+| `mdb_value_php_null` | 47 | medium |
+| `same_candidates_diff_winner` | 10 | high |
+| `both_stale_recompute_mismatch` | 10 | medium-high |
+| `both_sides_match_recomputed` | 6 | low-medium |
+| `sqlite_stale_index_addr` | 2 | medium |
+| `mdb_null_php_value` | 1 | medium-high |
+
+Top suggested next investigations (full list in the cause-analysis md):
+
+1. B1 release-process step (CmdIndexYear → CmdIndexAddress before shipping User MDB) — would close 412 rows; engineering cost: zero (process change).
+2. B3 secondary tie-break (MIN(c_addr_id)) added to both implementations — would close 10 rows; engineering cost: small algorithm tweak per side.
+3. A2 tcode 05 entry-code-mapping check (pull SQLite ENTRY_CODE_TYPE_REL membership) — would close 7 rows; engineering cost: single SQL probe.
+
 ### Examples where only c_index_year disagrees
 
 **`c_personid = 3501` — 李孝稱 (Li Xiaocheng)**

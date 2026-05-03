@@ -678,6 +678,40 @@ PR K2 進一步的 triage (`analysis/triage_index_year_drift_groups.py` → `rep
 
 PR M（`analysis/dump_data_mdb_vba.py`）從 DATA mdb 抽出了 `frmBaseMaintenance.CmdIndexAddress_Click`。它**沒有**像 PHP 那樣明確 `MAX(c_sequence)` 聚合 —— 在維護週期差異之外，這還是一個候選演演算法差異。建議的 release checklist 緩解步驟：在 User MDB 出貨前先在 DATA mdb 上跑 `CmdIndexYear`，再跑 `CmdIndexAddress`。詳見 `analysis/index_drift_algorithm_notes.md` 中的 "Maintenance trigger path" 段。
 
+### 目前能解釋的 drift 原因
+
+每個 bucket 的成因／證據／信心度／下一步追查都寫在 `analysis/index_drift_cause_analysis.md`。本節只列每個 bucket 的計數和信心度摘要；目前沒有任何 bucket 被列為已確認的 CBDB bug。
+
+**c_index_year 原因桶**
+
+| Bucket | 筆數 | 信心度 |
+|---|---:|---|
+| `php_returned_sentinel` | 1 | high |
+| `php_did_not_compute` | 19 | medium-high (for tcode 05 / cleanly testable); medium (for the others) |
+| `access_did_not_compute` | 7 | medium |
+| `iteration_order_diff` | 5 | medium |
+| `consistent_within_rule` | 14 | medium |
+| `candidate_algorithm_divergence` | 5 | low-medium |
+| `blocked_by_runtime_priority_triage_pending` | 17 | low (per-row causes); high (category label) |
+
+**c_index_addr_id 原因桶**
+
+| Bucket | 筆數 | 信心度 |
+|---|---:|---|
+| `mdb_stale_index_addr` | 412 | high |
+| `mdb_value_php_null` | 47 | medium |
+| `same_candidates_diff_winner` | 10 | high |
+| `both_stale_recompute_mismatch` | 10 | medium-high |
+| `both_sides_match_recomputed` | 6 | low-medium |
+| `sqlite_stale_index_addr` | 2 | medium |
+| `mdb_null_php_value` | 1 | medium-high |
+
+建議優先處理的調查專案（完整列表見 cause-analysis md）：
+
+1. B1 release-process step (CmdIndexYear → CmdIndexAddress before shipping User MDB) —— 可消化 412 筆；工程成本：zero (process change)。
+2. B3 secondary tie-break (MIN(c_addr_id)) added to both implementations —— 可消化 10 筆；工程成本：small algorithm tweak per side。
+3. A2 tcode 05 entry-code-mapping check (pull SQLite ENTRY_CODE_TYPE_REL membership) —— 可消化 7 筆；工程成本：single SQL probe。
+
 ### 僅 c_index_year 不一致的樣例
 
 **`c_personid = 3501` — 李孝稱 (Li Xiaocheng)**

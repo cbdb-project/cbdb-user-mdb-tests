@@ -1552,6 +1552,7 @@ CLASSIFICATION_JSON = REPO / "reports" / "index_drift_classification.json"
 RULE_CLASSIFICATION_JSON = REPO / "reports" / "index_year_drift_rule_classification.json"
 RULE_GROUPS_JSON = REPO / "reports" / "index_year_drift_rule_groups.json"
 ADDR_CLASSIFICATION_JSON = REPO / "reports" / "index_addr_drift_classification.json"
+CAUSE_SUMMARY_JSON = REPO / "reports" / "index_drift_cause_summary.json"
 DEMO_PERSONS_JSON = REPO / "reports" / "demo_persons.json"
 KNOWN_BUGS_STATUS_JSON = REPO / "reports" / "known_bugs_status.json"
 
@@ -1987,6 +1988,64 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
                     f"\"Maintenance trigger path\" for the full "
                     f"write-up."
                 ))
+
+            # ---- Cause analysis appendix (PR Y) ----
+            if CAUSE_SUMMARY_JSON.exists():
+                cs = _json.loads(
+                    CAUSE_SUMMARY_JSON.read_text(encoding="utf-8"))
+                _h(doc, 2, "What currently explains the drift")
+                doc.add_paragraph(Z(
+                    "Per-bucket cause / supporting evidence / "
+                    "confidence / next action lives in "
+                    "`analysis/index_drift_cause_analysis.md`.  This "
+                    "section just summarises the headline counts and "
+                    "confidence per bucket; no bucket is labelled a "
+                    "confirmed CBDB bug."
+                ))
+                # c_index_year table
+                _h(doc, 3, "c_index_year cause buckets")
+                tbl = doc.add_table(rows=1, cols=3)
+                tbl.style = "Light Grid Accent 1"
+                hdr = tbl.rows[0].cells
+                hdr[0].text = "Bucket"
+                hdr[1].text = "Count"
+                hdr[2].text = "Confidence"
+                for b in cs["c_index_year"]["buckets"]:
+                    if b["count"] == 0:
+                        continue
+                    row = tbl.add_row().cells
+                    row[0].text = b["bucket"]
+                    row[1].text = str(b["count"])
+                    row[2].text = b["confidence"]
+                doc.add_paragraph("")
+                # c_index_addr_id table
+                _h(doc, 3, "c_index_addr_id cause buckets")
+                tbl = doc.add_table(rows=1, cols=3)
+                tbl.style = "Light Grid Accent 1"
+                hdr = tbl.rows[0].cells
+                hdr[0].text = "Bucket"
+                hdr[1].text = "Count"
+                hdr[2].text = "Confidence"
+                for b in cs["c_index_addr_id"]["buckets"]:
+                    if b["count"] == 0:
+                        continue
+                    row = tbl.add_row().cells
+                    row[0].text = b["bucket"]
+                    row[1].text = str(b["count"])
+                    row[2].text = b["confidence"]
+                doc.add_paragraph("")
+                doc.add_paragraph(Z(
+                    "Top suggested next investigations (full list in "
+                    "the cause-analysis md):"
+                ))
+                for inv in cs[
+                    "suggested_next_investigations_in_priority_order"
+                ][:3]:
+                    doc.add_paragraph(Z(
+                        f"  {inv['id']}. {inv['task']} — would close "
+                        f"{inv['would_close_rows']} rows; engineering "
+                        f"cost: {inv['engineering_cost']}."
+                    ))
         else:
             _h(doc, 2, Z("年份差異 —— 逐筆 rule 分類"))
             doc.add_paragraph(Z(
@@ -2139,6 +2198,59 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
                     f"tie-break（如 MIN(c_addr_id)）。逐筆證據見 "
                     f"`reports/index_addr_same_candidates_deep_dive.json`。"
                 ))
+
+            # ---- Cause analysis appendix (PR Y) ----
+            if CAUSE_SUMMARY_JSON.exists():
+                cs = _json.loads(
+                    CAUSE_SUMMARY_JSON.read_text(encoding="utf-8"))
+                _h(doc, 2, Z("目前能解釋的 drift 原因"))
+                doc.add_paragraph(Z(
+                    "每個 bucket 的成因／證據／信心度／下一步追查"
+                    "都寫在 `analysis/index_drift_cause_analysis.md`。"
+                    "本節只列每個 bucket 的計數和信心度摘要；目前"
+                    "沒有任何 bucket 被列為已確認的 CBDB bug。"
+                ))
+                _h(doc, 3, Z("c_index_year 原因桶"))
+                tbl = doc.add_table(rows=1, cols=3)
+                tbl.style = "Light Grid Accent 1"
+                hdr = tbl.rows[0].cells
+                hdr[0].text = Z("Bucket")
+                hdr[1].text = Z("筆數")
+                hdr[2].text = Z("信心度")
+                for b in cs["c_index_year"]["buckets"]:
+                    if b["count"] == 0:
+                        continue
+                    row = tbl.add_row().cells
+                    row[0].text = b["bucket"]
+                    row[1].text = str(b["count"])
+                    row[2].text = b["confidence"]
+                doc.add_paragraph("")
+                _h(doc, 3, Z("c_index_addr_id 原因桶"))
+                tbl = doc.add_table(rows=1, cols=3)
+                tbl.style = "Light Grid Accent 1"
+                hdr = tbl.rows[0].cells
+                hdr[0].text = Z("Bucket")
+                hdr[1].text = Z("筆數")
+                hdr[2].text = Z("信心度")
+                for b in cs["c_index_addr_id"]["buckets"]:
+                    if b["count"] == 0:
+                        continue
+                    row = tbl.add_row().cells
+                    row[0].text = b["bucket"]
+                    row[1].text = str(b["count"])
+                    row[2].text = b["confidence"]
+                doc.add_paragraph("")
+                doc.add_paragraph(Z(
+                    "建議優先處理的調查項目（完整列表見 cause-analysis md）："
+                ))
+                for inv in cs[
+                    "suggested_next_investigations_in_priority_order"
+                ][:3]:
+                    doc.add_paragraph(Z(
+                        f"  {inv['id']}. {inv['task']} —— 可消化 "
+                        f"{inv['would_close_rows']} 筆；工程成本："
+                        f"{inv['engineering_cost']}。"
+                    ))
 
     # ---- Per bucket ----
     bucket_meta = {
@@ -3372,6 +3484,60 @@ def _build_md(lang: str, out_path: Path) -> None:
                     f"`reports/index_addr_same_candidates_deep_dive.json`."
                 ))
                 lines.append("")
+
+                # ---- Cause analysis appendix (PR Y) ----
+                if CAUSE_SUMMARY_JSON.exists():
+                    cs = _json.loads(
+                        CAUSE_SUMMARY_JSON.read_text(encoding="utf-8"))
+                    lines.append("### What currently explains the drift")
+                    lines.append("")
+                    lines.append(Z(
+                        "Per-bucket cause / supporting evidence / "
+                        "confidence / next action lives in "
+                        "`analysis/index_drift_cause_analysis.md`.  "
+                        "This section just summarises headline counts "
+                        "and confidence; no bucket is labelled a "
+                        "confirmed CBDB bug."
+                    ))
+                    lines.append("")
+                    lines.append("**c_index_year cause buckets**")
+                    lines.append("")
+                    lines.append("| Bucket | Count | Confidence |")
+                    lines.append("|---|---:|---|")
+                    for b in cs["c_index_year"]["buckets"]:
+                        if b["count"] == 0:
+                            continue
+                        lines.append(
+                            f"| `{b['bucket']}` | {b['count']} "
+                            f"| {b['confidence']} |"
+                        )
+                    lines.append("")
+                    lines.append("**c_index_addr_id cause buckets**")
+                    lines.append("")
+                    lines.append("| Bucket | Count | Confidence |")
+                    lines.append("|---|---:|---|")
+                    for b in cs["c_index_addr_id"]["buckets"]:
+                        if b["count"] == 0:
+                            continue
+                        lines.append(
+                            f"| `{b['bucket']}` | {b['count']} "
+                            f"| {b['confidence']} |"
+                        )
+                    lines.append("")
+                    lines.append(Z(
+                        "Top suggested next investigations (full list "
+                        "in the cause-analysis md):"
+                    ))
+                    lines.append("")
+                    for inv in cs[
+                        "suggested_next_investigations_in_priority_order"
+                    ][:3]:
+                        lines.append(Z(
+                            f"{inv['id']}. {inv['task']} — would close "
+                            f"{inv['would_close_rows']} rows; "
+                            f"engineering cost: {inv['engineering_cost']}."
+                        ))
+                    lines.append("")
             else:
                 lines.append(f"### {Z('c_index_addr_id 差異 —— 逐筆分類')}")
                 lines.append("")
@@ -3412,6 +3578,58 @@ def _build_md(lang: str, out_path: Path) -> None:
                     f"\"Maintenance trigger path\" 段。"
                 ))
                 lines.append("")
+
+                # ---- Cause analysis appendix (PR Y) ----
+                if CAUSE_SUMMARY_JSON.exists():
+                    cs = _json.loads(
+                        CAUSE_SUMMARY_JSON.read_text(encoding="utf-8"))
+                    lines.append(f"### {Z('目前能解釋的 drift 原因')}")
+                    lines.append("")
+                    lines.append(Z(
+                        "每個 bucket 的成因／證據／信心度／下一步追查"
+                        "都寫在 `analysis/index_drift_cause_analysis.md`。"
+                        "本節只列每個 bucket 的計數和信心度摘要；目前"
+                        "沒有任何 bucket 被列為已確認的 CBDB bug。"
+                    ))
+                    lines.append("")
+                    lines.append(f"**{Z('c_index_year 原因桶')}**")
+                    lines.append("")
+                    lines.append(f"| Bucket | {Z('筆數')} | {Z('信心度')} |")
+                    lines.append("|---|---:|---|")
+                    for b in cs["c_index_year"]["buckets"]:
+                        if b["count"] == 0:
+                            continue
+                        lines.append(
+                            f"| `{b['bucket']}` | {b['count']} "
+                            f"| {b['confidence']} |"
+                        )
+                    lines.append("")
+                    lines.append(f"**{Z('c_index_addr_id 原因桶')}**")
+                    lines.append("")
+                    lines.append(f"| Bucket | {Z('筆數')} | {Z('信心度')} |")
+                    lines.append("|---|---:|---|")
+                    for b in cs["c_index_addr_id"]["buckets"]:
+                        if b["count"] == 0:
+                            continue
+                        lines.append(
+                            f"| `{b['bucket']}` | {b['count']} "
+                            f"| {b['confidence']} |"
+                        )
+                    lines.append("")
+                    lines.append(Z(
+                        "建議優先處理的調查項目（完整列表見 cause-"
+                        "analysis md）："
+                    ))
+                    lines.append("")
+                    for inv in cs[
+                        "suggested_next_investigations_in_priority_order"
+                    ][:3]:
+                        lines.append(Z(
+                            f"{inv['id']}. {inv['task']} —— 可消化 "
+                            f"{inv['would_close_rows']} 筆；工程成本："
+                            f"{inv['engineering_cost']}。"
+                        ))
+                    lines.append("")
 
         data = _json.loads(DRIFT_JSON.read_text(encoding="utf-8"))
         bucket_meta = {
