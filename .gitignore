@@ -10,6 +10,12 @@ data/
 analysis/_*
 analysis/_exports_tmp/
 
+# Bug-report capture working copies + lock files (keep .docx + .png).
+reports/_*
+reports/*.mdb
+reports/*.ldb
+reports/*.laccdb
+
 # Real-export goldens that are blessed locally before the first push.
 tests/golden/exports/_tmp/
 
