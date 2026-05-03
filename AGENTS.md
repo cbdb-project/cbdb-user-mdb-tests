@@ -291,8 +291,10 @@ Triage convention used by the report:
 - **P2** silent display — sub-form column shows blank where data exists
 - **P3** missing UI — handler exists but no button to fire it
 - **P4** setup — one-time install fix
-- **P5** dormant / latent / resolved — defect real but doesn't fire
-  on the current dump or has no UI trigger today
+- **P5** dormant / latent / not currently reproducible — defect real
+  but doesn't fire on the current dump or has no UI trigger today;
+  **none have been verified as upstream-fixed** (see marker-failure
+  policy below)
 
 When triaging future findings, weight P0/P1 heavier than P2-P5.
 Static scans tend to surface a lot of low-priority noise — flag it,
@@ -383,8 +385,17 @@ on the shipped dump: 6 of 19 audits flagged, 6.5 s total.
 All audits share `analysis/audit_lib.read_vba_lines` for proper
 `\\r\\r\\n` handling so reported line numbers match grep / VBE.
 
-These are guarded by `tests/test_known_bugs.py`; if those tests start
-failing, it means upstream fixed the bug (good — flip the asserts).
+These are guarded by `tests/test_known_bugs.py`; if those tests
+start failing, the marker no longer reproduces — that's a signal
+to investigate, **not** an automatic confirmation that upstream
+fixed the bug.  The candidates are: (a) upstream actually patched
+the source .mdb / VBA, (b) the input fixture or Access driver
+behaviour changed out from under the test, (c) the original bug was
+misclassified.  Only (a) justifies marking the issue as fixed in
+`reports/generate_report.py`'s `ISSUES` dict, and only after
+inspecting the new VBA / queries dump or hearing from the
+maintainer.  Until then, prefer re-classifying (Dormant / Latent /
+Not currently reproducible) over removing the issue.
 
 ### NOT a bug: User MDB ≠ cbdb-online-main-server SQLite on a small handful of `c_index_year` / `c_index_addr_id` / `c_birthyear` / `c_deathyear` values
 

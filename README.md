@@ -160,8 +160,9 @@ python -m pytest tests/ -W ignore --include-vba   # full suite
 
 # To regenerate the bilingual bug-report (FOUR files) AFTER a new dump
 # — captures fresh demo personid hints, known-bug statuses, and per-
-# issue 'Bug appears FIXED' banners wherever a regression marker has
-# flipped:
+# issue 'marker no longer reproduces — please verify' banners wherever
+# a regression marker has flipped (see policy below: a flipped marker
+# is a signal to investigate, NOT an automatic fix confirmation):
 python -m pytest tests/test_known_bugs.py -W ignore --no-discover-inputs \
     --json-report --json-report-file=reports/known_bugs_status.json
 python reports/probe_demo_persons.py    # refresh concrete demo personids
@@ -181,10 +182,21 @@ emitted by a single `generate_report.py` run so they never drift
 out of sync.
 
 The Word doc generator NEVER deletes issues automatically — when a
-regression marker fails (= bug appears fixed), the corresponding
-issue gets a "⚠ please verify in person" banner prepended, but its
-description / steps / fix recommendation stay intact so nothing is
-lost if the test gave a false positive.
+regression marker fails (= the marker no longer reproduces), the
+corresponding issue gets a "⚠ please verify in person" banner
+prepended, but its description / steps / fix recommendation stay
+intact so nothing is lost if the test gave a false positive.
+
+**Policy — marker failure ≠ upstream fix.** A flipped marker is a
+signal to investigate; it is NOT an automatic confirmation that the
+bug is fixed.  The marker can also flip because the input fixture
+or Access driver changed under the test, or because the original
+classification was wrong.  Only delete an issue from
+`reports/generate_report.py`'s `ISSUES` dict after inspecting a
+new VBA / queries dump that shows the source-level fix, or after
+the maintainer explicitly confirms it.  Until then, prefer
+re-classifying the issue (Dormant / Latent / Not currently
+reproducible) over removing it.
 
 `run_all_audits.py` prints a FLAGGED / CLEAN summary.  As of the
 shipped dump (2026-05-02): 6 of 21 audits flag known bugs (#1-#19);
@@ -193,8 +205,9 @@ the remaining 15 act as long-term regression guards.  Use
 (`analysis/audit_baseline.json`); use `--update-baseline` after
 intentionally accepting a new finding or a fix.  When a CBDB
 release adds new code, anything that newly flags is your investigation
-queue; anything that newly drops back to clean means a bug was
-fixed (also flip the matching marker in `tests/test_known_bugs.py`).
+queue; anything that newly drops back to clean means a marker no
+longer reproduces — investigate (per the policy above) before
+flipping the matching marker in `tests/test_known_bugs.py`.
 
 ---
 
@@ -246,7 +259,7 @@ content elsewhere.
 | P2 — Silent display         | 1 | user-visible bound control renders blank where data exists |
 | P3 — Missing UI             | 5 | event handler exists in code but no button on the form |
 | P4 — Setup                  | 1 | one-time install fix (dao360.dll on Office 2016+) |
-| P5 — Resolved / dormant / latent | 7 | defect real but doesn't fire on the current dump or has no UI trigger today (#1, #3 dormant; #4, #5, #11, #12, #14 latent) |
+| P5 — Dormant / latent / not currently reproducible | 7 | defect real but doesn't fire on the current dump or has no UI trigger today; **none have been verified as upstream-fixed** (#1, #3 dormant; #4, #5, #11, #12, #14 latent) |
 
 > **Re-verifications.** Issues that earlier snapshots graded 🔴/🟡
 > were re-checked end-to-end and demoted to P5 in two passes:
@@ -258,9 +271,12 @@ content elsewhere.
 > can't drift back.
 
 **Regression coverage**: `tests/test_known_bugs.py` has a CI marker
-for every issue — when a fix lands in the source dump, the
-corresponding test fails with a "Bug #N appears to be FIXED — flip
-the assertion" message.
+for every issue — when a marker stops reproducing, the
+corresponding test fails with a "Bug #N marker no longer reproduces
+(investigate upstream fix vs. fixture/driver change vs.
+misclassification before flipping)" message.  See the marker-failure
+policy near the top of this README — a flipped marker is a signal to
+investigate, not an automatic fix confirmation.
 
 ### Roadmap
 

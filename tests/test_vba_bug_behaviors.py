@@ -130,7 +130,7 @@ def test_bug4_lookat_place_cmdgis_fires_object_required(monkeypatch):
         print(f"\nDEBUG log: {msgs}", flush=True)
         err_msgs = [m for m in msgs if ":ERR " in m]
         assert any("Object required" in m for m in err_msgs), (
-            f"Bug #4 may be FIXED — un-patched LookAtPlace.CmdGIS "
+            f"Bug #4 marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — un-patched LookAtPlace.CmdGIS "
             f"no longer raises 'Object required'.  err_msgs={err_msgs}"
         )
     finally:
@@ -184,7 +184,7 @@ def test_bug5_lookat_status_cmdpajek_sql_fires_field_error(vba: VbaSession):
     # row is the bug — a clean form would complete and write a .net file.
     # We check err is non-empty AND specific to the family.
     assert err_msgs, (
-        f"Bug #5 may be FIXED — LookAtStatus.CmdPajek now completes "
+        f"Bug #5 marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — LookAtStatus.CmdPajek now completes "
         f"without errors.  msgs={msgs}"
     )
     expected_kinds = (
@@ -238,7 +238,7 @@ def test_bug6_lookat_groupdata_query_entry_fires_no_such_field(vba: VbaSession):
         for m in err_msgs
     )
     assert field_err, (
-        f"Bug #6 may be FIXED — LookAtGroupData.CmdRun with ChkEntry "
+        f"Bug #6 marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — LookAtGroupData.CmdRun with ChkEntry "
         f"no longer raises a field-related ERR.  err_msgs={err_msgs}"
     )
 
@@ -256,7 +256,7 @@ def test_bug7_lookat_place_cmdneo4j_fires_item_not_found(vba: VbaSession):
     print(f"\nDEBUG log: {msgs}", flush=True)
     err_msgs = [m for m in msgs if ":ERR " in m]
     assert any("Item not found" in m for m in err_msgs), (
-        f"Bug #7 may be FIXED — LookAtPlace.CmdNeo4j no longer "
+        f"Bug #7 marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — LookAtPlace.CmdNeo4j no longer "
         f"raises 'Item not found' at runtime.  err_msgs={err_msgs}"
     )
 
