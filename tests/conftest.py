@@ -45,6 +45,36 @@ def pytest_addoption(parser):
         "--no-discover-inputs", action="store_true", default=False,
         help="Skip auto-running discover_test_inputs.py at session start.",
     )
+    parser.addoption(
+        "--include-vba", action="store_true", default=False,
+        help="Include the Access-COM ('access' marker) test files.  "
+             "Defaults to OFF — the fast suite skips them so headless / "
+             "non-Windows runs don't error-out.",
+    )
+
+
+def pytest_collection_modifyitems(config, items):
+    """Skip Access-COM-dependent tests by default.
+
+    Every test file that uses `cbdb_driver.vba_session.VbaSession` /
+    win32com / pywinauto must spawn an Access process and is slow,
+    Windows-only, and prone to environment errors (orphan MSACCESS
+    processes, RPC unavailable, ROT collisions).
+
+    The fast (non-Access) suite is what CI / quick-check runs want;
+    pass `--include-vba` to opt in to the COM suite.
+    """
+    if config.getoption("--include-vba"):
+        return
+    skip_access = pytest.mark.skip(
+        reason="needs Access COM — run with `--include-vba` to enable"
+    )
+    for item in items:
+        path = str(item.fspath).replace("\\", "/")
+        # Files that drive Access via COM:
+        if ("/test_vba_" in path
+                or path.endswith("/test_infra_smoke.py")):
+            item.add_marker(skip_access)
 
 
 @pytest.fixture(scope="session")
@@ -56,12 +86,19 @@ def user_mdb_path(request) -> Path:
 
 
 def pytest_configure(config):
-    """At pytest start: re-run discover_test_inputs.py if its output
-    is missing or older than the .mdb. Keeps test fixtures aligned to
-    the current data distribution.
+    """Register markers AND refresh test_inputs.json if stale.
 
-    Disable with: pytest --no-discover-inputs
+    Discovery failures hard-exit pytest — running matrix tests against
+    a stale fixture file silently masks data-version drift, which
+    looks like 'pass' but is actually 'tested with the wrong data'.
+
+    Disable refresh with: pytest --no-discover-inputs
     """
+    config.addinivalue_line(
+        "markers",
+        "access: requires a running Access COM session "
+        "(Windows + Office + a working data/CBDB_BJ_User.mdb).",
+    )
     if config.getoption("--no-discover-inputs"):
         return
     inputs_json = ROOT / "analysis" / "dump" / "test_inputs.json"
@@ -81,8 +118,18 @@ def pytest_configure(config):
             capture_output=True, text=True,
         )
         if rc.returncode != 0:
-            print(f"[conftest] discover failed (rc={rc.returncode}):\n"
-                  f"  stderr: {rc.stderr[-500:]}")
+            # Hard-exit rather than continue with stale fixtures.  The
+            # original behaviour (warn + continue) would let matrix
+            # tests pass against an outdated test_inputs.json — which
+            # silently masks data-version drift and produces misleading
+            # green CI runs.
+            pytest.exit(
+                f"[conftest] discover_test_inputs.py FAILED (rc="
+                f"{rc.returncode}).  Tests would otherwise run against "
+                f"a stale fixture file ({inputs_json.name}).  Fix the "
+                f"discovery error or pass `--no-discover-inputs` to "
+                f"skip refresh.\n\n  stderr tail:\n{rc.stderr[-1000:]}"
+            )
         else:
             print(f"[conftest] discovery refreshed.")
 
