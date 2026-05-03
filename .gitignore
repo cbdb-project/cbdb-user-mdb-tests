@@ -10,11 +10,17 @@ data/
 analysis/_*
 analysis/_exports_tmp/
 
-# Bug-report capture working copies + lock files (keep .docx + .png).
+# Bug-report capture working copies + lock files.
+# (.docx outputs are GENERATED on demand by reports/generate_report.py
+# and intentionally NOT committed — they're non-deterministic at the
+# zip-timestamp level and would dirty every report regen.  The .md
+# siblings are committed; reviewers / readers regenerate .docx
+# locally if they want a Word file.)
 reports/_*
 reports/*.mdb
 reports/*.ldb
 reports/*.laccdb
+reports/*.docx
 
 # Real-export goldens that are blessed locally before the first push.
 tests/golden/exports/_tmp/

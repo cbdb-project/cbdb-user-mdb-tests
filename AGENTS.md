@@ -31,7 +31,9 @@ else.  Do not duplicate their content elsewhere — copies drift.
 2. **Issues / bugs (all 19 of them, content + tier + severity +
    reproduction steps)** → the `ISSUES` dict in
    **`reports/generate_report.py`**, which auto-generates the four
-   `reports/CBDB_Issues_Report_*.{md,docx}` outputs (en/zh × md/docx).
+   `reports/CBDB_Issues_Report_*.md` outputs (en + zh; the same
+   script also emits `.docx` siblings on demand, but those are
+   gitignored — see PR O policy).
 
 **Hard rules for any agent (or human contributor):**
 
@@ -94,7 +96,7 @@ cbdb-user-mdb-tests/
 │   └── test_other_forms_skeletons.py
 ├── reports/                      # auto-generated bilingual issue report
 │   ├── generate_report.py        #   ⭐ source of truth for all 19 issues
-│   └── CBDB_Issues_Report_*.{md,docx}
+│   └── CBDB_Issues_Report_*.md   (committed; .docx is generated on demand and gitignored)
 ├── tests/MANUAL_SMOKE.md         # 5-min checklist (UI things tests miss)
 ├── tests/VALIDATION_DIMENSIONS.md  # menu of test dimensions
 └── FINAL_STATE.md                # last regenerated state
