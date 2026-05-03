@@ -236,10 +236,34 @@ _GIS_REQUIRED_COLUMNS: dict[str, list[str]] = {
         "Dynasty",
         "OfficeAddr", "OfficeAddrChn", "X", "Y", "xy_count",
     ],
-    # LookAtTexts / LookAtPlace / LookAtKinship don't have committed
-    # goldens yet; their first run can be blessed in a follow-up
-    # PR.  For now they get the loose check + per-row width / key-
-    # column non-empty assertions.
+    # PR T: LookAtTexts/LookAtPlace/LookAtKinship manifests, derived
+    # from the VBA source (analysis/dump/vba/Form_LookAt<F>.vb,
+    # GISFrame=1 / NameChn branch).  LookAtTexts also has a committed
+    # byte-level golden (tests/golden/exports/real_lookattexts_gis_
+    # biblcat_1.tab) whose header matches this manifest exactly.
+    # LookAtPlace and LookAtKinship have no committed byte-level
+    # golden — blessing one is deferred (would require a stable
+    # picker fixture + commit against current CBDB_20260430_DATA.mdb).
+    "LookAtTexts": [
+        # Form_LookAtTexts.vb:1386-1387 (UTF-8 / NameChn branch).
+        "Name", "NameChn", "Sex", "IndexYear",
+        "AddrName", "AddrChn", "X", "Y", "xy_count",
+    ],
+    "LookAtPlace": [
+        # Form_LookAtPlace.vb:1588-1590.  Separator is comma
+        # (Chr(44), Form_LookAtPlace.vb:1582), not tab — the test's
+        # `sep` autodetect handles that.  Note: no `Sex` column.
+        "Name", "NameChn", "IndexYear",
+        "AddrName", "AddrChn", "X", "Y", "xy_count",
+    ],
+    "LookAtKinship": [
+        # Form_LookAtKinship.vb:220-221.  Note the column-name
+        # difference vs the other forms: `XY_count` is capitalised
+        # (the others emit `xy_count`).  Don't normalise — the
+        # exported file uses exactly this casing.
+        "Name", "NameChn", "IndexYear", "Sex",
+        "AddrName", "AddrChn", "X", "Y", "XY_count",
+    ],
 }
 
 # Columns that should be non-empty for the vast majority of rows
