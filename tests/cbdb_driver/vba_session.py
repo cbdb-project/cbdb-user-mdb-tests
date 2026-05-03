@@ -960,41 +960,56 @@ class VbaSession:
             )
 
     def _inject_timer_trigger(self, form: str, ctl: str = "CmdQuery") -> None:
-        """Inject a Form_Timer sub into the form module that reads
-        ZZ_TEST_CONFIG.timer_target and dispatches to the matching
-        *_Click handler.  Bypasses both the disabled-button click drop
-        and the Application.Run-can't-reach-form-module-sub issue
-        (Form_Timer is fired by Access itself when TimerInterval > 0).
+        """Inject (or re-inject) a Form_Timer sub that calls
+        `<ctl>_Click` on the next timer fire.
 
-        ctl is the default fallback used when timer_target is empty."""
+        IMPORTANT: This is a SINGLE-TARGET trigger, not the
+        `ZZ_TEST_CONFIG.timer_target`-driven dispatcher implied by an
+        earlier draft.  Real chaining (CmdQuery → CmdGIS → etc.) is
+        done INSIDE CmdQuery_Click via the autodetect-injected post-
+        body block (see `_inject_autodetect`), not by re-firing the
+        timer.  `set_timer_target` writes to ZZ_TEST_CONFIG but
+        nothing reads it any more — kept for backwards compatibility
+        with older test scripts; treat it as deprecated.
+
+        Re-injection: if a previous call to this method baked a
+        DIFFERENT `ctl` into Form_Timer, we DELETE the old sub and
+        AddFromString a new one.  Earlier behaviour was 'marker
+        present → return', which silently kept the old target and
+        made the second `click_via_timer(form, ctl='other')` fire
+        the wrong handler."""
         comp = self.app.VBE.VBProjects(1).VBComponents(f"Form_{form}")
         cm = comp.CodeModule
         body = cm.Lines(1, cm.CountOfLines) if cm.CountOfLines else ""
-        if self._TIMER_MARKER in body:
+        # Per-ctl marker so we can detect "already injected for THIS
+        # ctl" vs "injected for a different ctl, must replace".
+        per_ctl_marker = f"{self._TIMER_MARKER} ctl={ctl}"
+        if per_ctl_marker in body:
             return
-        # Build dispatch Select Case body — only include subs that
-        # actually exist in this form module.
-        cases: list[str] = []
-        for s in self._TIMER_DISPATCH_SUBS:
-            if f"Sub {s}_Click(" in body:
-                cases.append(f'        Case "{s}": Call {s}_Click')
-        # Always have CmdQuery (or caller's ctl) as fallback.
-        fallback = ctl if f"Sub {ctl}_Click(" in body else "CmdQuery"
-        # Build a dispatch helper that splits comma-separated targets
-        # and calls each in order — Access form OnTimer only fires once
-        # cleanly per OpenForm session (re-arming via TimerInterval=N
-        # doesn't reliably re-fire after Form_Timer set it to 0), so
-        # we chain multiple subs in a single fire.
-        case_lines: list[str] = []
-        for s in self._TIMER_DISPATCH_SUBS:
-            if f"Sub {s}_Click(" in body:
-                case_lines.append(f'            Case "{s}": Call {s}_Click')
-        # Single-Call dispatch (matrix-tested working version).  Chains
-        # are handled INSIDE CmdQuery_Click via autodetect-injected
-        # post-body code (see _inject_autodetect).
-        first_ctl = ctl if f"Sub {ctl}_Click(" in body else fallback
+        # If ANY older Form_Timer is already there (different ctl, or
+        # legacy marker without ctl), strip it first.  CodeModule.
+        # DeleteLines uses 1-based line numbers and a count.
+        if (self._TIMER_MARKER in body
+                or "Private Sub Form_Timer(" in body):
+            try:
+                start = cm.ProcStartLine("Form_Timer", 0)
+                count = cm.ProcCountLines("Form_Timer", 0)
+                if count > 0:
+                    cm.DeleteLines(start, count)
+            except Exception:
+                # Some COM versions raise if ProcStartLine can't find
+                # the sub — fall back to a blunt re-AddFromString
+                # which the new sub will append cleanly anyway.
+                pass
+
+        # Resolve the actual sub name to call.  Fallback is needed for
+        # picker forms that don't have the requested ctl but still
+        # need *some* timer trigger (rare).
+        first_ctl = ctl if f"Sub {ctl}_Click(" in body else (
+            "CmdQuery" if "Sub CmdQuery_Click(" in body else ctl
+        )
         sub = (
-            f"\n' {self._TIMER_MARKER}\n"
+            f"\n' {per_ctl_marker}\n"
             "Private Sub Form_Timer()\n"
             "    Me.TimerInterval = 0\n"
             "    On Error Resume Next\n"
