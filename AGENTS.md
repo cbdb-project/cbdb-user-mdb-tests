@@ -564,6 +564,40 @@ Verified separately that BIOG_ADDR_CODES (the rank table) is
 **identical** between the two sides for all 22 addr_types, so the
 divergence isn't coming from rank-priority configuration.
 
+PR M dumped `frmBaseMaintenance` and the 4 DATA-mdb modules via
+`Access.Application.SaveAsText` →
+`analysis/dump_data/vba/Form_frmBaseMaintenance.vb` etc.  Two
+findings rewrite parts of PR I and PR L (see
+`analysis/index_drift_algorithm_notes.md` § "Maintenance trigger
+path" for the long version):
+
+  1. The **`CmdIndexYear` button calls `GetBirthIndexYearSQL`**,
+     which is inline VBA closely mirroring PHP
+     `IndexYearRebuildService.php` (subtractive offsets like
+     `c_year - 30`, `ENTRY_CODE_TYPE_REL` joins, etc.).  It does
+     NOT call the 37 saved `BM IY Rule` QueryDefs PR I compared
+     against.  PR I's "logic_diff" sign-flip flag is largely
+     **invalidated**: the runtime path matches PHP on those
+     rules.  PR I's JSON / markdown stay in repo as historical
+     evidence + a methodological warning; re-deriving against
+     `GetBirthIndexYearSQL` is left as follow-up.
+  2. The **`CmdIndexAddress` button** uses a per-rank UPDATE that
+     does **NOT** explicitly aggregate by `MAX(c_sequence)` (the
+     way PHP and the front-end `Form_frmIndexAddr.vb` do).  When
+     a person has multiple BIOG_ADDR_DATA rows of the same
+     addr_type, this UPDATE picks whichever row JET surfaces
+     first — a candidate algorithmic divergence between the
+     maintenance code and PHP, on top of the maintenance-cadence
+     issue PR L flagged.
+
+Operational implication for the User MDB release process: the
+maintenance buttons are manual, with no scheduler / AutoExec
+trigger.  Adding a release-checklist step that runs
+`CmdIndexYear` then `CmdIndexAddress` on the DATA mdb before
+shipping a new User MDB is the most direct mitigation for the 412
+`mdb_stale_index_addr` rows.  (Candidate, not prescribed — the
+maintainer's call.)
+
 ## Test inventory snapshot (run this to get current state)
 
 ```bash

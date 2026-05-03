@@ -1775,6 +1775,20 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
                     f"per-row output: "
                     f"`reports/index_addr_drift_classification.json`."
                 ))
+                doc.add_paragraph(Z(
+                    f"PR M (`analysis/dump_data_mdb_vba.py`) extracted "
+                    f"`frmBaseMaintenance.CmdIndexAddress_Click` from "
+                    f"the DATA mdb.  It does NOT explicitly "
+                    f"`MAX(c_sequence)`-aggregate the way PHP does — "
+                    f"a candidate algorithmic divergence on top of "
+                    f"the maintenance-cadence issue.  Suggested "
+                    f"release-checklist mitigation: run "
+                    f"`CmdIndexYear` then `CmdIndexAddress` on the "
+                    f"DATA mdb before shipping a new User MDB.  See "
+                    f"`analysis/index_drift_algorithm_notes.md` § "
+                    f"\"Maintenance trigger path\" for the full "
+                    f"write-up."
+                ))
         else:
             _h(doc, 2, Z("年份差異 —— 逐筆 rule 分類"))
             doc.add_paragraph(Z(
@@ -1904,6 +1918,17 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
                     f"`same_candidates_diff_winner` 是唯一的候選演算法"
                     f"差異。逐筆輸出見 "
                     f"`reports/index_addr_drift_classification.json`。"
+                ))
+                doc.add_paragraph(Z(
+                    f"PR M（`analysis/dump_data_mdb_vba.py`）從 DATA mdb "
+                    f"抽出了 `frmBaseMaintenance.CmdIndexAddress_Click`。"
+                    f"它**沒有**像 PHP 那樣明確 `MAX(c_sequence)` 聚合 "
+                    f"—— 在維護週期差異之外，這還是一個候選演算法差異。"
+                    f"建議的 release checklist 緩解步驟：在 User MDB "
+                    f"出貨前先在 DATA mdb 上跑 `CmdIndexYear`，再跑 "
+                    f"`CmdIndexAddress`。詳見 "
+                    f"`analysis/index_drift_algorithm_notes.md` 中的 "
+                    f"\"Maintenance trigger path\" 段。"
                 ))
 
     # ---- Per bucket ----
@@ -3136,6 +3161,18 @@ def _build_md(lang: str, out_path: Path) -> None:
                     f"`same_candidates_diff_winner` 是唯一的候選演算法"
                     f"差異。逐筆輸出見 "
                     f"`reports/index_addr_drift_classification.json`。"
+                ))
+                lines.append("")
+                lines.append(Z(
+                    f"PR M（`analysis/dump_data_mdb_vba.py`）從 DATA mdb "
+                    f"抽出了 `frmBaseMaintenance.CmdIndexAddress_Click`。"
+                    f"它**沒有**像 PHP 那樣明確 `MAX(c_sequence)` 聚合 "
+                    f"—— 在維護週期差異之外，這還是一個候選演算法差異。"
+                    f"建議的 release checklist 緩解步驟：在 User MDB "
+                    f"出貨前先在 DATA mdb 上跑 `CmdIndexYear`，再跑 "
+                    f"`CmdIndexAddress`。詳見 "
+                    f"`analysis/index_drift_algorithm_notes.md` 中的 "
+                    f"\"Maintenance trigger path\" 段。"
                 ))
                 lines.append("")
 
