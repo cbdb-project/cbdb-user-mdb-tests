@@ -1,6 +1,18 @@
 """Deep triage of the c_index_year drift buckets that PR K1 left
 under-named.
 
+NOTE (PR N, 2026-05-03): the PHP_RULE_BY_TCODE table below was
+populated from PR I's reading of the BM IY Rule QueryDefs.  PR M
+showed those QueryDefs are NOT what CmdIndexYear_Click runs; the
+runtime path is GetBirthIndexYearSQL.  PR N's corrected rule
+comparison in `analysis/index_year_rule_comparison.md` shows
+runtime Access matches PHP on most type_codes (no logic_diff).
+The buckets this script outputs (consistent_within_rule,
+iteration_order_diff, php_did_not_compute, etc.) are still valid
+because they only reference type_codes, not PR I's incorrect
+rule labels.  But the per-bucket rationales below are best
+re-read against PR N's comparison rather than PR I's.
+
 Reads:
   - reports/index_year_drift_rule_classification.json (PR K1 output)
 

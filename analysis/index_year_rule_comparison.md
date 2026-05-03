@@ -1,180 +1,162 @@
-# Access BM IY rules vs PHP IndexYearRebuildService — rule-by-rule comparison
+# Runtime Access index-year rebuild vs PHP IndexYearRebuildService — rule-by-rule comparison
 
-**What this is.** A reviewable side-by-side of the two index-year
-rebuild implementations.  This is the "rule-layer difference map"
-the maintainer should consult before triaging the 547 unclassified
-per-row diffs from PR G; the goal is to know **which rule is the
-likely cause** of any given divergence before walking the row.
+**Updated 2026-05-03 (PR N).**  This document **supersedes** the
+earlier (PR I) comparison that paired PHP against the 37 saved
+`BM IY Rule …` QueryDefs.  PR M's `SaveAsText` extraction of
+`frmBaseMaintenance` showed those QueryDefs are **not** what
+`CmdIndexYear_Click` runs at maintenance time — the actual
+runtime path is the inline VBA `GetBirthIndexYearSQL`, which
+turns out to track PHP much more closely than PR I's flagged
+`logic_diff` count suggested.
 
-**What this is not.** Not a verdict on whether either side is
-correct.  Verdicts of `logic_diff` and `needs_manual_review` are
-*candidate* divergences — they need confirmation from the
-maintainer (or per-row data evidence) before being filed as bugs
-against either side.
+The earlier `analysis/index_year_rule_comparison.{md,json}`
+contents are kept in git history for reference, but the JSON file
+in HEAD now reflects the runtime-vs-PHP pairing.
 
 ## Sources
 
-- **Access (User MDB DATA backend)** —
-  `data/CBDB_<YYYYMMDD>_DATA.mdb`, 37 saved QueryDefs named
-  `BM IY Rule …`, extracted in PR H to
-  [`analysis/dump_data/querydefs_index/*.sql`](dump_data/querydefs_index/).
-  The driver VBA (which orders the rules and runs them in phases)
-  lives on `frmBaseMaintenance` and in 4 modules in the same .mdb
-  file; their **source code has not yet been extracted** (needs
-  `Access.Application.SaveAsText`).  We can see *what* each
-  individual rule does; we cannot yet see the *order* the Access
-  side runs them in.
+| Side | File | Sub / function |
+|------|------|---------------|
+| **Access (runtime)** | [`analysis/dump_data/vba/Form_frmBaseMaintenance.vb`](dump_data/vba/Form_frmBaseMaintenance.vb) | `GetBirthIndexYearSQL` (called from `CmdIndexYear_Click`) |
+| **Access (vestigial, NOT runtime)** | [`analysis/dump_data/querydefs_index/*.sql`](dump_data/querydefs_index/) | 37 saved `BM IY Rule …` QueryDefs.  Present in DATA mdb but `CmdIndexYear_Click` does not call them.  PR I compared against these by mistake. |
+| **PHP** | [`analysis/php_source/IndexYearRebuildService.php`](php_source/IndexYearRebuildService.php) | pinned commit [`a642f7a`](https://github.com/cbdb-project/cbdb-online-main-server/blob/a642f7ab6552ac48e5e98b867b155121d5b0fe3a/app/Services/IndexYearRebuildService.php) (2026-03-13) |
 
-- **PHP (cbdb-online-main-server)** —
-  [`app/Services/IndexYearRebuildService.php`](https://github.com/cbdb-project/cbdb-online-main-server/blob/a642f7ab6552ac48e5e98b867b155121d5b0fe3a/app/Services/IndexYearRebuildService.php)
-  pinned to commit `a642f7a` (2026-03-13).  Local copy at
-  [`analysis/php_source/IndexYearRebuildService.php`](php_source/IndexYearRebuildService.php).
-  Three phases:
-  - **Phase A** (direct rules): RESET → 01 → 02 → 03 → 29 → 30 → 05
-    → 06 → 07 → 08 → 09 → 10 → 11.
-  - **Phase B** (aggregate rules): 13, 15, 17, 19, 21, 23, 25, 27.
-  - **Phase C** (loop, max 2 iterations): 04, 12, 14, 16, 18, 20,
-    22, 24, 26, 28.
+## Pairing strategy
 
-The `compare_index_year_rules.py` script writes the structured
-counterpart of this document to
-[`analysis/index_year_rule_comparison.json`](index_year_rule_comparison.json).
+Both runtime Access and PHP emit a `c_index_year_type_code` per
+rule (e.g. `'01'`, `'05'`, `'12'`).  We pair rules by emitted
+type_code rather than by rule-number / name.  This avoids the
+name-based mismatch that misled PR I (Access "Rule 03 BY" and
+PHP "Rule 03" are completely different rules; both, however,
+emit different type_codes, so type-code-based pairing is
+unambiguous).
 
-## Numbering scheme — the rule numbers do NOT line up
+`compare_index_year_rules.py` now does this automatically.
 
-Access "Rule N" and PHP "Rule N" are different numbering schemes.
-The two were paired by *semantic intent* (what kin / source / formula
-they use), not by number.  Examples:
+## Verdict counts
 
-| Number | Access "Rule N" means | PHP "Rule N" means |
-|--------|-----------------------|--------------------|
-| 03     | birthyear + 59 when no deathyear | wife from husband (kin 134), husband.c_index_year + 3 |
-| 04     | wife from husband (Access naming: 04W), husband.c_birthyear + 62 | husband propagation in Phase C (loop), husband.c_index_year + 3 |
-| 05     | jinshi entry: c_year + 30 | jinshi entry: entry_year - 30 |
-
-**Implication.** Don't read either side's `c_index_year_type_code`
-column as if it referenced the other side's rule numbering.
-
-## Pair-by-pair table
-
-Status legend:
-- ✅ matched — identical formula AND preconditions
-- 🟡 matched_minor_diff — same intent, minor implementation difference (e.g. one side groups joins differently but result equivalent)
-- 🔴 logic_diff — candidate algorithm divergence (different formula, different precondition, etc.)
-- ⚠ needs_manual_review — paired but not yet checked in detail
-- ➖ missing_in_access / missing_in_php — no corresponding rule paired
-
-Verdict counts (from the script's JSON output):
+(From the current run of `compare_index_year_rules.py`; re-run
+after every fresh PHP-side commit pull or DATA-mdb refresh.)
 
 | Verdict | Count |
 |---------|------:|
-| 🔴 logic_diff           | 8 |
-| ➖ missing_in_access     | 3 |
-| ➖ missing_in_php        | 1 |
-| ⚠ needs_manual_review  | 15 |
-| ✅ matched               | 0 |
-| 🟡 matched_minor_diff    | 0 |
+| ✅ matched               | 22 |
+| 🟡 matched_minor_diff    | 8 |
+| 🔴 logic_diff            | 0 |
+| ➖ access_only           | 3 |
+| ➖ php_only              | 0 |
+| ⚠ needs_manual_review  | 0 |
 
-Zero pairs land in `matched` so far — that doesn't necessarily mean
-everything diverges, just that we haven't confirmed any pair as
-identical yet.  Most are `needs_manual_review`.
+**No `logic_diff` flags.** PR I's marquee finding (Access uses
+`+N`, PHP uses `-N`) was an artefact of comparing PHP against
+the wrong Access source.  The runtime Access uses `-N` like PHP.
 
-### Phase A — direct rules
+## Per-rule pairings
 
-| Access rule | PHP method | Status | Why |
-|-------------|------------|--------|-----|
-| `BM IY Rule 01A DY Query` (c_deathyear when c_birthyear≥c_deathyear-60) | _no PHP analogue_ | ➖ missing_in_php | Access splits Rule 01 into two variants by birth-vs-death gap; PHP just uses raw birthyear. |
-| `BM IY Rule 01B DY Query` (c_birthyear+59 when c_birthyear≤c_deathyear-59) | `sqlRule01` (c_birthyear, no offset, fires whenever birthyear valid) | 🔴 logic_diff | **Different output value.** Access adds +59 ("midpoint of life"); PHP writes raw birthyear. |
-| `BM IY Rule 02 DY Query` (c_deathyear when no birthyear) | `sqlRule02` (c_deathyear - c_death_age + 1, requires c_death_age>0) | 🔴 logic_diff | Access: no offset, no death-age requirement.  PHP: subtracts death age, requires it.  PHP's `sqlRule29Or30` covers the no-death-age case with c_deathyear ± fixed offset by gender. |
-| `BM IY Rule 03 BY Query` (c_birthyear+59 when no deathyear) | `sqlRule01` (c_birthyear, no offset) | 🔴 logic_diff | Same shape as 01B vs sqlRule01 — Access offsets by +59, PHP doesn't. |
-| `BM IY Rule 04W Query` (wife from husband.c_birthyear+62, kin=134, exclude kin_code=168) | `sqlRule03` (wife from husband.c_index_year+3, kin=134, exclude concubine kin set) | 🔴 logic_diff | **Two differences**: Access uses husband's birthyear+62, PHP uses husband's index_year+3.  Access excludes only one concubine code (168); PHP excludes 5 (`168, 163, 344, 467, 585`). |
-| `BM IY Rule 05 JS Query` (c_year+30 from ENTRY_DATA.c_entry_code IN (36, 165)) | `sqlEntryRule('040101', 30, '05')` (c_year-30, joins ENTRY_CODE_TYPE_REL.c_entry_type='040101', uses MIN(c_year)) | 🔴 logic_diff | **Sign flip + indirection.** Access reads c_entry_code directly, adds +30.  PHP joins through ENTRY_CODE_TYPE_REL and subtracts -30 from MIN(c_year).  Probably the single biggest single-rule divergence in the index_year_only_diff bucket. |
-| `BM IY Rule 06 JR Query` | `sqlEntryRule('040102', 27, '07')` | 🔴 logic_diff | Same sign-flip pattern.  Access +27, PHP -27. |
-| `BM IY Rule 07 XC Query` (writes to `tmpBM_NIY` not BIOG_MAIN, c_year+39, c_entry_code=257) | _no obvious analogue_ | ⚠ needs_manual_review | Access uses an intermediate temp table.  PHP doesn't appear to have a +39 path or an entry_code=257 mapping. |
-| `BM IY Rule 05W Husband JS Query` | `sqlWifeFromEntryRule('040101', 27, '06')` | 🔴 logic_diff | Same sign-flip as 05 / 05W. |
-| `BM IY Rule 06W Husband JR Query` | `sqlWifeFromEntryRule('040102', 24, '08')` | 🔴 logic_diff | Same sign-flip. |
-| `BM IY Rule 07W Husband XC Query` | _no obvious analogue_ | ⚠ needs_manual_review | Same temp-table issue as 07 XC. |
-| _no Access analogue_ | `sqlRule29Or30` (c_deathyear - 56/63 by gender) | ➖ missing_in_access | PHP gender-default-from-deathyear rule.  Access Rule 02 DY covers similar ground but without the offset. |
-| _no Access analogue_ | `sqlRule11` (child = father.c_birthyear + 30, kin 75) | ➖ missing_in_access | No Phase-A child-from-father-birthyear rule on the Access side that we found.  Rule 14 (Phase C) uses father.c_index_year + 30, which is a different path. |
+### Phase A: direct rules
 
-### Phase B / Phase C — aggregate + loop rules
+| type_code | Access source line ish | PHP method | Verdict |
+|-----------|----------------------|------------|---------|
+| `01` | `c_index_year = c_birthyear` | `sqlRule01` | matched |
+| `02` | `c_deathyear - c_death_age + 1` | `sqlRule02` | matched |
+| `03` | `husband.c_index_year + 3`, kin 134 | `sqlRule03` (concubine=false) | matched |
+| `05` | `ENTRY_DATA.c_year - 30` (entry_type 040101) | `sqlEntryRule('040101', 30, '05')` | matched |
+| `06` | wife from husband entry `-27` | `sqlWifeFromEntryRule('040101', 27, '06')` | matched |
+| `07` | `ENTRY_DATA.c_year - 27` (entry_type 040102) | `sqlEntryRule('040102', 27, '07')` | matched |
+| `08` | wife `-24` | `sqlWifeFromEntryRule('040102', 24, '08')` | matched |
+| `09` | `ENTRY_DATA.c_year - 21` (entry_type 040103) | `sqlEntryRule('040103', 21, '09')` | matched |
+| `10` | wife `-18` | `sqlWifeFromEntryRule('040103', 18, '10')` | matched |
+| `11` | `father.c_birthyear + 30`, kin 75 | `sqlRule11` | matched |
+| `17` | wife concubine variant of 03 | `sqlRule03(concubine=true)` | matched (kin filter slightly broader on Access; low impact) |
+| `29` | `c_deathyear - 64` (male) | `sqlRule29Or30(female=false)`, `-63` | **matched_minor_diff** (off-by-1) |
+| `30` | `c_deathyear - 53` (female) | `sqlRule29Or30(female=true)`, `-56` | **matched_minor_diff** (off-by-3) |
+| `31` | wife jinshi concubine variant | (no PHP equivalent) | access_only |
+| `32` | wife juren concubine variant | (no PHP equivalent) | access_only |
+| `33` | wife 040103 concubine variant | (no PHP equivalent) | access_only |
 
-(All paired entries below are flagged `needs_manual_review` — the
-shape is similar between the two sides but per-rule inputs and
-tie-break behaviour need confirmation.)
+### Phase B: aggregate rules
 
-| Access rule(s) | PHP method | Why review |
-|----------------|------------|-----------|
-| `BM IY Rule 08 Father BY Query` (+ Phase 1 helper) | `sqlAggregateRule13` (father from MIN(child.c_birthyear) - 30, kin 75) | Confirm Access uses MIN, not first-row, and that source-personid attribution agrees |
-| `BM IY Rule 09 Oldest Child BY Father …` (group of Phase 1 + Doublecheck queries) | `sqlAggregateRule13` (same as above; the Access "Oldest Child" naming hints they collapse to MIN as well) | Confirm aggregation on tie-break |
-| `BM IY Rule 10 Older Brother BY …` | `sqlAggregateSiblingRule(kin=[125,165], MAX, +2)` | Confirm Access uses the same kin codes (125, 165) and MAX, +2 offset |
-| `BM IY Rule 12 SIL BY …` (Phase 1 + Phase 1 Doublecheck) | `sqlAggregateSonInLawRule(kin=[181,201,224,332], MIN, -27 male / -24 female)` | Confirm Access kin code list |
-| `BM IY Rule 13 Grandfather BY …` (Phase 1 + Phase 2 + Phase 2 Null) | `sqlRule27` (descendant from grandfather.c_birthyear + 60, kin 62) | Three Access queries vs one PHP method — Access likely handles null cases explicitly that PHP folds into WHERE |
-| `BM IY Rule 14 Father IY Phase 1 Query` | `sqlLoopFatherPropagationRule` (Phase C: child = father.c_index_year + 30) | Loop iteration order; Access driver loop not yet extracted |
-| `BM IY Rule 15 Part 1 Father Phase 1 Query` | `sqlLoopOldestChildIndexToFatherRule` (Phase C: father from MIN(child.c_index_year) - 30) | Aggregation tie-break |
-| `BM IY Rule 16 Older Brother IY Phase 1 Query` | `sqlLoopSiblingRule(MAX, +2)` | Confirm kin codes |
-| `BM IY Rule 17 Younger Brother IY Phase 1 Query` | `sqlLoopSiblingRule(MIN, -2)` | Confirm kin codes |
-| `BM IY Rule 18 SIL IY Phase 1 Query` | `sqlLoopSonInLawRule` | Loop iteration; gender split |
-| `BM IY Rule 18 SIL IY Mother Phase 1 Query` | `sqlLoopOldestChildIndexToMotherRule` | Naming is confusing on the Access side ("18 ... Mother" is the mother flow, not SIL) |
-| `BM IY Rule 19 Grandfather IY Phase 1 Query` | `sqlLoopGrandfatherPropagationRule` | Loop iteration |
-| _no Access analogue_ | `sqlAggregateRule15` (mother from MIN(child.c_birthyear) - 27, kin 111) | Looks like PHP has an additional Phase B mother-from-child-birthyear rule that Access either doesn't run, or covers via a different path |
-| _no Access analogue_ | `sqlLoopHusbandPropagationRule` (Phase C: wife from husband.c_index_year + 3) | Access' wife rule (04W) is in Phase A using birthyear; we don't see a separate Phase C husband-propagation step.  Could be that Access' driver VBA re-runs Rule 04W in a loop with later husband index values; need to confirm by reading frmBaseMaintenance source |
+| type_code | Access | PHP method | Verdict |
+|-----------|--------|------------|---------|
+| `13` | father from MIN(child.c_birthyear) - 30, kin 75 | `sqlAggregateRule13` | matched_minor_diff (Access uses staging step + final UPDATE; PHP uses single subquery aggregate; equivalent on the happy path) |
+| `15` | mother from MIN(child.c_birthyear) - 27, kin 111 | `sqlAggregateRule15` | matched_minor_diff (same staging-vs-subquery distinction) |
+| `19` | older brother MAX(c_birthyear) + 2 (kin 125, 165) | `sqlAggregateSiblingRule(MAX, +2)` | matched_minor_diff |
+| `21` | younger brother MIN - 2 (kin 126, 166) | `sqlAggregateSiblingRule(MIN, -2)` | matched_minor_diff |
+| `23` | son-in-law male target -27 | `sqlAggregateSonInLawRule(false)` | matched_minor_diff |
+| `25` | son-in-law female target -24 | `sqlAggregateSonInLawRule(true)` | matched_minor_diff |
+| `27` | grandfather.c_birthyear + 60, kin 62 | `sqlRule27` | matched |
 
-## What this means for the 547 unclassified diffs from PR G
+### Phase C: loop rules (with CONCAT'd type_codes)
 
-PR G's classifier surfaced 547 per-row diffs with matching
-birthyear+deathyear that couldn't be attributed to source-data
-drift.  Of those:
+Both sides CONCAT the loop-rule type_code onto the parent's
+type_code (so e.g. PHP's `'11' + '12' = '1112'` corresponds to
+Access's `iif(parent='01','12',parent + '12')`).
 
-- **478** were `index_addr_only_diff` — these have **nothing to
-  do with the index-year rules above**.  They depend on
-  `Form_frmIndexAddr.vb` (User MDB front end) vs PHP
-  `IndexAddressRebuildService.php` (not yet extracted or
-  compared).  Address comparison is a separate piece of work.
-- **59** were `index_year_only_diff` — these are the ones the
-  rule comparison above is most relevant to.  The 8 `logic_diff`
-  pairs (especially the **+30 / -30 sign flip in entry-based
-  rules**) are the most likely contributors.
-- **10** were `index_both_diff` — both index fields disagree.
-  Could overlap with any of the above.
+| type_code | Access | PHP method | Verdict |
+|-----------|--------|------------|---------|
+| `04` | husband propagation, husband.c_index_year + 3 | `sqlLoopHusbandPropagationRule(false)` | matched |
+| `12` | child = father.c_index_year + 30 | `sqlLoopFatherPropagationRule` | matched |
+| `14` | father = MIN(child.c_index_year) - 30 | `sqlLoopOldestChildIndexToFatherRule` | matched |
+| `16` | mother = MIN(child.c_index_year) - 27 | `sqlLoopOldestChildIndexToMotherRule` | matched |
+| `18` | husband (concubine) | `sqlLoopHusbandPropagationRule(true)` | matched |
+| `20` | older brother +2 | `sqlLoopSiblingRule(MAX, +2)` | matched |
+| `22` | younger brother -2 | `sqlLoopSiblingRule(MIN, -2)` | matched |
+| `24` | son-in-law male -27 | `sqlLoopSonInLawRule(false)` | matched |
+| `26` | son-in-law female -24 | `sqlLoopSonInLawRule(true)` | matched |
+| `28` | grandfather +60 | `sqlLoopGrandfatherPropagationRule` | matched |
 
-Concretely, suggested next-step triage order (per-row):
+## Implications for K1 / K2 (per-row year-drift classification)
 
-1. Pick a handful of `index_year_only_diff` personids whose PHP
-   `c_index_year_type_code` is in `{'05', '06', '07', '08', '09',
-   '10'}` (entry-based rules).  Compare the User MDB and SQLite
-   c_index_year values; the difference should be ~60 years apart
-   if the sign flip is the actual cause.
-2. Pick `index_year_only_diff` personids whose PHP type_code is
-   `'01'` (birthyear) — should differ by 59 if Rule 01B vs
-   sqlRule01 is the cause.
-3. For remaining unmatched cases, fall back to per-row source
-   walking.
+The K1 / K2 buckets were built on the assumption that PR I's
+`logic_diff` flags (especially the `+N`/`-N` sign-flip) explained
+some of the year drifts.  PR N now removes that assumption: at
+the rule level the runtime Access path matches PHP everywhere
+*except* the off-by-1 / off-by-3 for type_codes `29` / `30`
+(`matched_minor_diff`).
+
+That doesn't invalidate K1 / K2's per-row buckets — those came
+from PR G's per-personid diff list and only reference type_codes,
+not the wrong rule labels.  Reading them now:
+
+  - **`php_did_not_compute` × 19** — biggest sub-bucket from K2
+    is `access_tcode='05'` × 7.  With PR N's finding that Access
+    Rule 05 is `c_year - 30 with ENTRY_CODE_TYPE_REL.c_entry_type
+    = '040101'` (matching PHP), the gap is more likely upstream
+    in `ENTRY_CODE_TYPE_REL` membership — the entries aren't
+    classified into `'040101'` on whichever side, so neither
+    rule fires for those personids.  Worth a quick PHP-side
+    check.
+  - **`consistent_within_rule` × 14** — the diff = -20 cluster
+    across PHP type_codes 11 / 13 / 15 / 19 is interesting given
+    that Rules 13, 15, 19 are all `matched_minor_diff` (staging
+    vs subquery aggregate).  The shared `-20` could reflect a
+    consistent staging-step pick that picks the same wrong row
+    each time.  Maintainer-investigatable.
+  - **`iteration_order_diff` × 5** — both sides do CONCAT the
+    same way, so this is most likely a Phase-C iteration-count
+    difference (PHP caps at 2 loops; Access also caps at
+    "tLoopCount < 3" i.e. 2 loops — both same!  Yet the data
+    show divergence).  The most likely remaining cause is the
+    order rules fire WITHIN each loop pass.  Worth confirming.
 
 ## Limitations
 
-- **Access driver VBA still missing.**  Without
-  `frmBaseMaintenance.cls` source we don't actually know in what
-  order Access runs the 37 BM IY queries, whether it loops, or
-  whether some queries are unused.  PR J (interactive
-  `Access.Application.SaveAsText`) is the obvious fix.
-- **`tmpBM_NIY` flow not analysed.**  Several Access rules write to
-  this temp table; PHP has no equivalent.  We don't know what
-  reads from `tmpBM_NIY` later.  Could be a staging step that gets
-  copied back to BIOG_MAIN, or could be an unused leftover.
-- **`c_index_year_type_code` and `c_index_year_source_id` writes
-  on the Access side were not surveyed in detail.**  PHP carefully
-  sets both for every rule; Access's `BM IY Rule …` queries we
-  read mostly write `c_notes` instead, with no obvious type-code
-  assignment.  This itself could account for some `_type_code` /
-  `_source_id` divergence.
-- **Pinned PHP commit may have moved.**  We pinned at `a642f7a`
-  (2026-03-13).  The latest weekly snapshot the SQLite was built
-  from could have a newer version of `IndexYearRebuildService.php`
-  with different behaviour.  Re-pin and re-run the comparison
-  whenever a fresh snapshot is downloaded.
-- **No `matched` verdicts yet.**  The script and this document
-  default to conservative (`needs_manual_review`); a future pass
-  with the maintainer or with side-by-side test data should
-  upgrade pairs to `matched` / `matched_minor_diff` where
-  warranted.
+- **Type_code-based pairing presumes both sides use the same
+  type_codes consistently.**  We confirmed this empirically
+  (33 paired codes, 0 `php_only`, 3 Access-only concubine
+  variants).  If a future cbdb-online-main-server commit renames
+  a code, this comparator would silently mis-pair.  Re-run the
+  comparator + spot-check after every PHP pull.
+- **`needs_manual_review` is currently 0** because the
+  hand-curated `VERDICT_BY_TYPE_CODE` table covers every paired
+  code.  When a new code appears (Access or PHP), it'll default
+  to `needs_manual_review` until added to the table.
+- **PR I's `logic_diff` flags are not actively in repo any more,
+  but the K1 / K2 outputs are unchanged** (their per-row buckets
+  don't depend on PR I's verdict labels).  K1 / K2 docs gain a
+  pointer at this updated comparator.
+- **Off-by-1 / off-by-3 on Rules 29 / 30 (matched_minor_diff) is
+  the closest thing to a real divergence we have at the rule
+  level.**  Worth maintainer confirmation that the difference is
+  intentional (Access's `-64` / `-53` may be older constants
+  PHP intentionally updated).

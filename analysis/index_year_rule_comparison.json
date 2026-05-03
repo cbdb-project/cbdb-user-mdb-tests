@@ -1,4 +1,6 @@
 {
+  "scope": "Per-rule comparison of the runtime Access GetBirthIndexYearSQL (in frmBaseMaintenance) against PHP IndexYearRebuildService.  Pairs by emitted c_index_year_type_code.",
+  "supersedes": "PR I's earlier comparison against the 37 saved BM IY Rule QueryDefs.  Those QueryDefs are NOT what CmdIndexYear_Click runs; PR M discovered CmdIndexYear_Click → GetBirthIndexYearSQL via SaveAsText extraction, and this script is the corrected comparator.",
   "php_source": {
     "repo": "cbdb-project/cbdb-online-main-server",
     "path": "app/Services/IndexYearRebuildService.php",
@@ -6,35 +8,65 @@
     "commit_date": "2026-03-13",
     "local_copy": "analysis\\php_source\\IndexYearRebuildService.php"
   },
+  "access_runtime_source": {
+    "file": "analysis\\dump_data\\vba\\Form_frmBaseMaintenance.vb",
+    "subroutine": "GetBirthIndexYearSQL",
+    "called_from": "CmdIndexYear_Click"
+  },
+  "vestigial_querydef_source": {
+    "dir": "analysis\\dump_data\\querydefs_index",
+    "n_files": 37,
+    "note": "The 37 BM IY Rule QueryDefs are present in the DATA mdb but NOT executed by CmdIndexYear_Click.  Kept here as historical / vestigial evidence; not the runtime truth.",
+    "files": [
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Dynasty_fix_IY_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Dynasty_Fix_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Dynasty_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_01A_DY_Phase_1_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_01A_DY_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_01B_DY_Phase_1_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_01B_DY_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_02_DY_Phase_1_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_02_DY_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_03_BY_Phase_1_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_03_BY_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_04W_Phase_1_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_04W_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_05_JS_Phase_1_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_05_JS_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_05W_Husband_JS_Phase_1_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_05W_Husband_JS_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_06_JR_Phase_1_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_06W_Husband_JR_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_07_XC_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_07W_Husband_XC_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_08_Father_BY_Phase_1_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_08_Father_BY_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_09_Oldest_Child_BY_Father_Phase_1_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_10_Older_Brother_BY_Phase_1_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_12_SIL_BY_Phase_1_Doublecheck_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_12_SIL_BY_Phase_1_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_13_Grandfather_BY_Phase_1_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_13_Grandfather_BY_Phase_2_Null_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_13_Grandfather_BY_Phase_2_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_14_Father_IY_Phase_1_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_15_Part_1_Father_Phase_1_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_16_Older_Brother_IY_Phase_1_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_17_Younger_Brother_IY_Phase_1_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_18_SIL_IY_Mother_Phase_1_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_18_SIL_IY_Phase_1_Query.sql",
+      "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_19_Grandfather_IY_Phase_1_Query.sql"
+    ]
+  },
   "summary": {
-    "access_rules_total": 37,
-    "php_methods_total": 19,
-    "pairs_in_map": 27,
-    "verdict_counts": {
-      "missing_in_php": 1,
-      "logic_diff": 8,
-      "needs_manual_review": 15,
-      "missing_in_access": 3
-    },
-    "unpaired_access_rules": [
-      "BM IY Rule 01A DY Phase 1 Query",
-      "BM IY Rule 01B DY Phase 1 Query",
-      "BM IY Rule 02 DY Phase 1 Query",
-      "BM IY Rule 03 BY Phase 1 Query",
-      "BM IY Rule 04W Phase 1 Query",
-      "BM IY Rule 05 JS Phase 1 Query",
-      "BM IY Rule 05W Husband JS Phase 1 Query",
-      "BM IY Rule 06 JR Phase 1 Query",
-      "BM IY Rule 08 Father BY Phase 1 Query",
-      "BM IY Rule 09 Oldest Child BY Father Phase 1 Query",
-      "BM IY Rule 10 Older Brother BY Phase 1 Query",
-      "BM IY Rule 12 SIL BY Phase 1 Doublecheck Query",
-      "BM IY Rule 12 SIL BY Phase 1 Query",
-      "BM IY Rule 13 Grandfather BY Phase 1 Query",
-      "BM IY Rule 13 Grandfather BY Phase 2 Null Query",
-      "BM IY Rule 13 Grandfather BY Phase 2 Query"
-    ],
-    "unpaired_php_methods": []
+    "type_codes_total": 33,
+    "verdicts": {
+      "matched": 22,
+      "matched_minor_diff": 8,
+      "logic_diff": 0,
+      "access_only": 3,
+      "php_only": 0,
+      "needs_manual_review": 0
+    }
   },
   "php_phase_order": {
     "phase_a": [
@@ -99,1400 +131,827 @@
         "args": ""
       }
     ],
-    "phase_b": [],
-    "loop": []
+    "phase_b": [
+      {
+        "type_code": "13",
+        "method": "sqlAggregateRule13",
+        "args": ""
+      },
+      {
+        "type_code": "15",
+        "method": "sqlAggregateRule15",
+        "args": ""
+      },
+      {
+        "type_code": "17",
+        "method": "sqlRule03",
+        "args": "true"
+      },
+      {
+        "type_code": "19",
+        "method": "sqlAggregateSiblingRule",
+        "args": "[125, 165], 'MAX', 2, '19'"
+      },
+      {
+        "type_code": "21",
+        "method": "sqlAggregateSiblingRule",
+        "args": "[126, 166], 'MIN', -2, '21'"
+      },
+      {
+        "type_code": "23",
+        "method": "sqlAggregateSonInLawRule",
+        "args": "false, 27, '23'"
+      },
+      {
+        "type_code": "25",
+        "method": "sqlAggregateSonInLawRule",
+        "args": "true, 24, '25'"
+      },
+      {
+        "type_code": "27",
+        "method": "sqlRule27",
+        "args": ""
+      }
+    ],
+    "loop": [
+      {
+        "type_code": "04",
+        "method": "sqlLoopHusbandPropagationRule",
+        "args": "false"
+      },
+      {
+        "type_code": "12",
+        "method": "sqlLoopFatherPropagationRule",
+        "args": ""
+      },
+      {
+        "type_code": "14",
+        "method": "sqlLoopOldestChildIndexToFatherRule",
+        "args": ""
+      },
+      {
+        "type_code": "16",
+        "method": "sqlLoopOldestChildIndexToMotherRule",
+        "args": ""
+      },
+      {
+        "type_code": "18",
+        "method": "sqlLoopHusbandPropagationRule",
+        "args": "true"
+      },
+      {
+        "type_code": "20",
+        "method": "sqlLoopSiblingRule",
+        "args": "[125, 165], 'MAX', 2, '20'"
+      },
+      {
+        "type_code": "22",
+        "method": "sqlLoopSiblingRule",
+        "args": "[126, 166], 'MIN', -2, '22'"
+      },
+      {
+        "type_code": "24",
+        "method": "sqlLoopSonInLawRule",
+        "args": "false, 27, '24'"
+      },
+      {
+        "type_code": "26",
+        "method": "sqlLoopSonInLawRule",
+        "args": "true, 24, '26'"
+      },
+      {
+        "type_code": "28",
+        "method": "sqlLoopGrandfatherPropagationRule",
+        "args": ""
+      }
+    ]
   },
   "pairs": [
     {
-      "access_name": "BM IY Rule 01A DY Query",
-      "php_method": null,
-      "verdict": "missing_in_php",
-      "notes": "Access has TWO Rule-01 variants: 01A copies c_deathyear when c_birthyear>=c_deathyear-60, 01B uses c_birthyear+59 when c_birthyear<=c_deathyear-59.  PHP's Rule 01 is just `c_index_year = c_birthyear` whenever birthyear is valid — no death-year branch.  The Access 01A path produces a different value (deathyear, not birthyear) for old people whose recorded death age is ≤60 — that is potential algorithm divergence.",
-      "access": {
-        "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_01A_DY_Query.sql",
-        "name": "BM IY Rule 01A DY Query",
-        "is_phase_1": false,
-        "uses_tmpBM_NIY": false,
-        "is_dynasty_query": false,
-        "set_index_year_expr": "[BIOG_MAIN].[c_deathyear]",
-        "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) And ((BIOG_MAIN.c_birthyear)>=BIOG_MAIN.c_deathyear-60) And ((BIOG_MAIN.c_deathyear)>0));",
-        "joins_kin_data": false,
-        "joins_entry_data": false,
-        "kin_codes_used": [],
-        "sets_type_code": false
-      },
-      "php": null
-    },
-    {
-      "access_name": "BM IY Rule 01B DY Query",
-      "php_method": "sqlRule01",
-      "verdict": "logic_diff",
-      "notes": "Both fire when birthyear is the strongest evidence, but the *value* differs: Access 01B writes c_birthyear+59, PHP sqlRule01 writes c_birthyear.  PHP's Phase B Rule 03 (spouse propagation) also uses husband.c_index_year+3 rather than +62 — see Rule 04W.  The +59 / +62 offsets in Access look like a 'midpoint of life' adjustment that PHP has dropped in favour of using the raw birthyear and letting Phase C propagation do the smoothing.",
-      "access": {
-        "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_01B_DY_Query.sql",
-        "name": "BM IY Rule 01B DY Query",
-        "is_phase_1": false,
-        "uses_tmpBM_NIY": false,
-        "is_dynasty_query": false,
-        "set_index_year_expr": "[BIOG_MAIN].[c_birthyear]+59",
-        "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) And ((BIOG_MAIN.c_birthyear)<=BIOG_MAIN.c_deathyear-59) And ((BIOG_MAIN.c_deathyear)>0));",
-        "joins_kin_data": false,
-        "joins_entry_data": false,
-        "kin_codes_used": [],
-        "sets_type_code": false
+      "type_code": "01",
+      "verdict": "matched",
+      "rationale": "Both: c_index_year = c_birthyear (raw birthyear).",
+      "access_runtime": {
+        "access_label": "1 Birth Year",
+        "type_code": "01",
+        "set_expr": "[BIOG_MAIN].[c_birthyear],",
+        "sql_preview": "1 Birth Year\" cmdSQL.CommandText = \"UPDATE BIOG_MAIN SET BIOG_MAIN.c_index_year = [BIOG_MAIN].[c_birthyear], BIOG_MAIN.c_index_year_type_code = '01' WHERE (((BIOG_MAIN.c_birthyear)<>0) OR (BIOG_MAIN.c_birthyear = 0 AND \" + strDynastyTest + \"))\" cmdSQL.Execute tRecProcessed tTotal = tRecProcessed"
       },
       "php": {
+        "phase": "phase_a",
         "method": "sqlRule01",
-        "params": "",
-        "set_index_year_expr": "bm.c_birthyear",
-        "set_type_code_expr": "'01'",
-        "set_source_id_expr": null,
-        "uses_kin_data": false,
-        "uses_entry_data": false,
-        "kin_codes_used": []
+        "args": "",
+        "method_summary": {
+          "method": "sqlRule01",
+          "params": "",
+          "set_index_year_expr": "bm.c_birthyear",
+          "set_type_code_expr": "'01'",
+          "set_source_id_expr": null
+        }
       }
     },
     {
-      "access_name": "BM IY Rule 02 DY Query",
-      "php_method": "sqlRule02",
-      "verdict": "logic_diff",
-      "notes": "Access Rule 02 DY: c_index_year = c_deathyear whenever birthyear is unknown and deathyear>0.  PHP sqlRule02: c_index_year = c_deathyear - c_death_age + 1, gated on c_death_age > 0.  Different formulas AND different preconditions (PHP requires a recorded death age; Access doesn't).  PHP also has sqlRule29Or30 to cover the case where deathyear is known but death_age isn't, with c_deathyear - 56 / -63 by gender.  Together those cover similar ground but with different numerical outputs.",
-      "access": {
-        "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_02_DY_Query.sql",
-        "name": "BM IY Rule 02 DY Query",
-        "is_phase_1": false,
-        "uses_tmpBM_NIY": false,
-        "is_dynasty_query": false,
-        "set_index_year_expr": "[BIOG_MAIN].[c_deathyear]",
-        "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) AND ((BIOG_MAIN.c_birthyear) Is Null Or (BIOG_MAIN.c_birthyear)=0) AND ((BIOG_MAIN.c_deathyear",
-        "joins_kin_data": false,
-        "joins_entry_data": false,
-        "kin_codes_used": [],
-        "sets_type_code": false
+      "type_code": "02",
+      "verdict": "matched",
+      "rationale": "Both: c_index_year = c_deathyear - c_death_age + 1.",
+      "access_runtime": {
+        "access_label": "2:  Death Year - Death Age",
+        "type_code": "02",
+        "set_expr": "[BIOG_MAIN].[c_deathyear]-[BIOG_MAIN].[c_death_age] + 1,",
+        "sql_preview": "2: Death Year - Death Age\" cmdSQL.CommandText = \"UPDATE BIOG_MAIN SET BIOG_MAIN.c_index_year = [BIOG_MAIN].[c_deathyear]-[BIOG_MAIN].[c_death_age] + 1, BIOG_MAIN.c_index_year_type_code = '02' WHERE (((BIOG_MAIN.c_index_year) Is Null) AND ((BIOG_MAIN.c_deathyear)<>0 OR (BIOG_MAIN.c_deathyear = 0 AND \" + strDynastyTest + \")) And ((BIOG_MAIN.c_death_age)>0))\" cmdSQL.Execute tRecProcessed tTotal = tTotal + tRecProcessed"
       },
       "php": {
+        "phase": "phase_a",
         "method": "sqlRule02",
-        "params": "",
-        "set_index_year_expr": "bm.c_deathyear - bm.c_death_age + 1",
-        "set_type_code_expr": "'02'",
-        "set_source_id_expr": null,
-        "uses_kin_data": false,
-        "uses_entry_data": false,
-        "kin_codes_used": []
+        "args": "",
+        "method_summary": {
+          "method": "sqlRule02",
+          "params": "",
+          "set_index_year_expr": "bm.c_deathyear - bm.c_death_age + 1",
+          "set_type_code_expr": "'02'",
+          "set_source_id_expr": null
+        }
       }
     },
     {
-      "access_name": "BM IY Rule 03 BY Query",
-      "php_method": "sqlRule01",
-      "verdict": "logic_diff",
-      "notes": "Access Rule 03 BY: c_birthyear+59, fires only when deathyear is null/zero.  PHP sqlRule01: c_birthyear (no offset), fires whenever birthyear is valid.  Same input column, different output.  Note: the Access rule *number* '03' is a different rule entirely from PHP's Rule 03 (which is wife-from-husband propagation).  The two numbering schemes do not align.",
-      "access": {
-        "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_03_BY_Query.sql",
-        "name": "BM IY Rule 03 BY Query",
-        "is_phase_1": false,
-        "uses_tmpBM_NIY": false,
-        "is_dynasty_query": false,
-        "set_index_year_expr": "[BIOG_MAIN].[c_birthyear]+59",
-        "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) AND ((BIOG_MAIN.c_birthyear)>0) AND ((BIOG_MAIN.c_deathyear) Is Null Or (BIOG_MAIN.c_deathyear",
-        "joins_kin_data": false,
-        "joins_entry_data": false,
-        "kin_codes_used": [],
-        "sets_type_code": false
+      "type_code": "03",
+      "verdict": "matched",
+      "rationale": "Both: wife = husband.c_index_year + 3 (kin 134).",
+      "access_runtime": {
+        "access_label": "4W",
+        "type_code": "03",
+        "set_expr": "[BIOG_MAIN_1].[c_index_year]+3,",
+        "sql_preview": "4W\" ' Rule 4W: Husband's index year (i.e. birth year or death year - death age + 1) + 3 (W or W1) ' Specifying the husband as 134 eliminates a handful of other relations, some of which are clearly coded incorrectly ' This is true for all calculations for wives and concubines cmdSQL.CommandText = \"UPDATE (BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id) INNER JOIN KIN_DATA AS KIN_DATA_1 ON (BIOG_MAIN.c_personid = KIN_DATA_1.c_kin_id) AND (BIOG_MAIN_1.c_personid = KIN_DATA_1.c_personid..."
       },
       "php": {
-        "method": "sqlRule01",
-        "params": "",
-        "set_index_year_expr": "bm.c_birthyear",
-        "set_type_code_expr": "'01'",
-        "set_source_id_expr": null,
-        "uses_kin_data": false,
-        "uses_entry_data": false,
-        "kin_codes_used": []
-      }
-    },
-    {
-      "access_name": "BM IY Rule 04W Query",
-      "php_method": "sqlRule03",
-      "verdict": "logic_diff",
-      "notes": "Both compute wife's index year from husband (kin_code=134), excluding concubine relationships.  But Access uses husband.c_birthyear+62, PHP uses husband.c_index_year+3.  Access also explicitly tests KIN_DATA_1.c_kin_code<>168 (only one concubine code); PHP excludes a wider set [168, 163, 344, 467, 585].",
-      "access": {
-        "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_04W_Query.sql",
-        "name": "BM IY Rule 04W Query",
-        "is_phase_1": false,
-        "uses_tmpBM_NIY": false,
-        "is_dynasty_query": false,
-        "set_index_year_expr": "[BIOG_MAIN_1].[c_birthyear]+62",
-        "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) AND ((KIN_DATA.c_kin_code)=134) AND ((BIOG_MAIN_1.c_birthyear)>0) AND ((KIN_DATA_1.c_kin_code)",
-        "joins_kin_data": true,
-        "joins_entry_data": false,
-        "kin_codes_used": [],
-        "sets_type_code": false
-      },
-      "php": {
+        "phase": "phase_a",
         "method": "sqlRule03",
-        "params": "bool $concubine",
-        "set_index_year_expr": "husband.c_index_year + 3",
-        "set_type_code_expr": "'$typeCode'",
-        "set_source_id_expr": "husband.c_personid",
-        "uses_kin_data": true,
-        "uses_entry_data": false,
-        "kin_codes_used": [
-          134
-        ]
+        "args": "false",
+        "method_summary": {
+          "method": "sqlRule03",
+          "params": "bool $concubine",
+          "set_index_year_expr": "husband.c_index_year + 3",
+          "set_type_code_expr": "'$typeCode'",
+          "set_source_id_expr": "husband.c_personid"
+        }
       }
     },
     {
-      "access_name": "BM IY Rule 05 JS Query",
-      "php_method": "sqlEntryRule",
-      "verdict": "logic_diff",
-      "notes": "**Sign flip!**  Access Rule 05 JS: c_index_year = ENTRY_DATA.c_year + 30 (gates on c_entry_code IN (36, 165) directly).  PHP sqlEntryRule('040101', 30, '05'): c_index_year = entry_year - 30, gated by ENTRY_CODE_TYPE_REL.c_entry_type='040101' (a category mapping table).  Both also use MIN(c_year) on the PHP side vs first matching row on the Access side.  This is the single biggest divergence we found and is a likely explanation for many of the index_year_only_diff observations from PR G.",
-      "access": {
-        "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_05_JS_Query.sql",
-        "name": "BM IY Rule 05 JS Query",
-        "is_phase_1": false,
-        "uses_tmpBM_NIY": false,
-        "is_dynasty_query": false,
-        "set_index_year_expr": "[ENTRY_DATA].[c_year]+30",
-        "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) AND ((ENTRY_DATA.c_entry_code)=36 Or (ENTRY_DATA.c_entry_code)=165) AND ((ENTRY_DATA.c_year)>0",
-        "joins_kin_data": false,
-        "joins_entry_data": true,
-        "kin_codes_used": [],
-        "sets_type_code": false
+      "type_code": "04",
+      "verdict": "matched",
+      "rationale": "Phase C: husband propagation, husband.c_index_year + 3.",
+      "access_runtime": {
+        "access_label": "Husband",
+        "type_code": "04",
+        "set_expr": "[BIOG_MAIN_1].[c_index_year]+3,",
+        "sql_preview": "Husband \" cmdSQL.CommandText = \"UPDATE (BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id) INNER JOIN KIN_DATA AS KIN_DATA_1 ON (BIOG_MAIN.c_personid = KIN_DATA_1.c_kin_id) AND (BIOG_MAIN_1.c_personid = KIN_DATA_1.c_personid) SET BIOG_MAIN.c_index_year_type_code = iif(BIOG_MAIN_1.c_index_year_type_code = '01','04',BIOG_MAIN_1.c_index_year_type_code + '04'), BIOG_MAIN.c_index_year = [BIOG_MAIN_1].[c_index_year]+3, BIOG_MAIN.c_index_year_source_id = [BIOG_MAIN_1].[c_personid] WHERE ((BIO..."
       },
       "php": {
-        "method": "sqlEntryRule",
-        "params": "string $entryType, int $subtractYears, string $typeCode",
-        "set_index_year_expr": "entry_agg.entry_year - $subtractYears",
-        "set_type_code_expr": "'$typeCode'",
-        "set_source_id_expr": null,
-        "uses_kin_data": false,
-        "uses_entry_data": true,
-        "kin_codes_used": []
-      }
-    },
-    {
-      "access_name": "BM IY Rule 06 JR Query",
-      "php_method": "sqlEntryRule",
-      "verdict": "logic_diff",
-      "notes": "Same sign flip as Rule 05.  Access uses +27 on raw entry year, PHP uses -27.  Naming also drifts: Access calls this 'JR' (juren), PHP doesn't expose the type mnemonic directly — the entry code mapping is in ENTRY_CODE_TYPE_REL (040102).",
-      "access": null,
-      "php": {
-        "method": "sqlEntryRule",
-        "params": "string $entryType, int $subtractYears, string $typeCode",
-        "set_index_year_expr": "entry_agg.entry_year - $subtractYears",
-        "set_type_code_expr": "'$typeCode'",
-        "set_source_id_expr": null,
-        "uses_kin_data": false,
-        "uses_entry_data": true,
-        "kin_codes_used": []
-      }
-    },
-    {
-      "access_name": "BM IY Rule 07 XC Query",
-      "php_method": null,
-      "verdict": "needs_manual_review",
-      "notes": "Access Rule 07 XC writes to tmpBM_NIY (a temp staging table) rather than directly to BIOG_MAIN, with c_year+39 and c_entry_code=257.  PHP doesn't appear to have a direct equivalent for entry code 257; sqlEntryRule covers '040103' with -21 / -18 offsets for the wife variants, no obvious +39 path.  Need to compare against ENTRY_CODE_TYPE_REL contents to see where 257 maps.",
-      "access": {
-        "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_07_XC_Query.sql",
-        "name": "BM IY Rule 07 XC Query",
-        "is_phase_1": false,
-        "uses_tmpBM_NIY": true,
-        "is_dynasty_query": false,
-        "set_index_year_expr": "[ENTRY_DATA].[c_year]+39",
-        "where_short": "(((tmpBM_NIY.c_index_year) Is Null Or (tmpBM_NIY.c_index_year)=0) AND ((ENTRY_DATA.c_entry_code)=257) AND ((ENTRY_DATA.c_year)>0));",
-        "joins_kin_data": false,
-        "joins_entry_data": true,
-        "kin_codes_used": [],
-        "sets_type_code": true
-      },
-      "php": null
-    },
-    {
-      "access_name": "BM IY Rule 05W Husband JS Query",
-      "php_method": "sqlWifeFromEntryRule",
-      "verdict": "logic_diff",
-      "notes": "Same sign-flip pattern.  Access wife-from-husband-jinshi uses husband_entry_year + N; PHP uses entry_year - N.",
-      "access": {
-        "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_05W_Husband_JS_Query.sql",
-        "name": "BM IY Rule 05W Husband JS Query",
-        "is_phase_1": false,
-        "uses_tmpBM_NIY": false,
-        "is_dynasty_query": false,
-        "set_index_year_expr": "[ENTRY_DATA].[c_year]+33",
-        "where_short": "(((BIOG_MAIN_1.c_index_year) Is Null Or (BIOG_MAIN_1.c_index_year)=0) AND ((KIN_DATA.c_kin_code)=134) AND ((KIN_DATA_1.c_kin_code)<>168) AND ((ENTRY_DATA.c_year",
-        "joins_kin_data": true,
-        "joins_entry_data": true,
-        "kin_codes_used": [],
-        "sets_type_code": false
-      },
-      "php": {
-        "method": "sqlWifeFromEntryRule",
-        "params": "string $entryType, int $subtractYears, string $typeCode",
-        "set_index_year_expr": "entry_agg.entry_year - $subtractYears",
-        "set_type_code_expr": "'$typeCode'",
-        "set_source_id_expr": "entry_agg.source_personid",
-        "uses_kin_data": true,
-        "uses_entry_data": true,
-        "kin_codes_used": [
-          134
-        ]
-      }
-    },
-    {
-      "access_name": "BM IY Rule 06W Husband JR Query",
-      "php_method": "sqlWifeFromEntryRule",
-      "verdict": "logic_diff",
-      "notes": "Same sign-flip pattern as 05W.",
-      "access": {
-        "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_06W_Husband_JR_Query.sql",
-        "name": "BM IY Rule 06W Husband JR Query",
-        "is_phase_1": false,
-        "uses_tmpBM_NIY": true,
-        "is_dynasty_query": false,
-        "set_index_year_expr": "[ENTRY_DATA].[c_year]+36",
-        "where_short": "(((tmpBM_NIY.c_index_year) Is Null Or (tmpBM_NIY.c_index_year)=0) AND ((KIN_DATA.c_kin_code)=134) AND ((KIN_DATA_1.c_kin_code)<>39 And (KIN_DATA_1.c_kin_code)<>",
-        "joins_kin_data": true,
-        "joins_entry_data": true,
-        "kin_codes_used": [],
-        "sets_type_code": true
-      },
-      "php": {
-        "method": "sqlWifeFromEntryRule",
-        "params": "string $entryType, int $subtractYears, string $typeCode",
-        "set_index_year_expr": "entry_agg.entry_year - $subtractYears",
-        "set_type_code_expr": "'$typeCode'",
-        "set_source_id_expr": "entry_agg.source_personid",
-        "uses_kin_data": true,
-        "uses_entry_data": true,
-        "kin_codes_used": [
-          134
-        ]
-      }
-    },
-    {
-      "access_name": "BM IY Rule 07W Husband XC Query",
-      "php_method": null,
-      "verdict": "needs_manual_review",
-      "notes": "Wife variant of Rule 07 XC; same tmpBM_NIY routing.  No obvious PHP equivalent.",
-      "access": {
-        "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_07W_Husband_XC_Query.sql",
-        "name": "BM IY Rule 07W Husband XC Query",
-        "is_phase_1": false,
-        "uses_tmpBM_NIY": true,
-        "is_dynasty_query": false,
-        "set_index_year_expr": "[ENTRY_DATA].[c_year]+42",
-        "where_short": "(((tmpBM_NIY.c_index_year) Is Null Or (tmpBM_NIY.c_index_year)=0) AND ((KIN_DATA.c_kin_code)=134) AND ((KIN_DATA_1.c_kin_code)<>39 And (KIN_DATA_1.c_kin_code)<>",
-        "joins_kin_data": true,
-        "joins_entry_data": true,
-        "kin_codes_used": [],
-        "sets_type_code": true
-      },
-      "php": null
-    },
-    {
-      "access_name": "BM IY Rule 08 Father BY Query",
-      "php_method": "sqlAggregateRule13",
-      "verdict": "needs_manual_review",
-      "notes": "Both compute father's index year from child birthyear, kin_code=75.  Access uses c_birthyear-30 in Phase 1 Doublecheck path; PHP picks MIN(child.c_birthyear)-30 with deterministic source-personid via the aggregate subquery.  Need to inspect the Access Phase 1 + Doublecheck pair to confirm the aggregation behaviour matches MIN.",
-      "access": {
-        "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_08_Father_BY_Query.sql",
-        "name": "BM IY Rule 08 Father BY Query",
-        "is_phase_1": false,
-        "uses_tmpBM_NIY": false,
-        "is_dynasty_query": false,
-        "set_index_year_expr": "[BIOG_MAIN].[c_birthyear]+89",
-        "where_short": "(((BIOG_MAIN_1.c_index_year) Is Null Or (BIOG_MAIN_1.c_index_year)=0) AND ((KIN_DATA.c_kin_code)=75) AND ((BIOG_MAIN.c_birthyear)>0) AND ((BIOG_MAIN.c_index_yea",
-        "joins_kin_data": true,
-        "joins_entry_data": false,
-        "kin_codes_used": [],
-        "sets_type_code": false
-      },
-      "php": {
-        "method": "sqlAggregateRule13",
-        "params": "",
-        "set_index_year_expr": "agg.base_value - 30",
-        "set_type_code_expr": "'13'",
-        "set_source_id_expr": "agg.source_personid",
-        "uses_kin_data": true,
-        "uses_entry_data": false,
-        "kin_codes_used": [
-          75
-        ]
-      }
-    },
-    {
-      "access_name": "BM IY Rule 09 Oldest Child BY Father (group)",
-      "php_method": "sqlAggregateRule13",
-      "verdict": "needs_manual_review",
-      "notes": "Aggregate father from oldest child birthyear.  Both sides aim at MIN(child.c_birthyear) - 30 logically, but Access splits the work across multiple Phase queries and a temp table.  Worth confirming the MIN selection agrees on tie-break and source attribution.",
-      "access": null,
-      "php": {
-        "method": "sqlAggregateRule13",
-        "params": "",
-        "set_index_year_expr": "agg.base_value - 30",
-        "set_type_code_expr": "'13'",
-        "set_source_id_expr": "agg.source_personid",
-        "uses_kin_data": true,
-        "uses_entry_data": false,
-        "kin_codes_used": [
-          75
-        ]
-      }
-    },
-    {
-      "access_name": "BM IY Rule 10 Older Brother BY (group)",
-      "php_method": "sqlAggregateSiblingRule",
-      "verdict": "needs_manual_review",
-      "notes": "Older brother propagation.  PHP uses kin_codes [125, 165] with MAX +2; Access kin codes need verification.",
-      "access": null,
-      "php": {
-        "method": "sqlAggregateSiblingRule",
-        "params": "array $kinCodes, string $aggFn, int $delta, string $typeCode",
-        "set_index_year_expr": "{$this->offsetExpr('agg.base_value'",
-        "set_type_code_expr": "'$typeCode'",
-        "set_source_id_expr": "agg.source_personid",
-        "uses_kin_data": true,
-        "uses_entry_data": false,
-        "kin_codes_used": []
-      }
-    },
-    {
-      "access_name": "BM IY Rule 12 SIL BY (group)",
-      "php_method": "sqlAggregateSonInLawRule",
-      "verdict": "needs_manual_review",
-      "notes": "Son-in-law propagation.  PHP kin codes (181,201,224,332).  Access kin codes need verification.  Two Access queries (Phase 1 + Phase 1 Doublecheck) suggest a sanity check loop that PHP doesn't have.",
-      "access": null,
-      "php": {
-        "method": "sqlAggregateSonInLawRule",
-        "params": "bool $femaleTarget, int $subtractYears, string $typeCode",
-        "set_index_year_expr": "agg.base_value - $subtractYears",
-        "set_type_code_expr": "'$typeCode'",
-        "set_source_id_expr": "agg.source_personid",
-        "uses_kin_data": true,
-        "uses_entry_data": false,
-        "kin_codes_used": [
-          181,
-          201,
-          224,
-          332
-        ]
-      }
-    },
-    {
-      "access_name": "BM IY Rule 13 Grandfather BY (group)",
-      "php_method": "sqlRule27",
-      "verdict": "needs_manual_review",
-      "notes": "Grandfather propagation, kin_code=62.  PHP uses grandfather.c_birthyear + 60.  Access has THREE queries in this group (Phase 1, Phase 2, Phase 2 Null) — likely covers null handling explicitly that PHP collapses into the WHERE clause.",
-      "access": null,
-      "php": {
-        "method": "sqlRule27",
-        "params": "",
-        "set_index_year_expr": "grandfather.c_birthyear + 60",
-        "set_type_code_expr": "'27'",
-        "set_source_id_expr": "grandfather.c_personid",
-        "uses_kin_data": true,
-        "uses_entry_data": false,
-        "kin_codes_used": [
-          62
-        ]
-      }
-    },
-    {
-      "access_name": "BM IY Rule 14 Father IY Phase 1 Query",
-      "php_method": "sqlLoopFatherPropagationRule",
-      "verdict": "needs_manual_review",
-      "notes": "Phase C loop: child.c_index_year = father.c_index_year + 30.  PHP loops up to 2 times; Access' loop driver is in frmBaseMaintenance VBA which we have NOT extracted yet.",
-      "access": {
-        "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_14_Father_IY_Phase_1_Query.sql",
-        "name": "BM IY Rule 14 Father IY Phase 1 Query",
-        "is_phase_1": true,
-        "uses_tmpBM_NIY": false,
-        "is_dynasty_query": false,
-        "set_index_year_expr": null,
-        "where_short": "(((BIOG_MAIN_1.c_index_year) Is Null Or (BIOG_MAIN_1.c_index_year)=0) And ((KIN_DATA.c_kin_code)=75) And (InStr(1,BIOG_MAIN.c_notes,\"Index year algorithmically\"",
-        "joins_kin_data": true,
-        "joins_entry_data": false,
-        "kin_codes_used": [],
-        "sets_type_code": false
-      },
-      "php": {
-        "method": "sqlLoopFatherPropagationRule",
-        "params": "",
-        "set_index_year_expr": "father.c_index_year + 30",
-        "set_type_code_expr": "CONCAT(COALESCE(father.c_index_year_type_code",
-        "set_source_id_expr": "father.c_personid",
-        "uses_kin_data": true,
-        "uses_entry_data": false,
-        "kin_codes_used": [
-          75
-        ]
-      }
-    },
-    {
-      "access_name": "BM IY Rule 15 Part 1 Father Phase 1 Query",
-      "php_method": "sqlLoopOldestChildIndexToFatherRule",
-      "verdict": "needs_manual_review",
-      "notes": "Father from oldest child index_year (Phase C).  Same MIN aggregation question as Rule 13.",
-      "access": {
-        "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_15_Part_1_Father_Phase_1_Query.sql",
-        "name": "BM IY Rule 15 Part 1 Father Phase 1 Query",
-        "is_phase_1": true,
-        "uses_tmpBM_NIY": false,
-        "is_dynasty_query": false,
-        "set_index_year_expr": null,
-        "where_short": "(((BIOG_MAIN_1.c_index_year) Is Null Or (BIOG_MAIN_1.c_index_year)=0) And ((KIN_DATA.c_kin_code)=75) And ((InStr(1,BIOG_MAIN.c_notes,\"Index year algorithmically",
-        "joins_kin_data": true,
-        "joins_entry_data": false,
-        "kin_codes_used": [],
-        "sets_type_code": false
-      },
-      "php": {
-        "method": "sqlLoopOldestChildIndexToFatherRule",
-        "params": "",
-        "set_index_year_expr": "agg.base_value - 30",
-        "set_type_code_expr": "'14'",
-        "set_source_id_expr": "agg.source_personid",
-        "uses_kin_data": true,
-        "uses_entry_data": false,
-        "kin_codes_used": [
-          75
-        ]
-      }
-    },
-    {
-      "access_name": "BM IY Rule 16 Older Brother IY Phase 1 Query",
-      "php_method": "sqlLoopSiblingRule",
-      "verdict": "needs_manual_review",
-      "notes": "Older brother index_year propagation.",
-      "access": {
-        "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_16_Older_Brother_IY_Phase_1_Query.sql",
-        "name": "BM IY Rule 16 Older Brother IY Phase 1 Query",
-        "is_phase_1": true,
-        "uses_tmpBM_NIY": false,
-        "is_dynasty_query": false,
-        "set_index_year_expr": null,
-        "where_short": "(((BIOG_MAIN_1.c_index_year) Is Null Or (BIOG_MAIN_1.c_index_year)=0) And ((KIN_DATA.c_kin_code)=125 Or (KIN_DATA.c_kin_code)=165) And ((InStr(1,BIOG_MAIN.c_not",
-        "joins_kin_data": true,
-        "joins_entry_data": false,
-        "kin_codes_used": [],
-        "sets_type_code": false
-      },
-      "php": {
-        "method": "sqlLoopSiblingRule",
-        "params": "array $kinCodes, string $aggFn, int $delta, string $typeCode",
-        "set_index_year_expr": "{$this->offsetExpr('agg.base_value'",
-        "set_type_code_expr": "'$typeCode'",
-        "set_source_id_expr": "agg.source_personid",
-        "uses_kin_data": true,
-        "uses_entry_data": false,
-        "kin_codes_used": []
-      }
-    },
-    {
-      "access_name": "BM IY Rule 17 Younger Brother IY Phase 1 Query",
-      "php_method": "sqlLoopSiblingRule",
-      "verdict": "needs_manual_review",
-      "notes": "Younger brother index_year propagation.",
-      "access": {
-        "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_17_Younger_Brother_IY_Phase_1_Query.sql",
-        "name": "BM IY Rule 17 Younger Brother IY Phase 1 Query",
-        "is_phase_1": true,
-        "uses_tmpBM_NIY": false,
-        "is_dynasty_query": false,
-        "set_index_year_expr": null,
-        "where_short": "(((BIOG_MAIN_1.c_index_year) Is Null Or (BIOG_MAIN_1.c_index_year)=0) And ((KIN_DATA.c_kin_code)=126 Or (KIN_DATA.c_kin_code)=166) And ((InStr(1,BIOG_MAIN.c_not",
-        "joins_kin_data": true,
-        "joins_entry_data": false,
-        "kin_codes_used": [],
-        "sets_type_code": false
-      },
-      "php": {
-        "method": "sqlLoopSiblingRule",
-        "params": "array $kinCodes, string $aggFn, int $delta, string $typeCode",
-        "set_index_year_expr": "{$this->offsetExpr('agg.base_value'",
-        "set_type_code_expr": "'$typeCode'",
-        "set_source_id_expr": "agg.source_personid",
-        "uses_kin_data": true,
-        "uses_entry_data": false,
-        "kin_codes_used": []
-      }
-    },
-    {
-      "access_name": "BM IY Rule 18 SIL IY Phase 1 Query",
-      "php_method": "sqlLoopSonInLawRule",
-      "verdict": "needs_manual_review",
-      "notes": "Son-in-law index_year propagation.",
-      "access": {
-        "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_18_SIL_IY_Phase_1_Query.sql",
-        "name": "BM IY Rule 18 SIL IY Phase 1 Query",
-        "is_phase_1": true,
-        "uses_tmpBM_NIY": false,
-        "is_dynasty_query": false,
-        "set_index_year_expr": null,
-        "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) And ((KIN_DATA.c_kin_code)=181 Or (KIN_DATA.c_kin_code)=201 Or (KIN_DATA.c_kin_code)=224 Or (K",
-        "joins_kin_data": true,
-        "joins_entry_data": false,
-        "kin_codes_used": [],
-        "sets_type_code": false
-      },
-      "php": {
-        "method": "sqlLoopSonInLawRule",
-        "params": "bool $femaleTarget, int $subtractYears, string $typeCode",
-        "set_index_year_expr": "agg.base_value - $subtractYears",
-        "set_type_code_expr": "'$typeCode'",
-        "set_source_id_expr": "agg.source_personid",
-        "uses_kin_data": true,
-        "uses_entry_data": false,
-        "kin_codes_used": [
-          181,
-          201,
-          224,
-          332
-        ]
-      }
-    },
-    {
-      "access_name": "BM IY Rule 18 SIL IY Mother Phase 1 Query",
-      "php_method": "sqlLoopOldestChildIndexToMotherRule",
-      "verdict": "needs_manual_review",
-      "notes": "Mother from oldest child index_year, Phase C.  Naming is confusing (Access calls this '18 ... Mother' even though it's a mother-not-SIL flow).",
-      "access": {
-        "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_18_SIL_IY_Mother_Phase_1_Query.sql",
-        "name": "BM IY Rule 18 SIL IY Mother Phase 1 Query",
-        "is_phase_1": true,
-        "uses_tmpBM_NIY": false,
-        "is_dynasty_query": false,
-        "set_index_year_expr": null,
-        "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) And ((KIN_DATA.c_kin_code)=181 Or (KIN_DATA.c_kin_code)=201 Or (KIN_DATA.c_kin_code)=224 Or (K",
-        "joins_kin_data": true,
-        "joins_entry_data": false,
-        "kin_codes_used": [],
-        "sets_type_code": false
-      },
-      "php": {
-        "method": "sqlLoopOldestChildIndexToMotherRule",
-        "params": "",
-        "set_index_year_expr": "agg.base_value - 27",
-        "set_type_code_expr": "'16'",
-        "set_source_id_expr": "agg.source_personid",
-        "uses_kin_data": true,
-        "uses_entry_data": false,
-        "kin_codes_used": [
-          111
-        ]
-      }
-    },
-    {
-      "access_name": "BM IY Rule 19 Grandfather IY Phase 1 Query",
-      "php_method": "sqlLoopGrandfatherPropagationRule",
-      "verdict": "needs_manual_review",
-      "notes": "Grandfather index_year propagation, Phase C.",
-      "access": {
-        "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_19_Grandfather_IY_Phase_1_Query.sql",
-        "name": "BM IY Rule 19 Grandfather IY Phase 1 Query",
-        "is_phase_1": true,
-        "uses_tmpBM_NIY": false,
-        "is_dynasty_query": false,
-        "set_index_year_expr": null,
-        "where_short": "(((BIOG_MAIN_1.c_index_year) Is Null Or (BIOG_MAIN_1.c_index_year)=0) And ((KIN_DATA.c_kin_code)=62) And ((InStr(1,BIOG_MAIN.c_notes,'Index year algorithmically",
-        "joins_kin_data": true,
-        "joins_entry_data": false,
-        "kin_codes_used": [],
-        "sets_type_code": false
-      },
-      "php": {
-        "method": "sqlLoopGrandfatherPropagationRule",
-        "params": "",
-        "set_index_year_expr": "grandfather.c_index_year + 60",
-        "set_type_code_expr": "CONCAT(COALESCE(grandfather.c_index_year_type_code",
-        "set_source_id_expr": "grandfather.c_personid",
-        "uses_kin_data": true,
-        "uses_entry_data": false,
-        "kin_codes_used": [
-          62
-        ]
-      }
-    },
-    {
-      "access_name": null,
-      "php_method": "sqlRule29Or30",
-      "verdict": "missing_in_access",
-      "notes": "PHP gender-default-from-deathyear (c_deathyear - 56 for female, -63 for male, no death_age required).  Access Rule 02 DY is similar but writes c_deathyear with no offset.  These are not equivalent.",
-      "access": null,
-      "php": {
-        "method": "sqlRule29Or30",
-        "params": "bool $female",
-        "set_index_year_expr": "bm.c_deathyear - $offset",
-        "set_type_code_expr": "'$typeCode'",
-        "set_source_id_expr": null,
-        "uses_kin_data": false,
-        "uses_entry_data": false,
-        "kin_codes_used": []
-      }
-    },
-    {
-      "access_name": null,
-      "php_method": "sqlRule11",
-      "verdict": "missing_in_access",
-      "notes": "PHP child = father.c_birthyear + 30, kin_code=75.  Access has no obvious 'child from father birthyear' rule in the BM IY family — the analogous Rule 14 is in Phase C and uses father.c_index_year + 30.  Could be that Access intentionally relies on Phase C propagation to cover this; would benefit from confirmation.",
-      "access": null,
-      "php": {
-        "method": "sqlRule11",
-        "params": "",
-        "set_index_year_expr": "father.c_birthyear + 30",
-        "set_type_code_expr": "'11'",
-        "set_source_id_expr": "father.c_personid",
-        "uses_kin_data": true,
-        "uses_entry_data": false,
-        "kin_codes_used": [
-          75
-        ]
-      }
-    },
-    {
-      "access_name": null,
-      "php_method": "sqlAggregateRule15",
-      "verdict": "missing_in_access",
-      "notes": "PHP mother from oldest child birthyear (kin_code=111).  Access has Rule 15 Part 1 Father and Rule 18 ... Mother, but those are in Phase C using c_index_year not c_birthyear — so PHP's Phase B mother-from-child-birthyear path looks unmatched in Access.",
-      "access": null,
-      "php": {
-        "method": "sqlAggregateRule15",
-        "params": "",
-        "set_index_year_expr": "agg.base_value - 27",
-        "set_type_code_expr": "'15'",
-        "set_source_id_expr": "agg.source_personid",
-        "uses_kin_data": true,
-        "uses_entry_data": false,
-        "kin_codes_used": [
-          111
-        ]
-      }
-    },
-    {
-      "access_name": null,
-      "php_method": "sqlLoopHusbandPropagationRule",
-      "verdict": "needs_manual_review",
-      "notes": "PHP Phase C re-applies the wife-from-husband rule using husband.c_index_year+3 (after husbands have themselves been resolved by other rules).  Access' Rule 04W is in Phase A (birthyear+62) and we don't see an obvious Phase C husband-propagation step.  Could mean PHP smooths through more chains than Access; could also be that Access' driver VBA (which we haven't extracted yet) re-runs the Phase A rules in a loop and effectively covers it.  Confirming requires the frmBaseMaintenance VBA source.",
-      "access": null,
-      "php": {
+        "phase": "loop",
         "method": "sqlLoopHusbandPropagationRule",
-        "params": "bool $concubine",
-        "set_index_year_expr": "husband.c_index_year + 3",
-        "set_type_code_expr": "CONCAT(COALESCE(husband.c_index_year_type_code",
-        "set_source_id_expr": "husband.c_personid",
-        "uses_kin_data": true,
-        "uses_entry_data": false,
-        "kin_codes_used": [
-          134
-        ]
+        "args": "false",
+        "method_summary": {
+          "method": "sqlLoopHusbandPropagationRule",
+          "params": "bool $concubine",
+          "set_index_year_expr": "husband.c_index_year + 3",
+          "set_type_code_expr": "CONCAT(COALESCE(husband.c_index_year_type_code",
+          "set_source_id_expr": "husband.c_personid"
+        }
       }
+    },
+    {
+      "type_code": "05",
+      "verdict": "matched",
+      "rationale": "Both: c_index_year = ENTRY_DATA.c_year - 30 with ENTRY_CODE_TYPE_REL.c_entry_type='040101' join.",
+      "access_runtime": {
+        "access_label": "5",
+        "type_code": "05",
+        "set_expr": "[ENTRY_DATA].[c_year]-30,",
+        "sql_preview": "5\" ' Rule 5: Jinshi year (year - 30), entry ype = \"040101\" cmdSQL.CommandText = \"UPDATE ENTRY_CODE_TYPE_REL INNER JOIN (BIOG_MAIN INNER JOIN ENTRY_DATA ON BIOG_MAIN.c_personid = ENTRY_DATA.c_personid) ON ENTRY_CODE_TYPE_REL.c_entry_code = ENTRY_DATA.c_entry_code SET BIOG_MAIN.c_index_year = [ENTRY_DATA].[c_year]-30, BIOG_MAIN.c_index_year_type_code = '05' WHERE (((BIOG_MAIN.c_index_year) Is Null) AND ((ENTRY_DATA.c_year)>0) AND ((ENTRY_CODE_TYPE_REL.c_entry_type)='040101'))\" cmdSQL.Execute tRecProcessed tTotal = tTotal + tRecProcessed"
+      },
+      "php": {
+        "phase": "phase_a",
+        "method": "sqlEntryRule",
+        "args": "'040101', 30, '05'",
+        "method_summary": {
+          "method": "sqlEntryRule",
+          "params": "string $entryType, int $subtractYears, string $typeCode",
+          "set_index_year_expr": "entry_agg.entry_year - $subtractYears",
+          "set_type_code_expr": "'$typeCode'",
+          "set_source_id_expr": null
+        }
+      }
+    },
+    {
+      "type_code": "06",
+      "verdict": "matched",
+      "rationale": "Both: wife from husband entry c_year - 27 (entry type '040101').",
+      "access_runtime": {
+        "access_label": "5W",
+        "type_code": "06",
+        "set_expr": "[ENTRY_DATA].[c_year] -27,",
+        "sql_preview": "5W\" ' Rule 5W: Husband's Jinshi year (year - 30 + 3) cmdSQL.CommandText = \"UPDATE BIOG_MAIN AS WIFE_BIOG INNER JOIN ( ( ( ( BIOG_MAIN As husband_biog INNER JOIN ENTRY_DATA ON HUSBAND_BIOG.c_personid = ENTRY_DATA.c_personid ) INNER JOIN ENTRY_CODE_TYPE_REL ON ENTRY_DATA.c_entry_code = ENTRY_CODE_TYPE_REL.c_entry_code ) INNER JOIN KIN_DATA ON HUSBAND_BIOG.c_personid = KIN_DATA.c_personid ) INNER JOIN KIN_DATA AS KIN_DATA_1 ON HUSBAND_BIOG.c_personid = KIN_DATA_1.c_kin_id ) ON (WIFE_BIOG.c_personid = KIN_DATA.c_kin_id) AND (WIFE_BIOG.c_personid = KIN_DATA_1.c_personid) SET WIFE_BIOG.c_index_year ..."
+      },
+      "php": {
+        "phase": "phase_a",
+        "method": "sqlWifeFromEntryRule",
+        "args": "'040101', 27, '06'",
+        "method_summary": {
+          "method": "sqlWifeFromEntryRule",
+          "params": "string $entryType, int $subtractYears, string $typeCode",
+          "set_index_year_expr": "entry_agg.entry_year - $subtractYears",
+          "set_type_code_expr": "'$typeCode'",
+          "set_source_id_expr": "entry_agg.source_personid"
+        }
+      }
+    },
+    {
+      "type_code": "07",
+      "verdict": "matched",
+      "rationale": "Both: ENTRY_DATA.c_year - 27 (entry type '040102').",
+      "access_runtime": {
+        "access_label": "6",
+        "type_code": "07",
+        "set_expr": "[ENTRY_DATA].[c_year]-27,",
+        "sql_preview": "6\" ' Rule 6: Juren year (year - 27), entry type = \"040102\" cmdSQL.CommandText = \"UPDATE ENTRY_CODE_TYPE_REL INNER JOIN (BIOG_MAIN INNER JOIN ENTRY_DATA ON BIOG_MAIN.c_personid = ENTRY_DATA.c_personid) ON ENTRY_CODE_TYPE_REL.c_entry_code = ENTRY_DATA.c_entry_code SET BIOG_MAIN.c_index_year = [ENTRY_DATA].[c_year]-27, BIOG_MAIN.c_index_year_type_code = '07' WHERE (((BIOG_MAIN.c_index_year) Is Null) AND ((ENTRY_DATA.c_year)>0) AND ((ENTRY_CODE_TYPE_REL.c_entry_type)='040102'))\" cmdSQL.Execute tRecProcessed tTotal = tTotal + tRecProcessed"
+      },
+      "php": {
+        "phase": "phase_a",
+        "method": "sqlEntryRule",
+        "args": "'040102', 27, '07'",
+        "method_summary": {
+          "method": "sqlEntryRule",
+          "params": "string $entryType, int $subtractYears, string $typeCode",
+          "set_index_year_expr": "entry_agg.entry_year - $subtractYears",
+          "set_type_code_expr": "'$typeCode'",
+          "set_source_id_expr": null
+        }
+      }
+    },
+    {
+      "type_code": "08",
+      "verdict": "matched",
+      "rationale": "Both: wife from husband entry c_year - 24 (entry type '040102').",
+      "access_runtime": {
+        "access_label": "6W",
+        "type_code": "08",
+        "set_expr": "[ENTRY_DATA].[c_year] -24,",
+        "sql_preview": "6W\" ' Rule 6W: Husband's Juren year (year - 27 + 3) cmdSQL.CommandText = \"UPDATE BIOG_MAIN AS WIFE_BIOG INNER JOIN ( ( ( ( BIOG_MAIN As husband_biog INNER JOIN ENTRY_DATA ON HUSBAND_BIOG.c_personid = ENTRY_DATA.c_personid ) INNER JOIN ENTRY_CODE_TYPE_REL ON ENTRY_DATA.c_entry_code = ENTRY_CODE_TYPE_REL.c_entry_code ) INNER JOIN KIN_DATA ON HUSBAND_BIOG.c_personid = KIN_DATA.c_personid ) INNER JOIN KIN_DATA AS KIN_DATA_1 ON HUSBAND_BIOG.c_personid = KIN_DATA_1.c_kin_id ) ON (WIFE_BIOG.c_personid = KIN_DATA.c_kin_id) AND (WIFE_BIOG.c_personid = KIN_DATA_1.c_personid) SET WIFE_BIOG.c_index_year =..."
+      },
+      "php": {
+        "phase": "phase_a",
+        "method": "sqlWifeFromEntryRule",
+        "args": "'040102', 24, '08'",
+        "method_summary": {
+          "method": "sqlWifeFromEntryRule",
+          "params": "string $entryType, int $subtractYears, string $typeCode",
+          "set_index_year_expr": "entry_agg.entry_year - $subtractYears",
+          "set_type_code_expr": "'$typeCode'",
+          "set_source_id_expr": "entry_agg.source_personid"
+        }
+      }
+    },
+    {
+      "type_code": "09",
+      "verdict": "matched",
+      "rationale": "Both: ENTRY_DATA.c_year - 21 (entry type '040103').",
+      "access_runtime": {
+        "access_label": "7",
+        "type_code": "09",
+        "set_expr": "[ENTRY_DATA].[c_year]-21,",
+        "sql_preview": "7\" ' Rule 7: Xiucai year (year - 21) cmdSQL.CommandText = \"UPDATE ENTRY_CODE_TYPE_REL INNER JOIN (BIOG_MAIN INNER JOIN ENTRY_DATA ON BIOG_MAIN.c_personid = ENTRY_DATA.c_personid) ON ENTRY_CODE_TYPE_REL.c_entry_code = ENTRY_DATA.c_entry_code SET BIOG_MAIN.c_index_year = [ENTRY_DATA].[c_year]-21, BIOG_MAIN.c_index_year_type_code = '09' WHERE (((BIOG_MAIN.c_index_year) Is Null) AND ((ENTRY_DATA.c_year)>0) AND ((ENTRY_CODE_TYPE_REL.c_entry_type)='040103'))\" cmdSQL.Execute tRecProcessed tTotal = tTotal + tRecProcessed"
+      },
+      "php": {
+        "phase": "phase_a",
+        "method": "sqlEntryRule",
+        "args": "'040103', 21, '09'",
+        "method_summary": {
+          "method": "sqlEntryRule",
+          "params": "string $entryType, int $subtractYears, string $typeCode",
+          "set_index_year_expr": "entry_agg.entry_year - $subtractYears",
+          "set_type_code_expr": "'$typeCode'",
+          "set_source_id_expr": null
+        }
+      }
+    },
+    {
+      "type_code": "10",
+      "verdict": "matched",
+      "rationale": "Both: wife from husband entry c_year - 18 (entry type '040103').",
+      "access_runtime": {
+        "access_label": "7W",
+        "type_code": "10",
+        "set_expr": "[ENTRY_DATA].[c_year] - 18,",
+        "sql_preview": "7W\" ' Rule 7W: Husband's Xiucai year (year - 21 + 3) cmdSQL.CommandText = \"UPDATE BIOG_MAIN AS WIFE_BIOG INNER JOIN ( ( ( ( BIOG_MAIN As husband_biog INNER JOIN ENTRY_DATA ON HUSBAND_BIOG.c_personid = ENTRY_DATA.c_personid ) INNER JOIN ENTRY_CODE_TYPE_REL ON ENTRY_DATA.c_entry_code = ENTRY_CODE_TYPE_REL.c_entry_code ) INNER JOIN KIN_DATA ON HUSBAND_BIOG.c_personid = KIN_DATA.c_personid ) INNER JOIN KIN_DATA AS KIN_DATA_1 ON HUSBAND_BIOG.c_personid = KIN_DATA_1.c_kin_id ) ON (WIFE_BIOG.c_personid = KIN_DATA.c_kin_id) AND (WIFE_BIOG.c_personid = KIN_DATA_1.c_personid) SET WIFE_BIOG.c_index_year ..."
+      },
+      "php": {
+        "phase": "phase_a",
+        "method": "sqlWifeFromEntryRule",
+        "args": "'040103', 18, '10'",
+        "method_summary": {
+          "method": "sqlWifeFromEntryRule",
+          "params": "string $entryType, int $subtractYears, string $typeCode",
+          "set_index_year_expr": "entry_agg.entry_year - $subtractYears",
+          "set_type_code_expr": "'$typeCode'",
+          "set_source_id_expr": "entry_agg.source_personid"
+        }
+      }
+    },
+    {
+      "type_code": "11",
+      "verdict": "matched",
+      "rationale": "Both: child = father.c_birthyear + 30 (kin 75).",
+      "access_runtime": {
+        "access_label": "8",
+        "type_code": "11",
+        "set_expr": "[BIOG_MAIN].[c_birthyear]+ 30,",
+        "sql_preview": "8\" ' Rule 8: Father's birth year (year + 30) cmdSQL.CommandText = \"UPDATE BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_kin_id) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_personid SET BIOG_MAIN_1.c_index_year = [BIOG_MAIN].[c_birthyear]+ 30, BIOG_MAIN_1.c_index_year_type_code = '11', BIOG_MAIN_1.c_index_year_source_id = [BIOG_MAIN].[c_personid] WHERE (((BIOG_MAIN.c_birthyear)<> 0 OR (BIOG_MAIN.c_birthyear = 0 AND \" + strDynastyTest + \")) AND ((BIOG_MAIN_1.c_index_year) Is Null) AND ((KIN_DATA.c_kin_code)=75))\" cmdSQL.Execute tRecProcessed t..."
+      },
+      "php": {
+        "phase": "phase_a",
+        "method": "sqlRule11",
+        "args": "",
+        "method_summary": {
+          "method": "sqlRule11",
+          "params": "",
+          "set_index_year_expr": "father.c_birthyear + 30",
+          "set_type_code_expr": "'11'",
+          "set_source_id_expr": "father.c_personid"
+        }
+      }
+    },
+    {
+      "type_code": "12",
+      "verdict": "matched",
+      "rationale": "Phase C: child = father.c_index_year + 30.",
+      "access_runtime": {
+        "access_label": "Father",
+        "type_code": "12",
+        "set_expr": "[BIOG_MAIN].[c_index_year]+ 30,",
+        "sql_preview": "Father \" cmdSQL.CommandText = \"UPDATE BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_kin_id) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_personid SET BIOG_MAIN_1.c_index_year = [BIOG_MAIN].[c_index_year]+ 30, BIOG_MAIN_1.c_index_year_type_code = iif(BIOG_MAIN.c_index_year_type_code = '01','12',BIOG_MAIN.c_index_year_type_code + '12'), BIOG_MAIN_1.c_index_year_source_id = [BIOG_MAIN].[c_personid] WHERE (((BIOG_MAIN.c_index_year)>-400) AND ((BIOG_MAIN_1.c_index_year) Is Null) AND ((KIN_DATA.c_kin_code)=75))\" cmdSQL.Execute tRecProcessed tTotalN..."
+      },
+      "php": {
+        "phase": "loop",
+        "method": "sqlLoopFatherPropagationRule",
+        "args": "",
+        "method_summary": {
+          "method": "sqlLoopFatherPropagationRule",
+          "params": "",
+          "set_index_year_expr": "father.c_index_year + 30",
+          "set_type_code_expr": "CONCAT(COALESCE(father.c_index_year_type_code",
+          "set_source_id_expr": "father.c_personid"
+        }
+      }
+    },
+    {
+      "type_code": "13",
+      "verdict": "matched_minor_diff",
+      "rationale": "Both: father from MIN(child.c_birthyear) - 30 (kin 75).  Access uses a Phase-1 staging step + final UPDATE; PHP uses a single subquery aggregate.  Equivalent in the happy path; differ only on null / missing-row edges.",
+      "access_runtime": {
+        "access_label": "9",
+        "type_code": "13",
+        "set_expr": "[TMP_INDEX_YEAR].[c_index_year]-30,",
+        "sql_preview": "9\" ' Rule 9: Oldest Child's birth year (father) (year - 30) cmdSQL.CommandText = \"DELETE * FROM TMP_INDEX_YEAR\" cmdSQL.Execute tRecProcessed cmdSQL.CommandText = \"INSERT INTO TMP_INDEX_YEAR ( c_personid, c_index_year ) SELECT BIOG_MAIN_1.c_personid, Min(BIOG_MAIN.c_birthyear) AS MinOfc_birthyear FROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id WHERE ((BIOG_MAIN_1.c_index_year) Is Null ) And ((KIN_DATA.c_kin_code) = 75) And ((BIOG_MAIN.c_birthyear) <> 0 OR (BIOG_MAIN.c_birthyear =..."
+      },
+      "php": {
+        "phase": "phase_b",
+        "method": "sqlAggregateRule13",
+        "args": "",
+        "method_summary": {
+          "method": "sqlAggregateRule13",
+          "params": "",
+          "set_index_year_expr": "agg.base_value - 30",
+          "set_type_code_expr": "'13'",
+          "set_source_id_expr": "agg.source_personid"
+        }
+      }
+    },
+    {
+      "type_code": "14",
+      "verdict": "matched",
+      "rationale": "Phase C: father = MIN(child.c_index_year) - 30.",
+      "access_runtime": {
+        "access_label": "OldestChild-Father",
+        "type_code": "14",
+        "set_expr": "[TMP_INDEX_YEAR].[c_index_year]-30,",
+        "sql_preview": "OldestChild-Father \" cmdSQL.CommandText = \"DELETE * FROM TMP_INDEX_YEAR\" cmdSQL.Execute tRecProcessed cmdSQL.CommandText = \"INSERT INTO TMP_INDEX_YEAR ( c_personid, c_index_year ) SELECT BIOG_MAIN_1.c_personid, Min(BIOG_MAIN.c_index_year) AS MinOfc_index_year FROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id WHERE (((BIOG_MAIN_1.c_index_year) Is Null ) And ((KIN_DATA.c_kin_code) = 75) And ((BIOG_MAIN.c_index_year) > -400)) GROUP BY BIOG_MAIN_1.c_personid\" cmdSQL.Execute tRecProces..."
+      },
+      "php": {
+        "phase": "loop",
+        "method": "sqlLoopOldestChildIndexToFatherRule",
+        "args": "",
+        "method_summary": {
+          "method": "sqlLoopOldestChildIndexToFatherRule",
+          "params": "",
+          "set_index_year_expr": "agg.base_value - 30",
+          "set_type_code_expr": "'14'",
+          "set_source_id_expr": "agg.source_personid"
+        }
+      }
+    },
+    {
+      "type_code": "15",
+      "verdict": "matched_minor_diff",
+      "rationale": "Both: mother from MIN(child.c_birthyear) - 27 (kin 111).  Same staging vs subquery distinction as 13.",
+      "access_runtime": {
+        "access_label": "9W",
+        "type_code": "15",
+        "set_expr": "[TMP_INDEX_YEAR].[c_index_year]-27,",
+        "sql_preview": "9W\" ' Rule 9W: Oldest Child's birth year (mother) (year - 30 + 3) cmdSQL.CommandText = \"DELETE * FROM TMP_INDEX_YEAR\" cmdSQL.Execute tRecProcessed cmdSQL.CommandText = \"INSERT INTO TMP_INDEX_YEAR ( c_personid, c_index_year ) SELECT BIOG_MAIN_1.c_personid, Min(BIOG_MAIN.c_birthyear) AS MinOfc_birthyear FROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id WHERE ((BIOG_MAIN_1.c_index_year) Is Null ) And ((KIN_DATA.c_kin_code) = 111) And ((BIOG_MAIN.c_birthyear) <> 0 OR (BIOG_MAIN.c_birt..."
+      },
+      "php": {
+        "phase": "phase_b",
+        "method": "sqlAggregateRule15",
+        "args": "",
+        "method_summary": {
+          "method": "sqlAggregateRule15",
+          "params": "",
+          "set_index_year_expr": "agg.base_value - 27",
+          "set_type_code_expr": "'15'",
+          "set_source_id_expr": "agg.source_personid"
+        }
+      }
+    },
+    {
+      "type_code": "16",
+      "verdict": "matched",
+      "rationale": "Phase C: mother = MIN(child.c_index_year) - 27.",
+      "access_runtime": {
+        "access_label": "OldestChild-Mother",
+        "type_code": "16",
+        "set_expr": "[TMP_INDEX_YEAR].[c_index_year]-27,",
+        "sql_preview": "OldestChild-Mother \" cmdSQL.CommandText = \"DELETE * FROM TMP_INDEX_YEAR\" cmdSQL.Execute tRecProcessed cmdSQL.CommandText = \"INSERT INTO TMP_INDEX_YEAR ( c_personid, c_index_year ) SELECT BIOG_MAIN_1.c_personid, Min(BIOG_MAIN.c_index_year) AS MinOfc_index_year FROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id WHERE (((BIOG_MAIN_1.c_index_year) Is Null ) And ((KIN_DATA.c_kin_code) = 111) And ((BIOG_MAIN.c_birthyear) > -400)) GROUP BY BIOG_MAIN_1.c_personid\" cmdSQL.Execute tRecProces..."
+      },
+      "php": {
+        "phase": "loop",
+        "method": "sqlLoopOldestChildIndexToMotherRule",
+        "args": "",
+        "method_summary": {
+          "method": "sqlLoopOldestChildIndexToMotherRule",
+          "params": "",
+          "set_index_year_expr": "agg.base_value - 27",
+          "set_type_code_expr": "'16'",
+          "set_source_id_expr": "agg.source_personid"
+        }
+      }
+    },
+    {
+      "type_code": "17",
+      "verdict": "matched",
+      "rationale": "Both: wife (concubine) from husband.c_index_year + 3.  Concubine kin filter: PHP uses a 5-code set [168,163,344,467,585]; Access uses the broader kin filter through the reverse-kin clause — small set diff, low impact.",
+      "access_runtime": {
+        "access_label": "4W Concubine",
+        "type_code": "17",
+        "set_expr": "[BIOG_MAIN_1].[c_index_year] + 3,",
+        "sql_preview": "4W Concubine\" ' Now apply the rules for successor wives and concubines, AFTER 9W, which relies on their children's birth year ' Rule 4W: Husband's index year (i.e. birth year or death year - death age + 1) + 3 cmdSQL.CommandText = \"UPDATE ( BIOG_MAIN As BIOG_MAIN_1 INNER JOIN ( BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid ) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id) INNER JOIN KIN_DATA AS KIN_DATA_1 ON (BIOG_MAIN.c_personid = KIN_DATA_1.c_kin_id) AND (BIOG_MAIN_1.c_personid = KIN_DATA_1.c_personid) SET BIOG_MAIN.c_index_year_type_code = '17', BIOG_MAIN.c_inde..."
+      },
+      "php": {
+        "phase": "phase_b",
+        "method": "sqlRule03",
+        "args": "true",
+        "method_summary": {
+          "method": "sqlRule03",
+          "params": "bool $concubine",
+          "set_index_year_expr": "husband.c_index_year + 3",
+          "set_type_code_expr": "'$typeCode'",
+          "set_source_id_expr": "husband.c_personid"
+        }
+      }
+    },
+    {
+      "type_code": "18",
+      "verdict": "matched",
+      "rationale": "Phase C: husband (concubine variant).",
+      "access_runtime": {
+        "access_label": "Husband-Concubine-SuccessorWife",
+        "type_code": "18",
+        "set_expr": "[BIOG_MAIN_1].[c_index_year]+3,",
+        "sql_preview": "Husband-Concubine-SuccessorWife \" cmdSQL.CommandText = \"UPDATE (BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id) INNER JOIN KIN_DATA AS KIN_DATA_1 ON (BIOG_MAIN.c_personid = KIN_DATA_1.c_kin_id) AND (BIOG_MAIN_1.c_personid = KIN_DATA_1.c_personid) SET BIOG_MAIN.c_index_year_type_code = iif(BIOG_MAIN_1.c_index_year_type_code = '01','18',BIOG_MAIN_1.c_index_year_type_code + '18'), BIOG_MAIN.c_index_year = [BIOG_MAIN_1].[c_index_year]+3, BIOG_MAIN.c_index_year_source_id = [BIOG_MAIN_1]...."
+      },
+      "php": {
+        "phase": "loop",
+        "method": "sqlLoopHusbandPropagationRule",
+        "args": "true",
+        "method_summary": {
+          "method": "sqlLoopHusbandPropagationRule",
+          "params": "bool $concubine",
+          "set_index_year_expr": "husband.c_index_year + 3",
+          "set_type_code_expr": "CONCAT(COALESCE(husband.c_index_year_type_code",
+          "set_source_id_expr": "husband.c_personid"
+        }
+      }
+    },
+    {
+      "type_code": "19",
+      "verdict": "matched_minor_diff",
+      "rationale": "Both: older brother MAX(c_birthyear) + 2 with kin in {125, 165}.  Same comment as 13 on the staging vs subquery shape.",
+      "access_runtime": {
+        "access_label": "10",
+        "type_code": "19",
+        "set_expr": "[TMP_INDEX_YEAR].[c_index_year]+2,",
+        "sql_preview": "10\" ' Rule 10: Youngest older brother's birth year (year + 2) cmdSQL.CommandText = \"DELETE * FROM TMP_INDEX_YEAR\" cmdSQL.Execute tRecProcessed cmdSQL.CommandText = \"INSERT INTO TMP_INDEX_YEAR ( c_personid, c_index_year ) SELECT BIOG_MAIN.c_personid, Max(BIOG_MAIN_1.c_birthyear) AS MaxOfc_birthyear FROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id WHERE (((BIOG_MAIN.c_index_year) Is Null ) And ((KIN_DATA.c_kin_code) = 125 Or (KIN_DATA.c_kin_code) = 165) And ((BIOG_MAIN_1.c_birthyea..."
+      },
+      "php": {
+        "phase": "phase_b",
+        "method": "sqlAggregateSiblingRule",
+        "args": "[125, 165], 'MAX', 2, '19'",
+        "method_summary": {
+          "method": "sqlAggregateSiblingRule",
+          "params": "array $kinCodes, string $aggFn, int $delta, string $typeCode",
+          "set_index_year_expr": "{$this->offsetExpr('agg.base_value'",
+          "set_type_code_expr": "'$typeCode'",
+          "set_source_id_expr": "agg.source_personid"
+        }
+      }
+    },
+    {
+      "type_code": "20",
+      "verdict": "matched",
+      "rationale": "Phase C: older brother +2.",
+      "access_runtime": {
+        "access_label": "YoungestOldestBrother",
+        "type_code": "20",
+        "set_expr": "[TMP_INDEX_YEAR].[c_index_year]+2,",
+        "sql_preview": "YoungestOldestBrother \" cmdSQL.CommandText = \"DELETE * FROM TMP_INDEX_YEAR\" cmdSQL.Execute tRecProcessed cmdSQL.CommandText = \"INSERT INTO TMP_INDEX_YEAR ( c_personid, c_index_year ) SELECT BIOG_MAIN.c_personid, Max(BIOG_MAIN_1.c_index_year) AS MaxOfc_index_year FROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id WHERE (((BIOG_MAIN.c_index_year) Is Null ) And ((KIN_DATA.c_kin_code) = 125 Or (KIN_DATA.c_kin_code) = 165) And ((BIOG_MAIN_1.c_index_year) > -400)) GROUP BY BIOG_MAIN.c_pe..."
+      },
+      "php": {
+        "phase": "loop",
+        "method": "sqlLoopSiblingRule",
+        "args": "[125, 165], 'MAX', 2, '20'",
+        "method_summary": {
+          "method": "sqlLoopSiblingRule",
+          "params": "array $kinCodes, string $aggFn, int $delta, string $typeCode",
+          "set_index_year_expr": "{$this->offsetExpr('agg.base_value'",
+          "set_type_code_expr": "'$typeCode'",
+          "set_source_id_expr": "agg.source_personid"
+        }
+      }
+    },
+    {
+      "type_code": "21",
+      "verdict": "matched_minor_diff",
+      "rationale": "Both: younger brother MIN(c_birthyear) - 2 with kin in {126, 166}.",
+      "access_runtime": {
+        "access_label": "11",
+        "type_code": "21",
+        "set_expr": "[TMP_INDEX_YEAR].[c_index_year]-2,",
+        "sql_preview": "11\" ' Rule 11: Oldest younger brother's birth year (year - 2) cmdSQL.CommandText = \"DELETE * FROM TMP_INDEX_YEAR\" cmdSQL.Execute tRecProcessed cmdSQL.CommandText = \"INSERT INTO TMP_INDEX_YEAR ( c_personid, c_index_year ) SELECT BIOG_MAIN.c_personid, Min(BIOG_MAIN_1.c_birthyear) AS MinOfc_birthyear FROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id WHERE (((BIOG_MAIN.c_index_year) Is Null ) And ((KIN_DATA.c_kin_code) = 126 Or (KIN_DATA.c_kin_code) = 166) And ((BIOG_MAIN_1.c_birthyea..."
+      },
+      "php": {
+        "phase": "phase_b",
+        "method": "sqlAggregateSiblingRule",
+        "args": "[126, 166], 'MIN', -2, '21'",
+        "method_summary": {
+          "method": "sqlAggregateSiblingRule",
+          "params": "array $kinCodes, string $aggFn, int $delta, string $typeCode",
+          "set_index_year_expr": "{$this->offsetExpr('agg.base_value'",
+          "set_type_code_expr": "'$typeCode'",
+          "set_source_id_expr": "agg.source_personid"
+        }
+      }
+    },
+    {
+      "type_code": "22",
+      "verdict": "matched",
+      "rationale": "Phase C: younger brother -2.",
+      "access_runtime": {
+        "access_label": "OldestYoungerBrother",
+        "type_code": "22",
+        "set_expr": "[TMP_INDEX_YEAR].[c_index_year]-2,",
+        "sql_preview": "OldestYoungerBrother \" cmdSQL.CommandText = \"DELETE * FROM TMP_INDEX_YEAR\" cmdSQL.Execute tRecProcessed cmdSQL.CommandText = \"INSERT INTO TMP_INDEX_YEAR ( c_personid, c_index_year ) SELECT BIOG_MAIN.c_personid, Min(BIOG_MAIN_1.c_index_year) AS MinOfc_index_year FROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id WHERE (((BIOG_MAIN.c_index_year) Is Null ) And ((KIN_DATA.c_kin_code) = 126 Or (KIN_DATA.c_kin_code) = 166) And ((BIOG_MAIN_1.c_index_year) > -400)) GROUP BY BIOG_MAIN.c_per..."
+      },
+      "php": {
+        "phase": "loop",
+        "method": "sqlLoopSiblingRule",
+        "args": "[126, 166], 'MIN', -2, '22'",
+        "method_summary": {
+          "method": "sqlLoopSiblingRule",
+          "params": "array $kinCodes, string $aggFn, int $delta, string $typeCode",
+          "set_index_year_expr": "{$this->offsetExpr('agg.base_value'",
+          "set_type_code_expr": "'$typeCode'",
+          "set_source_id_expr": "agg.source_personid"
+        }
+      }
+    },
+    {
+      "type_code": "23",
+      "verdict": "matched_minor_diff",
+      "rationale": "Both: son-in-law male target -27 with kin in {181,201,224,332}.",
+      "access_runtime": {
+        "access_label": "12",
+        "type_code": "23",
+        "set_expr": "[TMP_INDEX_YEAR].[c_index_year]-27,",
+        "sql_preview": "12\" ' Rule 12: Oldest son-in-law's birthday (male) (year - 27) cmdSQL.CommandText = \"DELETE * FROM TMP_INDEX_YEAR\" cmdSQL.Execute tRecProcessed cmdSQL.CommandText = \"INSERT INTO TMP_INDEX_YEAR ( c_personid, c_index_year ) SELECT BIOG_MAIN.c_personid, Min(BIOG_MAIN_1.c_birthyear) AS MinOfc_birthyear FROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id WHERE (((BIOG_MAIN.c_index_year) Is Null ) And ((KIN_DATA.c_kin_code) = 181 Or (KIN_DATA.c_kin_code) = 201 Or (KIN_DATA.c_kin_code) = 2..."
+      },
+      "php": {
+        "phase": "phase_b",
+        "method": "sqlAggregateSonInLawRule",
+        "args": "false, 27, '23'",
+        "method_summary": {
+          "method": "sqlAggregateSonInLawRule",
+          "params": "bool $femaleTarget, int $subtractYears, string $typeCode",
+          "set_index_year_expr": "agg.base_value - $subtractYears",
+          "set_type_code_expr": "'$typeCode'",
+          "set_source_id_expr": "agg.source_personid"
+        }
+      }
+    },
+    {
+      "type_code": "24",
+      "verdict": "matched",
+      "rationale": "Phase C: son-in-law male -27.",
+      "access_runtime": {
+        "access_label": "OldestSonInLaw-male",
+        "type_code": "24",
+        "set_expr": "[TMP_INDEX_YEAR].[c_index_year]-27,",
+        "sql_preview": "OldestSonInLaw-male \" cmdSQL.CommandText = \"DELETE * FROM TMP_INDEX_YEAR\" cmdSQL.Execute tRecProcessed cmdSQL.CommandText = \"INSERT INTO TMP_INDEX_YEAR ( c_personid, c_index_year ) SELECT BIOG_MAIN.c_personid, Min(BIOG_MAIN_1.c_index_year) AS MinOfc_index_year FROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id WHERE (((BIOG_MAIN.c_index_year) Is Null ) And ((KIN_DATA.c_kin_code) = 181 Or (KIN_DATA.c_kin_code) = 201 Or (KIN_DATA.c_kin_code) = 224 Or (KIN_DATA.c_kin_code) = 332) And ..."
+      },
+      "php": {
+        "phase": "loop",
+        "method": "sqlLoopSonInLawRule",
+        "args": "false, 27, '24'",
+        "method_summary": {
+          "method": "sqlLoopSonInLawRule",
+          "params": "bool $femaleTarget, int $subtractYears, string $typeCode",
+          "set_index_year_expr": "agg.base_value - $subtractYears",
+          "set_type_code_expr": "'$typeCode'",
+          "set_source_id_expr": "agg.source_personid"
+        }
+      }
+    },
+    {
+      "type_code": "25",
+      "verdict": "matched_minor_diff",
+      "rationale": "Both: son-in-law female target -24.",
+      "access_runtime": {
+        "access_label": "12W",
+        "type_code": "25",
+        "set_expr": "[TMP_INDEX_YEAR].[c_index_year]-24,",
+        "sql_preview": "12W\" ' Rule 12W: Oldest son-in-law's birthday (female) (year - 27 + 3) cmdSQL.CommandText = \"DELETE * FROM TMP_INDEX_YEAR\" cmdSQL.Execute tRecProcessed cmdSQL.CommandText = \"INSERT INTO TMP_INDEX_YEAR ( c_personid, c_index_year ) SELECT BIOG_MAIN.c_personid, Min(BIOG_MAIN_1.c_birthyear) AS MinOfc_birthyear FROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id WHERE (((BIOG_MAIN.c_index_year) Is Null ) And ((KIN_DATA.c_kin_code) = 181 Or (KIN_DATA.c_kin_code) = 201 Or (KIN_DATA.c_kin_c..."
+      },
+      "php": {
+        "phase": "phase_b",
+        "method": "sqlAggregateSonInLawRule",
+        "args": "true, 24, '25'",
+        "method_summary": {
+          "method": "sqlAggregateSonInLawRule",
+          "params": "bool $femaleTarget, int $subtractYears, string $typeCode",
+          "set_index_year_expr": "agg.base_value - $subtractYears",
+          "set_type_code_expr": "'$typeCode'",
+          "set_source_id_expr": "agg.source_personid"
+        }
+      }
+    },
+    {
+      "type_code": "26",
+      "verdict": "matched",
+      "rationale": "Phase C: son-in-law female -24.",
+      "access_runtime": {
+        "access_label": "OldestSonInLaw-female",
+        "type_code": "26",
+        "set_expr": "[TMP_INDEX_YEAR].[c_index_year]-24,",
+        "sql_preview": "OldestSonInLaw-female \" cmdSQL.CommandText = \"DELETE * FROM TMP_INDEX_YEAR\" cmdSQL.Execute tRecProcessed cmdSQL.CommandText = \"INSERT INTO TMP_INDEX_YEAR ( c_personid, c_index_year ) SELECT BIOG_MAIN.c_personid, Min(BIOG_MAIN_1.c_index_year) AS MinOfc_index_year FROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id WHERE (((BIOG_MAIN.c_index_year) Is Null ) And ((KIN_DATA.c_kin_code) = 181 Or (KIN_DATA.c_kin_code) = 201 Or (KIN_DATA.c_kin_code) = 224 Or (KIN_DATA.c_kin_code) = 332) An..."
+      },
+      "php": {
+        "phase": "loop",
+        "method": "sqlLoopSonInLawRule",
+        "args": "true, 24, '26'",
+        "method_summary": {
+          "method": "sqlLoopSonInLawRule",
+          "params": "bool $femaleTarget, int $subtractYears, string $typeCode",
+          "set_index_year_expr": "agg.base_value - $subtractYears",
+          "set_type_code_expr": "'$typeCode'",
+          "set_source_id_expr": "agg.source_personid"
+        }
+      }
+    },
+    {
+      "type_code": "27",
+      "verdict": "matched",
+      "rationale": "Both: descendant from grandfather.c_birthyear + 60 (kin 62).",
+      "access_runtime": {
+        "access_label": "13",
+        "type_code": "27",
+        "set_expr": "[TMP_INDEX_YEAR].[c_index_year]+59,",
+        "sql_preview": "13\" ' Rule 13: Father's father's birth year (year + 59) ' The initial algorithm took a max of the birth years, and there are 4 people in the database who have 2 separate records for FF ' The max code approach has been commented out but can replace the direct version if necessary 'cmdSQL.CommandText = \"DELETE * FROM TMP_INDEX_YEAR\" 'cmdSQL.Execute tRecProcessed 'cmdSQL.CommandText = \"INSERT INTO TMP_INDEX_YEAR ( c_personid, c_index_year ) SELECT BIOG_MAIN_1.c_personid, Max(BIOG_MAIN.c_birthyear) AS MaxOfc_birthyear FROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_..."
+      },
+      "php": {
+        "phase": "phase_b",
+        "method": "sqlRule27",
+        "args": "",
+        "method_summary": {
+          "method": "sqlRule27",
+          "params": "",
+          "set_index_year_expr": "grandfather.c_birthyear + 60",
+          "set_type_code_expr": "'27'",
+          "set_source_id_expr": "grandfather.c_personid"
+        }
+      }
+    },
+    {
+      "type_code": "28",
+      "verdict": "matched",
+      "rationale": "Phase C: grandfather +60.",
+      "access_runtime": {
+        "access_label": "FatherOfFather",
+        "type_code": "28",
+        "set_expr": "[BIOG_MAIN].[c_index_year]+ 60,",
+        "sql_preview": "FatherOfFather \" ' The initial algorithm took a max of the birth years, and there are 4 people in the database who have 2 separate records for FF ' The max code approach has been commented out but can replace the direct version if necessary cmdSQL.CommandText = \"UPDATE BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_kin_id) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_personid SET BIOG_MAIN_1.c_index_year = [BIOG_MAIN].[c_index_year]+ 60, BIOG_MAIN_1.c_index_year_type_code = iif(BIOG_MAIN.c_index_year_type_code = '01','28',BIOG_MAIN.c_index_yea..."
+      },
+      "php": {
+        "phase": "loop",
+        "method": "sqlLoopGrandfatherPropagationRule",
+        "args": "",
+        "method_summary": {
+          "method": "sqlLoopGrandfatherPropagationRule",
+          "params": "",
+          "set_index_year_expr": "grandfather.c_index_year + 60",
+          "set_type_code_expr": "CONCAT(COALESCE(grandfather.c_index_year_type_code",
+          "set_source_id_expr": "grandfather.c_personid"
+        }
+      }
+    },
+    {
+      "type_code": "29",
+      "verdict": "matched_minor_diff",
+      "rationale": "Access: c_deathyear - 64 (male).  PHP: c_deathyear - 63.  Off by 1 year — likely intentional minor difference, but the closest thing in the comparison to a real divergence and worth maintainer confirmation.",
+      "access_runtime": {
+        "access_label": "3: Male's death year",
+        "type_code": "29",
+        "set_expr": "[BIOG_MAIN].[c_deathyear]-64,",
+        "sql_preview": "3: Male's death year\" ' Rule 20: Person's death year:\" 64 for men, 53 for women cmdSQL.CommandText = \"UPDATE BIOG_MAIN SET BIOG_MAIN.c_index_year = [BIOG_MAIN].[c_deathyear]-64, BIOG_MAIN.c_index_year_type_code = '29' WHERE (((BIOG_MAIN.c_index_year) Is Null) AND ((BIOG_MAIN.c_deathyear)<> 0 OR (BIOG_MAIN.c_deathyear = 0 AND \" + strDynastyTest + \")) AND ((BIOG_MAIN.c_female)=False));\" cmdSQL.Execute tRecProcessed tTotal = tTotal + tRecProcessed"
+      },
+      "php": {
+        "phase": "phase_a",
+        "method": "sqlRule29Or30",
+        "args": "false",
+        "method_summary": {
+          "method": "sqlRule29Or30",
+          "params": "bool $female",
+          "set_index_year_expr": "bm.c_deathyear - $offset",
+          "set_type_code_expr": "'$typeCode'",
+          "set_source_id_expr": null
+        }
+      }
+    },
+    {
+      "type_code": "30",
+      "verdict": "matched_minor_diff",
+      "rationale": "Access: c_deathyear - 53 (female).  PHP: c_deathyear - 56.  Off by 3 years — same minor-divergence note as Rule 29.",
+      "access_runtime": {
+        "access_label": "3W: Female's death year",
+        "type_code": "30",
+        "set_expr": "[BIOG_MAIN].[c_deathyear]-53,",
+        "sql_preview": "3W: Female's death year\" cmdSQL.CommandText = \"UPDATE BIOG_MAIN SET BIOG_MAIN.c_index_year = [BIOG_MAIN].[c_deathyear]-53, BIOG_MAIN.c_index_year_type_code = '30' WHERE (((BIOG_MAIN.c_index_year) Is Null) AND ((BIOG_MAIN.c_deathyear)<> 0 OR (BIOG_MAIN.c_deathyear = 0 AND \" + strDynastyTest + \")) AND ((BIOG_MAIN.c_female)=True));\" cmdSQL.Execute tRecProcessed tTotal = tTotal + tRecProcessed"
+      },
+      "php": {
+        "phase": "phase_a",
+        "method": "sqlRule29Or30",
+        "args": "true",
+        "method_summary": {
+          "method": "sqlRule29Or30",
+          "params": "bool $female",
+          "set_index_year_expr": "bm.c_deathyear - $offset",
+          "set_type_code_expr": "'$typeCode'",
+          "set_source_id_expr": null
+        }
+      }
+    },
+    {
+      "type_code": "31",
+      "verdict": "access_only",
+      "rationale": "Concubine variant of Rule 5W (wife jinshi -27).  PHP doesn't emit type_code 31 separately; the 17 wife-concubine path covers similar ground.",
+      "access_runtime": {
+        "access_label": "5W Concubine",
+        "type_code": "31",
+        "set_expr": "[ENTRY_DATA].[c_year] -27,",
+        "sql_preview": "5W Concubine\" ' Rule 5W: Husband's Jinshi year (year - 30 + 3) cmdSQL.CommandText = \"UPDATE BIOG_MAIN AS WIFE_BIOG INNER JOIN ( ( ( ( BIOG_MAIN As husband_biog INNER JOIN ENTRY_DATA ON HUSBAND_BIOG.c_personid = ENTRY_DATA.c_personid ) INNER JOIN ENTRY_CODE_TYPE_REL ON ENTRY_DATA.c_entry_code = ENTRY_CODE_TYPE_REL.c_entry_code ) INNER JOIN KIN_DATA ON HUSBAND_BIOG.c_personid = KIN_DATA.c_personid ) INNER JOIN KIN_DATA AS KIN_DATA_1 ON HUSBAND_BIOG.c_personid = KIN_DATA_1.c_kin_id ) ON (WIFE_BIOG.c_personid = KIN_DATA.c_kin_id) AND (WIFE_BIOG.c_personid = KIN_DATA_1.c_personid) SET WIFE_BIOG.c_i..."
+      },
+      "php": null
+    },
+    {
+      "type_code": "32",
+      "verdict": "access_only",
+      "rationale": "Concubine variant of Rule 6W (wife juren -24).",
+      "access_runtime": {
+        "access_label": "6W Concubine",
+        "type_code": "32",
+        "set_expr": "[ENTRY_DATA].[c_year] -24,",
+        "sql_preview": "6W Concubine\" ' Rule 6W: Husband's Juren year (year - 27 + 3) cmdSQL.CommandText = \"UPDATE BIOG_MAIN AS WIFE_BIOG INNER JOIN ( ( ( ( BIOG_MAIN As husband_biog INNER JOIN ENTRY_DATA ON HUSBAND_BIOG.c_personid = ENTRY_DATA.c_personid ) INNER JOIN ENTRY_CODE_TYPE_REL ON ENTRY_DATA.c_entry_code = ENTRY_CODE_TYPE_REL.c_entry_code ) INNER JOIN KIN_DATA ON HUSBAND_BIOG.c_personid = KIN_DATA.c_personid ) INNER JOIN KIN_DATA AS KIN_DATA_1 ON HUSBAND_BIOG.c_personid = KIN_DATA_1.c_kin_id ) ON (WIFE_BIOG.c_personid = KIN_DATA.c_kin_id) AND (WIFE_BIOG.c_personid = KIN_DATA_1.c_personid) SET WIFE_BIOG.c_in..."
+      },
+      "php": null
+    },
+    {
+      "type_code": "33",
+      "verdict": "access_only",
+      "rationale": "Concubine variant of Rule 7W (wife 040103 -18).",
+      "access_runtime": {
+        "access_label": "7W Concubine",
+        "type_code": "33",
+        "set_expr": "[ENTRY_DATA].[c_year] - 18,",
+        "sql_preview": "7W Concubine\" ' Rule 7W: Husband's Xiucai year (year - 21 + 3) cmdSQL.CommandText = \"UPDATE BIOG_MAIN AS WIFE_BIOG INNER JOIN ( ( ( ( BIOG_MAIN As husband_biog INNER JOIN ENTRY_DATA ON HUSBAND_BIOG.c_personid = ENTRY_DATA.c_personid ) INNER JOIN ENTRY_CODE_TYPE_REL ON ENTRY_DATA.c_entry_code = ENTRY_CODE_TYPE_REL.c_entry_code ) INNER JOIN KIN_DATA ON HUSBAND_BIOG.c_personid = KIN_DATA.c_personid ) INNER JOIN KIN_DATA AS KIN_DATA_1 ON HUSBAND_BIOG.c_personid = KIN_DATA_1.c_kin_id ) ON (WIFE_BIOG.c_personid = KIN_DATA.c_kin_id) AND (WIFE_BIOG.c_personid = KIN_DATA_1.c_personid) SET WIFE_BIOG.c_i..."
+      },
+      "php": null
     }
-  ],
-  "access_rules": [
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Dynasty_fix_IY_Query.sql",
-      "name": "BM IY Dynasty fix IY Query",
-      "is_phase_1": false,
-      "uses_tmpBM_NIY": true,
-      "is_dynasty_query": true,
-      "set_index_year_expr": null,
-      "where_short": "(((BIOG_MAIN.c_index_year)>0 And (BIOG_MAIN.c_index_year)<300) AND ((BIOG_MAIN.c_dy)>4 And (BIOG_MAIN.c_dy)<21));",
-      "joins_kin_data": false,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Dynasty_Fix_Query.sql",
-      "name": "BM IY Dynasty Fix Query",
-      "is_phase_1": false,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": true,
-      "set_index_year_expr": null,
-      "where_short": "(((Right([BIOG_MAIN].[c_notes],36))=\"Dynasty calculated from index year; \"));",
-      "joins_kin_data": false,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Dynasty_Query.sql",
-      "name": "BM IY Dynasty Query",
-      "is_phase_1": false,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": true,
-      "set_index_year_expr": null,
-      "where_short": "(((BIOG_MAIN.c_dy) Is Null Or (BIOG_MAIN.c_dy)=0) And ((BIOG_MAIN.c_index_year)>0 And (BIOG_MAIN.c_index_year)>=DYNASTIES.c_start And (BIOG_MAIN.c_index_year)<=",
-      "joins_kin_data": false,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_01A_DY_Phase_1_Query.sql",
-      "name": "BM IY Rule 01A DY Phase 1 Query",
-      "is_phase_1": true,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": null,
-      "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) And ((BIOG_MAIN.c_birthyear)>=BIOG_MAIN.c_deathyear-60) And ((BIOG_MAIN.c_deathyear)>0));",
-      "joins_kin_data": false,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_01A_DY_Query.sql",
-      "name": "BM IY Rule 01A DY Query",
-      "is_phase_1": false,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": "[BIOG_MAIN].[c_deathyear]",
-      "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) And ((BIOG_MAIN.c_birthyear)>=BIOG_MAIN.c_deathyear-60) And ((BIOG_MAIN.c_deathyear)>0));",
-      "joins_kin_data": false,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_01B_DY_Phase_1_Query.sql",
-      "name": "BM IY Rule 01B DY Phase 1 Query",
-      "is_phase_1": true,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": null,
-      "where_short": "(((BIOG_MAIN.c_birthyear)<=BIOG_MAIN.c_deathyear-59 And (BIOG_MAIN.c_birthyear)>0) And ((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) And ((BI",
-      "joins_kin_data": false,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_01B_DY_Query.sql",
-      "name": "BM IY Rule 01B DY Query",
-      "is_phase_1": false,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": "[BIOG_MAIN].[c_birthyear]+59",
-      "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) And ((BIOG_MAIN.c_birthyear)<=BIOG_MAIN.c_deathyear-59) And ((BIOG_MAIN.c_deathyear)>0));",
-      "joins_kin_data": false,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_02_DY_Phase_1_Query.sql",
-      "name": "BM IY Rule 02 DY Phase 1 Query",
-      "is_phase_1": true,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": null,
-      "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) AND ((BIOG_MAIN.c_birthyear) Is Null Or (BIOG_MAIN.c_birthyear)=0) AND ((BIOG_MAIN.c_deathyear",
-      "joins_kin_data": false,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_02_DY_Query.sql",
-      "name": "BM IY Rule 02 DY Query",
-      "is_phase_1": false,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": "[BIOG_MAIN].[c_deathyear]",
-      "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) AND ((BIOG_MAIN.c_birthyear) Is Null Or (BIOG_MAIN.c_birthyear)=0) AND ((BIOG_MAIN.c_deathyear",
-      "joins_kin_data": false,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_03_BY_Phase_1_Query.sql",
-      "name": "BM IY Rule 03 BY Phase 1 Query",
-      "is_phase_1": true,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": null,
-      "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) AND ((BIOG_MAIN.c_birthyear)>0) AND ((BIOG_MAIN.c_deathyear) Is Null Or (BIOG_MAIN.c_deathyear",
-      "joins_kin_data": false,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_03_BY_Query.sql",
-      "name": "BM IY Rule 03 BY Query",
-      "is_phase_1": false,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": "[BIOG_MAIN].[c_birthyear]+59",
-      "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) AND ((BIOG_MAIN.c_birthyear)>0) AND ((BIOG_MAIN.c_deathyear) Is Null Or (BIOG_MAIN.c_deathyear",
-      "joins_kin_data": false,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_04W_Phase_1_Query.sql",
-      "name": "BM IY Rule 04W Phase 1 Query",
-      "is_phase_1": true,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": null,
-      "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) AND ((KIN_DATA.c_kin_code)=134) AND ((BIOG_MAIN_1.c_birthyear)>0) AND ((KIN_DATA_1.c_kin_code)",
-      "joins_kin_data": true,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_04W_Query.sql",
-      "name": "BM IY Rule 04W Query",
-      "is_phase_1": false,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": "[BIOG_MAIN_1].[c_birthyear]+62",
-      "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) AND ((KIN_DATA.c_kin_code)=134) AND ((BIOG_MAIN_1.c_birthyear)>0) AND ((KIN_DATA_1.c_kin_code)",
-      "joins_kin_data": true,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_05_JS_Phase_1_Query.sql",
-      "name": "BM IY Rule 05 JS Phase 1 Query",
-      "is_phase_1": true,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": null,
-      "where_short": "(((ENTRY_DATA.c_year)>0) AND ((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) AND ((ENTRY_DATA.c_entry_code)=36 Or (ENTRY_DATA.c_entry_code)=165",
-      "joins_kin_data": false,
-      "joins_entry_data": true,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_05_JS_Query.sql",
-      "name": "BM IY Rule 05 JS Query",
-      "is_phase_1": false,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": "[ENTRY_DATA].[c_year]+30",
-      "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) AND ((ENTRY_DATA.c_entry_code)=36 Or (ENTRY_DATA.c_entry_code)=165) AND ((ENTRY_DATA.c_year)>0",
-      "joins_kin_data": false,
-      "joins_entry_data": true,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_05W_Husband_JS_Phase_1_Query.sql",
-      "name": "BM IY Rule 05W Husband JS Phase 1 Query",
-      "is_phase_1": true,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": null,
-      "where_short": "(((BIOG_MAIN_1.c_index_year) Is Null Or (BIOG_MAIN_1.c_index_year)=0) AND ((KIN_DATA.c_kin_code)=134) AND ((ENTRY_DATA.c_year)>0) AND ((ENTRY_DATA.c_entry_code)",
-      "joins_kin_data": true,
-      "joins_entry_data": true,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_05W_Husband_JS_Query.sql",
-      "name": "BM IY Rule 05W Husband JS Query",
-      "is_phase_1": false,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": "[ENTRY_DATA].[c_year]+33",
-      "where_short": "(((BIOG_MAIN_1.c_index_year) Is Null Or (BIOG_MAIN_1.c_index_year)=0) AND ((KIN_DATA.c_kin_code)=134) AND ((KIN_DATA_1.c_kin_code)<>168) AND ((ENTRY_DATA.c_year",
-      "joins_kin_data": true,
-      "joins_entry_data": true,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_06_JR_Phase_1_Query.sql",
-      "name": "BM IY Rule 06 JR Phase 1 Query",
-      "is_phase_1": true,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": "[ENTRY_DATA].[c_year]+33",
-      "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) AND ((ENTRY_DATA.c_entry_code)=39) AND ((ENTRY_DATA.c_year)>0));",
-      "joins_kin_data": false,
-      "joins_entry_data": true,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_06W_Husband_JR_Query.sql",
-      "name": "BM IY Rule 06W Husband JR Query",
-      "is_phase_1": false,
-      "uses_tmpBM_NIY": true,
-      "is_dynasty_query": false,
-      "set_index_year_expr": "[ENTRY_DATA].[c_year]+36",
-      "where_short": "(((tmpBM_NIY.c_index_year) Is Null Or (tmpBM_NIY.c_index_year)=0) AND ((KIN_DATA.c_kin_code)=134) AND ((KIN_DATA_1.c_kin_code)<>39 And (KIN_DATA_1.c_kin_code)<>",
-      "joins_kin_data": true,
-      "joins_entry_data": true,
-      "kin_codes_used": [],
-      "sets_type_code": true
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_07_XC_Query.sql",
-      "name": "BM IY Rule 07 XC Query",
-      "is_phase_1": false,
-      "uses_tmpBM_NIY": true,
-      "is_dynasty_query": false,
-      "set_index_year_expr": "[ENTRY_DATA].[c_year]+39",
-      "where_short": "(((tmpBM_NIY.c_index_year) Is Null Or (tmpBM_NIY.c_index_year)=0) AND ((ENTRY_DATA.c_entry_code)=257) AND ((ENTRY_DATA.c_year)>0));",
-      "joins_kin_data": false,
-      "joins_entry_data": true,
-      "kin_codes_used": [],
-      "sets_type_code": true
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_07W_Husband_XC_Query.sql",
-      "name": "BM IY Rule 07W Husband XC Query",
-      "is_phase_1": false,
-      "uses_tmpBM_NIY": true,
-      "is_dynasty_query": false,
-      "set_index_year_expr": "[ENTRY_DATA].[c_year]+42",
-      "where_short": "(((tmpBM_NIY.c_index_year) Is Null Or (tmpBM_NIY.c_index_year)=0) AND ((KIN_DATA.c_kin_code)=134) AND ((KIN_DATA_1.c_kin_code)<>39 And (KIN_DATA_1.c_kin_code)<>",
-      "joins_kin_data": true,
-      "joins_entry_data": true,
-      "kin_codes_used": [],
-      "sets_type_code": true
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_08_Father_BY_Phase_1_Query.sql",
-      "name": "BM IY Rule 08 Father BY Phase 1 Query",
-      "is_phase_1": true,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": null,
-      "where_short": "(((BIOG_MAIN_1.c_index_year) Is Null Or (BIOG_MAIN_1.c_index_year)=0) AND ((KIN_DATA.c_kin_code)=75) AND ((BIOG_MAIN.c_birthyear)>0));",
-      "joins_kin_data": true,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_08_Father_BY_Query.sql",
-      "name": "BM IY Rule 08 Father BY Query",
-      "is_phase_1": false,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": "[BIOG_MAIN].[c_birthyear]+89",
-      "where_short": "(((BIOG_MAIN_1.c_index_year) Is Null Or (BIOG_MAIN_1.c_index_year)=0) AND ((KIN_DATA.c_kin_code)=75) AND ((BIOG_MAIN.c_birthyear)>0) AND ((BIOG_MAIN.c_index_yea",
-      "joins_kin_data": true,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_09_Oldest_Child_BY_Father_Phase_1_Query.sql",
-      "name": "BM IY Rule 09 Oldest Child BY Father Phase 1 Query",
-      "is_phase_1": true,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": null,
-      "where_short": "(((BIOG_MAIN_1.c_index_year) Is Null Or (BIOG_MAIN_1.c_index_year)=0) AND ((KIN_DATA.c_kin_code)=75) AND ((BIOG_MAIN.c_birthyear)>0))",
-      "joins_kin_data": true,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_10_Older_Brother_BY_Phase_1_Query.sql",
-      "name": "BM IY Rule 10 Older Brother BY Phase 1 Query",
-      "is_phase_1": true,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": null,
-      "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) AND ((KIN_DATA.c_kin_code)=125 Or (KIN_DATA.c_kin_code)=165) AND ((BIOG_MAIN_1.c_birthyear)>0)",
-      "joins_kin_data": true,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_12_SIL_BY_Phase_1_Doublecheck_Query.sql",
-      "name": "BM IY Rule 12 SIL BY Phase 1 Doublecheck Query",
-      "is_phase_1": true,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": null,
-      "where_short": "(((BIOG_MAIN_1.c_birthyear)>0) AND ((KIN_DATA.c_kin_code)=181 Or (KIN_DATA.c_kin_code)=201 Or (KIN_DATA.c_kin_code)=224 Or (KIN_DATA.c_kin_code)=332));",
-      "joins_kin_data": true,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_12_SIL_BY_Phase_1_Query.sql",
-      "name": "BM IY Rule 12 SIL BY Phase 1 Query",
-      "is_phase_1": true,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": null,
-      "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) AND ((KIN_DATA.c_kin_code)=181 Or (KIN_DATA.c_kin_code)=201 Or (KIN_DATA.c_kin_code)=224 Or (K",
-      "joins_kin_data": true,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_13_Grandfather_BY_Phase_1_Query.sql",
-      "name": "BM IY Rule 13 Grandfather BY Phase 1 Query",
-      "is_phase_1": true,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": null,
-      "where_short": "(((BIOG_MAIN_1.c_index_year) Is Null Or (BIOG_MAIN_1.c_index_year)=0) AND ((KIN_DATA.c_kin_code)=62) AND ((BIOG_MAIN.c_birthyear)>0))",
-      "joins_kin_data": true,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_13_Grandfather_BY_Phase_2_Null_Query.sql",
-      "name": "BM IY Rule 13 Grandfather BY Phase 2 Null Query",
-      "is_phase_1": false,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": "[tmpIndexYear].[c_index_year]+119",
-      "where_short": "(((BIOG_MAIN.c_notes) Is Null));",
-      "joins_kin_data": false,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_13_Grandfather_BY_Phase_2_Query.sql",
-      "name": "BM IY Rule 13 Grandfather BY Phase 2 Query",
-      "is_phase_1": false,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": "[tmpIndexYear].[c_index_year]+119",
-      "where_short": "((Not (BIOG_MAIN.c_notes) Is Null));",
-      "joins_kin_data": false,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_14_Father_IY_Phase_1_Query.sql",
-      "name": "BM IY Rule 14 Father IY Phase 1 Query",
-      "is_phase_1": true,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": null,
-      "where_short": "(((BIOG_MAIN_1.c_index_year) Is Null Or (BIOG_MAIN_1.c_index_year)=0) And ((KIN_DATA.c_kin_code)=75) And (InStr(1,BIOG_MAIN.c_notes,\"Index year algorithmically\"",
-      "joins_kin_data": true,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_15_Part_1_Father_Phase_1_Query.sql",
-      "name": "BM IY Rule 15 Part 1 Father Phase 1 Query",
-      "is_phase_1": true,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": null,
-      "where_short": "(((BIOG_MAIN_1.c_index_year) Is Null Or (BIOG_MAIN_1.c_index_year)=0) And ((KIN_DATA.c_kin_code)=75) And ((InStr(1,BIOG_MAIN.c_notes,\"Index year algorithmically",
-      "joins_kin_data": true,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_16_Older_Brother_IY_Phase_1_Query.sql",
-      "name": "BM IY Rule 16 Older Brother IY Phase 1 Query",
-      "is_phase_1": true,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": null,
-      "where_short": "(((BIOG_MAIN_1.c_index_year) Is Null Or (BIOG_MAIN_1.c_index_year)=0) And ((KIN_DATA.c_kin_code)=125 Or (KIN_DATA.c_kin_code)=165) And ((InStr(1,BIOG_MAIN.c_not",
-      "joins_kin_data": true,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_17_Younger_Brother_IY_Phase_1_Query.sql",
-      "name": "BM IY Rule 17 Younger Brother IY Phase 1 Query",
-      "is_phase_1": true,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": null,
-      "where_short": "(((BIOG_MAIN_1.c_index_year) Is Null Or (BIOG_MAIN_1.c_index_year)=0) And ((KIN_DATA.c_kin_code)=126 Or (KIN_DATA.c_kin_code)=166) And ((InStr(1,BIOG_MAIN.c_not",
-      "joins_kin_data": true,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_18_SIL_IY_Mother_Phase_1_Query.sql",
-      "name": "BM IY Rule 18 SIL IY Mother Phase 1 Query",
-      "is_phase_1": true,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": null,
-      "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) And ((KIN_DATA.c_kin_code)=181 Or (KIN_DATA.c_kin_code)=201 Or (KIN_DATA.c_kin_code)=224 Or (K",
-      "joins_kin_data": true,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_18_SIL_IY_Phase_1_Query.sql",
-      "name": "BM IY Rule 18 SIL IY Phase 1 Query",
-      "is_phase_1": true,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": null,
-      "where_short": "(((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) And ((KIN_DATA.c_kin_code)=181 Or (KIN_DATA.c_kin_code)=201 Or (KIN_DATA.c_kin_code)=224 Or (K",
-      "joins_kin_data": true,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    },
-    {
-      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_19_Grandfather_IY_Phase_1_Query.sql",
-      "name": "BM IY Rule 19 Grandfather IY Phase 1 Query",
-      "is_phase_1": true,
-      "uses_tmpBM_NIY": false,
-      "is_dynasty_query": false,
-      "set_index_year_expr": null,
-      "where_short": "(((BIOG_MAIN_1.c_index_year) Is Null Or (BIOG_MAIN_1.c_index_year)=0) And ((KIN_DATA.c_kin_code)=62) And ((InStr(1,BIOG_MAIN.c_notes,'Index year algorithmically",
-      "joins_kin_data": true,
-      "joins_entry_data": false,
-      "kin_codes_used": [],
-      "sets_type_code": false
-    }
-  ],
-  "php_methods": {
-    "sqlRule01": {
-      "method": "sqlRule01",
-      "params": "",
-      "set_index_year_expr": "bm.c_birthyear",
-      "set_type_code_expr": "'01'",
-      "set_source_id_expr": null,
-      "uses_kin_data": false,
-      "uses_entry_data": false,
-      "kin_codes_used": []
-    },
-    "sqlRule02": {
-      "method": "sqlRule02",
-      "params": "",
-      "set_index_year_expr": "bm.c_deathyear - bm.c_death_age + 1",
-      "set_type_code_expr": "'02'",
-      "set_source_id_expr": null,
-      "uses_kin_data": false,
-      "uses_entry_data": false,
-      "kin_codes_used": []
-    },
-    "sqlRule03": {
-      "method": "sqlRule03",
-      "params": "bool $concubine",
-      "set_index_year_expr": "husband.c_index_year + 3",
-      "set_type_code_expr": "'$typeCode'",
-      "set_source_id_expr": "husband.c_personid",
-      "uses_kin_data": true,
-      "uses_entry_data": false,
-      "kin_codes_used": [
-        134
-      ]
-    },
-    "sqlRule29Or30": {
-      "method": "sqlRule29Or30",
-      "params": "bool $female",
-      "set_index_year_expr": "bm.c_deathyear - $offset",
-      "set_type_code_expr": "'$typeCode'",
-      "set_source_id_expr": null,
-      "uses_kin_data": false,
-      "uses_entry_data": false,
-      "kin_codes_used": []
-    },
-    "sqlEntryRule": {
-      "method": "sqlEntryRule",
-      "params": "string $entryType, int $subtractYears, string $typeCode",
-      "set_index_year_expr": "entry_agg.entry_year - $subtractYears",
-      "set_type_code_expr": "'$typeCode'",
-      "set_source_id_expr": null,
-      "uses_kin_data": false,
-      "uses_entry_data": true,
-      "kin_codes_used": []
-    },
-    "sqlWifeFromEntryRule": {
-      "method": "sqlWifeFromEntryRule",
-      "params": "string $entryType, int $subtractYears, string $typeCode",
-      "set_index_year_expr": "entry_agg.entry_year - $subtractYears",
-      "set_type_code_expr": "'$typeCode'",
-      "set_source_id_expr": "entry_agg.source_personid",
-      "uses_kin_data": true,
-      "uses_entry_data": true,
-      "kin_codes_used": [
-        134
-      ]
-    },
-    "sqlRule11": {
-      "method": "sqlRule11",
-      "params": "",
-      "set_index_year_expr": "father.c_birthyear + 30",
-      "set_type_code_expr": "'11'",
-      "set_source_id_expr": "father.c_personid",
-      "uses_kin_data": true,
-      "uses_entry_data": false,
-      "kin_codes_used": [
-        75
-      ]
-    },
-    "sqlAggregateRule13": {
-      "method": "sqlAggregateRule13",
-      "params": "",
-      "set_index_year_expr": "agg.base_value - 30",
-      "set_type_code_expr": "'13'",
-      "set_source_id_expr": "agg.source_personid",
-      "uses_kin_data": true,
-      "uses_entry_data": false,
-      "kin_codes_used": [
-        75
-      ]
-    },
-    "sqlAggregateRule15": {
-      "method": "sqlAggregateRule15",
-      "params": "",
-      "set_index_year_expr": "agg.base_value - 27",
-      "set_type_code_expr": "'15'",
-      "set_source_id_expr": "agg.source_personid",
-      "uses_kin_data": true,
-      "uses_entry_data": false,
-      "kin_codes_used": [
-        111
-      ]
-    },
-    "sqlAggregateSiblingRule": {
-      "method": "sqlAggregateSiblingRule",
-      "params": "array $kinCodes, string $aggFn, int $delta, string $typeCode",
-      "set_index_year_expr": "{$this->offsetExpr('agg.base_value'",
-      "set_type_code_expr": "'$typeCode'",
-      "set_source_id_expr": "agg.source_personid",
-      "uses_kin_data": true,
-      "uses_entry_data": false,
-      "kin_codes_used": []
-    },
-    "sqlAggregateSonInLawRule": {
-      "method": "sqlAggregateSonInLawRule",
-      "params": "bool $femaleTarget, int $subtractYears, string $typeCode",
-      "set_index_year_expr": "agg.base_value - $subtractYears",
-      "set_type_code_expr": "'$typeCode'",
-      "set_source_id_expr": "agg.source_personid",
-      "uses_kin_data": true,
-      "uses_entry_data": false,
-      "kin_codes_used": [
-        181,
-        201,
-        224,
-        332
-      ]
-    },
-    "sqlRule27": {
-      "method": "sqlRule27",
-      "params": "",
-      "set_index_year_expr": "grandfather.c_birthyear + 60",
-      "set_type_code_expr": "'27'",
-      "set_source_id_expr": "grandfather.c_personid",
-      "uses_kin_data": true,
-      "uses_entry_data": false,
-      "kin_codes_used": [
-        62
-      ]
-    },
-    "sqlLoopHusbandPropagationRule": {
-      "method": "sqlLoopHusbandPropagationRule",
-      "params": "bool $concubine",
-      "set_index_year_expr": "husband.c_index_year + 3",
-      "set_type_code_expr": "CONCAT(COALESCE(husband.c_index_year_type_code",
-      "set_source_id_expr": "husband.c_personid",
-      "uses_kin_data": true,
-      "uses_entry_data": false,
-      "kin_codes_used": [
-        134
-      ]
-    },
-    "sqlLoopFatherPropagationRule": {
-      "method": "sqlLoopFatherPropagationRule",
-      "params": "",
-      "set_index_year_expr": "father.c_index_year + 30",
-      "set_type_code_expr": "CONCAT(COALESCE(father.c_index_year_type_code",
-      "set_source_id_expr": "father.c_personid",
-      "uses_kin_data": true,
-      "uses_entry_data": false,
-      "kin_codes_used": [
-        75
-      ]
-    },
-    "sqlLoopOldestChildIndexToFatherRule": {
-      "method": "sqlLoopOldestChildIndexToFatherRule",
-      "params": "",
-      "set_index_year_expr": "agg.base_value - 30",
-      "set_type_code_expr": "'14'",
-      "set_source_id_expr": "agg.source_personid",
-      "uses_kin_data": true,
-      "uses_entry_data": false,
-      "kin_codes_used": [
-        75
-      ]
-    },
-    "sqlLoopOldestChildIndexToMotherRule": {
-      "method": "sqlLoopOldestChildIndexToMotherRule",
-      "params": "",
-      "set_index_year_expr": "agg.base_value - 27",
-      "set_type_code_expr": "'16'",
-      "set_source_id_expr": "agg.source_personid",
-      "uses_kin_data": true,
-      "uses_entry_data": false,
-      "kin_codes_used": [
-        111
-      ]
-    },
-    "sqlLoopSiblingRule": {
-      "method": "sqlLoopSiblingRule",
-      "params": "array $kinCodes, string $aggFn, int $delta, string $typeCode",
-      "set_index_year_expr": "{$this->offsetExpr('agg.base_value'",
-      "set_type_code_expr": "'$typeCode'",
-      "set_source_id_expr": "agg.source_personid",
-      "uses_kin_data": true,
-      "uses_entry_data": false,
-      "kin_codes_used": []
-    },
-    "sqlLoopSonInLawRule": {
-      "method": "sqlLoopSonInLawRule",
-      "params": "bool $femaleTarget, int $subtractYears, string $typeCode",
-      "set_index_year_expr": "agg.base_value - $subtractYears",
-      "set_type_code_expr": "'$typeCode'",
-      "set_source_id_expr": "agg.source_personid",
-      "uses_kin_data": true,
-      "uses_entry_data": false,
-      "kin_codes_used": [
-        181,
-        201,
-        224,
-        332
-      ]
-    },
-    "sqlLoopGrandfatherPropagationRule": {
-      "method": "sqlLoopGrandfatherPropagationRule",
-      "params": "",
-      "set_index_year_expr": "grandfather.c_index_year + 60",
-      "set_type_code_expr": "CONCAT(COALESCE(grandfather.c_index_year_type_code",
-      "set_source_id_expr": "grandfather.c_personid",
-      "uses_kin_data": true,
-      "uses_entry_data": false,
-      "kin_codes_used": [
-        62
-      ]
-    }
-  }
+  ]
 }

@@ -96,17 +96,20 @@ WHERE (((BIOG_MAIN.c_index_year) Is Null
         Or (BIOG_MAIN.c_deathyear)=0));
 ```
 
-The full set of dumped rules is the side-by-side reference for
-auditing PHP `IndexYearRebuildService.php` against the Access
-implementation.  PR I's first pass at that comparison is in
+The full set of dumped rules is **historical reference**, not the
+runtime truth: PR M discovered `CmdIndexYear_Click` calls
+`GetBirthIndexYearSQL` (inline VBA) and ignores these saved
+QueryDefs entirely.  PR N's corrected comparison is in
 [`analysis/index_year_rule_comparison.md`](index_year_rule_comparison.md)
-(structured copy:
-[`analysis/index_year_rule_comparison.json`](index_year_rule_comparison.json)).
-Headline: 8 candidate `logic_diff`s, 4 missing-on-one-side, 15
-needing manual review, 0 confirmed `matched` yet.  The most
-prominent single divergence is a **sign flip in entry-based
-rules** (Access uses `c_year + N`, PHP uses `c_year - N`).  None
-of these are confirmed bugs; the maintainer needs to look.
+(structured copy: `.json`), which pairs runtime VBA against PHP
+by emitted `c_index_year_type_code`.  Verdict counts: **22
+matched, 8 matched_minor_diff, 0 logic_diff**, 3 access-only
+(concubine wife variants 31/32/33).  PR I's earlier "+N vs -N
+sign-flip" flag was an artefact of comparing the wrong Access
+source; runtime Access uses `-N` like PHP.  Closest thing to a
+real divergence at the rule level: off-by-1 (Rule 29) /
+off-by-3 (Rule 30) on deathyear-default offsets.  None confirmed
+as bugs.
 
 ## Maintenance trigger path (added by PR M)
 
@@ -156,15 +159,13 @@ QueryDef shape, but **`CmdIndexYear_Click` does not call it**.  It
 appears to be older / vestigial code; not part of the live
 maintenance trigger path.
 
-**Implication for PR I.**  The "logic_diff" flags — especially the
-sign-flip on entry rules (Access `+N` vs PHP `-N`) — were
-comparing PHP against the wrong Access source.  The runtime
-Access path in `GetBirthIndexYearSQL` uses `-N` like PHP.  PR I's
-finding is partially invalidated; the real divergences (if any)
-need to be re-derived against `GetBirthIndexYearSQL`, not the
-BM IY QueryDefs.  PR I's JSON / markdown stay in repo as
-historical evidence + a methodological cautionary tale; the
-proper update is left to follow-up work.
+**Implication for PR I — superseded by PR N.** The "logic_diff"
+flags PR I emitted (especially the sign-flip on entry rules,
+Access `+N` vs PHP `-N`) were comparing PHP against the wrong
+Access source.  PR N's corrected comparator pairs runtime VBA
+against PHP and emits zero `logic_diff`.  Earlier wording in
+this document and in PR I's superseded JSON/MD has been replaced
+with the PR N-aligned framing above.
 
 ### `c_index_addr_id` trigger path
 
