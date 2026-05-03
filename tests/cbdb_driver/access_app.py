@@ -1,14 +1,18 @@
 """AccessApp — manages the Access COM application + ODBC connection."""
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
+import sys
 import time
+import warnings
 import winreg
 from pathlib import Path
 
 import pyodbc
 import win32com.client
+import win32process
 
 
 # Candidate paths for the modern DAO replacement (ACEDAO.DLL)
@@ -20,8 +24,61 @@ ACEDAO_CANDIDATES = [
 ]
 
 
+def _pid_for_access_app(app) -> int | None:
+    """Return the PID of an Access.Application COM object, or None.
+
+    Walks `app.hWndAccessApp` (the main window handle) through
+    win32process.GetWindowThreadProcessId.  Returns None if the app
+    object doesn't expose a usable HWND (e.g. early in startup, or
+    after Quit)."""
+    try:
+        hwnd = int(app.hWndAccessApp)
+    except Exception:
+        return None
+    if hwnd == 0:
+        return None
+    try:
+        _tid, pid = win32process.GetWindowThreadProcessId(hwnd)
+    except Exception:
+        return None
+    return int(pid) if pid else None
+
+
+def kill_access_pid(pid: int) -> bool:
+    """Force-kill exactly one MSACCESS.EXE PID.  Returns True if
+    `taskkill` reported success.  Safe to call on a PID that's
+    already gone — `taskkill` returns non-zero and we ignore that."""
+    if not pid:
+        return False
+    rc = subprocess.run(
+        ["taskkill", "/F", "/PID", str(int(pid))],
+        capture_output=True, check=False,
+    )
+    return rc.returncode == 0
+
+
 def kill_orphan_access():
-    """Kill any leftover MSACCESS.EXE — useful between sessions."""
+    """Force-kill ALL MSACCESS.EXE processes on the box.
+
+    DESTRUCTIVE: this also kills any Access database the developer is
+    editing manually.  As of 2026-05-03 this is gated behind the
+    `CBDB_KILL_ALL_ACCESS=1` environment variable so the test suite
+    can't trash unrelated work by accident.
+
+    The test suite proper uses `kill_access_pid()` against PIDs it
+    spawned itself; this function is only needed as a recovery escape
+    hatch when a previous session crashed and left orphan Access
+    processes that block the working-copy file."""
+    if os.environ.get("CBDB_KILL_ALL_ACCESS") != "1":
+        warnings.warn(
+            "kill_orphan_access(): suppressed — set "
+            "CBDB_KILL_ALL_ACCESS=1 to force-kill every MSACCESS.EXE "
+            "on the box (will also kill any Access DB you're editing "
+            "manually).  The test suite normally only kills PIDs it "
+            "spawned itself via kill_access_pid().",
+            stacklevel=2,
+        )
+        return
     subprocess.run(
         ["taskkill", "/F", "/IM", "MSACCESS.EXE"],
         capture_output=True, check=False,
@@ -64,10 +121,18 @@ def make_working_copy(src: str | Path, dest: str | Path) -> Path:
     if dest_p.exists():
         try:
             dest_p.unlink()
-        except PermissionError:
-            kill_orphan_access()
-            time.sleep(1)
-            dest_p.unlink()
+        except PermissionError as e:
+            # An Access process is holding the working copy.  Used to
+            # recover by `taskkill /F /IM MSACCESS.EXE` here, but that
+            # also kills any Access DB the developer is editing
+            # manually.  Ask explicitly instead.
+            raise PermissionError(
+                f"cannot remove stale working copy {dest_p}: {e}.  "
+                f"Likely a previous test run left an MSACCESS.EXE "
+                f"holding it open.  Either close Access manually, or "
+                f"set CBDB_KILL_ALL_ACCESS=1 and call "
+                f"kill_orphan_access() before retrying."
+            ) from e
     shutil.copy2(src_p, dest_p)
     return dest_p
 
@@ -82,6 +147,7 @@ class AccessApp:
         self._conn: pyodbc.Connection | None = None
         self._broken_refs_removed: list[str] = []
         self._dao_added: str | None = None
+        self._pid: int | None = None
 
     # ---------- lifecycle ----------
     def open(self) -> "AccessApp":
@@ -96,6 +162,10 @@ class AccessApp:
             pass
         self._app.Visible = not self.hidden
         self._app.OpenCurrentDatabase(str(self.mdb_path))
+        # Capture the PID now while the COM object is alive — after
+        # Quit/CloseCurrentDatabase the hWnd may already be gone, and
+        # we need the PID for a scoped taskkill in close().
+        self._pid = _pid_for_access_app(self._app)
         self._fix_vba_references()
         # ODBC for direct table I/O (much faster than DAO recordsets to df)
         cs = (
@@ -122,7 +192,11 @@ class AccessApp:
             except Exception:
                 pass
             self._app = None
-        kill_orphan_access()
+        # Scoped kill: only the MSACCESS.EXE we spawned, not every
+        # Access window the developer might have open.
+        if self._pid is not None:
+            kill_access_pid(self._pid)
+            self._pid = None
 
     def __enter__(self):
         return self.open()

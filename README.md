@@ -85,10 +85,10 @@ cbdb-user-mdb-tests/
 
 | Tool | Version | Notes |
 |------|---------|-------|
-| Windows | 10 / 11 | Access COM is Windows-only |
-| Microsoft Access | 2016+ (ACE engine) | Office 365 click-to-run works |
+| Windows | 10 / 11 | Access COM is Windows-only (the `--include-vba` suite); the fast suite collects on Linux too once `pip install -r requirements.txt` succeeds |
+| Microsoft Access | 2016+ (ACE engine) | Office 365 click-to-run works; only needed for `--include-vba` |
 | Python | 3.11+ | tested on 3.12 |
-| pyodbc, pywin32, pywinauto, pandas, pytest | latest | `pip install -r requirements.txt` |
+| Python deps | pinned in [`requirements.txt`](./requirements.txt) | `pip install -r requirements.txt` (covers driver: `pyodbc`, `pywin32`, `pywinauto`, `pandas`; tests: `pytest`, `pytest-json-report`; report generator: `python-docx`, `Pillow`, `opencc`) |
 | Microsoft Access Driver (`*.mdb, *.accdb`) | bundled with Office | required for ODBC access |
 
 ### Drop the MDB + HelpFiles into `data/`
@@ -215,9 +215,9 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 | LookAtOffice           | ✅ 2 fixtures | ✅ CmdGIS (struct) | ✅ Store | ✅ Offices + PlaceOffice + PlacePeople | ✅ Offices (3-col) | 37 429 + 35 748 rows |
 | LookAtPlace            | ✅ 2 fixtures | ✅ CmdGIS (struct, GISFrame→CodeFrame workaround) | ✅ Store | ✅ Places | — (no save button) | 5 962 + 3 528 rows |
 | LookAtKinship          | ✅ 1 fixture | ✅ CmdGIS (struct, requery shim) | ✅ Store + ✅ Recall | ✅ CmdImport | — (no save button) | 949 rows (Zhao Tingmei) |
-| LookAtAssociationPairs | ⏭ skipped | — | ✅ Recall | ✅ CmdImportList | — (no save button) | `Link1stOrder` ASSOC_DATA self-join too slow |
-| LookAtNetworks         | ⏭ skipped | — | ⏭ Recall (Form_Open hangs) | ⏭ ImportPeople / ImportPlaces (Form_Open) | — (no save button) | recursive expansion (Zhu Xi 2 471 assocs) |
-| LookAtGroupData        | ⏭ skipped | — | ✅ Recall | ✅ CmdImport | — (no save button) | similar recursion |
+| LookAtAssociationPairs | ✅ tiny fixture (`test_vba_matrix_hard_forms.py`, 4×5) | — | ✅ Recall | ✅ CmdImportList | — (no save button) | `Link1stOrder` ASSOC_DATA self-join too slow at full scale; tiny fixture covers CmdQuery happy-path |
+| LookAtNetworks         | ⏭ skipped (Form_Open hangs) | — | ⏭ Recall (Form_Open hangs) | ⏭ ImportPeople / ImportPlaces (Form_Open) | — (no save button) | recursive expansion (Zhu Xi 2 471 assocs); blocked by driver Form_Open issue, not fixture size |
+| LookAtGroupData        | ✅ tiny fixture (`test_vba_matrix_hard_forms.py`, c_person_id=1, 2 entries / 2 statuses) | — | ✅ Recall | ✅ CmdImport | — (no save button) | recursion; tiny fixture covers backfill on `ZZ_SCRATCH_IMPORT_PEOPLE` |
 
 **Latest matrix run**: `12 passed, 3 skipped in 110.22s`.
 **Latest Store/Recall run** (`tests/test_vba_storeid_recallid.py`): `11 passed, 1 skipped in 142.82s`.
@@ -361,7 +361,11 @@ CBDB 用戶端是給歷史學家用的 Windows-only Access 介面，每次資料
 ## 安裝
 
 1. Windows 10/11 + Microsoft Access 2016+ + Python 3.11+
-2. `pip install pyodbc pywin32 pywinauto pandas pytest`
+   （快速 suite 在 Linux/headless 也可跑；`--include-vba` 才需要 Office）
+2. `pip install -r requirements.txt`
+   （涵蓋 driver 套件 `pyodbc` / `pywin32` / `pywinauto` / `pandas`、
+   測試 `pytest` / `pytest-json-report`、報告生成 `python-docx` / `Pillow` / `opencc`；
+   版本範圍鎖定見 `requirements.txt`）
 3. 從 [CBDB 官網](https://projects.iq.harvard.edu/cbdb/download-cbdb)
    取得 `CBDB_BJ_User.mdb`、`CBDB_<日期>_DATA.mdb`、`HelpFiles/`，
    放在 `data/` 之下（此資料夾已 gitignored，不會上傳）。
@@ -397,12 +401,12 @@ python -m pytest tests/test_vba_export.py -v -W ignore --include-vba
 - ✅ 1 個真實匯出位元組對比（`LookAtEntry.CmdGIS`）
 - ✅ 12 維度資料完整性檢查
 - ✅ 已確認 19 個 issue（詳見 [`reports/CBDB_Issues_Report_ZH-Hant.md`](./reports/CBDB_Issues_Report_ZH-Hant.md)；P0 ×3 / P1 ×2 / P2 ×3 / P3 ×5 / P4 ×1 / P5 dormant·latent ×5）
-- ⏳ 剩 3 個表單因遞迴展開太慢暫跳過
-- ⏳ 其他匯出按鈕（Neo4j/KML/Pajek/GUESS/Gephi）尚未涵蓋
+- 🟡 剩 1 個表單（LookAtNetworks）因 Form_Open hang 暫跳過；其餘 2 個（LookAtAssociationPairs / LookAtGroupData）已用 tiny fixture 覆蓋（`test_vba_matrix_hard_forms.py`）— roadmap 第 7 項
+- 🟡 其他匯出按鈕大多已部分涵蓋：CmdGIS（6 個 form, `test_vba_cmdgis_other_forms.py`）、CmdGUESS（Kinship+Office, `test_vba_cmdguess_cross_form.py`）、CmdPajek/Gephi（`test_vba_pajek_gephi_cross_form.py`，5 過 / 2 Status skip）、CmdGISPeople（Office）、CmdNeo4j（3 過 / 4 skip — 還順手挖出 Bug #7/#8/#9）。CmdKML 與 CmdUCInet 仍只在 LookAtNetworks 那 3 個跳過的 form 上未測（依賴 roadmap 第 7 項解凍）— roadmap 第 8 項
 - ✅ pytest 啟動時自動偵測 `test_inputs.json` 是否過時並重跑 `discover_test_inputs.py`（`pytest --no-discover-inputs` 可關閉）— roadmap 第 9 項
 - ✅ 比對 User MDB 的 `index year` / `index address` 算法與 [`cbdb-online-main-server`](https://github.com/cbdb-project/cbdb-online-main-server) — roadmap 第 12 項已成。两边跑同一个算法（PHP `IndexYearRebuildService.php`）；少量 person 级差异是线上系统持续更新源数据 vs MDB 用某个时点的快照所致，**与维护者确认这不是 bug**。测试有阈值看门，算法层一旦真飘走会立刻报警。详见 AGENTS.md "NOT a bug" 段 + report 末尾 `c_index_year` / `c_index_addr_id` drift 附录
 - ✅ Import-list 按鈕（`tests/test_vba_import_lists.py`，11 種按鈕跨 8 個表單，15 passed + 2 skipped；只有 LookAtNetworks 兩項因 Form_Open 卡住而 skip）— roadmap 第 13 項
-- ⏳ Save-list 按鈕（`CmdSaveEntryCodes` / `CmdSaveOffices` 等）寫出清單檔的位元組級對比 — roadmap 第 14 項
+- ✅ Save-list 按鈕（`tests/test_vba_save_lists.py`，5 個 `CmdSave*_Click` 全部覆蓋；位元組級對比 + 對碼表 INNER JOIN 比對 desc/desc_chn）— roadmap 第 14 項
 - ✅ `CmdStoreID` / `CmdRecallID` 跨 form round-trip 測試（`tests/test_vba_storeid_recallid.py`，11 passed + 1 skipped；含 Entry → Kinship 完整 round-trip）— roadmap 第 15 項
 
 ## 貢獻

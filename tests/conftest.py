@@ -16,16 +16,17 @@ import shutil
 import tempfile
 from pathlib import Path
 
-import pyodbc
 import pytest
 
 # Make tests/ importable
 TESTS_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(TESTS_DIR))
 
-from cbdb_replay.driver import open_connection, working_copy
-from cbdb_driver import AccessApp, VbaInjector, FormDriver
-from cbdb_driver.access_app import make_working_copy, kill_orphan_access
+# IMPORTANT: do NOT import pyodbc / cbdb_driver / win32com / pywinauto
+# at module top-level.  The fast suite (no `--include-vba`) must collect
+# cleanly on Linux / headless / fresh machines that don't have Office or
+# pywin32 installed.  Each fixture below imports its dependencies
+# locally — that way pytest collection only needs `pytest` itself.
 
 ROOT = TESTS_DIR.parent
 USER_MDB = ROOT / "data" / "CBDB_BJ_User.mdb"
@@ -53,28 +54,26 @@ def pytest_addoption(parser):
     )
 
 
-def pytest_collection_modifyitems(config, items):
-    """Skip Access-COM-dependent tests by default.
+def _is_access_com_test_file(name: str) -> bool:
+    return name.startswith("test_vba_") or name == "test_infra_smoke.py"
+
+
+def pytest_ignore_collect(collection_path, config):
+    """Skip *importing* Access-COM-dependent test files by default.
 
     Every test file that uses `cbdb_driver.vba_session.VbaSession` /
-    win32com / pywinauto must spawn an Access process and is slow,
-    Windows-only, and prone to environment errors (orphan MSACCESS
-    processes, RPC unavailable, ROT collisions).
+    win32com / pywinauto imports those Windows-only modules at top
+    level.  Just adding a skip marker (the previous approach) doesn't
+    help — pytest still imports the file during collection, which
+    fails on Linux / headless / fresh machines that lack pywin32.
 
-    The fast (non-Access) suite is what CI / quick-check runs want;
-    pass `--include-vba` to opt in to the COM suite.
+    Skipping the file at collect-time is the only way to keep
+    `pytest tests/ -W ignore` green on a non-Windows box.  Pass
+    `--include-vba` to opt back in.
     """
     if config.getoption("--include-vba"):
-        return
-    skip_access = pytest.mark.skip(
-        reason="needs Access COM — run with `--include-vba` to enable"
-    )
-    for item in items:
-        path = str(item.fspath).replace("\\", "/")
-        # Files that drive Access via COM:
-        if ("/test_vba_" in path
-                or path.endswith("/test_infra_smoke.py")):
-            item.add_marker(skip_access)
+        return False
+    return _is_access_com_test_file(collection_path.name)
 
 
 @pytest.fixture(scope="session")
@@ -135,8 +134,9 @@ def pytest_configure(config):
 
 
 @pytest.fixture(scope="session")
-def ro_conn(user_mdb_path) -> pyodbc.Connection:
+def ro_conn(user_mdb_path):
     """Read-only connection to the production user-mdb."""
+    from cbdb_replay.driver import open_connection
     conn = open_connection(user_mdb_path, readonly=True)
     yield conn
     conn.close()
@@ -163,12 +163,25 @@ def com_app(user_mdb_path):
     Access is opened VISIBLE because pywinauto-based clicks need the
     form's window to receive focus.  This fixture is session-scoped so
     one Access process serves all tests."""
-    kill_orphan_access()
+    # Lazy imports — only the COM-driven test fixtures pull in pywin32
+    # and pyodbc, so the fast suite stays collectable on machines
+    # without Office or even Windows.
+    import pyodbc as _pyodbc
+    from cbdb_driver import AccessApp, VbaInjector
+    from cbdb_driver.access_app import make_working_copy
+
+    # Used to call `kill_orphan_access()` here unconditionally, which
+    # also killed any Access DB the developer was editing manually.
+    # Each AccessApp now does a scoped per-PID kill in close(), so a
+    # clean shutdown leaves nothing to clean up.  If a previous run
+    # crashed and left orphan MSACCESS.EXE processes blocking the
+    # working copy, run `CBDB_KILL_ALL_ACCESS=1 python -c "from
+    # cbdb_driver.access_app import kill_orphan_access; kill_orphan_access()"`
+    # once, then re-run the suite.
     work = make_working_copy(user_mdb_path, WORK_MDB)
     # Pre-patch LinkListInit BEFORE Access opens, otherwise
     # NAVIGATION_PANE.Form_Open hangs trying to relink to a non-existent
     # CBDB_<ver>_DATA.mdb at our working path.
-    import pyodbc as _pyodbc
     _conn = _pyodbc.connect(
         "DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};"
         f"DBQ={work};", autocommit=True
@@ -202,7 +215,8 @@ def com_app(user_mdb_path):
 
 
 @pytest.fixture(scope="session")
-def driver(com_app) -> FormDriver:
+def driver(com_app):
+    from cbdb_driver import FormDriver
     drv = FormDriver(com_app)
     yield drv
     drv.close_all()
