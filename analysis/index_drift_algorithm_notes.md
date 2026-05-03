@@ -108,15 +108,141 @@ prominent single divergence is a **sign flip in entry-based
 rules** (Access uses `c_year + N`, PHP uses `c_year - N`).  None
 of these are confirmed bugs; the maintainer needs to look.
 
-What's still missing:
+## Maintenance trigger path (added by PR M)
 
-  - The *driver* code that runs the rules in order (a VBA Sub on
-    `frmBaseMaintenance`?).  We can see the UPDATE rules but not
-    the loop that fires them.  Extracting the form/module source
-    needs interactive Access (`SaveAsText`), which we haven't
-    automated yet.
-  - The `frmBaseMaintenance` UI itself — same story; we have its
-    name but not its design.
+PR M extracted `frmBaseMaintenance` and the four DATA-mdb modules
+via `Access.Application.SaveAsText` into
+`analysis/dump_data/vba/`.  What we found rewrites part of PR I's
+analysis — the actual runtime maintenance path is **not** the 37
+saved `BM IY Rule` QueryDefs we extracted in PR H.
+
+### `c_index_year` trigger path
+
+  Maintenance button: `frmBaseMaintenance.CmdIndexYear`
+  Click handler:      `CmdIndexYear_Click`  (line 2794)
+                          ↓ Call
+                      `GetBirthIndexYearSQL` (line 3529)
+
+`GetBirthIndexYearSQL` is **inline VBA** that issues a chain of
+`UPDATE BIOG_MAIN ...` statements directly via ADODB — it does
+NOT call any of the saved `BM IY Rule` QueryDefs.  Its rules
+read very close to the PHP `IndexYearRebuildService.php`:
+
+  Rule 1   : c_index_year = c_birthyear (raw birthyear, no offset)
+             — matches PHP `sqlRule01`, NOT BM IY Rule 03 BY
+               (which adds +59).
+  Rule 2   : c_index_year = c_deathyear - c_death_age + 1
+             — matches PHP `sqlRule02` exactly.
+  Rule 3   : c_deathyear - 64 (male) / c_deathyear - 53 (female)
+             — close to PHP `sqlRule29Or30` (-63 / -56),
+               offsets differ by 1.
+  Rule 4W  : wife = husband.c_index_year + 3 (kin 134 + reverse
+             kin in {135, 138})
+             — matches PHP `sqlRule03` formula; reverse-kin
+               filter is more permissive than PHP's
+               concubine-exclusion list.
+  Rule 5   : entry c_year - 30 with ENTRY_CODE_TYPE_REL.
+             c_entry_type='040101'
+             — matches PHP `sqlEntryRule('040101', 30, '05')`,
+               INCLUDING the - sign.
+  Rule 5W  : wife from husband entry c_year - 27 + same join
+             — matches PHP `sqlWifeFromEntryRule(...)`.
+  ... (37+ more rules in the same style, see lines 3529-end)
+
+There's also a separate `GetIndexYearSQL` (line 2851) that uses a
+`tmpIndexYear` staging table and additive-offset rules
+(`c_birthyear+59`, etc.) — that one matches the BM IY Rule
+QueryDef shape, but **`CmdIndexYear_Click` does not call it**.  It
+appears to be older / vestigial code; not part of the live
+maintenance trigger path.
+
+**Implication for PR I.**  The "logic_diff" flags — especially the
+sign-flip on entry rules (Access `+N` vs PHP `-N`) — were
+comparing PHP against the wrong Access source.  The runtime
+Access path in `GetBirthIndexYearSQL` uses `-N` like PHP.  PR I's
+finding is partially invalidated; the real divergences (if any)
+need to be re-derived against `GetBirthIndexYearSQL`, not the
+BM IY QueryDefs.  PR I's JSON / markdown stay in repo as
+historical evidence + a methodological cautionary tale; the
+proper update is left to follow-up work.
+
+### `c_index_addr_id` trigger path
+
+  Maintenance button: `frmBaseMaintenance.CmdIndexAddress`
+  Click handler:      `CmdIndexAddress_Click`  (line 2748)
+
+This handler:
+
+  1. Reads `BIOG_ADDR_CODES` ordered by
+     `c_index_addr_default_rank` (NOT `c_index_addr_rank`) — same
+     priority field PHP `IndexAddressRebuildService.php` uses.
+  2. UPDATE BIOG_MAIN SET c_index_addr_id = NULL (clears all).
+  3. Loops `ti = 1 .. tStop` over the priority list; for each
+     addr_type, runs:
+
+         UPDATE BIOG_ADDR_CODES INNER JOIN
+                (BIOG_MAIN INNER JOIN
+                 (ADDR_CODES INNER JOIN BIOG_ADDR_DATA ON ...) ON ...)
+                ON BIOG_ADDR_CODES.c_addr_type = BIOG_ADDR_DATA.c_addr_type
+         SET BIOG_MAIN.c_index_addr_id = ADDR_CODES.c_addr_id,
+             BIOG_MAIN.c_index_addr_type_code = BIOG_ADDR_DATA.c_addr_type
+         WHERE BIOG_MAIN.c_index_addr_id Is Null
+           AND BIOG_ADDR_DATA.c_addr_type = <ti>
+
+Three differences from the PR L recompute / PHP:
+
+  - **No explicit `MAX(c_sequence)` tie-break.**  When a person has
+    multiple BIOG_ADDR_DATA rows of the same addr_type, this
+    UPDATE picks whichever JET-internal ordering surfaces first.
+    PHP and the front-end `Form_frmIndexAddr.vb` both pre-collapse
+    to MAX(c_sequence).  The DATA-mdb maintenance VBA does not.
+  - **Uses `c_index_addr_default_rank` (matches PHP)**, NOT
+    `c_index_addr_rank` (which `Form_frmIndexAddr.vb` in the
+    front-end uses).
+  - **Reset clause** explicitly clears all c_index_addr_id values
+    before re-populating (PHP and the front-end VBA also do this).
+
+**Implication for PR L.**  The `mdb_stale_index_addr` × 412
+finding stands, but with a sharper attribution: the User MDB's
+stale values come either from "maintenance never re-run" OR from
+"maintenance ran, but JET ordering picked a different row than
+MAX(c_sequence) would have".  Either way the **release-process
+fix is the same**: re-run `frmBaseMaintenance.CmdIndexAddress`
+before publishing the User MDB.  But maintainers should also be
+aware that the current Access maintenance code does NOT use
+`MAX(c_sequence)`, so a re-run may pick a different (still
+arbitrary) row than PHP would.  This is a **candidate
+algorithmic divergence** between the maintenance code and the
+PHP service.
+
+### Front-end vs DATA-mdb confusion table
+
+  Path                                              | Reads from
+  --------------------------------------------------+-----------
+  Front-end `Form_frmIndexAddr.vb` (User MDB)       | `c_index_addr_rank`
+  DATA-mdb `frmBaseMaintenance.CmdIndexAddress`     | `c_index_addr_default_rank`
+  PHP `IndexAddressRebuildService.php`              | `c_index_addr_default_rank`
+
+The shipped 2026-04-30 dump has `c_index_addr_rank ==
+c_index_addr_default_rank` for all 22 addr_types (verified by PR L
+preflight), so this distinction doesn't currently produce
+differences.  But if a curator ever uses the front-end
+`frmIndexAddr` form's UI buttons to re-rank addr types, the two
+columns would diverge — and only the front-end VBA would respect
+the new ranking.  That's a latent bug surface worth knowing about.
+
+### Release-process implications
+
+Because the DATA mdb's `frmBaseMaintenance.CmdIndexYear` /
+`CmdIndexAddress` are *manual* maintenance buttons (no scheduler,
+no AutoExec trigger), the stale-index buckets PR L surfaced
+(`mdb_stale_index_addr` × 412) are best understood as a **release-
+process risk**: nothing automatically re-runs the rebuild before a
+User MDB is published.  The PHP side avoids this by re-running on
+its weekly export cadence.  Recommended (candidate, not
+prescribed): add a release-checklist step that runs
+`CmdIndexYear` and `CmdIndexAddress` on the DATA mdb before
+shipping a new User MDB version.
 
 ### cbdb-online-main-server (PHP)
 
