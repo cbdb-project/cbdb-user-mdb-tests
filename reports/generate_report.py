@@ -1079,6 +1079,194 @@ def _numbered(document, items: list[str]) -> None:
         document.add_paragraph(item, style="List Number")
 
 
+DRIFT_JSON = REPO / "reports" / "index_drift_examples.json"
+
+
+def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
+    """Render the 'index_year / index_addr drift, NOT a bug' chapter
+    using the examples collected by collect_index_year_diffs.py."""
+    import json as _json
+    if not DRIFT_JSON.exists():
+        return
+    data = _json.loads(DRIFT_JSON.read_text(encoding="utf-8"))
+
+    title = (
+        "Appendix — `c_index_year` / `c_index_addr_id` drift "
+        "vs the cbdb-online-main-server snapshot (not bugs)"
+        if is_en else
+        "附录 —— `c_index_year` / `c_index_addr_id` 与 "
+        "cbdb-online-main-server 快照之间的偏差（非缺陷）"
+    )
+    _h(doc, 1, Z(title))
+
+    intro = (
+        "When we compare BIOG_MAIN's `c_index_year` and `c_index_addr_id` "
+        "between this User MDB and the weekly cbdb-online-main-server "
+        "SQLite snapshot, a small fraction of persons disagree. We want "
+        "to be very clear that these are NOT regressions — both pipelines "
+        "run the same `IndexYearRebuildService.php` algorithm, but on "
+        "different snapshots of source data and with different downstream "
+        "decisions. We list a handful of representative examples below "
+        "with the underlying field values so you can see exactly what "
+        "kind of drift this is.\n\n"
+        "Why we still document this: when the SAME person disagrees in "
+        "the same way across many releases, it tells us nothing new; "
+        "but if the SHAPE of disagreement changes (e.g. addresses start "
+        "diverging where only years used to), that hints the algorithm "
+        "or schema shifted, and we'd want to look at it."
+        if is_en else
+        "我们把本 .mdb 的 BIOG_MAIN 与 cbdb-online-main-server 每周发布的 "
+        "SQLite 快照在 `c_index_year`、`c_index_addr_id` 两个字段上做比对，"
+        "可以看到一小部分人物对不齐。我们希望明确说明：这并不是缺陷 —— "
+        "两套管线跑的都是同一段 `IndexYearRebuildService.php` 算法，只是依据"
+        "的源数据快照不一样，下游某些择优规则也略有出入。下面列举若干典型"
+        "样例，并展示底层字段值，方便您一眼看出这是哪种偏差。\n\n"
+        "我们仍然把它放进报告，是因为：如果同一个人物在多次发布里都按同样"
+        "方式对不齐，那不增加任何信息；但若偏差的「类型」发生变化（例如"
+        "原本只是年份不同，现在地点也开始不同），那说明算法或 schema 有过"
+        "变动，值得我们关注。"
+    )
+    for para in intro.split("\n\n"):
+        doc.add_paragraph(Z(para))
+
+    # ---- Per bucket ----
+    bucket_meta = {
+        "year_only": {
+            "title_en": "Examples where only c_index_year disagrees",
+            "title_zh": "仅 `c_index_year` 不一致的样例",
+            "explain_en": (
+                "Same person, same source data, but the two pipelines "
+                "picked different priority rules. The User MDB's "
+                "`c_index_year_type_code` and `c_index_year_source_id` "
+                "differ from the snapshot's, which means each pipeline "
+                "selected a different upstream evidence row when "
+                "deciding 'which year is most representative for this "
+                "person'."
+            ),
+            "explain_zh": (
+                "同一个人物、同一份源数据，但两套管线选了不同的优先级规则。"
+                "User MDB 的 `c_index_year_type_code` 和 "
+                "`c_index_year_source_id` 与快照不同，意味着两边在「为这个"
+                "人物选一个最能代表生平的年份」时，挑中了不同的上游证据行。"
+            ),
+        },
+        "addr_only": {
+            "title_en": "Examples where only c_index_addr_id disagrees",
+            "title_zh": "仅 `c_index_addr_id` 不一致的样例",
+            "explain_en": (
+                "Year agrees, address doesn't. Most commonly the User "
+                "MDB still has an older `c_index_addr_id` choice while "
+                "the snapshot has been re-classified to a finer-grained "
+                "or higher-quality address (or to NULL when the "
+                "evidence was downgraded). The two pipelines apply the "
+                "same address-priority rules but to different snapshots "
+                "of `BIOG_ADDR_DATA`."
+            ),
+            "explain_zh": (
+                "年份对得上，但地点对不上。最常见的情况是：User MDB 仍保留"
+                "较早一次的 `c_index_addr_id` 选择，而快照已经重新分类到"
+                "更细粒度或证据等级更高的地点（或在证据被下调时改为 NULL）。"
+                "两套管线用的是同一套地点优先级规则，只是依据的 "
+                "`BIOG_ADDR_DATA` 快照不同。"
+            ),
+        },
+        "both": {
+            "title_en": "Examples where both fields disagree",
+            "title_zh": "两个字段都不一致的样例",
+            "explain_en": (
+                "Both year and address moved together — usually because "
+                "the snapshot got new high-priority biographical "
+                "evidence (a newly-entered birth year or a more "
+                "specific address from a different source text)."
+            ),
+            "explain_zh": (
+                "年份和地点同时变动 —— 通常是因为快照在某个高优先级的传记"
+                "证据行上有新增（例如新录入的生年，或来自其他原始文献的更"
+                "精确地点）。"
+            ),
+        },
+        "source_data": {
+            "title_en": (
+                "Examples where the SOURCE data itself differs "
+                "(birthyear / deathyear)"
+            ),
+            "title_zh": (
+                "底层 SOURCE 数据本身不同（生年 / 卒年）的样例"
+            ),
+            "explain_en": (
+                "Here the SQLite snapshot has different `c_birthyear` / "
+                "`c_deathyear` from the User MDB. This is the clearest "
+                "case of pure data drift: someone updated the source "
+                "row in the cbdb-online-main-server pipeline after the "
+                "User MDB was last exported. There's no algorithmic "
+                "disagreement here — just two different snapshots in "
+                "time."
+            ),
+            "explain_zh": (
+                "在这一组里，SQLite 快照的 `c_birthyear` / `c_deathyear` "
+                "本身就和 User MDB 不一样。这是最纯粹的数据快照差异：在 "
+                "User MDB 最近一次导出之后，有人在 "
+                "cbdb-online-main-server 那边更新了源数据行。这里完全没有"
+                "算法分歧 —— 只是两个时间点的两份快照。"
+            ),
+        },
+    }
+
+    for bucket_key, meta in bucket_meta.items():
+        items = data.get(bucket_key, [])
+        if not items:
+            continue
+        _h(doc, 2, Z(meta["title_en"] if is_en else meta["title_zh"]))
+        for para in (meta["explain_en"] if is_en
+                     else meta["explain_zh"]).split("\n\n"):
+            doc.add_paragraph(Z(para))
+
+        # Render each example as a small table.
+        for ex in items[:5]:
+            u = ex["user"]; s = ex["sqlite"]
+            label = f"c_personid = {ex['personid']} — {ex['name_chn']} ({ex['name_py']})"
+            _h(doc, 3, Z(label))
+            tbl = doc.add_table(rows=1, cols=3)
+            tbl.style = "Light Grid Accent 1"
+            hdr = tbl.rows[0].cells
+            hdr[0].text = Z("Field" if is_en else "字段")
+            hdr[1].text = Z("User MDB" if is_en else "本 .mdb (User MDB)")
+            hdr[2].text = Z(
+                "cbdb-online-main-server snapshot"
+                if is_en else
+                "cbdb-online-main-server 快照"
+            )
+            for f_label, key in [
+                ("c_index_year", "index_year"),
+                ("c_index_addr_id", "index_addr_id"),
+                ("c_birthyear", "birthyear"),
+                ("c_deathyear", "deathyear"),
+                ("c_index_year_type_code", "index_year_type_code"),
+                ("c_index_year_source_id", "index_year_source_id"),
+            ]:
+                row = tbl.add_row().cells
+                row[0].text = f_label
+                row[1].text = "" if u[key] is None else str(u[key])
+                row[2].text = "" if s[key] is None else str(s[key])
+            doc.add_paragraph("")  # spacer
+
+    note = (
+        "These examples were collected by "
+        "`reports/collect_index_year_diffs.py` from the first 20 000 "
+        "person ids common to both databases. The full automated "
+        "cross-check (`tests/test_index_year_xcheck.py`, ~657 246 "
+        "persons) reports roughly the same shape: very small "
+        "fractions disagree, with addresses being the most common "
+        "drift type."
+        if is_en else
+        "这批样例是 `reports/collect_index_year_diffs.py` 在两边数据库共有"
+        "的前 20000 个 personid 中采集的。完整的自动化对照（"
+        "`tests/test_index_year_xcheck.py`，约 657246 人）给出相同的形态："
+        "对不齐的比例非常小，其中地点偏差占多数。"
+    )
+    doc.add_paragraph(Z(note))
+
+
 def _build(lang: str, out_path: Path) -> None:
     is_en = (lang == "en")
 
@@ -1222,6 +1410,10 @@ def _build(lang: str, out_path: Path) -> None:
             for para in (it["fix_en"] if is_en
                          else it["fix_zh"]).split("\n\n"):
                 doc.add_paragraph(Z(para))
+
+    # ---- Appendix: index_year / index_addr drift (NOT a bug) ----
+    doc.add_page_break()
+    _add_index_drift_appendix(doc, is_en, Z)
 
     # ---- Closing ----
     doc.add_page_break()
