@@ -1163,6 +1163,7 @@ def _numbered(document, items: list[str]) -> None:
 
 DRIFT_JSON = REPO / "reports" / "index_drift_examples.json"
 DEMO_PERSONS_JSON = REPO / "reports" / "demo_persons.json"
+KNOWN_BUGS_STATUS_JSON = REPO / "reports" / "known_bugs_status.json"
 
 
 def _load_demo_persons() -> dict:
@@ -1170,6 +1171,87 @@ def _load_demo_persons() -> dict:
     if DEMO_PERSONS_JSON.exists():
         return _json.loads(DEMO_PERSONS_JSON.read_text(encoding="utf-8"))
     return {}
+
+
+def _load_bug_test_status() -> dict[int, dict]:
+    """Map bug-id → {outcome: 'passed'|'failed'|'mixed', tests: [...],
+    when: <iso>}.
+
+    Reads `reports/known_bugs_status.json` produced by
+    `pytest tests/test_known_bugs.py --json-report
+    --json-report-file=reports/known_bugs_status.json`.
+
+    Convention:
+      - test name `test_bug<N>_*` → bug N
+      - test name `test_bugs_<lo>_to_<hi>_*` → bugs lo..hi inclusive
+      - test name `test_bug_view_statusdata_fy_alias_swap` /
+        `test_bug_view_statusdata_fy_value_equals_ly_value` → bug 1
+      - test name `test_bug_dao_reference_broken_in_user_mdb` → bug 2
+
+    SAFETY: this function only INFORMS the report; it never causes the
+    generator to drop or move content.  The intent is "show the
+    maintainer that test results agree with the issue" — not to
+    auto-edit the report.
+    """
+    import json as _json, re as _re
+    if not KNOWN_BUGS_STATUS_JSON.exists():
+        return {}
+    data = _json.loads(
+        KNOWN_BUGS_STATUS_JSON.read_text(encoding="utf-8")
+    )
+    raw_when = data.get("created") or data.get("environment", {}).get(
+        "created"
+    ) or ""
+    when = ""
+    if raw_when:
+        try:
+            from datetime import datetime, timezone
+            ts = float(raw_when)
+            when = (datetime.fromtimestamp(ts, tz=timezone.utc)
+                    .strftime("%Y-%m-%d %H:%M UTC"))
+        except (TypeError, ValueError):
+            when = str(raw_when)
+
+    by_bug: dict[int, list[tuple[str, str]]] = {}
+
+    def _record(bug_id: int, nodeid: str, outcome: str) -> None:
+        by_bug.setdefault(bug_id, []).append((nodeid, outcome))
+
+    for t in data.get("tests", []):
+        nodeid = t.get("nodeid", "")
+        outcome = t.get("outcome", "")
+        # Strip everything before "::" so we just have the test name.
+        name = nodeid.rsplit("::", 1)[-1]
+
+        # Cluster: test_bugs_<lo>_to_<hi>_...
+        m = _re.match(r"^test_bugs_(\d+)_to_(\d+)_", name)
+        if m:
+            lo, hi = int(m.group(1)), int(m.group(2))
+            for n in range(lo, hi + 1):
+                _record(n, nodeid, outcome)
+            continue
+        # Individual: test_bug<N>_...
+        m = _re.match(r"^test_bug(\d+)_", name)
+        if m:
+            _record(int(m.group(1)), nodeid, outcome)
+            continue
+        # Special hand-mapped cases (the no-number bug names).
+        if "view_statusdata" in name:
+            _record(1, nodeid, outcome)
+        elif "dao_reference" in name:
+            _record(2, nodeid, outcome)
+
+    out: dict[int, dict] = {}
+    for bug_id, items in by_bug.items():
+        outcomes = {o for _, o in items}
+        if outcomes == {"passed"}:
+            agg = "passed"
+        elif outcomes == {"failed"}:
+            agg = "failed"
+        else:
+            agg = "mixed"
+        out[bug_id] = {"outcome": agg, "tests": items, "when": when}
+    return out
 
 
 def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
@@ -1456,6 +1538,7 @@ def _build(lang: str, out_path: Path) -> None:
         "P4_setup": "P4 — 安装设置",
     }
     demo_persons = _load_demo_persons()
+    bug_status = _load_bug_test_status()
 
     for tier in tier_order:
         items = by_tier.get(tier, [])
@@ -1471,6 +1554,72 @@ def _build(lang: str, out_path: Path) -> None:
             _h(doc, 3, Z("Severity" if is_en else "严重等级"))
             doc.add_paragraph(Z(it["severity_en"] if is_en
                                   else it["severity_zh"]))
+            # ---- Auto-derived test status banner (informational) ----
+            # If a known-bug test exists for this issue and reports
+            # 'failed', that's a hint the bug may have been fixed
+            # upstream — but we never act on it automatically.  We
+            # display a clearly-marked banner asking the maintainer to
+            # confirm in person; the issue's full description / steps
+            # / fix recommendation stay rendered as-is so nothing is
+            # lost if the test gave a false-positive.
+            status = bug_status.get(it["id"])
+            if status:
+                outcome = status["outcome"]
+                if outcome == "failed":
+                    banner = (
+                        "⚠ Automated test status: the regression marker "
+                        "for this issue currently FAILS (run on "
+                        f"{status.get('when', 'unknown date')}), which "
+                        "usually means the underlying defect has been "
+                        "FIXED in the source dump.  Please verify in "
+                        "person before considering this issue closed; "
+                        "this report has NOT been edited to drop the "
+                        "issue.  Tests consulted:\n"
+                        + "\n".join(
+                            f"  • {t.rsplit('::', 1)[-1]}"
+                            for t, _ in status["tests"]
+                        )
+                        if is_en else
+                        "⚠ 自動測試狀態：本 issue 對應的回歸標記目前 "
+                        f"FAIL（執行時間：{status.get('when', '未知')}），"
+                        "通常意味著底層缺陷已在 source dump 中被修復。"
+                        "請務必親自確認，再將此 issue 視為關閉；本報告"
+                        "並未自動刪除任何 issue。對照的測試：\n"
+                        + "\n".join(
+                            f"  • {t.rsplit('::', 1)[-1]}"
+                            for t, _ in status["tests"]
+                        )
+                    )
+                    p = doc.add_paragraph()
+                    run = p.add_run(Z(banner))
+                    run.bold = True
+                elif outcome == "mixed":
+                    banner = (
+                        "ℹ Automated test status: this issue's "
+                        "regression markers report MIXED outcomes "
+                        f"(run {status.get('when', 'unknown date')}). "
+                        "Likely the issue is partially fixed; please "
+                        "review the per-test breakdown:\n"
+                        + "\n".join(
+                            f"  • {t.rsplit('::', 1)[-1]}: {o}"
+                            for t, o in status["tests"]
+                        )
+                        if is_en else
+                        "ℹ 自動測試狀態：本 issue 對應的回歸標記呈現"
+                        f"混合結果（執行時間：{status.get('when', '未知')}）。"
+                        "可能是部分修復，請查看分項：\n"
+                        + "\n".join(
+                            f"  • {t.rsplit('::', 1)[-1]}: {o}"
+                            for t, o in status["tests"]
+                        )
+                    )
+                    p = doc.add_paragraph()
+                    run = p.add_run(Z(banner))
+                    run.italic = True
+                # outcome == "passed" → bug confirmed present; no
+                # banner (it's the default expectation; banner-spam is
+                # noise).
+
             _h(doc, 3, Z("Description" if is_en else "问题描述"))
             for para in (it["summary_en"] if is_en
                          else it["summary_zh"]).split("\n\n"):

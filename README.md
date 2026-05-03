@@ -153,7 +153,24 @@ python analysis/run_all_audits.py       # human-readable audit sweep
                                          # — 21 static audits, ~6-7s
 python -m pytest tests/ -W ignore       # fast suite (no Access)
 python -m pytest tests/ -W ignore --include-vba   # full suite
+
+# To regenerate the bilingual Word bug-report (`reports/*.docx`)
+# AFTER a new dump — captures fresh demo personid hints, known-bug
+# statuses, and Word-doc per-issue 'Bug appears FIXED' banners
+# wherever a regression marker has flipped:
+python -m pytest tests/test_known_bugs.py -W ignore --no-discover-inputs \
+    --json-report --json-report-file=reports/known_bugs_status.json
+python reports/probe_demo_persons.py    # refresh concrete demo personids
+python reports/collect_index_year_diffs.py  # refresh drift appendix
+python reports/capture_screenshots.py   # refresh real-Access screenshots
+python reports/generate_report.py       # rebuild EN + ZH-Hant docx
 ```
+
+The Word doc generator NEVER deletes issues automatically — when a
+regression marker fails (= bug appears fixed), the corresponding
+issue gets a "⚠ please verify in person" banner prepended, but its
+description / steps / fix recommendation stay intact so nothing is
+lost if the test gave a false positive.
 
 `run_all_audits.py` prints a FLAGGED / CLEAN summary.  As of the
 shipped dump (2026-05-02): 6 of 21 audits flag known bugs (#1-#19);
