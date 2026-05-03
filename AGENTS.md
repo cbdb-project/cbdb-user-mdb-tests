@@ -567,7 +567,20 @@ The 412 `mdb_stale_index_addr` is **not** a bug in either
 algorithm — it's a maintenance-cadence diff (the User MDB needs
 its `frmBaseMaintenance` rebuild re-run before the next release).
 The 10 `same_candidates_diff_winner` rows are the only candidate
-algorithm-divergence rows and worth a closer look.
+algorithm-divergence rows.
+
+PR S deep-dived those 10 (`analysis/deep_dive_addr_same_candidates.py`
+→ `reports/index_addr_same_candidates_deep_dive.json`).
+**10 / 10 have MAX(c_sequence) ties** — multiple BIOG_ADDR_DATA
+rows of the winning addr_type all sharing the same c_sequence.
+PHP, Access maintenance, and the PR L recompute each pick a
+different row depending on the underlying engine's storage order.
+Both implementations follow the same documented rule (rank-
+priority + MAX c_sequence); neither is "wrong"; the result is
+just non-deterministic when ties occur.  Candidate mitigation:
+add an explicit secondary tie-break (e.g. MIN(c_addr_id)) to both
+sides.  Treated as `candidate_release_process_or_algorithm_
+improvement`, not a confirmed bug.
 
 Verified separately that BIOG_ADDR_CODES (the rank table) is
 **identical** between the two sides for all 22 addr_types, so the
