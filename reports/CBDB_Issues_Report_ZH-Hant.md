@@ -72,9 +72,11 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
 
 ![bug7_step1_annotated.png](screenshots/bug7_step1_annotated.png)
 
+_Step 1 — open LookAtPlace, run any query, click **Neo4j**.  The CmdNeo4j button is in the bottom export-button row; reachability verified against `analysis/dump/control_inventory.json` (LookAtPlace has a `CmdNeo4j` control with the `CmdNeo4j_Click` event bound — re-checked 2026-05-03)._
+
 ![bug7_step2_faux_popup.png](screenshots/bug7_step2_faux_popup.png)
 
-_The popup users see (re-rendered for the report; the real popup blocks the COM thread our test driver runs in)._
+_Step 2 — the popup users see.  Reconstructed in PIL because the real popup would block the COM test driver; the error code (DAO 3265 'Item not found in this collection') and message text come from JET's documented behaviour for a recordset field that isn't in the underlying SELECT._
 
 #### 建議修復方案
 
@@ -480,13 +482,9 @@ _本層的條目作為歷史 / 潛伏記錄保留。可分為三類：(a) DORMAN
 
 #### 截圖
 
-![bug4_step1_annotated.png](screenshots/bug4_step1_annotated.png)
-
-![bug4_step2_annotated.png](screenshots/bug4_step2_annotated.png)
-
 ![bug4_step3_faux_popup.png](screenshots/bug4_step3_faux_popup.png)
 
-_Re-rendered popup — exact runtime error users would see if the button were present._
+_**Hypothetical** popup, reconstructed in PIL.  Users currently CAN'T trigger this — Bug #15 means the CmdGIS button does not exist on LookAtPlace, so the click that would fire `CmdGIS_Click` (and produce this 'Object required' error) has nowhere to come from.  This image shows what the user would see if a future change restored the CmdGIS button without first fixing the GISFrame → CodeFrame typo on line 1539.  The earlier bug4 step1 / step2 runtime screenshots were misleading (their annotations implied a clickable GIS button) and were removed in PR C — only this faux popup is kept as latent-state evidence._
 
 #### 建議修復方案
 

@@ -193,25 +193,34 @@ def _open_session():
 # ---------------------------------------------------------------------
 
 def capture_bug4(app):
-    """Bug #4: LookAtPlace.CmdGIS GISFrame — show the form open,
-    then a faux 'Object required' popup."""
+    """Bug #4 (P5 LATENT): LookAtPlace.CmdGIS_Click references a
+    non-existent control `GISFrame`.  The runtime trigger is
+    blocked by Bug #15 — there is no CmdGIS button on LookAtPlace
+    in the current dump, so users cannot fire CmdGIS_Click and
+    therefore can't see this error today.
+
+    PR C (2026-05-03) dropped the previous step1/step2 runtime
+    screenshots — their annotations implied a clickable GIS button
+    and were misleading.  Only the faux popup is kept, captioned in
+    the report as 'this is what users would see IF a future change
+    restored the CmdGIS button without first fixing the GISFrame
+    reference'.  We backdrop it on a fresh LookAtPlace open so it
+    still has realistic Access chrome.
+    """
     app.DoCmd.OpenForm("LookAtPlace", 0, "", "", 0, 0)
     time.sleep(1.5)
-    s1 = SHOT_DIR / "bug4_step1_form_open.png"
-    _grab_access(s1)
-    _annotate(s1, SHOT_DIR / "bug4_step1_annotated.png",
-              "Step 1 — open LookAtPlace.  GIS export button (lower right) appears available.")
-
-    s2 = SHOT_DIR / "bug4_step2_after_query.png"
-    _grab_access(s2)
-    _annotate(s2, SHOT_DIR / "bug4_step2_annotated.png",
-              "Step 2 — after running a query (e.g. addr 7213), click GIS button.")
-
-    # Faux popup (real popup would block COM)
-    _faux_popup(s2, SHOT_DIR / "bug4_step3_faux_popup.png",
+    backdrop = SHOT_DIR / "bug4_backdrop.png"
+    _grab_access(backdrop)
+    _faux_popup(backdrop, SHOT_DIR / "bug4_step3_faux_popup.png",
                 "Microsoft Visual Basic",
                 "Run-time error '424':\n\nObject required\n\n"
                 "(Form_LookAtPlace.vb:1539 — `If GISFrame.Value = 1 Then`)")
+    # The backdrop itself isn't referenced from the report — drop
+    # it so we don't leave orphan PNGs behind.
+    try:
+        backdrop.unlink()
+    except FileNotFoundError:
+        pass
     try:
         app.DoCmd.Close(2, "LookAtPlace", 2)
     except Exception:

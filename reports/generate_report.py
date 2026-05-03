@@ -258,8 +258,20 @@ ISSUES = [
             "`BIOG_MAIN.c_female`（FROM 子句里 JOIN 已经把它们暴露出来了）。"
         ),
         "screenshots": [
-            ("bug7_step1_annotated.png", None),
-            ("bug7_step2_faux_popup.png", "The popup users see (re-rendered for the report; the real popup blocks the COM thread our test driver runs in)."),
+            ("bug7_step1_annotated.png",
+             "Step 1 — open LookAtPlace, run any query, click "
+             "**Neo4j**.  The CmdNeo4j button is in the bottom "
+             "export-button row; reachability verified against "
+             "`analysis/dump/control_inventory.json` (LookAtPlace "
+             "has a `CmdNeo4j` control with the `CmdNeo4j_Click` "
+             "event bound — re-checked 2026-05-03)."),
+            ("bug7_step2_faux_popup.png",
+             "Step 2 — the popup users see.  Reconstructed in PIL "
+             "because the real popup would block the COM test "
+             "driver; the error code (DAO 3265 'Item not found in "
+             "this collection') and message text come from JET's "
+             "documented behaviour for a recordset field that "
+             "isn't in the underlying SELECT."),
         ],
         "severity_en": "P0 — Silent data corruption (export silently produces nothing)",
         "severity_zh": "P0 — 静默数据缺失（导出无声地什么都没生成）",
@@ -453,9 +465,20 @@ ISSUES = [
             "`CmdPajek_Click` 已经写对了，可以参考。"
         ),
         "screenshots": [
-            ("bug4_step1_annotated.png", None),
-            ("bug4_step2_annotated.png", None),
-            ("bug4_step3_faux_popup.png", "Re-rendered popup — exact runtime error users would see if the button were present."),
+            ("bug4_step3_faux_popup.png",
+             "**Hypothetical** popup, reconstructed in PIL.  Users "
+             "currently CAN'T trigger this — Bug #15 means the "
+             "CmdGIS button does not exist on LookAtPlace, so the "
+             "click that would fire `CmdGIS_Click` (and produce "
+             "this 'Object required' error) has nowhere to come "
+             "from.  This image shows what the user would see if a "
+             "future change restored the CmdGIS button without "
+             "first fixing the GISFrame → CodeFrame typo on line "
+             "1539.  The earlier bug4 step1 / step2 runtime "
+             "screenshots were misleading (their annotations "
+             "implied a clickable GIS button) and were removed in "
+             "PR C — only this faux popup is kept as latent-state "
+             "evidence."),
         ],
         "severity_en": "P5 — Latent (would be P1 if Issue #15 fixed without first fixing this)",
         "severity_zh": "P5 — 潛伏（若先修了 Issue #15 而沒同時修本條，會變成 P1）",
