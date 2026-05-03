@@ -101,6 +101,12 @@ _The popup users see (re-rendered for the report; the real popup blocks the COM 
 2. 跑一次查詢，然後點 **Neo4j**。
 3. 匯出走到 People-with-Place 檔案那一步時，同樣的「Item not found」對話方塊彈出來，之後的檔案都不會再寫了。
 
+#### 截圖
+
+![bug8_faux_popup.png](screenshots/bug8_faux_popup.png)
+
+_Reconstructed-in-PIL popup showing the JET 'Item not found in this collection' error users would see.  **Important caveat:** the backdrop in this image is LookAtPlace, NOT LookAtNetworks — LookAtNetworks's `Form_Open` currently hangs the COM test driver, so a real runtime view of the host form couldn't be captured.  The popup text is reconstructed from VBA static inspection of `Form_LookAtNetworks.vb:2458` / `:2475`._
+
 #### 建議修復方案
 
 把兩條 SELECT 都擴充套件，加入迴圈裡讀到的欄位。對 tRstPlace 加上 `ADDR_CODES.x_coord`、`ADDR_CODES.y_coord`。對 tRstPeoplePlace 加上 `c_person_id` 和 `c_index_addr_id`。
@@ -122,6 +128,16 @@ _The popup users see (re-rendered for the report; the real popup blocks the COM 
 1. 用一組會產生「帶社會機構編碼的入仕」的查詢條件開啟 **LookAtEntry**（這種入仕較少見，大多數查詢觸發不到）。
 2. 點 **Neo4j**，依次確認每個儲存對話方塊。
 3. 走到 InstitutionCodes 檔案這一步時，同樣的「Item not found」對話方塊彈出來。
+
+#### 截圖
+
+![bug9_form_annotated.png](screenshots/bug9_form_annotated.png)
+
+_Step 1 — open LookAtEntry, run any query, click **Neo4j**.  (Note: this code path only fires for queries whose result includes entries with `c_inst_code > 0` — see the summary's REAL_BUT_GATED note.)_
+
+![bug9_faux_popup.png](screenshots/bug9_faux_popup.png)
+
+_Step 2 — the popup users see when the With block on line 1425 reads `!c_inst_code` against the wrong-named recordset.  Reconstructed in PIL because the real popup would block the COM test driver; the error code (DAO 3265) and message text are JET's standard response to a recordset field that doesn't exist._
 
 #### 建議修復方案
 
@@ -152,6 +168,16 @@ _The popup users see (re-rendered for the report; the real popup blocks the COM 
 3. 點 **Run**。
 4. 彈出「欄位不存在」之類的對話方塊（JET 在不同 Office 版本下給出的措辭是「沒有為一個或多個必要引數提供值」或「沒有此欄位」——都是因為 SQL 引用了根本不存在的 `ENTRY_DATA.c_parental_status`）。
 
+#### 截圖
+
+![bug6_form_annotated.png](screenshots/bug6_form_annotated.png)
+
+_Step 1 — open LookAtGroupData, leave only the Entry checkbox ticked, click Run.  (Demo input from `reports/demo_persons.json`: import list = c_personid 1, 安惇.)_
+
+![bug6_faux_popup.png](screenshots/bug6_faux_popup.png)
+
+_Step 2 — the JET error popup users see.  The popup graphic is reconstructed in PIL because the real popup would block the COM test driver; the error code (3061) and message text come from JET's documented behaviour for unknown-identifier-as-parameter on the line cited in the summary._
+
 #### 建議修復方案
 
 把第 2621 行的 `ENTRY_DATA.c_parental_status` 改成 `ENTRY_DATA.c_parental_status_code`。一行修復。
@@ -177,6 +203,16 @@ _The popup users see (re-rendered for the report; the real popup blocks the COM 
 1. 開啟人物 **c_personid = 5（查籥 Zha Yue）** 的生平詳情——之所以選他，是因為其 BIOG_MAIN 上 `c_fl_ey_notes` 欄位有實際內容，欄位可點（點一個空欄位不會觸發這個 Sub）。
 2. 在 BIOG_MAIN_2 子表單上點 `c_fl_ey_notes` 欄位——這會觸發 `c_fl_ey_notes_Click` Sub。
 3. 彈出「集合中找不到專案」對話方塊（因為 Sub 試圖 `DoCmd.OpenForm "frmPickNIAN_HAO"`，而該表單根本不存在）。
+
+#### 截圖
+
+![bug13_browser_annotated.png](screenshots/bug13_browser_annotated.png)
+
+_Step 1 — open CBDB_Browser_2, navigate to c_personid=5 (查籥 Zha Yue), click the `c_fl_ey_notes` field on the Birth/Death sub-tab (this fires `c_fl_ey_notes_Click`)._
+
+![bug13_faux_popup.png](screenshots/bug13_faux_popup.png)
+
+_Step 2 — the popup users see.  Reconstructed in PIL because the real popup would block the COM test driver; error 2102 + 'misspelled or refers to a form that doesn't exist' is Access's standard message when DoCmd.OpenForm targets a form not in CurrentProject.AllForms._
 
 #### 建議修復方案
 

@@ -314,7 +314,18 @@ ISSUES = [
             "对 tRstPlace 加上 `ADDR_CODES.x_coord`、`ADDR_CODES.y_coord`。"
             "对 tRstPeoplePlace 加上 `c_person_id` 和 `c_index_addr_id`。"
         ),
-        "screenshots": [],
+        "screenshots": [
+            ("bug8_faux_popup.png",
+             "Reconstructed-in-PIL popup showing the JET 'Item not "
+             "found in this collection' error users would see.  "
+             "**Important caveat:** the backdrop in this image is "
+             "LookAtPlace, NOT LookAtNetworks — LookAtNetworks's "
+             "`Form_Open` currently hangs the COM test driver, so a "
+             "real runtime view of the host form couldn't be "
+             "captured.  The popup text is reconstructed from VBA "
+             "static inspection of `Form_LookAtNetworks.vb:2458` / "
+             "`:2475`."),
+        ],
         "severity_en": "P0 — Silent data corruption",
         "severity_zh": "P0 — 静默数据缺失",
     },
@@ -372,7 +383,22 @@ ISSUES = [
             "把第 1425 行的 `With tRstAssocCodes` 改成 `With tRstInstitutions`。"
             "属于一字之差的笔误，底层记录集变量只是写错了。"
         ),
-        "screenshots": [],
+        "screenshots": [
+            ("bug9_form_annotated.png",
+             "Step 1 — open LookAtEntry, run any query, click "
+             "**Neo4j**.  (Note: this code path only fires for "
+             "queries whose result includes entries with "
+             "`c_inst_code > 0` — see the summary's "
+             "REAL_BUT_GATED note.)"),
+            ("bug9_faux_popup.png",
+             "Step 2 — the popup users see when the With block on "
+             "line 1425 reads `!c_inst_code` against the "
+             "wrong-named recordset.  Reconstructed in PIL because "
+             "the real popup would block the COM test driver; the "
+             "error code (DAO 3265) and message text are JET's "
+             "standard response to a recordset field that doesn't "
+             "exist."),
+        ],
         "severity_en": "P0 — Silent data corruption (export silently produces nothing)",
         "severity_zh": "P0 — 静默数据缺失（导出无声地什么都没生成）",
     },
@@ -575,7 +601,20 @@ ISSUES = [
             "把第 2621 行的 `ENTRY_DATA.c_parental_status` 改成 "
             "`ENTRY_DATA.c_parental_status_code`。一行修复。"
         ),
-        "screenshots": [],
+        "screenshots": [
+            ("bug6_form_annotated.png",
+             "Step 1 — open LookAtGroupData, leave only the Entry "
+             "checkbox ticked, click Run.  (Demo input from "
+             "`reports/demo_persons.json`: import list = "
+             "c_personid 1, 安惇.)"),
+            ("bug6_faux_popup.png",
+             "Step 2 — the JET error popup users see.  The popup "
+             "graphic is reconstructed in PIL because the real popup "
+             "would block the COM test driver; the error code (3061) "
+             "and message text come from JET's documented behaviour "
+             "for unknown-identifier-as-parameter on the line cited "
+             "in the summary."),
+        ],
         "severity_en": "P1 — Visible crash on a common path (Entry sub-query)",
         "severity_zh": "P1 — 常用路径上的可见报错（Entry 子查询）",
     },
@@ -635,7 +674,19 @@ ISSUES = [
             "`Form_BIOG_MAIN_2_Subform.c_fl_ey_notes_Click` 里把调用改成"
             "替代的那个 picker 表单。"
         ),
-        "screenshots": [],
+        "screenshots": [
+            ("bug13_browser_annotated.png",
+             "Step 1 — open CBDB_Browser_2, navigate to c_personid=5 "
+             "(查籥 Zha Yue), click the `c_fl_ey_notes` field on the "
+             "Birth/Death sub-tab (this fires `c_fl_ey_notes_Click`)."),
+            ("bug13_faux_popup.png",
+             "Step 2 — the popup users see.  Reconstructed in PIL "
+             "because the real popup would block the COM test "
+             "driver; error 2102 + 'misspelled or refers to a form "
+             "that doesn't exist' is Access's standard message when "
+             "DoCmd.OpenForm targets a form not in "
+             "CurrentProject.AllForms."),
+        ],
         "severity_en": "P1 — Visible crash on a user click",
         "severity_zh": "P1 — 用户点击时可见的报错",
     },
