@@ -33,9 +33,14 @@ test results match what an actual user sees), and asserts:
 
 Confirmed bugs found by the suite live in
 [`reports/CBDB_Issues_Report_EN.md`](./reports/CBDB_Issues_Report_EN.md)
-([中文](./reports/CBDB_Issues_Report_ZH-Hant.md) — all four
-en/zh × md/docx outputs auto-generated from
-[`reports/generate_report.py`](./reports/generate_report.py)).
+([中文](./reports/CBDB_Issues_Report_ZH-Hant.md) — both Markdown
+files are auto-generated from
+[`reports/generate_report.py`](./reports/generate_report.py),
+which can also emit a `.docx` sibling per language; the .docx
+files are intentionally NOT committed (their zip-timestamp
+metadata is non-deterministic and would dirty every regen).
+Run `python reports/generate_report.py` locally to produce
+fresh .docx if you need a Word file.
 
 ---
 
@@ -168,15 +173,17 @@ python -m pytest tests/test_known_bugs.py -W ignore --no-discover-inputs \
 python reports/probe_demo_persons.py    # refresh concrete demo personids
 python reports/collect_index_year_diffs.py  # refresh drift appendix
 python reports/capture_screenshots.py   # refresh real-Access screenshots
-python reports/generate_report.py       # rebuild ALL FOUR outputs:
-                                         #   reports/CBDB_Issues_Report_EN.docx
-                                         #   reports/CBDB_Issues_Report_ZH-Hant.docx
-                                         #   reports/CBDB_Issues_Report_EN.md
-                                         #   reports/CBDB_Issues_Report_ZH-Hant.md
+python reports/generate_report.py       # rebuild all four outputs:
+                                         #   reports/CBDB_Issues_Report_EN.md          (committed)
+                                         #   reports/CBDB_Issues_Report_ZH-Hant.md     (committed)
+                                         #   reports/CBDB_Issues_Report_EN.docx        (gitignored)
+                                         #   reports/CBDB_Issues_Report_ZH-Hant.docx   (gitignored)
 ```
 
-The `.md` siblings are committed alongside the `.docx` so reviewers
-can browse the report directly on GitHub (anchor-linked TOC + image
+Only the `.md` siblings are committed (they're deterministic and
+GitHub-renderable); `.docx` files are produced by the same run
+but are gitignored and regenerated on demand.  Reviewers can browse
+the markdown directly on GitHub (anchor-linked TOC + image
 references resolve to `reports/screenshots/*.png`).  All four are
 emitted by a single `generate_report.py` run so they never drift
 out of sync.
@@ -244,13 +251,13 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 
 **18 documented issues**, all detail in
 [`reports/CBDB_Issues_Report_EN.md`](./reports/CBDB_Issues_Report_EN.md)
-([中文版](./reports/CBDB_Issues_Report_ZH-Hant.md) ·
-[.docx EN](./reports/CBDB_Issues_Report_EN.docx) ·
-[.docx 中文](./reports/CBDB_Issues_Report_ZH-Hant.docx)). All four
+([中文版](./reports/CBDB_Issues_Report_ZH-Hant.md)).  Both Markdown
 files are auto-generated from the `ISSUES` dict in
 [`reports/generate_report.py`](./reports/generate_report.py) — that
 script is the **single source of truth**, please don't paste bug
-content elsewhere.
+content elsewhere.  The same script can emit `.docx` siblings on
+demand (gitignored; run `python reports/generate_report.py` to
+produce fresh ones).
 
 | Tier | Count | Meaning |
 |------|------:|---------|
