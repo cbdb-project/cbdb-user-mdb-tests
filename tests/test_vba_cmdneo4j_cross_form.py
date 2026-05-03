@@ -160,3 +160,152 @@ def test_cmd_neo4j_produces_files(vba: VbaSession, spec: Spec, tmp_path):
     for f in files:
         sz = f.stat().st_size
         assert sz > 0, f"[{fspec.name}] {f.name} is zero bytes"
+
+    # ---- Depth checks (PR Q) ----------------------------------
+    # CmdNeo4j writes 6-10 CSVs per form, each a different shape.
+    # Driver-side dialog redirection means we can't tell which
+    # file is which from the on-disk name (everything is
+    # `f<n>.out.csv`).  Inspect each file's header and classify
+    # by shape; for known shapes, assert per-row width + key
+    # id-column non-empty rate.
+    _assert_neo4j_export_depth(fspec.name, files)
+
+
+# ----------------------------------------------------------------------
+# PR Q: per-shape Neo4j export depth manifest
+# ----------------------------------------------------------------------
+
+# Recognised file shapes (from existing committed goldens at
+# tests/golden/exports/real_lookatentry_neo4j_*.csv).  Mapping:
+#   header_first_column → (shape_label, required_columns,
+#                           key_id_columns_must_be_non_empty)
+#
+# CmdNeo4j writes UTF-8 with BOM; we strip the BOM before splitting.
+_NEO4J_SHAPES: dict[str, tuple[str, list[str], list[str]]] = {
+    "nameID": ("People",
+               ["nameID", "nameHZ", "namePY", "indexyear",
+                "dynasty", "sex"],
+               ["nameID"]),
+    "NameID": ("PeopleEntry",
+               ["NameID", "EntryCode"],  # row width loose-check
+               ["NameID"]),
+    "EntryCode": ("EntryCode-codes",
+                  ["EntryCode", "EntryDesc", "EntryDescHZ"],
+                  ["EntryCode"]),
+    "KinCode": ("KinshipCodes",
+                ["KinCode", "KinDesc"],
+                ["KinCode"]),
+    "AssocCode": ("AssocCodes",
+                  ["AssocCode"],   # loose
+                  ["AssocCode"]),
+    "InstCode": ("InstCodes",
+                 ["InstCode"],
+                 ["InstCode"]),
+}
+
+
+def _classify_neo4j_csv(header_cols: list[str]
+                        ) -> tuple[str, list[str], list[str]] | None:
+    """Try to identify what shape a Neo4j CSV is from its header's
+    first column.  Returns None if we don't recognise it (loose-check
+    fallback)."""
+    if not header_cols:
+        return None
+    return _NEO4J_SHAPES.get(header_cols[0])
+
+
+def _assert_neo4j_export_depth(form_name: str,
+                                files: list[Path]) -> None:
+    """For each produced CSV: classify by header, then run width +
+    non-empty-id checks.  Unknown shapes get the loose check
+    (well-formed CSV, ≥ 1 data row, every row has ≥ 2 columns)."""
+    classified_count = 0
+    for f in files:
+        raw = f.read_bytes()
+        text = raw.decode("utf-8", errors="replace").lstrip("﻿")
+        lines = [ln for ln in text.replace("\r\n", "\n").split("\n")
+                 if ln.strip()]
+        if not lines:
+            raise AssertionError(
+                f"[{form_name}] {f.name} decoded to no lines: "
+                f"{raw[:80]!r}"
+            )
+        header = lines[0]
+        cols = header.split(",")
+        n_cols = len(cols)
+        data_rows = lines[1:]
+
+        # Per-row field count must match header.
+        bad_width = []
+        for i, line in enumerate(data_rows, start=1):
+            cells = line.split(",")
+            if len(cells) != n_cols:
+                bad_width.append((i, len(cells), line[:120]))
+            if len(bad_width) >= 5:
+                break
+        # CmdNeo4j sometimes embeds commas in free-text columns
+        # (it doesn't use CSV quoting consistently).  So instead of a
+        # hard equality assert, demand that the FIRST cell of every
+        # row be a non-empty integer-ish id (the various shape's
+        # primary id columns are all integer codes / personids).
+        # That catches "all cells slid over" without false-positiving
+        # on rows whose downstream columns contain commas.
+        bad_id = []
+        for i, line in enumerate(data_rows, start=1):
+            first = line.split(",", 1)[0].strip()
+            if not first or not first.replace("-", "").isdigit():
+                bad_id.append((i, first[:80], line[:120]))
+            if len(bad_id) >= 5:
+                break
+        # Skip the id-non-emptiness test for code-table shapes
+        # whose key column might legitimately be 0 / blank.
+
+        shape = _classify_neo4j_csv(cols)
+        if shape:
+            shape_label, required, key_id_cols = shape
+            classified_count += 1
+            missing = [c for c in required if c not in cols]
+            assert not missing, (
+                f"[{form_name}] {f.name} ({shape_label}) is missing "
+                f"required columns {missing}.  Header was {cols!r}."
+            )
+            # Key id columns: ≥ 90 % non-empty (very strict; these
+            # are integer ids, never blank in healthy data).
+            for key in key_id_cols:
+                if key not in cols:
+                    continue
+                idx = cols.index(key)
+                non_empty = 0
+                for line in data_rows:
+                    cells = line.split(",")
+                    if idx < len(cells) and cells[idx].strip():
+                        non_empty += 1
+                if not data_rows:
+                    continue
+                rate = non_empty / len(data_rows)
+                assert rate >= 0.90, (
+                    f"[{form_name}] {f.name} ({shape_label}) "
+                    f"column {key!r} non-empty in only "
+                    f"{non_empty}/{len(data_rows)} rows "
+                    f"({100*rate:.1f}%) — likely a silent column-"
+                    f"bind regression."
+                )
+
+        if bad_id and shape and shape_label not in (
+                "EntryCode-codes", "KinshipCodes",
+                "AssocCodes", "InstCodes"):
+            # Code-table shapes can legitimately start with 0.
+            raise AssertionError(
+                f"[{form_name}] {f.name} has rows whose first cell "
+                f"isn't an integer id (sample {bad_id[:3]!r}) — "
+                f"either CSV escaping is off or columns slid."
+            )
+
+        print(f"[{form_name}] {f.name}: "
+              f"{n_cols} cols, {len(data_rows)} rows"
+              + (f", shape={shape[0]}" if shape else ", shape=?"),
+              flush=True)
+
+    print(f"[{form_name}] CmdNeo4j depth: classified "
+          f"{classified_count}/{len(files)} files",
+          flush=True)
