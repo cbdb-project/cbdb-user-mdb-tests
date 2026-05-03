@@ -397,34 +397,54 @@ inspecting the new VBA / queries dump or hearing from the
 maintainer.  Until then, prefer re-classifying (Dormant / Latent /
 Not currently reproducible) over removing the issue.
 
-### NOT a bug: User MDB ≠ cbdb-online-main-server SQLite on a small handful of `c_index_year` / `c_index_addr_id` / `c_birthyear` / `c_deathyear` values
+### Index-year cross-check: User MDB ≠ cbdb-online-main-server SQLite (classification still open)
 
 `tests/test_index_year_xcheck.py` compares the User MDB's
 `BIOG_MAIN` against the weekly cbdb-online-main-server SQLite
 snapshot.  As of 2026-05-02 it reports ~12 source-data drifts and
 ~575 derived-field drifts on a 657 246-person sweep.
 
-**These are not bugs.** Confirmed with the maintainer: the online
-system's source data is updated continuously, and the published
-SQLite snapshot is just whatever was current when the weekly export
-ran.  The User MDB is a different (typically older) snapshot.  Both
-sides run the SAME index-year derivation algorithm
-(cbdb-online-main-server's `IndexYearRebuildService.php`) — so any
-algorithm-level disagreement WOULD be a bug, but pure data drift
-between two snapshots is expected.
+**Two independent implementations, not one shared algorithm.**
 
-The test's role is to catch it the moment that stops being true:
-- 0.5 % threshold on derived fields (`c_index_year`, `c_index_addr_id`)
-- 0.1 % threshold on source fields (`c_birthyear`, `c_deathyear`) —
-  if source drift suddenly jumps it likely means someone edited one
-  database without syncing to the other (worth flagging upstream).
+- The cbdb-online-main-server SQLite snapshot's `c_index_year` is
+  produced by the PHP service `IndexYearRebuildService.php`, and
+  its `c_index_addr_id` by `IndexAddressRebuildService.php`.  Both
+  PHP services live in
+  <https://github.com/cbdb-project/cbdb-online-main-server>.
+- The User MDB's `c_index_year` / `c_index_addr_id` are produced by
+  Access maintenance buttons (the `frmBaseMaintenance` family of
+  forms and their VBA).
+- The PHP services are intended to mirror the MDB/VBA maintenance
+  logic, but they are **independent implementations** (likely
+  ported, not the same code).  Any of the following can produce a
+  per-row difference and they all look the same in a diff:
 
-Don't open issues against CBDB for individual person diffs from this
-test unless the per-rule type-code distribution itself drifts (which
-WOULD indicate algorithm-version skew).  Full background and per-pid
-examples in `reports/CBDB_Issues_Report_EN.md` § Appendix
-("c_index_year / c_index_addr_id drift vs the cbdb-online-main-server
-snapshot").
+  1. **Source-data snapshot drift** — the online system updates its
+     source rows continuously; the User MDB ships a point-in-time
+     snapshot.
+  2. **Algorithm / porting divergence** — the PHP service may pick
+     up tweaks the VBA hasn't, or vice versa.
+  3. **Priority / tie-break differences** — when multiple
+     candidate years apply, the two implementations may pick
+     differently.
+  4. **Null / default handling differences** — e.g. how a missing
+     birthyear collapses to 0 vs NULL vs "use deathyear minus 60".
+
+**Do not assume any individual diff is "just data drift".**  We
+have not done a full classification.  The thresholds in the test
+(0.5 % on derived fields, 0.1 % on source fields) are coarse
+guards — they would catch a sudden jump (e.g. a wholesale
+algorithm regression) but say nothing about whether the steady
+~575 we already see are drift, divergence, or genuine bugs.
+
+If you're triaging a specific divergence, you need to walk the
+input rows on both sides and reproduce by hand which implementation
+yields which value.  The drift appendix in
+`reports/CBDB_Issues_Report_EN.md` shows a handful of representative
+examples to start from, but the sampled set (currently 13 rows
+across 3 buckets) is illustrative, not statistically
+representative.  Don't open or close CBDB issues based on it
+without classification.
 
 ## Test inventory snapshot (run this to get current state)
 
