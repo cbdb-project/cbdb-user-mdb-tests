@@ -35,7 +35,7 @@ The issues are ordered by severity (P0 highest). Each entry includes a concise d
   - [Issue #11 — EVENTS_DATA_2's c_event_record_id control bound to a non-existent column — but the control is hidden (LATENT)](#issue-11--events_data_2s-c_event_record_id-control-bound-to-a-non-existent-column--but-the-control-is-hidden-latent)
   - [Issue #12 — POSTED_TO_OFFICE_DATA_2's c_appt_type_code control bound to a non-projected column — but the control is hidden AND the user-facing appointment-type controls work (LATENT)](#issue-12--posted_to_office_data_2s-c_appt_type_code-control-bound-to-a-non-projected-column--but-the-control-is-hidden-and-the-user-facing-appointment-type-controls-work-latent)
 - [Severity legend](#severity-legend)
-- [Appendix — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (not bugs)](#appendix--c_index_year--c_index_addr_id-drift-vs-the-cbdb-online-main-server-snapshot-not-bugs)
+- [Appendix — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (differences need per-row classification before being filed as bugs)](#appendix--c_index_year--c_index_addr_id-drift-vs-the-cbdb-online-main-server-snapshot-differences-need-per-row-classification-before-being-filed-as-bugs)
 - [Closing note](#closing-note)
 
 ## Severity legend
@@ -581,9 +581,13 @@ Open person 2 (安邡, An Fang). The POSTED-TO-OFFICE sub-datasheet shows 1 post
 
 If the hidden control isn't needed, delete it.  If it's an intentional hidden join-key holder, change its ControlSource to a real column (e.g. `c_appt_code`).  Either way the change is invisible to users; this is code-hygiene only.
 
-## Appendix — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (not bugs)
+## Appendix — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (differences need per-row classification before being filed as bugs)
 
-When we compare BIOG_MAIN's `c_index_year` and `c_index_addr_id` between this User MDB and the weekly cbdb-online-main-server SQLite snapshot, a small fraction of persons disagree. We want to be very clear that these are NOT regressions — both pipelines run the same `IndexYearRebuildService.php` algorithm, but on different snapshots of source data and with different downstream decisions.
+When we compare BIOG_MAIN's `c_index_year` and `c_index_addr_id` between this User MDB and the weekly cbdb-online-main-server SQLite snapshot, a small fraction of persons disagree.
+
+**The two sides are independent implementations.**  The SQLite snapshot's `c_index_year` is produced by cbdb-online-main-server's PHP `IndexYearRebuildService.php` and its `c_index_addr_id` by `IndexAddressRebuildService.php` (both at <https://github.com/cbdb-project/cbdb-online-main-server>); the User MDB's same two fields are produced by the Access `frmBaseMaintenance` VBA maintenance buttons.  PHP is intended to mirror the VBA but they are separate code paths.  Per-row differences can come from at least four sources, and a diff alone doesn't tell us which: (1) source-data snapshot drift; (2) algorithm / porting divergence between PHP and VBA; (3) priority / tie-break differences; (4) null / default handling differences.
+
+**We have not classified the steady ~575 / 657 246 diffs we currently observe.**  The examples below are a small sample (currently 13 rows across 3 buckets, from `reports/index_drift_examples.json`) — illustrative of the shapes of disagreement, not statistically representative.  They are a starting point for per-row triage, not a verdict.
 
 ### Examples where only c_index_year disagrees
 
