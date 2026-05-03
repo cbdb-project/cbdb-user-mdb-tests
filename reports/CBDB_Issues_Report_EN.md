@@ -589,6 +589,21 @@ When we compare BIOG_MAIN's `c_index_year` and `c_index_addr_id` between this Us
 
 **We have not classified the steady ~575 / 657 246 diffs we currently observe.**  The examples below are a small sample (currently 13 rows across 3 buckets, from `reports/index_drift_examples.json`) — illustrative of the shapes of disagreement, not statistically representative.  They are a starting point for per-row triage, not a verdict.
 
+### Classification summary
+
+Compared **657,245** personids common to both databases (User MDB total 657,784; SQLite total 657,478; User-only 539; SQLite-only 233).
+
+| Bucket | Count | % of common | Meaning |
+|---|---:|---:|---|
+| `exact_match` | 656,682 | 99.914% | exact match on all four compared fields |
+| `source_drift_index_agrees` | 2 | 0.000% | source drift but indices agreed |
+| `source_drift_index_diffs_too` | 14 | 0.002% | source drift AND ≥1 index differs |
+| `index_year_only_diff` | 59 | 0.009% | source matched, only c_index_year differs — needs follow-up |
+| `index_addr_only_diff` | 478 | 0.073% | source matched, only c_index_addr_id differs — needs follow-up |
+| `index_both_diff` | 10 | 0.002% | source matched, both indices differ — strongest signal |
+
+Net diffs: **563** of 657,245 (0.086 %).  Of those, **16** are clearly attributable to source drift in birthyear / deathyear; **547** need per-row follow-up.  These could be PHP↔VBA divergence, or drift in evidence tables (BIOG_ADDR_DATA / ENTRY_DATA / NIAN_HAO etc.) that this classifier does not compare.  Full output: `reports/index_drift_classification.json`; algorithm pointers: `analysis/index_drift_algorithm_notes.md`.
+
 ### Examples where only c_index_year disagrees
 
 **`c_personid = 3501` — 李孝稱 (Li Xiaocheng)**
