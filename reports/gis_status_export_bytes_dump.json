@@ -1,0 +1,87 @@
+{
+  "fixture": "status_40_unfiltered",
+  "n_scratch_rows": 17023,
+  "n_data_rows": 17022,
+  "n_header_cells": 9,
+  "n_bad_rows": 1,
+  "bad_rows_sample": [
+    {
+      "row_index_1based": 11476,
+      "cell_count": 10,
+      "raw_line_repr": "'Ruan Fu\\t阮孚\\tM\\t 283\\t\\ufeffWei Shi\\t\\t\\\\\\x0fl\\t 114.1167357\\t 34.40078405\\t 1'",
+      "cells": [
+        {
+          "cell_index": 0,
+          "repr": "'Ruan Fu'",
+          "len_chars": 7,
+          "utf16le_hex": "52 00 75 00 61 00 6e 00 20 00 46 00 75 00",
+          "utf8_hex": "52 75 61 6e 20 46 75"
+        },
+        {
+          "cell_index": 1,
+          "repr": "'阮孚'",
+          "len_chars": 2,
+          "utf16le_hex": "2e 96 5a 5b",
+          "utf8_hex": "e9 98 ae e5 ad 9a"
+        },
+        {
+          "cell_index": 2,
+          "repr": "'M'",
+          "len_chars": 1,
+          "utf16le_hex": "4d 00",
+          "utf8_hex": "4d"
+        },
+        {
+          "cell_index": 3,
+          "repr": "' 283'",
+          "len_chars": 4,
+          "utf16le_hex": "20 00 32 00 38 00 33 00",
+          "utf8_hex": "20 32 38 33"
+        },
+        {
+          "cell_index": 4,
+          "repr": "'\\ufeffWei Shi'",
+          "len_chars": 8,
+          "utf16le_hex": "ff fe 57 00 65 00 69 00 20 00 53 00 68 00 69 00",
+          "utf8_hex": "ef bb bf 57 65 69 20 53 68 69"
+        },
+        {
+          "cell_index": 5,
+          "repr": "''",
+          "len_chars": 0,
+          "utf16le_hex": "",
+          "utf8_hex": ""
+        },
+        {
+          "cell_index": 6,
+          "repr": "'\\\\\\x0fl'",
+          "len_chars": 3,
+          "utf16le_hex": "5c 00 0f 00 6c 00",
+          "utf8_hex": "5c 0f 6c"
+        },
+        {
+          "cell_index": 7,
+          "repr": "' 114.1167357'",
+          "len_chars": 12,
+          "utf16le_hex": "20 00 31 00 31 00 34 00 2e 00 31 00 31 00 36 00 37 00 33 00 35 00 37 00",
+          "utf8_hex": "20 31 31 34 2e 31 31 36 37 33 35 37"
+        },
+        {
+          "cell_index": 8,
+          "repr": "' 34.40078405'",
+          "len_chars": 12,
+          "utf16le_hex": "20 00 33 00 34 00 2e 00 34 00 30 00 30 00 37 00 38 00 34 00 30 00 35 00",
+          "utf8_hex": "20 33 34 2e 34 30 30 37 38 34 30 35"
+        },
+        {
+          "cell_index": 9,
+          "repr": "' 1'",
+          "len_chars": 2,
+          "utf16le_hex": "20 00 31 00",
+          "utf8_hex": "20 31"
+        }
+      ]
+    }
+  ],
+  "header_repr": "'Name\\tNameChn\\tSex\\tIndexYear\\tAddrName\\tAddrChn\\tX\\tY\\txy_count'"
+}
