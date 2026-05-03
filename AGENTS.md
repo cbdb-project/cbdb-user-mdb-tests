@@ -477,13 +477,20 @@ tables (BIOG_ADDR_DATA, ENTRY_DATA, NIAN_HAO, fl_*_year, etc.)
 that the classifier does not compare.  Per-row triage required.
 
 Algorithm pointers (each side, where the source code lives) are in
-`analysis/index_drift_algorithm_notes.md`.  PR I has a first
-rule-by-rule comparison of Access BM IY queries against PHP
-`IndexYearRebuildService.php` (pinned commit `a642f7a`) in
-`analysis/index_year_rule_comparison.md` /
-`.json`: 8 candidate `logic_diff`s flagged (most notably a sign
-flip in entry-based rules, +N vs -N), 4 missing-on-one-side, 15
-needing manual review.  None confirmed as bugs.
+`analysis/index_drift_algorithm_notes.md`.  PR N (replacing PR I) compares the **runtime** Access source
+(`GetBirthIndexYearSQL` inside `frmBaseMaintenance`, dumped by
+PR M) against PHP `IndexYearRebuildService.php` (pinned commit
+`a642f7a`) → `analysis/index_year_rule_comparison.{md,json}`.
+Pairing is by emitted `c_index_year_type_code` (both sides emit
+them).  Verdicts: **22 matched, 8 matched_minor_diff, 0
+logic_diff**, 3 access-only (concubine wife variants 31/32/33),
+0 php-only.  PR I's `+N`/`-N` sign-flip flag was an artefact of
+comparing PHP against the wrong Access source (the 37 saved BM
+IY Rule QueryDefs, which `CmdIndexYear_Click` does not call —
+they're vestigial).  At the rule level the runtime Access path
+matches PHP almost everywhere; the closest thing to a real
+divergence is off-by-1 (Rule 29) / off-by-3 (Rule 30) on
+deathyear-default offsets.  None confirmed as bugs.
 
 PR K1 took those rule-level findings and ran them against the 69
 year-only diffs (59 `index_year_only_diff` + 10 `index_both_diff`)

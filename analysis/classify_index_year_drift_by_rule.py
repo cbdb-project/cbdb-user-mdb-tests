@@ -1,5 +1,21 @@
 """Per-row classification of c_index_year drifts using the
-rule-level findings from PR I (`analysis/index_year_rule_comparison.md`).
+rule-level findings from PR I.
+
+NOTE (PR N, 2026-05-03): the rule-level reference this script
+referred to has since been corrected.  PR I's pairing was against
+the BM IY Rule QueryDefs in the DATA mdb, which PR M showed are
+NOT what `CmdIndexYear_Click` runs.  PR N's corrected comparison
+(against the runtime `GetBirthIndexYearSQL`) is the current
+`analysis/index_year_rule_comparison.md`.
+
+This script's per-row buckets remain valid (they only reference
+type_codes, not PR I's incorrect rule labels) and the JSON output
+in `reports/index_year_drift_rule_classification.json` is still
+the canonical per-row breakdown.  But the hypothesis-test
+sub-buckets named after PR I's `+N`/`-N` sign-flip
+(`explained_by_birthyear_offset`, `explained_by_entry_sign_flip`,
+`explained_by_husband_formula`) all came back at 0 in K1 anyway,
+so the practical impact is small.
 
 Scope: only c_index_year.  c_index_addr_id (the much larger
 `index_addr_only_diff` bucket) is deferred to a separate PR.
