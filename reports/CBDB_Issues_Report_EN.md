@@ -620,6 +620,12 @@ Of the **69** year-only diffs, each row was tested against the rule-level diverg
 
 None of these are confirmed bugs.  Full per-row output is in `reports/index_year_drift_rule_classification.json`.
 
+Deeper triage (PR K2, `analysis/triage_index_year_drift_groups.py` → `reports/index_year_drift_rule_groups.json`) named the leftover buckets:
+
+- `consistent_within_rule` × 14 → 5 signature groups, all `candidate_same_rule_tie_break_or_aggregation_diff`.  Recurring diff=-20 across Rules 11/13/15/19 is the standout pattern.
+- `unclassified` × 18 → 18 named, 17 flagged `blocked_by_missing_frmBaseMaintenance_vba` (need Access execution-order to resolve).
+- `php_did_not_compute` × 19 → 6 groups by Access tcode; biggest is `access_tcode='05'` × 7 (`candidate_php_entry_code_mapping_gap` for jinshi).
+
 ### Examples where only c_index_year disagrees
 
 **`c_personid = 3501` — 李孝稱 (Li Xiaocheng)**

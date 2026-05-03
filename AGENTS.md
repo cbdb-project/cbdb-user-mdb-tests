@@ -508,8 +508,33 @@ and `reports/index_year_drift_rule_classification.json`.  Headline:
 
 Total 69, ~74 % bucketed into named patterns (still none labelled
 as confirmed bugs; the buckets are evidence categories for the
-maintainer).  Re-run after every fresh SQLite snapshot or any
-change to the index-recompute path on either side.
+maintainer).
+
+PR K2 (`analysis/triage_index_year_drift_groups.py` →
+`reports/index_year_drift_rule_groups.json`) does a second triage
+pass on what K1 left under-named:
+
+  - **consistent_within_rule** (14 rows): 5 (php_tcode,
+    access_tcode, diff) signature groups, all named
+    `candidate_same_rule_tie_break_or_aggregation_diff` (both
+    sides chose the same rule but produced different values; tie-
+    break or aggregation diff suspected).  A recurring **diff =
+    -20 across Rules 11 / 13 / 15 / 19** stands out.
+  - **unclassified** (18 rows): all 18 named after triage; 17
+    flagged `blocked_by_missing_frmBaseMaintenance_vba` (the
+    different-rules-on-each-side cases need Access's execution
+    order to resolve, which lives in the not-yet-extracted
+    frmBaseMaintenance VBA — see PR J prerequisite).
+  - **php_did_not_compute** (19 rows): 6 groups by Access tcode.
+    Biggest is `access_tcode='05'` × 7 — likely a PHP
+    `ENTRY_CODE_TYPE_REL` mapping gap for jinshi entries
+    (`candidate_php_entry_code_mapping_gap`).
+
+After K2, only 17 rows out of the original 69 are blocked on a
+missing source artefact (the Admin/maintenance VBA that drives
+frmBaseMaintenance).  Re-run the comparator + classifier + triage
+after every fresh SQLite snapshot or any change to the index-
+recompute path on either side.
 
 ## Test inventory snapshot (run this to get current state)
 

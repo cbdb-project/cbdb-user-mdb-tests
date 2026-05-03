@@ -1352,6 +1352,7 @@ def _numbered(document, items: list[str]) -> None:
 DRIFT_JSON = REPO / "reports" / "index_drift_examples.json"
 CLASSIFICATION_JSON = REPO / "reports" / "index_drift_classification.json"
 RULE_CLASSIFICATION_JSON = REPO / "reports" / "index_year_drift_rule_classification.json"
+RULE_GROUPS_JSON = REPO / "reports" / "index_year_drift_rule_groups.json"
 DEMO_PERSONS_JSON = REPO / "reports" / "demo_persons.json"
 KNOWN_BUGS_STATUS_JSON = REPO / "reports" / "known_bugs_status.json"
 
@@ -1680,6 +1681,44 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
                 f"bucket each one) is in "
                 f"`reports/index_year_drift_rule_classification.json`."
             ))
+            # ---- K2 deeper triage ----
+            if RULE_GROUPS_JSON.exists():
+                gcls = _json.loads(
+                    RULE_GROUPS_JSON.read_text(encoding="utf-8"))
+                gs = gcls["summary"]
+                doc.add_paragraph(Z(
+                    f"Deeper triage (PR K2, "
+                    f"`analysis/triage_index_year_drift_groups.py`) "
+                    f"named the leftover buckets:"
+                ))
+                doc.add_paragraph(Z(
+                    f"  • {gs['consistent_within_rule']['rows']} "
+                    f"`consistent_within_rule` rows → "
+                    f"{gs['consistent_within_rule']['groups']} "
+                    f"signature groups, all "
+                    f"`candidate_same_rule_tie_break_or_aggregation_diff`.  "
+                    f"Recurring diff=-20 across Rules 11/13/15/19 is the "
+                    f"standout pattern."
+                ))
+                doc.add_paragraph(Z(
+                    f"  • {gs['unclassified']['total']} "
+                    f"`unclassified` rows → "
+                    f"{gs['unclassified']['named_after_triage']} named, "
+                    f"{gs['unclassified']['blocked_by_missing_vba']} "
+                    f"flagged `blocked_by_missing_frmBaseMaintenance_vba` "
+                    f"(need Access execution-order to resolve)."
+                ))
+                doc.add_paragraph(Z(
+                    f"  • {gs['php_did_not_compute']['rows']} "
+                    f"`php_did_not_compute` rows → "
+                    f"{gs['php_did_not_compute']['groups']} groups by "
+                    f"Access tcode; biggest is `access_tcode='05'` × 7 "
+                    f"(`candidate_php_entry_code_mapping_gap` for jinshi)."
+                ))
+                doc.add_paragraph(Z(
+                    f"Full per-group output: "
+                    f"`reports/index_year_drift_rule_groups.json`."
+                ))
         else:
             _h(doc, 2, Z("年份差異 —— 逐筆 rule 分類"))
             doc.add_paragraph(Z(
@@ -1716,6 +1755,42 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
                 f"逐筆輸出（含分桶所依據的源資料證據）見 "
                 f"`reports/index_year_drift_rule_classification.json`。"
             ))
+            # ---- K2 deeper triage (zh) ----
+            if RULE_GROUPS_JSON.exists():
+                gcls = _json.loads(
+                    RULE_GROUPS_JSON.read_text(encoding="utf-8"))
+                gs = gcls["summary"]
+                doc.add_paragraph(Z(
+                    f"PR K2 進一步的 triage "
+                    f"(`analysis/triage_index_year_drift_groups.py`) 把"
+                    f"剩下的桶命名清楚："
+                ))
+                doc.add_paragraph(Z(
+                    f"  • `consistent_within_rule` "
+                    f"{gs['consistent_within_rule']['rows']} 筆 → "
+                    f"{gs['consistent_within_rule']['groups']} 個 signature "
+                    f"分組，全部標為 `candidate_same_rule_tie_break_"
+                    f"or_aggregation_diff`。最顯眼的是 Rule 11/13/15/19 "
+                    f"反覆出現的 diff=-20。"
+                ))
+                doc.add_paragraph(Z(
+                    f"  • `unclassified` {gs['unclassified']['total']} 筆 → "
+                    f"{gs['unclassified']['named_after_triage']} 筆已命名，"
+                    f"{gs['unclassified']['blocked_by_missing_vba']} 筆"
+                    f"標為 `blocked_by_missing_frmBaseMaintenance_vba`"
+                    f"（需要 Access 端執行順序才能判斷）。"
+                ))
+                doc.add_paragraph(Z(
+                    f"  • `php_did_not_compute` "
+                    f"{gs['php_did_not_compute']['rows']} 筆 → 按 Access "
+                    f"tcode 分 {gs['php_did_not_compute']['groups']} 組；"
+                    f"最大的是 `access_tcode='05'` × 7（jinshi 進士類的 "
+                    f"`candidate_php_entry_code_mapping_gap`）。"
+                ))
+                doc.add_paragraph(Z(
+                    f"逐組輸出見 "
+                    f"`reports/index_year_drift_rule_groups.json`。"
+                ))
 
     # ---- Per bucket ----
     bucket_meta = {
@@ -2763,6 +2838,41 @@ def _build_md(lang: str, out_path: Path) -> None:
                     f"`reports/index_year_drift_rule_classification.json`."
                 ))
                 lines.append("")
+                if RULE_GROUPS_JSON.exists():
+                    gcls = _json.loads(
+                        RULE_GROUPS_JSON.read_text(encoding="utf-8"))
+                    gs = gcls["summary"]
+                    lines.append(Z(
+                        f"Deeper triage (PR K2, "
+                        f"`analysis/triage_index_year_drift_groups.py` "
+                        f"→ `reports/index_year_drift_rule_groups.json`) "
+                        f"named the leftover buckets:"
+                    ))
+                    lines.append("")
+                    lines.append(Z(
+                        f"- `consistent_within_rule` × "
+                        f"{gs['consistent_within_rule']['rows']} → "
+                        f"{gs['consistent_within_rule']['groups']} "
+                        f"signature groups, all "
+                        f"`candidate_same_rule_tie_break_or_aggregation_diff`.  "
+                        f"Recurring diff=-20 across Rules 11/13/15/19 is "
+                        f"the standout pattern."
+                    ))
+                    lines.append(Z(
+                        f"- `unclassified` × {gs['unclassified']['total']} → "
+                        f"{gs['unclassified']['named_after_triage']} named, "
+                        f"{gs['unclassified']['blocked_by_missing_vba']} "
+                        f"flagged `blocked_by_missing_frmBaseMaintenance_vba` "
+                        f"(need Access execution-order to resolve)."
+                    ))
+                    lines.append(Z(
+                        f"- `php_did_not_compute` × "
+                        f"{gs['php_did_not_compute']['rows']} → "
+                        f"{gs['php_did_not_compute']['groups']} groups by "
+                        f"Access tcode; biggest is `access_tcode='05'` × 7 "
+                        f"(`candidate_php_entry_code_mapping_gap` for jinshi)."
+                    ))
+                    lines.append("")
             else:
                 lines.append(f"### {Z('年份差異 —— 逐筆 rule 分類')}")
                 lines.append("")
@@ -2802,6 +2912,40 @@ def _build_md(lang: str, out_path: Path) -> None:
                     f"`reports/index_year_drift_rule_classification.json`。"
                 ))
                 lines.append("")
+                if RULE_GROUPS_JSON.exists():
+                    gcls = _json.loads(
+                        RULE_GROUPS_JSON.read_text(encoding="utf-8"))
+                    gs = gcls["summary"]
+                    lines.append(Z(
+                        f"PR K2 進一步的 triage "
+                        f"(`analysis/triage_index_year_drift_groups.py` "
+                        f"→ `reports/index_year_drift_rule_groups.json`) "
+                        f"把剩下的桶命名清楚："
+                    ))
+                    lines.append("")
+                    lines.append(Z(
+                        f"- `consistent_within_rule` × "
+                        f"{gs['consistent_within_rule']['rows']} → "
+                        f"{gs['consistent_within_rule']['groups']} 個 "
+                        f"signature 分組，全部標為 "
+                        f"`candidate_same_rule_tie_break_or_aggregation_diff`。"
+                        f"最顯眼的是 Rule 11/13/15/19 反覆出現的 diff=-20。"
+                    ))
+                    lines.append(Z(
+                        f"- `unclassified` × {gs['unclassified']['total']} → "
+                        f"{gs['unclassified']['named_after_triage']} 筆已命名，"
+                        f"{gs['unclassified']['blocked_by_missing_vba']} 筆標為 "
+                        f"`blocked_by_missing_frmBaseMaintenance_vba`"
+                        f"（需要 Access 端執行順序才能判斷）。"
+                    ))
+                    lines.append(Z(
+                        f"- `php_did_not_compute` × "
+                        f"{gs['php_did_not_compute']['rows']} → 按 Access "
+                        f"tcode 分 {gs['php_did_not_compute']['groups']} 組；"
+                        f"最大的是 `access_tcode='05'` × 7（jinshi 進士類的 "
+                        f"`candidate_php_entry_code_mapping_gap`）。"
+                    ))
+                    lines.append("")
 
         data = _json.loads(DRIFT_JSON.read_text(encoding="utf-8"))
         bucket_meta = {

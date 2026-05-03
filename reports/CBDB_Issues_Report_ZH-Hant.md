@@ -620,6 +620,12 @@ _**Hypothetical** popup, reconstructed in PIL.  Users currently CAN'T trigger th
 
 以上沒有任何一筆被視為已確認的 bug。逐筆輸出見 `reports/index_year_drift_rule_classification.json`。
 
+PR K2 進一步的 triage (`analysis/triage_index_year_drift_groups.py` → `reports/index_year_drift_rule_groups.json`) 把剩下的桶命名清楚：
+
+- `consistent_within_rule` × 14 → 5 個 signature 分組，全部標為 `candidate_same_rule_tie_break_or_aggregation_diff`。最顯眼的是 Rule 11/13/15/19 反覆出現的 diff=-20。
+- `unclassified` × 18 → 18 筆已命名，17 筆標為 `blocked_by_missing_frmBaseMaintenance_vba`（需要 Access 端執行順序才能判斷）。
+- `php_did_not_compute` × 19 → 按 Access tcode 分 6 組；最大的是 `access_tcode='05'` × 7（jinshi 進士類的 `candidate_php_entry_code_mapping_gap`）。
+
 ### 僅 c_index_year 不一致的樣例
 
 **`c_personid = 3501` — 李孝稱 (Li Xiaocheng)**
