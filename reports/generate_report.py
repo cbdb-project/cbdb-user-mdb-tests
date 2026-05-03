@@ -37,6 +37,8 @@ REPO = Path(__file__).resolve().parent.parent
 SHOT_DIR = REPO / "reports" / "screenshots"
 OUT_EN = REPO / "reports" / "CBDB_Issues_Report_EN.docx"
 OUT_ZH = REPO / "reports" / "CBDB_Issues_Report_ZH-Hant.docx"
+OUT_EN_MD = REPO / "reports" / "CBDB_Issues_Report_EN.md"
+OUT_ZH_MD = REPO / "reports" / "CBDB_Issues_Report_ZH-Hant.md"
 
 
 # ---------------------------------------------------------------------
@@ -1731,9 +1733,412 @@ def _build(lang: str, out_path: Path) -> None:
     print(f"wrote {out_path}")
 
 
+def _build_md(lang: str, out_path: Path) -> None:
+    """Markdown sibling of `_build` — same content, different format,
+    suitable for in-browser viewing on GitHub."""
+    is_en = (lang == "en")
+
+    def Z(s: str) -> str:
+        return s if is_en else t(s)
+
+    lines: list[str] = []
+    title = (
+        "CBDB User MDB — Issues Report"
+        if is_en else
+        "CBDB 用户版 .mdb — 问题汇报"
+    )
+    subtitle = (
+        "A respectful summary of issues uncovered during regression testing."
+        if is_en else
+        "测试过程中发现的问题汇总，谨呈维护团队斧正。"
+    )
+    lines.append(f"# {Z(title)}")
+    lines.append("")
+    lines.append(f"_{Z(subtitle)}_")
+    lines.append("")
+
+    intro = (
+        "Dear maintainer,\n\n"
+        "Below is a summary of the issues we uncovered while building "
+        "an automated regression-test suite for the CBDB User MDB. "
+        "We hope this report is useful as you continue your wonderful "
+        "stewardship of this dataset, and we sincerely thank you for "
+        "the immense work that has gone into building it.\n\n"
+        "The issues are ordered by severity (P0 highest). Each entry "
+        "includes a concise description, step-by-step user reproduction, "
+        "screenshots where the issue is visible in the Access UI, and a "
+        "suggested fix. None of these are urgent; they are documented "
+        "so they can be addressed at the maintainer's convenience."
+        if is_en else
+        "尊敬的维护者：\n\n"
+        "下面是我们在为 CBDB 用户版 .mdb 编写自动化回归测试套件过程中，"
+        "陆续整理出来的一些问题清单。我们希望这份报告能在您继续主持这份"
+        "宝贵数据集时有所帮助；同时，对您多年来在这套数据上的辛勤付出，"
+        "我们由衷地表示感谢和敬意。\n\n"
+        "问题按严重程度排序（P0 最高）。每一条都包括：简明描述、用户端"
+        "一步一步的复现步骤、（在界面上能看到时）相关截图，以及一份建议"
+        "的修复方案。这些问题并不紧急，整理在此只是为了方便您在合适的时"
+        "候逐一处理。"
+    )
+    for para in intro.split("\n\n"):
+        lines.append(Z(para))
+        lines.append("")
+
+    # ---- TOC: GitHub auto-generates anchors from heading text. ----
+    lines.append(f"## {Z('Table of Contents' if is_en else '目录')}")
+    lines.append("")
+
+    tier_titles_en = {
+        "P0_silent_data": "P0 — Silent data corruption",
+        "P1_visible_crash": "P1 — Visible runtime crash",
+        "P2_silent_display": "P2 — Silent display",
+        "P3_missing_ui": "P3 — Missing UI",
+        "P4_setup": "P4 — Setup",
+    }
+    tier_titles_zh = {
+        "P0_silent_data": "P0 — 静默数据错误",
+        "P1_visible_crash": "P1 — 可见的运行时报错",
+        "P2_silent_display": "P2 — 静默显示问题",
+        "P3_missing_ui": "P3 — 缺失界面",
+        "P4_setup": "P4 — 安装设置",
+    }
+    tier_order = ["P0_silent_data", "P1_visible_crash",
+                  "P2_silent_display", "P3_missing_ui", "P4_setup"]
+
+    by_tier: dict[str, list[dict]] = {}
+    for it in ISSUES:
+        by_tier.setdefault(it["tier"], []).append(it)
+
+    def _slug(s: str) -> str:
+        # GitHub-flavoured anchor algorithm:
+        #   1. lower-case
+        #   2. drop every char that isn't [a-z0-9_-] OR a CJK
+        #      ideograph OR a space (DROP IN PLACE — do not merge
+        #      adjacent spaces; do not collapse runs of hyphens).
+        #   3. replace each remaining space with exactly one hyphen.
+        # Two subtle rules the earlier draft of this function got
+        # wrong:
+        #   - `_` is a word char and IS preserved by GitHub.  A blanket
+        #     `[`*_~]` strip removed it and broke `View_StatusData`-
+        #     style anchors.
+        #   - `\s+ → -` collapsed runs of spaces into a single hyphen.
+        #     GitHub doesn't.  'P0 — Silent ...' becomes
+        #     'p0--silent-...' (the em-dash gets removed but the
+        #     spaces around it stay, producing two hyphens).
+        import re as _re
+        out = s.lower().strip()
+        # Drop only the markdown formatting chars that are NOT also
+        # valid in identifiers (so no `_`).
+        out = _re.sub(r"[`*~]", "", out)
+        # Drop anything that isn't word-char / hyphen / space / CJK.
+        out = _re.sub(r"[^\w一-鿿\- ]+", "", out)
+        # 1-for-1 space → hyphen substitution (preserves doubles).
+        out = out.replace(" ", "-")
+        return out
+
+    for tier in tier_order:
+        items = by_tier.get(tier, [])
+        if not items:
+            continue
+        tier_title = (tier_titles_en[tier] if is_en
+                      else tier_titles_zh[tier])
+        lines.append(f"- [{Z(tier_title)}](#{_slug(Z(tier_title))})")
+        for it in items:
+            t_title = it["title_en"] if is_en else it["title_zh"]
+            entry = f"Issue #{it['id']} — {t_title}"
+            lines.append(
+                f"  - [{Z(entry)}](#{_slug(Z(entry))})"
+            )
+    lines.append(
+        f"- [{Z('Severity legend' if is_en else '严重等级说明')}]"
+        f"(#{_slug(Z('Severity legend' if is_en else '严重等级说明'))})"
+    )
+    appendix_title = (
+        "Appendix — c_index_year / c_index_addr_id drift "
+        "vs the cbdb-online-main-server snapshot (not bugs)"
+        if is_en else
+        "附录 —— c_index_year / c_index_addr_id 与 "
+        "cbdb-online-main-server 快照之间的偏差（非缺陷）"
+    )
+    lines.append(
+        f"- [{Z(appendix_title)}](#{_slug(Z(appendix_title))})"
+    )
+    lines.append(
+        f"- [{Z('Closing note' if is_en else '结语')}]"
+        f"(#{_slug(Z('Closing note' if is_en else '结语'))})"
+    )
+    lines.append("")
+
+    # ---- Severity legend ----
+    lines.append(f"## {Z('Severity legend' if is_en else '严重等级说明')}")
+    lines.append("")
+    legend_en = [
+        "P0 — Silent data corruption: data is wrong or missing without an error popup.",
+        "P1 — Visible runtime crash: a popup appears, the operation aborts.",
+        "P2 — Silent display: form fields render blank when they should show data.",
+        "P3 — Missing UI: a feature exists in code but no button invokes it.",
+        "P4 — Setup: one-time hurdle on each new install.",
+    ]
+    legend_zh = [
+        "P0 — 静默数据错误：数据错或缺失，但没有任何报错提示。",
+        "P1 — 可见的运行时报错：弹出错误对话框，操作中断。",
+        "P2 — 静默显示问题：表单字段本应有数据，却显示为空。",
+        "P3 — 缺失界面：代码里实现了某功能，但界面上没有按钮去触发它。",
+        "P4 — 安装设置：每台新机器需要一次性处理。",
+    ]
+    for s in (legend_en if is_en else legend_zh):
+        lines.append(f"- {Z(s)}")
+    lines.append("")
+
+    # ---- Per-issue ----
+    demo_persons = _load_demo_persons()
+    bug_status = _load_bug_test_status()
+
+    for tier in tier_order:
+        items = by_tier.get(tier, [])
+        if not items:
+            continue
+        tier_title = (tier_titles_en[tier] if is_en
+                      else tier_titles_zh[tier])
+        lines.append(f"## {Z(tier_title)}")
+        lines.append("")
+        for it in items:
+            t_title = it["title_en"] if is_en else it["title_zh"]
+            lines.append(f"### Issue #{it['id']} — {Z(t_title)}")
+            lines.append("")
+            lines.append(f"**{Z('Affected sub' if is_en else '涉及位置')}:** "
+                          f"`{it['form']}`")
+            lines.append("")
+            lines.append(f"**{Z('Severity' if is_en else '严重等级')}:** "
+                          f"{Z(it['severity_en'] if is_en else it['severity_zh'])}")
+            lines.append("")
+            # Auto-derived test status banner.
+            status = bug_status.get(it["id"])
+            if status:
+                outcome = status["outcome"]
+                if outcome == "failed":
+                    banner = (
+                        "⚠ **Automated test status: this issue's "
+                        "regression marker currently FAILS** "
+                        f"(run on {status.get('when', 'unknown date')}). "
+                        "That usually means the underlying defect has "
+                        "been **FIXED** in the source dump.  Please "
+                        "verify in person before considering this issue "
+                        "closed; this report has NOT been edited to drop "
+                        "the issue.  Tests consulted: "
+                        + ", ".join(
+                            f"`{t.rsplit('::', 1)[-1]}`"
+                            for t, _ in status["tests"]
+                        )
+                        if is_en else
+                        "⚠ **自動測試狀態：本 issue 對應的回歸標記目前 "
+                        f"FAIL**（執行時間：{status.get('when', '未知')}），"
+                        "通常意味著底層缺陷已在 source dump 中被 **修復**。"
+                        "請務必親自確認，再將此 issue 視為關閉；本報告"
+                        "並未自動刪除任何 issue。對照的測試："
+                        + "、".join(
+                            f"`{t.rsplit('::', 1)[-1]}`"
+                            for t, _ in status["tests"]
+                        )
+                    )
+                    lines.append(f"> {Z(banner)}")
+                    lines.append("")
+                elif outcome == "mixed":
+                    parts = ", ".join(
+                        f"`{t.rsplit('::', 1)[-1]}`: {o}"
+                        for t, o in status["tests"]
+                    )
+                    banner = (
+                        "ℹ Automated test status: MIXED outcomes "
+                        f"(run {status.get('when', 'unknown date')}). "
+                        f"Per-test: {parts}"
+                        if is_en else
+                        f"ℹ 自動測試狀態：混合結果（執行時間："
+                        f"{status.get('when', '未知')}）。分項：{parts}"
+                    )
+                    lines.append(f"> _{Z(banner)}_")
+                    lines.append("")
+            lines.append(f"#### {Z('Description' if is_en else '问题描述')}")
+            lines.append("")
+            for para in (it["summary_en"] if is_en
+                         else it["summary_zh"]).split("\n\n"):
+                lines.append(Z(para))
+                lines.append("")
+            lines.append(f"#### {Z('Steps to reproduce' if is_en else '复现步骤')}")
+            lines.append("")
+            demo = demo_persons.get(f"bug{it['id']}")
+            if demo:
+                if demo.get("dormant"):
+                    label = (
+                        "⚠ **Currently UI-dormant on this data snapshot — see note below**"
+                        if is_en else
+                        "⚠ **在當前資料快照下無法在 UI 上復現——請看下方說明**"
+                    )
+                    lines.append(Z(label))
+                    lines.append("")
+                    lines.append(
+                        demo["hint_en"] if is_en else Z(demo["hint_zh"])
+                    )
+                    lines.append("")
+                else:
+                    label = (
+                        f"**Recommended demo person:** `c_personid="
+                        f"{demo['personid']}` ({demo['name_chn']}, "
+                        f"{demo['name_py']})"
+                        if is_en else
+                        f"**建議使用的範例人物：** `c_personid="
+                        f"{demo['personid']}`（{demo['name_chn']}，"
+                        f"{demo['name_py']}）"
+                    )
+                    lines.append(Z(label))
+                    lines.append("")
+                    hint_text = demo["hint_en"] if is_en else Z(demo["hint_zh"])
+                    extra = (
+                        " _Picked by `reports/probe_demo_persons.py`; a "
+                        "SQL probe selected this person because their row "
+                        "counts genuinely satisfy the precondition the "
+                        "bug needs._"
+                        if is_en else
+                        " _由 `reports/probe_demo_persons.py` 透過 SQL "
+                        "probe 挑選；之所以選這位，是因為其底層記錄數確實"
+                        "滿足這個 bug 的觸發條件。_"
+                    )
+                    lines.append(hint_text + extra)
+                    lines.append("")
+            for i, step in enumerate(
+                it["steps_en"] if is_en else it["steps_zh"], 1
+            ):
+                lines.append(f"{i}. {Z(step)}")
+            lines.append("")
+            shots = it.get("screenshots") or []
+            if shots:
+                lines.append(f"#### {Z('Screenshots' if is_en else '截图')}")
+                lines.append("")
+                for fname, caption in shots:
+                    p = SHOT_DIR / fname
+                    if not p.exists():
+                        lines.append(
+                            f"_{Z(f'[screenshot {fname} not found]' if is_en else f'[未找到截图 {fname}]')}_"
+                        )
+                    else:
+                        rel = f"screenshots/{fname}"
+                        lines.append(f"![{fname}]({rel})")
+                        if caption:
+                            cap = caption if is_en else Z(caption)
+                            lines.append("")
+                            lines.append(f"_{cap}_")
+                    lines.append("")
+            lines.append(
+                f"#### {Z('Suggested fix' if is_en else '建议修复方案')}"
+            )
+            lines.append("")
+            for para in (it["fix_en"] if is_en
+                         else it["fix_zh"]).split("\n\n"):
+                lines.append(Z(para))
+                lines.append("")
+
+    # ---- Index drift appendix ----
+    import json as _json
+    if DRIFT_JSON.exists():
+        lines.append(f"## {Z(appendix_title)}")
+        lines.append("")
+        intro_drift = (
+            "When we compare BIOG_MAIN's `c_index_year` and "
+            "`c_index_addr_id` between this User MDB and the weekly "
+            "cbdb-online-main-server SQLite snapshot, a small fraction "
+            "of persons disagree. We want to be very clear that these "
+            "are NOT regressions — both pipelines run the same "
+            "`IndexYearRebuildService.php` algorithm, but on different "
+            "snapshots of source data and with different downstream "
+            "decisions."
+            if is_en else
+            "我们把本 .mdb 的 BIOG_MAIN 与 cbdb-online-main-server 每周"
+            "发布的 SQLite 快照在 `c_index_year`、`c_index_addr_id` 两个"
+            "字段上做比对，可以看到一小部分人物对不齐。我们希望明确说明："
+            "这并不是缺陷 —— 两套管线跑的都是同一段 "
+            "`IndexYearRebuildService.php` 算法，只是依据的源数据快照"
+            "不一样，下游某些择优规则也略有出入。"
+        )
+        lines.append(Z(intro_drift))
+        lines.append("")
+
+        data = _json.loads(DRIFT_JSON.read_text(encoding="utf-8"))
+        bucket_meta = {
+            "year_only": ("Examples where only c_index_year disagrees",
+                          "仅 c_index_year 不一致的样例"),
+            "addr_only": ("Examples where only c_index_addr_id disagrees",
+                          "仅 c_index_addr_id 不一致的样例"),
+            "both": ("Examples where both fields disagree",
+                     "两个字段都不一致的样例"),
+            "source_data": (
+                "Examples where the SOURCE data itself differs (birthyear / deathyear)",
+                "底层 SOURCE 数据本身不同（生年 / 卒年）的样例"),
+        }
+        for bucket_key, titles in bucket_meta.items():
+            items = data.get(bucket_key, [])
+            if not items:
+                continue
+            lines.append(f"### {Z(titles[0] if is_en else titles[1])}")
+            lines.append("")
+            for ex in items[:5]:
+                u = ex["user"]; s = ex["sqlite"]
+                head = (f"`c_personid = {ex['personid']}` — "
+                        f"{ex['name_chn']} ({ex['name_py']})")
+                lines.append(f"**{Z(head)}**")
+                lines.append("")
+                lines.append(
+                    f"| {Z('Field' if is_en else '字段')} "
+                    f"| {Z('User MDB' if is_en else '本 .mdb (User MDB)')} "
+                    f"| {Z('cbdb-online-main-server snapshot' if is_en else 'cbdb-online-main-server 快照')} |"
+                )
+                lines.append("|---|---|---|")
+                for f_label, key in [
+                    ("c_index_year", "index_year"),
+                    ("c_index_addr_id", "index_addr_id"),
+                    ("c_birthyear", "birthyear"),
+                    ("c_deathyear", "deathyear"),
+                    ("c_index_year_type_code", "index_year_type_code"),
+                    ("c_index_year_source_id", "index_year_source_id"),
+                ]:
+                    uv = "" if u[key] is None else str(u[key])
+                    sv = "" if s[key] is None else str(s[key])
+                    lines.append(f"| `{f_label}` | {uv} | {sv} |")
+                lines.append("")
+
+    # ---- Closing ----
+    lines.append(f"## {Z('Closing note' if is_en else '结语')}")
+    lines.append("")
+    closing = (
+        "Thank you for taking the time to read this report. None of the "
+        "items above is urgent; we hope having them all in one place "
+        "makes it easy to address them at your own pace.\n\n"
+        "If any of the descriptions or suggested fixes are unclear, we "
+        "would be glad to discuss further. The corresponding regression "
+        "tests in this repository will automatically flip from PASS to "
+        "FAIL the moment any issue is fixed in the source dump — so you "
+        "can use them as a confirmation signal."
+        if is_en else
+        "感谢您抽时间读完这份报告。以上各条都不紧急，我们把它们集中整理"
+        "在一起，只是希望方便您在合适的时候逐一处理。\n\n"
+        "如果对其中任何一条的描述或建议有疑问，欢迎随时一同讨论。本仓库"
+        "里对应的回归测试，会在您修好任意一个问题、并重新导出 dump 之后"
+        "自动从 PASS 翻成 FAIL —— 可以作为修复完成的信号使用。"
+    )
+    for para in closing.split("\n\n"):
+        lines.append(Z(para))
+        lines.append("")
+
+    out_path.write_text("\n".join(lines), encoding="utf-8")
+    print(f"wrote {out_path}")
+
+
 def main() -> int:
+    # Always emit all four formats together so the docx and md never
+    # drift apart.
     _build("en", OUT_EN)
     _build("zh", OUT_ZH)
+    _build_md("en", OUT_EN_MD)
+    _build_md("zh", OUT_ZH_MD)
     return 0
 
 

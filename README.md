@@ -154,17 +154,27 @@ python analysis/run_all_audits.py       # human-readable audit sweep
 python -m pytest tests/ -W ignore       # fast suite (no Access)
 python -m pytest tests/ -W ignore --include-vba   # full suite
 
-# To regenerate the bilingual Word bug-report (`reports/*.docx`)
-# AFTER a new dump — captures fresh demo personid hints, known-bug
-# statuses, and Word-doc per-issue 'Bug appears FIXED' banners
-# wherever a regression marker has flipped:
+# To regenerate the bilingual bug-report (FOUR files) AFTER a new dump
+# — captures fresh demo personid hints, known-bug statuses, and per-
+# issue 'Bug appears FIXED' banners wherever a regression marker has
+# flipped:
 python -m pytest tests/test_known_bugs.py -W ignore --no-discover-inputs \
     --json-report --json-report-file=reports/known_bugs_status.json
 python reports/probe_demo_persons.py    # refresh concrete demo personids
 python reports/collect_index_year_diffs.py  # refresh drift appendix
 python reports/capture_screenshots.py   # refresh real-Access screenshots
-python reports/generate_report.py       # rebuild EN + ZH-Hant docx
+python reports/generate_report.py       # rebuild ALL FOUR outputs:
+                                         #   reports/CBDB_Issues_Report_EN.docx
+                                         #   reports/CBDB_Issues_Report_ZH-Hant.docx
+                                         #   reports/CBDB_Issues_Report_EN.md
+                                         #   reports/CBDB_Issues_Report_ZH-Hant.md
 ```
+
+The `.md` siblings are committed alongside the `.docx` so reviewers
+can browse the report directly on GitHub (anchor-linked TOC + image
+references resolve to `reports/screenshots/*.png`).  All four are
+emitted by a single `generate_report.py` run so they never drift
+out of sync.
 
 The Word doc generator NEVER deletes issues automatically — when a
 regression marker fails (= bug appears fixed), the corresponding
