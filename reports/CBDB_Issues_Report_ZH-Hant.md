@@ -19,8 +19,6 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
   - [Issue #13 — BIOG_MAIN_2 子表單試圖開啟一個不存在的 picker 表單 (frmPickNIAN_HAO)](#issue-13--biog_main_2-子表單試圖開啟一個不存在的-picker-表單-frmpicknian_hao)
 - [P2 — 靜默顯示問題](#p2--靜默顯示問題)
   - [Issue #10 — EVENT_ADDR_2 子表單的地址列默默地顯示為空（ControlSource 寫錯了）](#issue-10--event_addr_2-子表單的地址列默默地顯示為空controlsource-寫錯了)
-  - [Issue #11 — EVENTS_DATA_2 子表單上有一個控制元件繫結到不存在的列 c_event_record_id](#issue-11--events_data_2-子表單上有一個控制元件繫結到不存在的列-c_event_record_id)
-  - [Issue #12 — POSTED_TO_OFFICE_DATA_2 子表單的任職型別控制元件綁到了錯的列名](#issue-12--posted_to_office_data_2-子表單的任職型別控制元件綁到了錯的列名)
 - [P3 — 缺失介面](#p3--缺失介面)
   - [Issue #15 — LookAtPlace 缺少 CmdGIS 按鈕（程式碼裡有 handler 但介面上沒控制元件）](#issue-15--lookatplace-缺少-cmdgis-按鈕程式碼裡有-handler-但介面上沒控制元件)
   - [Issue #16 — LookAtStatus 缺少 CmdPajek 按鈕](#issue-16--lookatstatus-缺少-cmdpajek-按鈕)
@@ -35,6 +33,8 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
   - [Issue #4 — LookAtPlace.CmdGIS 會報「Object required」 — LATENT，被 Issue #15（表單上沒有 CmdGIS 按鈕）所遮蔽](#issue-4--lookatplacecmdgis-會報object-required--latent被-issue-15表單上沒有-cmdgis-按鈕所遮蔽)
   - [Issue #5 — LookAtStatus.CmdPajek 引用了不存在的控制元件，且 SQL 用了三個不存在的列](#issue-5--lookatstatuscmdpajek-引用了不存在的控制元件且-sql-用了三個不存在的列)
   - [Issue #14 — KIN_DATA 子表單的 CmdPickKinRel 呼叫不存在的 picker（frmPickKINSHIP_CODES）——但目前該子表單在主表中無入口（LATENT）](#issue-14--kin_data-子表單的-cmdpickkinrel-呼叫不存在的-pickerfrmpickkinship_codes但目前該子表單在主表中無入口latent)
+  - [Issue #11 — EVENTS_DATA_2 上 c_event_record_id 控制元件綁到不存在的欄位——但該控制元件本身是隱藏的（LATENT）](#issue-11--events_data_2-上-c_event_record_id-控制元件綁到不存在的欄位但該控制元件本身是隱藏的latent)
+  - [Issue #12 — POSTED_TO_OFFICE_DATA_2 上 c_appt_type_code 控制元件綁到沒投影的欄位——但該控制元件是隱藏的，且使用者實際看的任職型別欄位是正常的（LATENT）](#issue-12--posted_to_office_data_2-上-c_appt_type_code-控制元件綁到沒投影的欄位但該控制元件是隱藏的且使用者實際看的任職型別欄位是正常的latent)
 - [嚴重等級說明](#嚴重等級說明)
 - [附錄 —— c_index_year / c_index_addr_id 與 cbdb-online-main-server 快照之間的偏差（非缺陷）](#附錄--c_index_year--c_index_addr_id-與-cbdb-online-main-server-快照之間的偏差非缺陷)
 - [結語](#結語)
@@ -188,7 +188,7 @@ _The popup users see (re-rendered for the report; the real popup blocks the COM 
 
 **涉及位置:** `EVENT_ADDR_2 Subform`
 
-**嚴重等級:** P2 — 靜默顯示問題（地址列空白）
+**嚴重等級:** P2 — 靜默顯示問題（EVENT_ADDR_2 的 TxtAddrCHN / TxtAddrPY 每一列都空白）
 
 #### 問題描述
 
@@ -205,81 +205,20 @@ _The popup users see (re-rendered for the report; the real popup blocks the COM 
 
 開啟人物 44872（孫才，Sun Cai）。EVENTS 子資料表會顯示 1 條事件，其中 1 條有對應地址。相關繫結控制元件在每一列都會顯示空白。 _由 `reports/probe_demo_persons.py` 透過 SQL probe 挑選；之所以選這位，是因為其底層記錄數確實滿足這個 bug 的觸發條件。_
 
-1. 開啟人物 **c_personid = 44872（孫才 Sun Cai）** 的生平詳情——之所以選他，是因為他同時有 EVENTS_DATA 和 EVENTS_ADDR 記錄，數量適中，方便肉眼檢查。
-2. 切換到 EVENT_ADDR 子資料表。
-3. 中文地址列和拼音地址列每一列都是空白，儘管底層 ADDR_CODES 對應行其實有真實值。
+1. 開啟 CBDB_Browser_2，導航到 **c_personid = 44872（孫才 Sun Cai）**——選他是因為他有 1 條 EVENTS_DATA 記錄，對應 1 條 EVENT_ADDR 指向 `c_addr_id = 12603`（ADDR_CODES 裡是 Anfeng / 安豐）。切到 **Events** 子分頁。
+2. 看事件那行內嵌的 EVENT_ADDR_2 子表單（在主事件那行下方的一小條）。那裡的兩個位址列位 `TxtAddrCHN` 與 `TxtAddrPY` 都是空白。
+3. **注意：**外層的 EVENTS_DATA_2 子表單也有自己的位址列位（也叫 TxtAddrCHN / TxtAddrPY，但是綁到 `c_addr_chn` / `c_addr_name`，這兩個 `View_EventsData` 確實有 project）——這兩個欄位是正常的，會顯示「安豐 / Anfeng」。Bug #10 講的是內層 EVENT_ADDR_2 那兩個空欄位，不是父層那條看得見的地址值。
+4. SQL 驗證（不需開 Access）：`SELECT c_name_chn FROM View_EventAddrData` 會拋 `Too few parameters. Expected 2.`——JET 把未知識別字當作引數對待，這就確認了該欄位不在投影裡。
 
 #### 截圖
 
 ![bug10_subform_annotated.png](screenshots/bug10_subform_annotated.png)
 
-_Runtime view: CBDB_Browser_2 with c_personid=44872 (孫才) loaded.  EVENT_ADDR sub-tab shows blank Chinese / Pinyin address columns (control `TxtAddrCHN` is bound to `c_name_chn`, which the form's RecordSource — `View_EventAddrData` — doesn't project).  ADDR_CODES has the values — they're just unreachable from this sub-form._
+_Runtime view of CBDB_Browser_2 → BIOG_MAIN_2 → Events tab with c_personid=44872 (孫才) loaded.  **The visible '安豐' / address values come from the parent EVENTS_DATA_2 sub-form's TxtAddrCHN (correctly bound to `c_addr_chn`).**  Bug #10's blank controls live in the smaller EVENT_ADDR_2 sub-form nested inside the event row — those two controls (TxtAddrCHN / TxtAddrPY bound to `c_name_chn` / `c_name`, neither in `View_EventAddrData`'s projection) render empty.  COM probe confirms both are Visible=True with widths 2340 / 2100 twips (≈4cm / 3.5cm) — i.e. real user-visible blank columns, just smaller than the parent row's address display.  Verification scripts: `analysis/probe_bug_10_11_12_visibility.py` (control visibility) + the SQL probe in the steps above._
 
 #### 建議修復方案
 
-在表單設計視圖裡，把 `TxtAddrCHN`.ControlSource 由 `c_name_chn` 改成 `c_event_addr_chn`，把 `TxtAddrPY`.ControlSource 由 `c_name` 改成 `c_event_addr_name`（這才是 View_EventAddrData 裡真實的別名）。
-
-### Issue #11 — EVENTS_DATA_2 子表單上有一個控制元件繫結到不存在的列 c_event_record_id
-
-**涉及位置:** `EVENTS_DATA_2 Subform`
-
-**嚴重等級:** P2 — 靜默顯示問題（一列空白）
-
-#### 問題描述
-
-EVENTS_DATA_2 子表單上有一個控制元件，其 ControlSource 寫的是 `c_event_record_id`。源表 EVENTS_DATA 和表單的 RecordSource （`View_EventsData`）都沒有這一列——可能是早期 schema 上確實有「event record id」欄位，後來被去掉了，也可能是想寫 `c_event_code` 而打成錯字。該控制元件每一行都默默顯示空白。
-
-#### 復現步驟
-
-**建議使用的範例人物：** `c_personid=44872`（孫才，Sun Cai）
-
-開啟人物 44872（孫才，Sun Cai）。EVENTS 子資料表會顯示 1 條事件，其中 1 條有對應地址。相關繫結控制元件在每一列都會顯示空白。 _由 `reports/probe_demo_persons.py` 透過 SQL probe 挑選；之所以選這位，是因為其底層記錄數確實滿足這個 bug 的觸發條件。_
-
-1. 開啟人物 **c_personid = 44872（孫才 Sun Cai）** 的生平詳情——與上面 Issue #10 同一個人，他有多條 EVENTS_DATA 記錄，每一列都會渲染出問題欄位。
-2. 切換到 EVENTS 子資料表。
-3. 繫結到 `c_event_record_id` 的控制元件每一列都是空白（因為 EVENTS_DATA 和 View_EventsData 都沒有這個欄位）。
-
-#### 截圖
-
-![bug11_subform_annotated.png](screenshots/bug11_subform_annotated.png)
-
-_Runtime view: CBDB_Browser_2 with c_personid=44872 (孫才) loaded.  EVENTS_DATA sub-tab has a control bound to `c_event_record_id`, which doesn't exist in either EVENTS_DATA or `View_EventsData` — every row renders blank silently._
-
-#### 建議修復方案
-
-首先確認本意是什麼。如果這一列已經不需要，刪掉控制元件即可；如果原本想綁 `c_event_code`，把 ControlSource 改成它；如果確實需要一個事件記錄 id，那就要在 EVENTS_DATA 上加這一列，並且在 View_EventsData 的 SELECT 裡 project 出來。
-
-### Issue #12 — POSTED_TO_OFFICE_DATA_2 子表單的任職型別控制元件綁到了錯的列名
-
-**涉及位置:** `POSTED_TO_OFFICE_DATA_2 Subform`
-
-**嚴重等級:** P2 — 靜默顯示問題（一列空白）
-
-#### 問題描述
-
-POSTED_TO_OFFICE_DATA_2 子表單上 `c_appt_type_code` 控制元件的 ControlSource 寫的是 `c_appt_type_code`。表單的 RecordSource （`View_PostingOfficeData`）投影的是 `POSTED_TO_OFFICE_DATA.c_appt_code`（中間沒有 `_type`）。控制元件默默地顯示空白。
-
-看起來是某次列重新命名後表單設計沒跟上。
-
-#### 復現步驟
-
-**建議使用的範例人物：** `c_personid=2`（安邡，An Fang）
-
-開啟人物 2（安邡，An Fang）。POSTED-TO-OFFICE 子資料表會顯示 1 條官職任命記錄，c_appt_code 都不為 NULL；但任職型別那一列每一列都是空白。 _由 `reports/probe_demo_persons.py` 透過 SQL probe 挑選；之所以選這位，是因為其底層記錄數確實滿足這個 bug 的觸發條件。_
-
-1. 開啟人物 **c_personid = 2（安邡 An Fang）** 的生平詳情——之所以選他，是因為他有為數不多的 POSTED_TO_OFFICE_DATA 記錄，且每條的 `c_appt_code` 都不為 NULL，這樣我們要檢查的欄位確實有源資料。
-2. 切換到 POSTED_TO_OFFICE 子資料表。
-3. 任職型別列每一列都是空白，儘管源表 c_appt_code 在每一列都是有值的。
-
-#### 截圖
-
-![bug12_subform_annotated.png](screenshots/bug12_subform_annotated.png)
-
-_Runtime view: CBDB_Browser_2 with c_personid=2 (安邡, An Fang) loaded — picked because he has POSTING_DATA (Sun Cai 44872 has none).  Postings sub-tab is open; the appointment-type column is blank on every row — the bound control's ControlSource (`c_appt_type_code`) is missing from `View_PostingOfficeData`'s projection._
-
-#### 建議修復方案
-
-把控制元件的 ControlSource 由 `c_appt_type_code` 改成 `c_appt_code`（這才是 View_PostingOfficeData 真正投影出來的列名）。
+在 `EVENT_ADDR_2 Subform` 的表單設計檢視裡，把 `TxtAddrCHN`.ControlSource 由 `c_name_chn` 改成 `c_event_addr_chn`；把 `TxtAddrPY`.ControlSource 由 `c_name` 改成 `c_event_addr_name`（這才是 View_EventAddrData 裡真實的別名）。
 
 ## P3 — 缺失介面
 
@@ -576,6 +515,64 @@ _Re-rendered popup — exact runtime error users would see if the button were pr
 #### 建議修復方案
 
 與 Issue #13 相同：把 picker 表單恢復，或把呼叫方改成指向替代的 picker。雖然目前執行路徑不可達，靜態缺陷仍應清理，以免日後 `KIN_DATA Subform` 被重新嵌入時又冒出來。
+
+### Issue #11 — EVENTS_DATA_2 上 c_event_record_id 控制元件綁到不存在的欄位——但該控制元件本身是隱藏的（LATENT）
+
+**涉及位置:** `EVENTS_DATA_2 Subform`
+
+**嚴重等級:** P5 — Latent（若日後把該控制元件改成 Visible=True 或加寬到 240 twips 以上，就會回到 P2）
+
+#### 問題描述
+
+**靜態缺陷確實存在，但執行時使用者看不到。**EVENTS_DATA_2 子表單上有一個叫 `c_event_record_id` 的控制元件，ControlSource 也是 `c_event_record_id`。EVENTS_DATA 與 `View_EventsData` 都沒有這個欄位（SQL 驗證：`SELECT c_event_record_id FROM View_EventsData` 會拋 `Too few parameters. Expected 1.`）。所以如果該控制元件顯示出來，確實會空白。
+
+**為何 LATENT。**對 runtime 表單做 COM 探測（`analysis/probe_bug_10_11_12_visibility.py`）顯示該控制元件 `Visible = False`，寬 240 twips（~4mm）、高 270 twips——這就是一個隱藏的內部控制元件，幾乎可以肯定是早期殘留的 join-key 欄位，本來就不打算給使用者看。使用者不會看到空白欄位，因為根本看不到這個控制元件。2026-05-03 從 P2 降到 P5。
+
+#### 復現步驟
+
+**建議使用的範例人物：** `c_personid=44872`（孫才，Sun Cai）
+
+開啟人物 44872（孫才，Sun Cai）。EVENTS 子資料表會顯示 1 條事件，其中 1 條有對應地址。相關繫結控制元件在每一列都會顯示空白。 _由 `reports/probe_demo_persons.py` 透過 SQL probe 挑選；之所以選這位，是因為其底層記錄數確實滿足這個 bug 的觸發條件。_
+
+1. 驗證路徑**只能靜態 + COM 探測**——沒有 UI 上的可見徵狀。
+2. 靜態證據：對 user mdb 跑 `SELECT c_event_record_id FROM View_EventsData` 會拋 `Too few parameters. Expected 1.`，確認該欄位不在投影裡。
+3. 可見性證據：跑 `python analysis/probe_bug_10_11_12_visibility.py`，看 `analysis/dump/bug_10_11_12_visibility.json` 中 bug #11 那筆——`control_summary.visible` 是 `False`、`width` 是 240 twips。
+
+#### 建議修復方案
+
+若這個隱藏控制元件用不到了，直接刪除即可；若原意是隱藏的 join-key 容器，把 ControlSource 改成真實的欄位（例如 `c_event_code`），免得帶著一個失效的繫結。無論怎麼改，使用者都看不到差別——這純粹是程式碼整潔。
+
+### Issue #12 — POSTED_TO_OFFICE_DATA_2 上 c_appt_type_code 控制元件綁到沒投影的欄位——但該控制元件是隱藏的，且使用者實際看的任職型別欄位是正常的（LATENT）
+
+**涉及位置:** `POSTED_TO_OFFICE_DATA_2 Subform`
+
+**嚴重等級:** P5 — Latent（若日後把該控制元件改成 Visible=True 或加寬到 180 twips 以上，就會回到 P2）
+
+#### 問題描述
+
+**靜態缺陷確實存在，但執行時使用者看不到。**POSTED_TO_OFFICE_DATA_2 上隱藏的內部控制元件 `c_appt_type_code` ControlSource 是 `c_appt_type_code`，而 `View_PostingOfficeData` 沒有投影這個欄位（SQL 驗證：拋 `Too few parameters. Expected 1.`）。
+
+**為何 LATENT。** 兩個理由：
+
+1. COM 探測（`analysis/probe_bug_10_11_12_visibility.py`）顯示該控制元件 `Visible = False`，寬 180 twips（~3mm）、高 330 twips——典型的隱藏 join-key 控制元件。
+2. 同一個子表單上**真正給使用者看的**任職型別欄位是 `TxtApptType`（綁 `c_appt_desc`）與 `TxtApptTypeChn`（綁 `c_appt_desc_chn`）。這兩個欄位都在 `View_PostingOfficeData` 的投影裡——SQL 探測能拿到真實值（例如 `'Regular Appointment'` / `'正授'`）。所以 Postings 分頁上的任職型別**是正常顯示的**；只有隱藏的 `c_appt_type_code` 控制元件壞掉。
+
+2026-05-03 從 P2 降到 P5——原本「任職型別列每一列都是空白」的 P2 說法是錯的；使用者實際看的任職型別欄位是正常的。
+
+#### 復現步驟
+
+**建議使用的範例人物：** `c_personid=2`（安邡，An Fang）
+
+開啟人物 2（安邡，An Fang）。POSTED-TO-OFFICE 子資料表會顯示 1 條官職任命記錄，c_appt_code 都不為 NULL；但任職型別那一列每一列都是空白。 _由 `reports/probe_demo_persons.py` 透過 SQL probe 挑選；之所以選這位，是因為其底層記錄數確實滿足這個 bug 的觸發條件。_
+
+1. 驗證路徑**只能靜態 + COM 探測**——沒有 UI 上的可見徵狀。
+2. 靜態證據：`SELECT c_appt_type_code FROM View_PostingOfficeData` 會拋 `Too few parameters. Expected 1.`，確認該欄位不在投影裡。
+3. 可見性證據：跑 `python analysis/probe_bug_10_11_12_visibility.py`，看 `analysis/dump/bug_10_11_12_visibility.json` 中 bug #12 那筆——`control_summary.visible` 是 `False`、width 是 180 twips。
+4. 反證（使用者實際看的欄位是正常的）：`SELECT TOP 1 c_appt_desc, c_appt_desc_chn FROM View_PostingOfficeData` 能返回真實值（例如 `'Regular Appointment'` / `'正授'`），這就是 `TxtApptType` / `TxtApptTypeChn`（可見的兩個控制元件）渲染出來的內容。
+
+#### 建議修復方案
+
+若這個隱藏控制元件用不到了，刪除即可；若是有意為之的隱藏 join-key 容器，把 ControlSource 改成真實的欄位（例如 `c_appt_code`）。無論怎麼改，使用者都看不到差別——這純粹是程式碼整潔。
 
 ## 附錄 —— c_index_year / c_index_addr_id 與 cbdb-online-main-server 快照之間的偏差（非缺陷）
 

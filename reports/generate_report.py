@@ -770,159 +770,279 @@ ISSUES = [
             "为空。"
         ),
         "steps_en": [
-            "Open the biographical detail form for **c_personid = 44872 "
-            "(Sun Cai 孫才)** — picked because he has both EVENTS_DATA "
-            "and EVENTS_ADDR rows in a small enough quantity to inspect "
-            "by eye.",
-            "Switch to the EVENT_ADDR sub-datasheet.",
-            "The Chinese address column and the Pinyin address column "
-            "are blank on every row, even though the underlying "
-            "ADDR_CODES rows actually have those fields populated.",
+            "Open CBDB_Browser_2 and navigate to **c_personid = 44872 "
+            "(Sun Cai 孫才)** — picked because he has 1 EVENTS_DATA "
+            "row with an associated EVENT_ADDR row pointing at "
+            "`c_addr_id = 12603` (Anfeng / 安豐 in ADDR_CODES).  "
+            "Switch to the **Events** sub-tab.",
+            "Look at the small EVENT_ADDR_2 sub-form embedded inside "
+            "the event row (it's nested below the main event line).  "
+            "The two address textboxes there — `TxtAddrCHN` and "
+            "`TxtAddrPY` — render blank.",
+            "**Note:** the parent EVENTS_DATA_2 sub-form has its own "
+            "address controls (also called TxtAddrCHN / TxtAddrPY but "
+            "bound to `c_addr_chn` / `c_addr_name`, which `View_EventsData` "
+            "DOES project) — those work and show '安豐' / 'Anfeng'.  "
+            "Bug #10 is specifically about the inner EVENT_ADDR_2 "
+            "sub-form's controls being blank, not about the visible "
+            "address values on the parent row.",
+            "SQL verification (no Access needed): "
+            "`SELECT c_name_chn FROM View_EventAddrData` raises "
+            "`Too few parameters. Expected 2.` — JET treats the "
+            "unknown identifier as a parameter, confirming the column "
+            "is not in the projection.",
         ],
         "steps_zh": [
-            "打開人物 **c_personid = 44872（孫才 Sun Cai）** 的生平詳情"
-            "——之所以選他，是因為他同時有 EVENTS_DATA 和 EVENTS_ADDR "
-            "記錄，數量適中，方便肉眼檢查。",
-            "切換到 EVENT_ADDR 子資料表。",
-            "中文地址列和拼音地址列每一列都是空白，儘管底層 ADDR_CODES "
-            "對應行其實有真實值。",
+            "打開 CBDB_Browser_2，導航到 **c_personid = 44872"
+            "（孫才 Sun Cai）**——選他是因為他有 1 條 EVENTS_DATA 記錄，"
+            "對應 1 條 EVENT_ADDR 指向 `c_addr_id = 12603`（ADDR_CODES "
+            "裡是 Anfeng / 安豐）。切到 **Events** 子分頁。",
+            "看事件那行內嵌的 EVENT_ADDR_2 子表單"
+            "（在主事件那行下方的一小條）。"
+            "那裡的兩個地址欄位 `TxtAddrCHN` 與 `TxtAddrPY` 都是空白。",
+            "**注意：**外層的 EVENTS_DATA_2 子表單也有自己的"
+            "地址欄位（也叫 TxtAddrCHN / TxtAddrPY，但是綁到 "
+            "`c_addr_chn` / `c_addr_name`，這兩個 `View_EventsData` "
+            "確實有 project）——這兩個欄位是正常的，會顯示「安豐 / Anfeng」。"
+            "Bug #10 講的是內層 EVENT_ADDR_2 那兩個空欄位，"
+            "不是父層那條看得見的地址值。",
+            "SQL 驗證（不需開 Access）："
+            "`SELECT c_name_chn FROM View_EventAddrData` 會拋 "
+            "`Too few parameters. Expected 2.`——JET 把未知識別字當作"
+            "參數對待，這就確認了該欄位不在投影裡。",
         ],
         "fix_en": (
-            "In the form designer, change `TxtAddrCHN`.ControlSource from "
-            "`c_name_chn` to `c_event_addr_chn`, and `TxtAddrPY`."
-            "ControlSource from `c_name` to `c_event_addr_name` (the "
-            "actual aliases in View_EventAddrData)."
+            "In the form designer for `EVENT_ADDR_2 Subform`, change "
+            "`TxtAddrCHN`.ControlSource from `c_name_chn` to "
+            "`c_event_addr_chn`, and `TxtAddrPY`.ControlSource from "
+            "`c_name` to `c_event_addr_name` (the actual aliases in "
+            "View_EventAddrData)."
         ),
         "fix_zh": (
-            "在表单设计视图里，把 `TxtAddrCHN`.ControlSource 由 `c_name_chn` "
-            "改成 `c_event_addr_chn`，把 `TxtAddrPY`.ControlSource 由 "
-            "`c_name` 改成 `c_event_addr_name`（这才是 View_EventAddrData "
-            "里真实的别名）。"
+            "在 `EVENT_ADDR_2 Subform` 的表單設計檢視裡，"
+            "把 `TxtAddrCHN`.ControlSource 由 `c_name_chn` 改成 "
+            "`c_event_addr_chn`；把 `TxtAddrPY`.ControlSource 由 "
+            "`c_name` 改成 `c_event_addr_name`（這才是 "
+            "View_EventAddrData 裡真實的別名）。"
         ),
         "screenshots": [
             ("bug10_subform_annotated.png",
-             "Runtime view: CBDB_Browser_2 with c_personid=44872 (孫才) loaded.  EVENT_ADDR sub-tab shows blank Chinese / Pinyin address columns (control `TxtAddrCHN` is bound to `c_name_chn`, which the form's RecordSource — `View_EventAddrData` — doesn't project).  ADDR_CODES has the values — they're just unreachable from this sub-form."),
+             "Runtime view of CBDB_Browser_2 → BIOG_MAIN_2 → Events tab "
+             "with c_personid=44872 (孫才) loaded.  **The visible '安豐' / "
+             "address values come from the parent EVENTS_DATA_2 sub-form's "
+             "TxtAddrCHN (correctly bound to `c_addr_chn`).**  Bug #10's "
+             "blank controls live in the smaller EVENT_ADDR_2 sub-form "
+             "nested inside the event row — those two controls "
+             "(TxtAddrCHN / TxtAddrPY bound to `c_name_chn` / `c_name`, "
+             "neither in `View_EventAddrData`'s projection) render "
+             "empty.  COM probe confirms both are Visible=True with "
+             "widths 2340 / 2100 twips (≈4cm / 3.5cm) — i.e. real "
+             "user-visible blank columns, just smaller than the parent "
+             "row's address display.  Verification scripts: "
+             "`analysis/probe_bug_10_11_12_visibility.py` (control "
+             "visibility) + the SQL probe in the steps above."),
         ],
-        "severity_en": "P2 — Silent display (address columns blank)",
-        "severity_zh": "P2 — 静默显示问题（地址列空白）",
+        "severity_en": "P2 — Silent display (EVENT_ADDR_2's TxtAddrCHN / TxtAddrPY render blank for every row)",
+        "severity_zh": "P2 — 靜默顯示問題（EVENT_ADDR_2 的 TxtAddrCHN / TxtAddrPY 每一列都空白）",
     },
     {
         "id": 11,
-        "tier": "P2_silent_display",
+        "tier": "P5_resolved_or_dormant",
         "form": "EVENTS_DATA_2 Subform",
-        "title_en": "EVENTS_DATA_2 Subform has a control bound to a non-existent column c_event_record_id",
-        "title_zh": "EVENTS_DATA_2 子表单上有一个控件绑定到不存在的列 c_event_record_id",
+        "title_en": "EVENTS_DATA_2's c_event_record_id control bound to a non-existent column — but the control is hidden (LATENT)",
+        "title_zh": "EVENTS_DATA_2 上 c_event_record_id 控件綁到不存在的欄位——但該控件本身是隱藏的（LATENT）",
         "summary_en": (
-            "The EVENTS_DATA_2 sub-form has a control whose ControlSource "
-            "is `c_event_record_id`. Neither the source table EVENTS_DATA "
-            "nor the form's RecordSource (`View_EventsData`) has a column "
-            "of that name — likely a stale design-time leftover from when "
-            "the schema had an event-record id, or an intended "
-            "`c_event_code` that was typo'd. The control silently shows "
-            "blank for every row."
+            "**Static defect is real, runtime symptom is not user-visible.** "
+            "The EVENTS_DATA_2 sub-form has a control named "
+            "`c_event_record_id` whose ControlSource is also "
+            "`c_event_record_id`.  Neither EVENTS_DATA nor "
+            "`View_EventsData` projects a column of that name (SQL probe "
+            "confirms — `SELECT c_event_record_id FROM View_EventsData` "
+            "raises `Too few parameters. Expected 1.`), so the control "
+            "would render blank if shown.\n\n"
+            "**Why LATENT.**  A live COM probe of the rendered form "
+            "(`analysis/probe_bug_10_11_12_visibility.py`) reports the "
+            "control as `Visible = False`, with width = 240 twips "
+            "(~4mm) and height = 270 twips — i.e. a hidden internal "
+            "control, almost certainly a leftover join-key field that "
+            "was never meant to be shown.  Real users won't see a blank "
+            "column because they don't see the control at all.  Reclassed "
+            "from P2 to P5 on 2026-05-03."
         ),
         "summary_zh": (
-            "EVENTS_DATA_2 子表单上有一个控件，其 ControlSource 写的是 "
-            "`c_event_record_id`。源表 EVENTS_DATA 和表单的 RecordSource "
-            "（`View_EventsData`）都没有这一列——可能是早期 schema 上确实有"
-            "「event record id」字段，后来被去掉了，也可能是想写 "
-            "`c_event_code` 而打成错字。该控件每一行都默默显示空白。"
+            "**靜態缺陷確實存在，但執行時用戶看不到。**"
+            "EVENTS_DATA_2 子表單上有一個叫 `c_event_record_id` 的控件，"
+            "ControlSource 也是 `c_event_record_id`。EVENTS_DATA 與 "
+            "`View_EventsData` 都沒有這個欄位（SQL 驗證："
+            "`SELECT c_event_record_id FROM View_EventsData` 會拋 "
+            "`Too few parameters. Expected 1.`）。所以如果該控件顯示出來，"
+            "確實會空白。\n\n"
+            "**為何 LATENT。**對 runtime 表單做 COM 探測"
+            "（`analysis/probe_bug_10_11_12_visibility.py`）"
+            "顯示該控件 `Visible = False`，寬 240 twips（~4mm）、"
+            "高 270 twips——這就是一個隱藏的內部控件，"
+            "幾乎可以肯定是早期殘留的 join-key 欄位，"
+            "本來就不打算給用戶看。"
+            "用戶不會看到空白欄位，因為根本看不到這個控件。"
+            "2026-05-03 從 P2 降到 P5。"
         ),
         "steps_en": [
-            "Open the biographical detail form for **c_personid = 44872 "
-            "(Sun Cai 孫才)** — same person used for Issue #10 above; "
-            "he has multiple EVENTS_DATA rows so the offending column "
-            "renders on each.",
-            "Switch to the EVENTS sub-datasheet.",
-            "The control bound to `c_event_record_id` is blank for "
-            "every row (because neither EVENTS_DATA nor "
-            "View_EventsData has that column).",
+            "Verification path is **static + COM probe only** — there's "
+            "no UI symptom to demonstrate.",
+            "Static evidence: `SELECT c_event_record_id FROM "
+            "View_EventsData` against the user mdb raises `Too few "
+            "parameters. Expected 1.`, confirming the column is not in "
+            "the projection.",
+            "Visibility evidence: run `python "
+            "analysis/probe_bug_10_11_12_visibility.py` and look at the "
+            "entry for bug #11 in `analysis/dump/"
+            "bug_10_11_12_visibility.json` — `control_summary.visible` "
+            "is `False` and `width` is 240 twips.",
         ],
         "steps_zh": [
-            "打開人物 **c_personid = 44872（孫才 Sun Cai）** 的生平詳情"
-            "——與上面 Issue #10 同一個人，他有多條 EVENTS_DATA 記錄，"
-            "每一列都會渲染出問題欄位。",
-            "切換到 EVENTS 子資料表。",
-            "綁定到 `c_event_record_id` 的控件每一列都是空白（因為 "
-            "EVENTS_DATA 和 View_EventsData 都沒有這個欄位）。",
+            "驗證路徑**只能靜態 + COM 探測**——沒有 UI 上的可見徵狀。",
+            "靜態證據：對 user mdb 跑 `SELECT c_event_record_id FROM "
+            "View_EventsData` 會拋 `Too few parameters. Expected 1.`，"
+            "確認該欄位不在投影裡。",
+            "可見性證據：跑 `python "
+            "analysis/probe_bug_10_11_12_visibility.py`，看 "
+            "`analysis/dump/bug_10_11_12_visibility.json` 中 bug #11 "
+            "那筆——`control_summary.visible` 是 `False`、`width` 是 "
+            "240 twips。",
         ],
         "fix_en": (
-            "Decide what was intended. If the column is no longer needed, "
-            "remove the control. If it should map to `c_event_code`, fix "
-            "the ControlSource to that name. If the schema needs a real "
-            "event-record-id column, add it to EVENTS_DATA AND project it "
-            "in View_EventsData."
+            "If the hidden control isn't needed, delete it.  If it's "
+            "intentionally a hidden join-key holder, change its "
+            "ControlSource to a real column (e.g. `c_event_code`) so "
+            "it doesn't carry a stale binding.  Either way, the change "
+            "is invisible to users; this is code-hygiene only."
         ),
         "fix_zh": (
-            "首先确认本意是什么。如果这一列已经不需要，删掉控件即可；如果原本"
-            "想绑 `c_event_code`，把 ControlSource 改成它；如果确实需要一个"
-            "事件记录 id，那就要在 EVENTS_DATA 上加这一列，并且在 "
-            "View_EventsData 的 SELECT 里 project 出来。"
+            "若這個隱藏控件用不到了，直接刪除即可；若原意是隱藏的 "
+            "join-key 容器，把 ControlSource 改成真實的欄位"
+            "（例如 `c_event_code`），免得帶著一個失效的綁定。"
+            "無論怎麼改，使用者都看不到差別——這純粹是程式碼整潔。"
         ),
-        "screenshots": [
-            ("bug11_subform_annotated.png",
-             "Runtime view: CBDB_Browser_2 with c_personid=44872 (孫才) loaded.  EVENTS_DATA sub-tab has a control bound to `c_event_record_id`, which doesn't exist in either EVENTS_DATA or `View_EventsData` — every row renders blank silently."),
-        ],
-        "severity_en": "P2 — Silent display (column blank)",
-        "severity_zh": "P2 — 静默显示问题（一列空白）",
+        "screenshots": [],
+        "severity_en": (
+            "P5 — Latent (would be P2 if the control were ever made "
+            "Visible=True or widened past its current 240-twip "
+            "width)"
+        ),
+        "severity_zh": (
+            "P5 — Latent（若日後把該控件改成 Visible=True 或加寬到 "
+            "240 twips 以上，就會回到 P2）"
+        ),
     },
     {
         "id": 12,
-        "tier": "P2_silent_display",
+        "tier": "P5_resolved_or_dormant",
         "form": "POSTED_TO_OFFICE_DATA_2 Subform",
-        "title_en": "POSTED_TO_OFFICE_DATA_2 Subform appointment-type control bound to wrong column name",
-        "title_zh": "POSTED_TO_OFFICE_DATA_2 子表单的任职类型控件绑到了错的列名",
+        "title_en": "POSTED_TO_OFFICE_DATA_2's c_appt_type_code control bound to a non-projected column — but the control is hidden AND the user-facing appointment-type controls work (LATENT)",
+        "title_zh": "POSTED_TO_OFFICE_DATA_2 上 c_appt_type_code 控件綁到沒投影的欄位——但該控件是隱藏的，且用戶實際看的任職類型欄位是正常的（LATENT）",
         "summary_en": (
-            "The control `c_appt_type_code` on POSTED_TO_OFFICE_DATA_2 "
-            "subform has ControlSource `c_appt_type_code`. The form's "
-            "RecordSource (`View_PostingOfficeData`) projects "
-            "`POSTED_TO_OFFICE_DATA.c_appt_code` (no `_type` infix). The "
-            "control silently shows blank.\n\n"
-            "Looks like a renamed column the form designer didn't follow."
+            "**Static defect is real, runtime symptom is not user-visible.** "
+            "The hidden internal control `c_appt_type_code` on "
+            "POSTED_TO_OFFICE_DATA_2 has ControlSource "
+            "`c_appt_type_code`, which `View_PostingOfficeData` doesn't "
+            "project (SQL probe: raises `Too few parameters. Expected "
+            "1.`).\n\n"
+            "**Why LATENT.**  Two reasons:\n\n"
+            "1. The COM probe (`analysis/probe_bug_10_11_12_visibility.py`) "
+            "reports the control as `Visible = False`, with width = "
+            "180 twips (~3mm) and height = 330 twips — a hidden "
+            "internal control, almost certainly a join-key holder.\n"
+            "2. The **user-facing** appointment-type controls on the "
+            "same sub-form are `TxtApptType` (bound to `c_appt_desc`) "
+            "and `TxtApptTypeChn` (bound to `c_appt_desc_chn`).  Both "
+            "of those columns ARE in `View_PostingOfficeData`'s "
+            "projection — SQL probe shows they return real values "
+            "(e.g. `'Regular Appointment'` / `'正授'`).  So the "
+            "appointment type IS displayed correctly on the Postings "
+            "sub-tab; only the hidden `c_appt_type_code` control is "
+            "broken.\n\n"
+            "Reclassed from P2 to P5 on 2026-05-03 — the original P2 "
+            "claim that 'the appointment-type column is blank on every "
+            "row' was wrong; the user-facing appointment-type column "
+            "works fine."
         ),
         "summary_zh": (
-            "POSTED_TO_OFFICE_DATA_2 子表单上 `c_appt_type_code` 控件的 "
-            "ControlSource 写的是 `c_appt_type_code`。表单的 RecordSource "
-            "（`View_PostingOfficeData`）投影的是 "
-            "`POSTED_TO_OFFICE_DATA.c_appt_code`（中间没有 `_type`）。"
-            "控件默默地显示空白。\n\n"
-            "看起来是某次列重命名后表单设计没跟上。"
+            "**靜態缺陷確實存在，但執行時用戶看不到。**"
+            "POSTED_TO_OFFICE_DATA_2 上隱藏的內部控件 `c_appt_type_code` "
+            "ControlSource 是 `c_appt_type_code`，而 "
+            "`View_PostingOfficeData` 沒有投影這個欄位"
+            "（SQL 驗證：拋 `Too few parameters. Expected 1.`）。\n\n"
+            "**為何 LATENT。** 兩個理由：\n\n"
+            "1. COM 探測（`analysis/probe_bug_10_11_12_visibility.py`）"
+            "顯示該控件 `Visible = False`，寬 180 twips（~3mm）、"
+            "高 330 twips——典型的隱藏 join-key 控件。\n"
+            "2. 同一個子表單上**真正給用戶看的**任職類型欄位是 "
+            "`TxtApptType`（綁 `c_appt_desc`）與 `TxtApptTypeChn`"
+            "（綁 `c_appt_desc_chn`）。這兩個欄位都在 "
+            "`View_PostingOfficeData` 的投影裡——SQL 探測能拿到真實值"
+            "（例如 `'Regular Appointment'` / `'正授'`）。"
+            "所以 Postings 分頁上的任職類型**是正常顯示的**；"
+            "只有隱藏的 `c_appt_type_code` 控件壞掉。\n\n"
+            "2026-05-03 從 P2 降到 P5——原本「任職類型列每一列都是空白」"
+            "的 P2 說法是錯的；用戶實際看的任職類型欄位是正常的。"
         ),
         "steps_en": [
-            "Open the biographical detail form for **c_personid = 2 "
-            "(An Fang 安邡)** — picked because he has a small number "
-            "of POSTED_TO_OFFICE_DATA rows, all with non-NULL "
-            "`c_appt_code`, so the column we want to inspect actually "
-            "has source data.",
-            "Switch to the POSTED_TO_OFFICE sub-datasheet.",
-            "The appointment-type column is blank for every row, "
-            "even though c_appt_code in the source table has a real "
-            "value on each.",
+            "Verification path is **static + COM probe only** — there's "
+            "no UI symptom to demonstrate.",
+            "Static evidence: `SELECT c_appt_type_code FROM "
+            "View_PostingOfficeData` raises `Too few parameters. "
+            "Expected 1.`, confirming the column is not projected.",
+            "Visibility evidence: run `python "
+            "analysis/probe_bug_10_11_12_visibility.py` and look at "
+            "the entry for bug #12 in `analysis/dump/"
+            "bug_10_11_12_visibility.json` — `control_summary.visible` "
+            "is `False` and width = 180 twips.",
+            "Counter-evidence (what users actually see works fine): "
+            "`SELECT TOP 1 c_appt_desc, c_appt_desc_chn FROM "
+            "View_PostingOfficeData` returns real values (e.g. "
+            "`'Regular Appointment'` / `'正授'`), and those are what "
+            "`TxtApptType` / `TxtApptTypeChn` (the visible controls) "
+            "render.",
         ],
         "steps_zh": [
-            "打開人物 **c_personid = 2（安邡 An Fang）** 的生平詳情"
-            "——之所以選他，是因為他有為數不多的 POSTED_TO_OFFICE_DATA "
-            "記錄，且每條的 `c_appt_code` 都不為 NULL，這樣我們要檢查"
-            "的欄位確實有源資料。",
-            "切換到 POSTED_TO_OFFICE 子資料表。",
-            "任職類型列每一列都是空白，儘管源表 c_appt_code 在每一列"
-            "都是有值的。",
+            "驗證路徑**只能靜態 + COM 探測**——沒有 UI 上的可見徵狀。",
+            "靜態證據：`SELECT c_appt_type_code FROM "
+            "View_PostingOfficeData` 會拋 `Too few parameters. "
+            "Expected 1.`，確認該欄位不在投影裡。",
+            "可見性證據：跑 `python "
+            "analysis/probe_bug_10_11_12_visibility.py`，看 "
+            "`analysis/dump/bug_10_11_12_visibility.json` 中 bug #12 "
+            "那筆——`control_summary.visible` 是 `False`、"
+            "width 是 180 twips。",
+            "反證（用戶實際看的欄位是正常的）："
+            "`SELECT TOP 1 c_appt_desc, c_appt_desc_chn FROM "
+            "View_PostingOfficeData` 能返回真實值（例如 "
+            "`'Regular Appointment'` / `'正授'`），這就是 "
+            "`TxtApptType` / `TxtApptTypeChn`（可見的兩個控件）"
+            "渲染出來的內容。",
         ],
         "fix_en": (
-            "Change the control's ControlSource from `c_appt_type_code` "
-            "to `c_appt_code` (the actual column projected by "
-            "View_PostingOfficeData)."
+            "If the hidden control isn't needed, delete it.  If it's "
+            "an intentional hidden join-key holder, change its "
+            "ControlSource to a real column (e.g. `c_appt_code`).  "
+            "Either way the change is invisible to users; this is "
+            "code-hygiene only."
         ),
         "fix_zh": (
-            "把控件的 ControlSource 由 `c_appt_type_code` 改成 `c_appt_code`"
-            "（这才是 View_PostingOfficeData 真正投影出来的列名）。"
+            "若這個隱藏控件用不到了，刪除即可；若是有意為之的隱藏 "
+            "join-key 容器，把 ControlSource 改成真實的欄位"
+            "（例如 `c_appt_code`）。無論怎麼改，使用者都看不到差別"
+            "——這純粹是程式碼整潔。"
         ),
-        "screenshots": [
-            ("bug12_subform_annotated.png",
-             "Runtime view: CBDB_Browser_2 with c_personid=2 (安邡, An Fang) loaded — picked because he has POSTING_DATA (Sun Cai 44872 has none).  Postings sub-tab is open; the appointment-type column is blank on every row — the bound control's ControlSource (`c_appt_type_code`) is missing from `View_PostingOfficeData`'s projection."),
-        ],
-        "severity_en": "P2 — Silent display (column blank)",
-        "severity_zh": "P2 — 静默显示问题（一列空白）",
+        "screenshots": [],
+        "severity_en": (
+            "P5 — Latent (would be P2 if the control were ever made "
+            "Visible=True or widened past its current 180-twip width)"
+        ),
+        "severity_zh": (
+            "P5 — Latent（若日後把該控件改成 Visible=True 或加寬到 "
+            "180 twips 以上，就會回到 P2）"
+        ),
     },
     # ========== Tier 4: missing UI (export buttons not on the form) ==========
     {
