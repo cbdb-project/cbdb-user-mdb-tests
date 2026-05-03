@@ -67,21 +67,38 @@ ISSUES = [
             "表里每一行显示的「首年份范围」其实是末年份范围。"
         ),
         "steps_en": [
-            "Open any person's biographical detail form.",
-            "Switch to the **Status** sub-datasheet.",
-            "Compare the column **First-year range** (`c_fy_range_desc`) "
-            "with the column **Last-year range** (`c_ly_range_desc`).",
-            "Whenever the underlying `c_fy_range` and `c_ly_range` codes "
-            "differ, the displayed first-year text actually shows the "
-            "last-year value.",
+            "Because no STATUS_DATA row in the current dump has both "
+            "c_fy_range AND c_ly_range populated, this bug cannot be "
+            "demonstrated through the UI today.  Verify it directly "
+            "in SQL instead:",
+            "Open the .mdb in Access.  Press F11 to show the "
+            "navigation pane, then double-click query "
+            "**View_StatusData**.",
+            "Inspect the SELECT clause: every `c_fy_range_*` alias is "
+            "pulled from `YEAR_RANGE_CODES_1`, but the FROM clause "
+            "joins that alias on the LAST-year range.  That's the "
+            "swap.",
+            "(Optional) Run `SELECT TOP 100 c_personid, c_fy_range, "
+            "c_fy_range_desc, c_ly_range, c_ly_range_desc FROM "
+            "View_StatusData WHERE c_fy_range > 0 OR c_ly_range > 0` "
+            "in the Access query window — once a future data refresh "
+            "populates both fields differently, every such row will "
+            "display the wrong first-year text.",
         ],
         "steps_zh": [
-            "打开任意一位人物的生平详情表单。",
-            "切换到 **Status** 子数据表。",
-            "对比 **首年份范围** 列（`c_fy_range_desc`）和 **末年份范围** "
-            "列（`c_ly_range_desc`）。",
-            "只要底层 `c_fy_range` 与 `c_ly_range` 编码不同，显示的首年份"
-            "范围其实都是末年份的值。",
+            "由於本 .mdb 當前快照下，沒有任何 STATUS_DATA 列同時填了 "
+            "c_fy_range 和 c_ly_range，這個 bug 暫時無法在 UI 上復現。"
+            "請直接用 SQL 驗證：",
+            "在 Access 裡打開 .mdb，按 F11 顯示導航窗格，雙擊查詢 "
+            "**View_StatusData**。",
+            "查看 SELECT 子句：所有 `c_fy_range_*` 別名都從 "
+            "`YEAR_RANGE_CODES_1` 取值，但 FROM 子句把這個別名 JOIN "
+            "在末年份範圍上——這就是錯位。",
+            "（可選）在 Access 查詢視窗執行 `SELECT TOP 100 c_personid, "
+            "c_fy_range, c_fy_range_desc, c_ly_range, c_ly_range_desc "
+            "FROM View_StatusData WHERE c_fy_range > 0 OR c_ly_range > 0` "
+            "——未來某次資料更新如果同時填了這兩個欄位且取值不同，每一條"
+            "結果都會顯示錯誤的首年份文字。",
         ],
         "fix_en": (
             "In `View_StatusData` change `YEAR_RANGE_CODES_1.c_range AS "
@@ -186,19 +203,27 @@ ISSUES = [
             "之后整个 Neo4j 导出链下游的任何文件都不会产生。"
         ),
         "steps_en": [
-            "Open **LookAtPlace** and run any successful query.",
-            "Click **Neo4j** to start the multi-file export.",
-            "Pick a save location for the first prompt (People file).",
-            "A `Run-time error 3265 — Item not found in this collection` popup "
-            "appears.",
-            "After clicking OK, no files have been written to the chosen folder.",
+            "Open **LookAtPlace**.  Pick the address picker, choose a "
+            "well-attested address — for example **c_addr_id = 7213** "
+            "(Kaifeng 開封) — so the resulting query has plenty of "
+            "people to feed the People-CSV loop.  Click **Run Query**.",
+            "Once the query finishes, click the **Neo4j** export button.",
+            "Pick a save location at the first SaveAs prompt (the "
+            "'People file' prompt).",
+            "A `Run-time error 3265 — Item not found in this "
+            "collection` popup appears almost immediately.",
+            "After clicking OK, the chosen folder is empty — no Neo4j "
+            "export file was written.",
         ],
         "steps_zh": [
-            "打开 **LookAtPlace** 并跑任意一次能成功的查询。",
-            "点 **Neo4j** 启动多文件导出。",
-            "在第一个保存对话框（People 文件）中选好路径。",
-            "弹出 `运行时错误 3265 ——集合中找不到项目` 对话框。",
-            "点确定后，目标文件夹里一个文件都没有生成。",
+            "打開 **LookAtPlace**。透過地址 picker 選一個資料量足夠的"
+            "地址——例如 **c_addr_id = 7213（開封）**——這樣查詢結果有"
+            "足夠人物餵給 People-CSV 迴圈。點 **Run Query**。",
+            "等查詢跑完，點 **Neo4j** 匯出按鈕。",
+            "在第一個另存對話框（「People 檔」對話框）裡選好儲存路徑。",
+            "幾乎立刻彈出 `執行時錯誤 3265 ——集合中找不到項目` 對話框。",
+            "點確定後，剛才選的資料夾裡一個檔案也沒有——整個 Neo4j 匯出"
+            "什麼都沒寫出。",
         ],
         "fix_en": (
             "Extend the SELECT in the People-CSV branch to project the "
@@ -494,17 +519,32 @@ ISSUES = [
             "可以参考。"
         ),
         "steps_en": [
-            "Open **LookAtGroupData** with any non-empty person list.",
-            "Tick the **Entry** checkbox.",
+            "In **LookAtGroupData**, populate the import list with one "
+            "entry — c_personid = 1 (An Dun 安惇) is enough; he has "
+            "exactly 2 ENTRY_DATA rows so the broken queryEntry SQL "
+            "will run on a tiny well-known sample.",
+            "Tick **only** the **Entry** checkbox (leave Status / "
+            "Office / Text / Addr unchecked so the unrelated query "
+            "branches don't fire).",
             "Click **Run**.",
-            "A popup appears reporting that a field doesn't exist (the "
-            "exact wording varies between Office versions).",
+            "A popup appears reporting that a field doesn't exist "
+            "(JET reports this as 'No value given for one or more "
+            "required parameters' / 'No such field' depending on the "
+            "Office build — both mean the SQL referenced "
+            "`ENTRY_DATA.c_parental_status` which doesn't exist).",
         ],
         "steps_zh": [
-            "打开 **LookAtGroupData**，给任意一份非空的 person 列表。",
-            "勾上 **Entry** 复选框。",
-            "点 **Run**。",
-            "弹出「字段不存在」之类的对话框（具体措辞取决于 Office 版本）。",
+            "在 **LookAtGroupData** 上把匯入清單設為一個人——例如 "
+            "c_personid = 1（安惇 An Dun），他只有 2 條 ENTRY_DATA "
+            "記錄，足以讓有缺陷的 queryEntry SQL 在一個小而熟知的"
+            "樣本上跑起來。",
+            "**只**勾 **Entry** 複選框（Status / Office / Text / "
+            "Addr 都不勾，避免無關的查詢分支干擾）。",
+            "點 **Run**。",
+            "彈出「欄位不存在」之類的對話框（JET 在不同 Office 版本"
+            "下給出的措辭是「沒有為一個或多個必要參數提供值」或「沒有"
+            "此欄位」——都是因為 SQL 引用了根本不存在的 "
+            "`ENTRY_DATA.c_parental_status`）。",
         ],
         "fix_en": (
             "Change `ENTRY_DATA.c_parental_status` to "
@@ -544,14 +584,25 @@ ISSUES = [
             "处没有跟着更新。"
         ),
         "steps_en": [
-            "Open any person's biographical detail form.",
-            "On the BIOG_MAIN_2 subform, click the `c_fl_ey_notes` field.",
-            "An `Item not found in this collection.` popup appears.",
+            "Open the biographical detail form for **c_personid = 5 "
+            "(Zha Yue 查籥)** — picked because his BIOG_MAIN row has a "
+            "non-empty `c_fl_ey_notes` value, so the field is "
+            "interactable (clicking an empty field doesn't fire the "
+            "Sub).",
+            "On the BIOG_MAIN_2 subform, click the `c_fl_ey_notes` "
+            "field — that fires the `c_fl_ey_notes_Click` Sub.",
+            "An `Item not found in this collection.` popup appears "
+            "(because the Sub tries `DoCmd.OpenForm \"frmPickNIAN_HAO\"` "
+            "and that form doesn't exist).",
         ],
         "steps_zh": [
-            "打开任意一位人物的生平详情表单。",
-            "在 BIOG_MAIN_2 子表单上，点击 `c_fl_ey_notes` 字段。",
-            "弹出「集合中找不到项目」对话框。",
+            "打開人物 **c_personid = 5（查籥 Zha Yue）** 的生平詳情"
+            "——之所以選他，是因為其 BIOG_MAIN 上 `c_fl_ey_notes` 欄位"
+            "有實際內容，欄位可點（點一個空欄位不會觸發這個 Sub）。",
+            "在 BIOG_MAIN_2 子表單上點 `c_fl_ey_notes` 欄位——這會觸發"
+            " `c_fl_ey_notes_Click` Sub。",
+            "彈出「集合中找不到項目」對話框（因為 Sub 試圖 "
+            "`DoCmd.OpenForm \"frmPickNIAN_HAO\"`，而該表單根本不存在）。",
         ],
         "fix_en": (
             "Either restore the picker form `frmPickNIAN_HAO`, or update "
@@ -588,14 +639,22 @@ ISSUES = [
             "这两个表单当前 .mdb 里都没有。"
         ),
         "steps_en": [
-            "Open any person's kinship subform.",
-            "Click the field that's bound to the kinship-code picker.",
-            "An `Item not found in this collection.` popup appears.",
+            "Open the biographical detail form for **c_personid = 1 "
+            "(An Dun 安惇)** — he has 4 KIN_DATA rows, plenty to land "
+            "on for a click test.",
+            "On the KIN_DATA subform, click the kinship-code picker "
+            "field on any row.",
+            "An `Item not found in this collection.` popup appears "
+            "(the Sub tries `DoCmd.OpenForm "
+            "\"frmPickKINSHIP_CODES\"`, which doesn't exist either).",
         ],
         "steps_zh": [
-            "打开任意一位人物的亲属（kinship）子表单。",
-            "点击需要选择 kinship 编码的字段。",
-            "弹出「集合中找不到项目」对话框。",
+            "打開人物 **c_personid = 1（安惇 An Dun）** 的生平詳情"
+            "——他有 4 條 KIN_DATA 記錄，足夠用來做一次點擊測試。",
+            "在 KIN_DATA 子表單上，點任一列的「kinship code」picker "
+            "欄位。",
+            "彈出「集合中找不到項目」對話框（Sub 試圖 "
+            "`DoCmd.OpenForm \"frmPickKINSHIP_CODES\"`，該表單也不存在）。",
         ],
         "fix_en": (
             "Same as Issue #13: restore the picker form or update the "
@@ -638,16 +697,22 @@ ISSUES = [
             "为空。"
         ),
         "steps_en": [
-            "Open any person's biographical detail form for someone with "
-            "events that have associated addresses.",
+            "Open the biographical detail form for **c_personid = 44872 "
+            "(Sun Cai 孫才)** — picked because he has both EVENTS_DATA "
+            "and EVENTS_ADDR rows in a small enough quantity to inspect "
+            "by eye.",
             "Switch to the EVENT_ADDR sub-datasheet.",
-            "The Chinese address column and the Pinyin address column are "
-            "blank, even though the underlying data is populated.",
+            "The Chinese address column and the Pinyin address column "
+            "are blank on every row, even though the underlying "
+            "ADDR_CODES rows actually have those fields populated.",
         ],
         "steps_zh": [
-            "打开一位有「带地址事件」记录的人物的生平详情。",
-            "切换到 EVENT_ADDR 子数据表。",
-            "中文地址列和拼音地址列都是空白，尽管底层数据其实有。",
+            "打開人物 **c_personid = 44872（孫才 Sun Cai）** 的生平詳情"
+            "——之所以選他，是因為他同時有 EVENTS_DATA 和 EVENTS_ADDR "
+            "記錄，數量適中，方便肉眼檢查。",
+            "切換到 EVENT_ADDR 子資料表。",
+            "中文地址列和拼音地址列每一列都是空白，儘管底層 ADDR_CODES "
+            "對應行其實有真實值。",
         ],
         "fix_en": (
             "In the form designer, change `TxtAddrCHN`.ControlSource from "
@@ -691,14 +756,22 @@ ISSUES = [
             "`c_event_code` 而打成错字。该控件每一行都默默显示空白。"
         ),
         "steps_en": [
-            "Open any person's biographical detail form.",
+            "Open the biographical detail form for **c_personid = 44872 "
+            "(Sun Cai 孫才)** — same person used for Issue #10 above; "
+            "he has multiple EVENTS_DATA rows so the offending column "
+            "renders on each.",
             "Switch to the EVENTS sub-datasheet.",
-            "The column is blank for every row.",
+            "The control bound to `c_event_record_id` is blank for "
+            "every row (because neither EVENTS_DATA nor "
+            "View_EventsData has that column).",
         ],
         "steps_zh": [
-            "打开任意一位人物的生平详情。",
-            "切换到 EVENTS 子数据表。",
-            "对应的列每一行都是空。",
+            "打開人物 **c_personid = 44872（孫才 Sun Cai）** 的生平詳情"
+            "——與上面 Issue #10 同一個人，他有多條 EVENTS_DATA 記錄，"
+            "每一列都會渲染出問題欄位。",
+            "切換到 EVENTS 子資料表。",
+            "綁定到 `c_event_record_id` 的控件每一列都是空白（因為 "
+            "EVENTS_DATA 和 View_EventsData 都沒有這個欄位）。",
         ],
         "fix_en": (
             "Decide what was intended. If the column is no longer needed, "
@@ -743,15 +816,24 @@ ISSUES = [
             "看起来是某次列重命名后表单设计没跟上。"
         ),
         "steps_en": [
-            "Open any person's biographical detail form for someone with "
-            "office postings.",
+            "Open the biographical detail form for **c_personid = 2 "
+            "(An Fang 安邡)** — picked because he has a small number "
+            "of POSTED_TO_OFFICE_DATA rows, all with non-NULL "
+            "`c_appt_code`, so the column we want to inspect actually "
+            "has source data.",
             "Switch to the POSTED_TO_OFFICE sub-datasheet.",
-            "The appointment-type column is blank for every row.",
+            "The appointment-type column is blank for every row, "
+            "even though c_appt_code in the source table has a real "
+            "value on each.",
         ],
         "steps_zh": [
-            "打开一位有官职任命记录的人物的生平详情。",
-            "切换到 POSTED_TO_OFFICE 子数据表。",
-            "任职类型列每一行都是空。",
+            "打開人物 **c_personid = 2（安邡 An Fang）** 的生平詳情"
+            "——之所以選他，是因為他有為數不多的 POSTED_TO_OFFICE_DATA "
+            "記錄，且每條的 `c_appt_code` 都不為 NULL，這樣我們要檢查"
+            "的欄位確實有源資料。",
+            "切換到 POSTED_TO_OFFICE 子資料表。",
+            "任職類型列每一列都是空白，儘管源表 c_appt_code 在每一列"
+            "都是有值的。",
         ],
         "fix_en": (
             "Change the control's ControlSource from `c_appt_type_code` "
@@ -1080,6 +1162,14 @@ def _numbered(document, items: list[str]) -> None:
 
 
 DRIFT_JSON = REPO / "reports" / "index_drift_examples.json"
+DEMO_PERSONS_JSON = REPO / "reports" / "demo_persons.json"
+
+
+def _load_demo_persons() -> dict:
+    import json as _json
+    if DEMO_PERSONS_JSON.exists():
+        return _json.loads(DEMO_PERSONS_JSON.read_text(encoding="utf-8"))
+    return {}
 
 
 def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
@@ -1365,6 +1455,8 @@ def _build(lang: str, out_path: Path) -> None:
         "P3_missing_ui": "P3 — 缺失界面",
         "P4_setup": "P4 — 安装设置",
     }
+    demo_persons = _load_demo_persons()
+
     for tier in tier_order:
         items = by_tier.get(tier, [])
         if not items:
@@ -1384,6 +1476,55 @@ def _build(lang: str, out_path: Path) -> None:
                          else it["summary_zh"]).split("\n\n"):
                 doc.add_paragraph(Z(para))
             _h(doc, 3, Z("Steps to reproduce" if is_en else "复现步骤"))
+            # Inject a concrete demo-person hint AHEAD of the steps so
+            # the maintainer never has to guess which person id to
+            # open.  For DORMANT bugs (no UI-reachable example on the
+            # current data snapshot), the hint says so and offers a
+            # SQL-only verification path instead.
+            demo = demo_persons.get(f"bug{it['id']}")
+            if demo:
+                if demo.get("dormant"):
+                    label = (
+                        "⚠ Currently UI-dormant on this data "
+                        "snapshot — see note below"
+                        if is_en else
+                        "⚠ 在當前資料快照下無法在 UI 上復現——請看下方說明"
+                    )
+                    para = doc.add_paragraph()
+                    run = para.add_run(Z(label))
+                    run.bold = True
+                    para = doc.add_paragraph()
+                    para.add_run(
+                        demo["hint_en"] if is_en else Z(demo["hint_zh"])
+                    )
+                else:
+                    label = (
+                        f"Recommended demo person: c_personid="
+                        f"{demo['personid']} ({demo['name_chn']}, "
+                        f"{demo['name_py']})"
+                        if is_en else
+                        f"建議使用的範例人物：c_personid={demo['personid']}"
+                        f"（{demo['name_chn']}，{demo['name_py']}）"
+                    )
+                    para = doc.add_paragraph()
+                    run = para.add_run(Z(label))
+                    run.bold = True
+                    para = doc.add_paragraph()
+                    para.add_run(
+                        demo["hint_en"] if is_en else Z(demo["hint_zh"])
+                    )
+                    para.add_run(
+                        Z(
+                            " — picked by `reports/probe_demo_persons.py`; "
+                            "a SQL probe selected this person because their "
+                            "row counts genuinely satisfy the precondition "
+                            "the bug needs."
+                            if is_en else
+                            " —— 由 `reports/probe_demo_persons.py` 透過 "
+                            "SQL probe 挑選；之所以選這位，是因為其底層"
+                            "記錄數確實滿足這個 bug 的觸發條件。"
+                        )
+                    ).italic = True
             _numbered(doc, [Z(s) for s in
                             (it["steps_en"] if is_en else it["steps_zh"])])
             shots = it.get("screenshots") or []
