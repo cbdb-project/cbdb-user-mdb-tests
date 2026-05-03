@@ -159,6 +159,8 @@ _Step 2 — the popup users see when the With block on line 1425 reads `!c_inst_
 
 證據——完整的位元組級追蹤在 `analysis/gis_status_embedded_delim_root_cause.md`；源端掃描在 `reports/gis_embedded_delimiter_findings.json`；實際匯出檔的位元組級 dump 在 `reports/gis_status_export_bytes_dump.json`。迴歸測試 `tests/test_addr_codes_embedded_delim.py` 會在上游資料被清理後**主動失敗**，提醒重新評估。
 
+**已知影響面（PR W）。** 在這 315 行髒 `ADDR_CODES` 裡，**只有 1 行**（`c_addr_id = 702559` / 尉氏）真的被任何人物記錄引用——透過 `BIOG_MAIN.c_index_addr_id` 或 `BIOG_ADDR_DATA`；其餘 314 行在 ADDR_CODES 表裡是孤立的，沒有任何人物掛上去。所以今天的使用者實際影響面其實很小：在 **LookAtStatus**（`c_status_code=40` fixture，正是本 issue 立案的那一行）已有位元組級實證；在 **LookAtKinship**（如果選到那 3 位以阮孚為親屬的人）和 **LookAtPlace**（如果使用者選 `c_addr_id = 702559`）屬於「按源資料看應該會觸達」；在 **LookAtTexts / LookAtAssociations / LookAtOffice** 在當前源資料下根本觸達不到。完整的逐表分析在 `analysis/gis_embedded_delimiter_reach.md` 與 `reports/gis_embedded_delimiter_reach.json`。其餘 314 行是一個**潛伏的資料品質問題**——它們一旦有第一個人物掛上去，就會重現同樣的欄位錯位。前面建議的兩條修法依然都值得做。
+
 #### 復現步驟
 
 1. 開啟 **LookAtStatus**。在 status picker 裡挑 status code **40**（進士），不要設年份過濾——測試 fixture 裡 `FrameFilterYears = 1`。

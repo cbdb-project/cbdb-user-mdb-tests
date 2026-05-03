@@ -159,6 +159,8 @@ Change `With tRstAssocCodes` on line 1425 to `With tRstInstitutions`. Single-cha
 
 Evidence — full byte-level trace in `analysis/gis_status_embedded_delim_root_cause.md`; source-side scan in `reports/gis_embedded_delimiter_findings.json`; exported-file dump in `reports/gis_status_export_bytes_dump.json`. The regression test `tests/test_addr_codes_embedded_delim.py` will fail (intentionally) if the upstream data is cleaned, prompting a re-evaluation.
 
+**Known reach (PR W).** Of the 315 dirty `ADDR_CODES` rows, **only 1** (`c_addr_id = 702559` / Wei Shi 尉氏) is referenced by any person record in `BIOG_MAIN` or `BIOG_ADDR_DATA`; the other 314 are orphan rows with no person attached.  So today's user-facing surface is small: byte-confirmed in **LookAtStatus** (`c_status_code=40` fixture, the row this report was filed on); **likely reachable** in **LookAtKinship** (any of the 3 persons whose kin includes Ruan Fu) and in **LookAtPlace** (if a user picks `c_addr_id = 702559`); **not currently reachable** in **LookAtTexts / LookAtAssociations / LookAtOffice** under existing source data.  Full per-form reach analysis in `analysis/gis_embedded_delimiter_reach.md` and `reports/gis_embedded_delimiter_reach.json`.  The 314 orphan rows are a latent data-quality issue — they would reproduce the same misalignment the moment any of them gains its first person link.  Both candidate fixes above remain warranted.
+
 #### Steps to reproduce
 
 1. Open **LookAtStatus**. Pick the status picker and choose status code **40** (Provincial Graduate / 进士) without setting any year filter — `FrameFilterYears = 1` in the test fixture.
