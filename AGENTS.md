@@ -536,6 +536,34 @@ frmBaseMaintenance).  Re-run the comparator + classifier + triage
 after every fresh SQLite snapshot or any change to the index-
 recompute path on either side.
 
+PR L (`analysis/classify_index_addr_drift.py` →
+`reports/index_addr_drift_classification.json`) classifies the
+488 c_index_addr diffs (the 478 `index_addr_only_diff` plus 10
+`index_both_diff` from PR G).  PHP source pinned at commit
+`e31fba7` of `app/Services/IndexAddressRebuildService.php` →
+`analysis/php_source/IndexAddressRebuildService.php`.  Headline:
+
+| Bucket | Count | Meaning |
+|---|---:|---|
+| `mdb_stale_index_addr` | **412** | SQLite stored value matches what we'd recompute from its BIOG_ADDR_DATA; User MDB stored value does NOT.  Most likely cause: the User MDB shipped with stale c_index_addr_id — BIOG_ADDR_DATA was updated after the last frmBaseMaintenance rebuild but nobody re-ran it.  PHP re-runs weekly so SQLite stays fresh. |
+| `mdb_value_php_null` | 47 | User MDB has a value, PHP wrote 0/null.  Most are personids whose BIOG_ADDR_DATA is missing from the SQLite snapshot. |
+| `same_candidates_diff_winner` | 10 | Identical BIOG_ADDR_DATA on both sides; both pick addr_type=1 but a different addr_id within it.  Tie-break / null-handling diff. |
+| `both_stale_recompute_mismatch` | 10 | Neither side's stored value matches the rank+MAX(c_sequence) recompute.  Could be older snapshots or an algorithm feature we don't model. |
+| `both_sides_match_recomputed` | 6 | Each side's stored value matches its own recompute; diff is BIOG_ADDR_DATA snapshot drift. |
+| `sqlite_stale_index_addr` | 2 | Reverse direction; rare. |
+| `mdb_null_php_value` | 1 | |
+| `unclassified` | 0 | |
+
+The 412 `mdb_stale_index_addr` is **not** a bug in either
+algorithm — it's a maintenance-cadence diff (the User MDB needs
+its `frmBaseMaintenance` rebuild re-run before the next release).
+The 10 `same_candidates_diff_winner` rows are the only candidate
+algorithm-divergence rows and worth a closer look.
+
+Verified separately that BIOG_ADDR_CODES (the rank table) is
+**identical** between the two sides for all 22 addr_types, so the
+divergence isn't coming from rank-priority configuration.
+
 ## Test inventory snapshot (run this to get current state)
 
 ```bash

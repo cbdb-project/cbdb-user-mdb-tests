@@ -1353,6 +1353,7 @@ DRIFT_JSON = REPO / "reports" / "index_drift_examples.json"
 CLASSIFICATION_JSON = REPO / "reports" / "index_drift_classification.json"
 RULE_CLASSIFICATION_JSON = REPO / "reports" / "index_year_drift_rule_classification.json"
 RULE_GROUPS_JSON = REPO / "reports" / "index_year_drift_rule_groups.json"
+ADDR_CLASSIFICATION_JSON = REPO / "reports" / "index_addr_drift_classification.json"
 DEMO_PERSONS_JSON = REPO / "reports" / "demo_persons.json"
 KNOWN_BUGS_STATUS_JSON = REPO / "reports" / "known_bugs_status.json"
 
@@ -1719,6 +1720,61 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
                     f"Full per-group output: "
                     f"`reports/index_year_drift_rule_groups.json`."
                 ))
+            # ---- Address-drift classification (PR L) ----
+            if ADDR_CLASSIFICATION_JSON.exists():
+                acls = _json.loads(
+                    ADDR_CLASSIFICATION_JSON.read_text(encoding="utf-8"))
+                aS = acls["summary"]
+                ab = aS["buckets"]
+                _h(doc, 2, Z(
+                    "c_index_addr_id diffs — per-row classification"
+                ))
+                doc.add_paragraph(Z(
+                    f"Of the {aS['total_addr_diffs']} c_index_addr "
+                    f"diffs (478 `index_addr_only_diff` + 10 "
+                    f"`index_both_diff` from PR G's bucketing), "
+                    f"each row was classified by re-simulating the "
+                    f"rank-priority + MAX(c_sequence) algorithm "
+                    f"against each side's BIOG_ADDR_DATA + the "
+                    f"shared BIOG_ADDR_CODES rank table:"
+                ))
+                for k, label in [
+                    ("mdb_stale_index_addr",
+                     "User MDB stored value doesn't match its own "
+                     "recompute; SQLite does — User MDB c_index_addr_id "
+                     "is stale (re-run frmBaseMaintenance)"),
+                    ("mdb_value_php_null",
+                     "User MDB has a value, PHP wrote 0/null"),
+                    ("same_candidates_diff_winner",
+                     "identical BIOG_ADDR_DATA, different winner — "
+                     "candidate algorithm divergence (all in addr_type=1)"),
+                    ("both_stale_recompute_mismatch",
+                     "neither side matches recompute"),
+                    ("both_sides_match_recomputed",
+                     "both stored values match recompute over their "
+                     "own BIOG_ADDR_DATA — diff is source-data drift"),
+                    ("sqlite_stale_index_addr",
+                     "PHP stored value doesn't match its own recompute"),
+                    ("mdb_null_php_value", ""),
+                    ("unclassified", ""),
+                ]:
+                    n = ab.get(k, 0)
+                    if n == 0:
+                        continue
+                    doc.add_paragraph(Z(
+                        f"  • {n:>4,d}  {k}{(' — ' + label) if label else ''}"
+                    ))
+                doc.add_paragraph(Z(
+                    f"None of these are confirmed bugs.  The 412 "
+                    f"`mdb_stale_index_addr` rows are a maintenance-"
+                    f"cadence diff (the User MDB needs its "
+                    f"frmBaseMaintenance rebuild re-run before the "
+                    f"next release).  The 10 "
+                    f"`same_candidates_diff_winner` rows are the only "
+                    f"candidate algorithm-divergence rows.  Full "
+                    f"per-row output: "
+                    f"`reports/index_addr_drift_classification.json`."
+                ))
         else:
             _h(doc, 2, Z("年份差異 —— 逐筆 rule 分類"))
             doc.add_paragraph(Z(
@@ -1790,6 +1846,64 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
                 doc.add_paragraph(Z(
                     f"逐組輸出見 "
                     f"`reports/index_year_drift_rule_groups.json`。"
+                ))
+            # ---- Address-drift classification (PR L) — zh ----
+            if ADDR_CLASSIFICATION_JSON.exists():
+                acls = _json.loads(
+                    ADDR_CLASSIFICATION_JSON.read_text(encoding="utf-8"))
+                aS = acls["summary"]
+                ab = aS["buckets"]
+                _h(doc, 2, Z("c_index_addr_id 差異 —— 逐筆分類"))
+                doc.add_paragraph(Z(
+                    f"在 {aS['total_addr_diffs']} 筆 c_index_addr 差異"
+                    f"中（PR G 分桶的 478 `index_addr_only_diff` + 10 "
+                    f"`index_both_diff`），逐筆把兩邊的 BIOG_ADDR_DATA "
+                    f"代入「rank-priority + MAX(c_sequence)」演算法重算，"
+                    f"與實際儲存值對照分類："
+                ))
+                label_zh = {
+                    "mdb_stale_index_addr":
+                        "User MDB 儲存值與重算結果不符；SQLite 相符 "
+                        "—— User MDB 的 c_index_addr_id 已 stale，"
+                        "需要重新跑 frmBaseMaintenance",
+                    "mdb_value_php_null": "User MDB 有值，PHP 寫了 0/null",
+                    "same_candidates_diff_winner":
+                        "兩邊 BIOG_ADDR_DATA 完全相同但 winner 不同 "
+                        "—— 候選演算法差異（全在 addr_type=1）",
+                    "both_stale_recompute_mismatch":
+                        "兩邊都不符合重算結果",
+                    "both_sides_match_recomputed":
+                        "兩邊各自的儲存值都符合自己的重算結果 "
+                        "—— 差異來自源資料漂移",
+                    "sqlite_stale_index_addr":
+                        "PHP 儲存值與重算結果不符",
+                    "mdb_null_php_value": "",
+                    "unclassified": "",
+                }
+                for k in [
+                    "mdb_stale_index_addr",
+                    "mdb_value_php_null",
+                    "same_candidates_diff_winner",
+                    "both_stale_recompute_mismatch",
+                    "both_sides_match_recomputed",
+                    "sqlite_stale_index_addr",
+                    "mdb_null_php_value",
+                    "unclassified",
+                ]:
+                    n = ab.get(k, 0)
+                    if n == 0:
+                        continue
+                    lbl = label_zh.get(k, "")
+                    doc.add_paragraph(Z(
+                        f"  • {n:>4,d}  {k}{(' — ' + lbl) if lbl else ''}"
+                    ))
+                doc.add_paragraph(Z(
+                    f"以上沒有任何一筆被視為已確認的 bug。412 筆 "
+                    f"`mdb_stale_index_addr` 屬於維護週期差異（User MDB "
+                    f"在下次釋出前需要重跑 frmBaseMaintenance）。10 筆 "
+                    f"`same_candidates_diff_winner` 是唯一的候選演算法"
+                    f"差異。逐筆輸出見 "
+                    f"`reports/index_addr_drift_classification.json`。"
                 ))
 
     # ---- Per bucket ----
@@ -2946,6 +3060,84 @@ def _build_md(lang: str, out_path: Path) -> None:
                         f"`candidate_php_entry_code_mapping_gap`）。"
                     ))
                     lines.append("")
+
+        # ---- Address-drift classification (PR L) ----
+        if ADDR_CLASSIFICATION_JSON.exists():
+            acls = _json.loads(
+                ADDR_CLASSIFICATION_JSON.read_text(encoding="utf-8"))
+            aS = acls["summary"]
+            ab = aS["buckets"]
+            addr_bucket_order = [
+                "mdb_stale_index_addr",
+                "mdb_value_php_null",
+                "same_candidates_diff_winner",
+                "both_stale_recompute_mismatch",
+                "both_sides_match_recomputed",
+                "sqlite_stale_index_addr",
+                "mdb_null_php_value",
+                "unclassified",
+            ]
+            if is_en:
+                lines.append(f"### {Z('c_index_addr_id diffs — per-row classification')}")
+                lines.append("")
+                lines.append(Z(
+                    f"Of the **{aS['total_addr_diffs']}** "
+                    f"c_index_addr diffs (478 `index_addr_only_diff` "
+                    f"+ 10 `index_both_diff` from PR G), each row "
+                    f"was classified by re-simulating the rank-"
+                    f"priority + MAX(c_sequence) algorithm against "
+                    f"each side's BIOG_ADDR_DATA + the shared "
+                    f"BIOG_ADDR_CODES rank table."
+                ))
+                lines.append("")
+                lines.append("| Bucket | Count |")
+                lines.append("|---|---:|")
+                for k in addr_bucket_order:
+                    n = ab.get(k, 0)
+                    if n == 0:
+                        continue
+                    lines.append(f"| `{k}` | {n} |")
+                lines.append("")
+                lines.append(Z(
+                    f"None of these are confirmed bugs.  The 412 "
+                    f"`mdb_stale_index_addr` rows are a maintenance-"
+                    f"cadence diff (the User MDB needs its "
+                    f"frmBaseMaintenance rebuild re-run before the "
+                    f"next release).  The 10 "
+                    f"`same_candidates_diff_winner` rows are the "
+                    f"only candidate algorithm-divergence rows.  "
+                    f"Full per-row output: "
+                    f"`reports/index_addr_drift_classification.json`."
+                ))
+                lines.append("")
+            else:
+                lines.append(f"### {Z('c_index_addr_id 差異 —— 逐筆分類')}")
+                lines.append("")
+                lines.append(Z(
+                    f"在 **{aS['total_addr_diffs']}** 筆 c_index_addr "
+                    f"差異中（PR G 的 478 `index_addr_only_diff` + 10 "
+                    f"`index_both_diff`），逐筆把兩邊的 BIOG_ADDR_DATA "
+                    f"代入「rank-priority + MAX(c_sequence)」演算法重算，"
+                    f"與實際儲存值對照分類："
+                ))
+                lines.append("")
+                lines.append("| 分桶 | 筆數 |")
+                lines.append("|---|---:|")
+                for k in addr_bucket_order:
+                    n = ab.get(k, 0)
+                    if n == 0:
+                        continue
+                    lines.append(f"| `{k}` | {n} |")
+                lines.append("")
+                lines.append(Z(
+                    f"以上沒有任何一筆被視為已確認的 bug。412 筆 "
+                    f"`mdb_stale_index_addr` 屬於維護週期差異（User MDB "
+                    f"在下次釋出前需要重跑 frmBaseMaintenance）。10 筆 "
+                    f"`same_candidates_diff_winner` 是唯一的候選演算法"
+                    f"差異。逐筆輸出見 "
+                    f"`reports/index_addr_drift_classification.json`。"
+                ))
+                lines.append("")
 
         data = _json.loads(DRIFT_JSON.read_text(encoding="utf-8"))
         bucket_meta = {

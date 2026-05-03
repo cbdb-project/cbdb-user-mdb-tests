@@ -626,6 +626,22 @@ Deeper triage (PR K2, `analysis/triage_index_year_drift_groups.py` → `reports/
 - `unclassified` × 18 → 18 named, 17 flagged `blocked_by_missing_frmBaseMaintenance_vba` (need Access execution-order to resolve).
 - `php_did_not_compute` × 19 → 6 groups by Access tcode; biggest is `access_tcode='05'` × 7 (`candidate_php_entry_code_mapping_gap` for jinshi).
 
+### c_index_addr_id diffs — per-row classification
+
+Of the **488** c_index_addr diffs (478 `index_addr_only_diff` + 10 `index_both_diff` from PR G), each row was classified by re-simulating the rank-priority + MAX(c_sequence) algorithm against each side's BIOG_ADDR_DATA + the shared BIOG_ADDR_CODES rank table.
+
+| Bucket | Count |
+|---|---:|
+| `mdb_stale_index_addr` | 412 |
+| `mdb_value_php_null` | 47 |
+| `same_candidates_diff_winner` | 10 |
+| `both_stale_recompute_mismatch` | 10 |
+| `both_sides_match_recomputed` | 6 |
+| `sqlite_stale_index_addr` | 2 |
+| `mdb_null_php_value` | 1 |
+
+None of these are confirmed bugs.  The 412 `mdb_stale_index_addr` rows are a maintenance-cadence diff (the User MDB needs its frmBaseMaintenance rebuild re-run before the next release).  The 10 `same_candidates_diff_winner` rows are the only candidate algorithm-divergence rows.  Full per-row output: `reports/index_addr_drift_classification.json`.
+
 ### Examples where only c_index_year disagrees
 
 **`c_personid = 3501` — 李孝稱 (Li Xiaocheng)**
