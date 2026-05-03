@@ -198,3 +198,152 @@ def test_cmd_gis_produces_file(vba: VbaSession, fx: CrossFixture, tmp_path):
     )
     print(f"[{spec.name}] CmdGIS OK — {len(cols)} cols, "
           f"{len(lines)-1} data rows", flush=True)
+
+    # ---- 8. depth checks (PR P) ---------------------------------
+    # Catch silent column drops, off-by-one row shifts, and
+    # large-scale data emptiness that the surface checks (file
+    # exists, NameChn in header) miss.
+    _assert_gis_export_depth(spec.name, header, lines, sep,
+                              scratch_rows=n)
+
+
+# ----------------------------------------------------------------------
+# PR P: per-form GIS export schema manifest + depth checks
+#
+# Required-column lists are derived from the existing goldens at
+# tests/golden/exports/real_lookat<form>_gis_*.tab — anything that's
+# in the golden header is asserted as a required column here.  When
+# CBDB intentionally adds / drops a column, update both the golden
+# (if any) AND this manifest in the same commit.
+# ----------------------------------------------------------------------
+
+# Required columns per form's CmdGIS UTF-8 (NameChn-branch) header.
+# Forms not listed here fall back to the loose anchor check
+# (`NameChn` present + ≥4 cols), which the existing test already does.
+_GIS_REQUIRED_COLUMNS: dict[str, list[str]] = {
+    "LookAtStatus": [
+        "Name", "NameChn", "Sex", "IndexYear",
+        "AddrName", "AddrChn", "X", "Y", "xy_count",
+    ],
+    "LookAtAssociations": [
+        "Name", "NameChn", "Female", "IndexYear",
+        "AddrName", "AddrChn", "X", "Y", "xy_count",
+    ],
+    "LookAtOffice": [
+        "Name", "NameChn", "IndexYear", "Sex",
+        "AddrName", "AddrChn", "PersonX", "PersonY",
+        "Office", "OfficeChn", "FirstYear", "LastYear",
+        "Dynasty",
+        "OfficeAddr", "OfficeAddrChn", "X", "Y", "xy_count",
+    ],
+    # LookAtTexts / LookAtPlace / LookAtKinship don't have committed
+    # goldens yet; their first run can be blessed in a follow-up
+    # PR.  For now they get the loose check + per-row width / key-
+    # column non-empty assertions.
+}
+
+# Columns that should be non-empty for the vast majority of rows
+# (>= 80 %).  Catches a silent column-bind regression that leaves
+# everything blank (the user-reported "lost columns" bug pattern).
+_GIS_EXPECTED_NON_EMPTY = {
+    "Name", "NameChn", "IndexYear",
+}
+
+# Strings the form uses as "no data" placeholders.  We treat these
+# as empty when computing the non-empty rate.
+_GIS_EMPTY_PLACEHOLDERS = {"", "[ ]", "[Addr Name Missing]",
+                            "[Addr Chn Missing]"}
+
+
+def _assert_gis_export_depth(form_name: str,
+                              header: str,
+                              lines: list[str],
+                              sep: str,
+                              scratch_rows: int) -> None:
+    """Run the depth assertions on a parsed GIS export.
+
+    `lines` includes the header at index 0; data rows are
+    `lines[1:]`.  `scratch_rows` is the row count that came out of
+    CmdQuery (or CmdRun) so we can sanity-check that the export
+    didn't silently drop most of them.
+    """
+    cols = header.split(sep)
+    n_cols = len(cols)
+    data_rows = lines[1:]
+
+    # 8a. Required-column manifest (per form).
+    required = _GIS_REQUIRED_COLUMNS.get(form_name)
+    if required is not None:
+        missing = [c for c in required if c not in cols]
+        assert not missing, (
+            f"[{form_name}] CmdGIS header is missing required "
+            f"columns {missing} (header was {cols!r}).  If this is "
+            f"intentional, update _GIS_REQUIRED_COLUMNS in "
+            f"tests/test_vba_cmdgis_other_forms.py + the golden."
+        )
+
+    # 8b. Per-row field count must match header — catches off-by-one
+    # column shifts that would silently slide every value one column
+    # to the left/right.
+    bad_width = []
+    for i, line in enumerate(data_rows, start=1):
+        cells = line.split(sep)
+        if len(cells) != n_cols:
+            bad_width.append((i, len(cells), line[:120]))
+        if len(bad_width) >= 5:
+            break
+    assert not bad_width, (
+        f"[{form_name}] CmdGIS rows have wrong field count "
+        f"(header has {n_cols} cols).  First mismatches "
+        f"(row_index, field_count, snippet):\n"
+        + "\n".join(f"  row {i}: {n} cells — {snip!r}"
+                     for i, n, snip in bad_width)
+    )
+
+    # 8c. Key columns non-empty rate.  CBDB's #1 user-reported bug
+    # class is "this column is empty for everyone" (silent backfill
+    # failures, wrong control source, etc.).  Demand ≥ 80% non-empty
+    # for Name / NameChn / IndexYear.
+    col_index = {c: i for i, c in enumerate(cols)}
+    for key_col in _GIS_EXPECTED_NON_EMPTY:
+        if key_col not in col_index:
+            continue
+        idx = col_index[key_col]
+        non_empty = 0
+        for line in data_rows:
+            cells = line.split(sep)
+            if idx >= len(cells):
+                continue
+            v = cells[idx].strip()
+            if v not in _GIS_EMPTY_PLACEHOLDERS:
+                non_empty += 1
+        if not data_rows:
+            continue
+        rate = non_empty / len(data_rows)
+        assert rate >= 0.80, (
+            f"[{form_name}] CmdGIS column {key_col!r} is non-empty "
+            f"in only {non_empty}/{len(data_rows)} rows "
+            f"({100*rate:.1f}%).  Below 80% threshold — likely a "
+            f"silent column-bind regression of the kind that gave "
+            f"us Bugs #10/#11/#12."
+        )
+
+    # 8d. Row-count sanity: GIS export should produce roughly one
+    # row per scratch_table row.  CmdGIS sometimes deduplicates or
+    # one-row-per-(person, addr, …) so this isn't a strict
+    # equality, but a > 5x mismatch should never happen.
+    if scratch_rows > 0 and data_rows:
+        ratio = len(data_rows) / scratch_rows
+        assert 0.20 <= ratio <= 5.0, (
+            f"[{form_name}] CmdGIS row count {len(data_rows)} is "
+            f"{ratio:.2f}× the scratch row count {scratch_rows}.  "
+            f"Outside the [0.2, 5.0] sanity band — either CmdGIS "
+            f"silently dropped most rows or it's joining and "
+            f"exploding."
+        )
+
+    print(f"[{form_name}] CmdGIS depth checks OK — "
+          f"{n_cols} cols, {len(data_rows)} data rows, "
+          f"required-col coverage "
+          f"{'manifested' if required is not None else 'loose-check'}",
+          flush=True)
