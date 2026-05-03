@@ -1855,8 +1855,8 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
             ))
             doc.add_paragraph(Z(
                 f"Of the {rs['total_year_diffs']} year-only diffs, "
-                f"each row was tested against the rule-level "
-                f"divergences flagged in PR I "
+                f"each row was bucketed against PR N's rule-level "
+                f"runtime-vs-PHP comparison "
                 f"(`analysis/index_year_rule_comparison.md`).  "
                 f"Conservative buckets (rows count once each):"
             ))
@@ -1903,9 +1903,9 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
                     f"  • {gs['unclassified']['total']} "
                     f"`unclassified` rows → "
                     f"{gs['unclassified']['named_after_triage']} named, "
-                    f"{gs['unclassified']['blocked_by_missing_vba']} "
-                    f"flagged `blocked_by_missing_frmBaseMaintenance_vba` "
-                    f"(need Access execution-order to resolve)."
+                    f"{gs['unclassified']['blocked_by_runtime_priority_triage_pending']} "
+                    f"flagged `blocked_by_runtime_priority_triage_pending` "
+                    f"(PR M dumped frmBaseMaintenance, so the source is in repo; resolving each row still needs a per-row walk of the runtime priority/iteration order)."
                 ))
                 doc.add_paragraph(Z(
                     f"  • {gs['php_did_not_compute']['rows']} "
@@ -1991,9 +1991,9 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
             _h(doc, 2, Z("年份差異 —— 逐筆 rule 分類"))
             doc.add_paragraph(Z(
                 f"在 {rs['total_year_diffs']} 筆「只有 c_index_year "
-                f"不一致」的行中，逐筆比對 PR I "
-                f"(`analysis/index_year_rule_comparison.md`) 標記的"
-                f"規則級差異。保守分類如下："
+                f"不一致」的行中，逐筆比對 PR N "
+                f"(`analysis/index_year_rule_comparison.md`) 的"
+                f"runtime-vs-PHP 規則級差異。保守分類如下："
             ))
             label_zh = {
                 "php_returned_sentinel": "PHP 寫了 sentinel／溢位值",
@@ -2001,7 +2001,7 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
                 "access_did_not_compute": "Access 沒算出值（覆蓋率缺口）",
                 "iteration_order_diff": "Phase-C 迭代次數不同",
                 "consistent_within_rule": "多列共享同一 (php_tcode, access_tcode, diff) — 單一規則差異訊號",
-                "candidate_algorithm_divergence": "形狀符合 PR I 標記但無法精確重建",
+                "candidate_algorithm_divergence": "形狀符合 K1 的歷史 hypothesis probe 但無法以單筆證據重建",
                 "unclassified": "尚未對上任何模式",
             }
             for k in [
@@ -2044,9 +2044,9 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
                 doc.add_paragraph(Z(
                     f"  • `unclassified` {gs['unclassified']['total']} 筆 → "
                     f"{gs['unclassified']['named_after_triage']} 筆已命名，"
-                    f"{gs['unclassified']['blocked_by_missing_vba']} 筆"
-                    f"標為 `blocked_by_missing_frmBaseMaintenance_vba`"
-                    f"（需要 Access 端執行順序才能判斷）。"
+                    f"{gs['unclassified']['blocked_by_runtime_priority_triage_pending']} 筆"
+                    f"標為 `blocked_by_runtime_priority_triage_pending`"
+                    f"（PR M 已 dump frmBaseMaintenance，源碼已在 repo；要逐筆判斷哪邊正確仍需走一遍 runtime 的 priority／iteration 順序）。"
                 ))
                 doc.add_paragraph(Z(
                     f"  • `php_did_not_compute` "
@@ -3158,8 +3158,8 @@ def _build_md(lang: str, out_path: Path) -> None:
                 lines.append("")
                 lines.append(Z(
                     f"Of the **{rs['total_year_diffs']}** year-only "
-                    f"diffs, each row was tested against the rule-"
-                    f"level divergences flagged in PR I "
+                    f"diffs, each row was bucketed against PR N's "
+                    f"rule-level runtime-vs-PHP comparison "
                     f"(`analysis/index_year_rule_comparison.md`).  "
                     f"Conservative buckets (rows count once each):"
                 ))
@@ -3209,9 +3209,9 @@ def _build_md(lang: str, out_path: Path) -> None:
                     lines.append(Z(
                         f"- `unclassified` × {gs['unclassified']['total']} → "
                         f"{gs['unclassified']['named_after_triage']} named, "
-                        f"{gs['unclassified']['blocked_by_missing_vba']} "
-                        f"flagged `blocked_by_missing_frmBaseMaintenance_vba` "
-                        f"(need Access execution-order to resolve)."
+                        f"{gs['unclassified']['blocked_by_runtime_priority_triage_pending']} "
+                        f"flagged `blocked_by_runtime_priority_triage_pending` "
+                        f"(PR M dumped frmBaseMaintenance, so the source is in repo; resolving each row still needs a per-row walk of the runtime priority/iteration order)."
                     ))
                     lines.append(Z(
                         f"- `php_did_not_compute` × "
@@ -3226,9 +3226,9 @@ def _build_md(lang: str, out_path: Path) -> None:
                 lines.append("")
                 lines.append(Z(
                     f"在 **{rs['total_year_diffs']}** 筆「只有 "
-                    f"c_index_year 不一致」的行中，逐筆比對 PR I "
-                    f"(`analysis/index_year_rule_comparison.md`) 標記"
-                    f"的規則級差異。保守分類如下："
+                    f"c_index_year 不一致」的行中，逐筆比對 PR N "
+                    f"(`analysis/index_year_rule_comparison.md`) 的"
+                    f"runtime-vs-PHP 規則級差異。保守分類如下："
                 ))
                 lines.append("")
                 lines.append("| 分桶 | 筆數 |")
@@ -3239,7 +3239,7 @@ def _build_md(lang: str, out_path: Path) -> None:
                     "access_did_not_compute": "Access 沒算出值（覆蓋率缺口）",
                     "iteration_order_diff": "Phase-C 迭代次數不同",
                     "consistent_within_rule": "多列共享同一 (php_tcode, access_tcode, diff)",
-                    "candidate_algorithm_divergence": "形狀符合 PR I 標記但無法精確重建",
+                    "candidate_algorithm_divergence": "形狀符合 K1 的歷史 hypothesis probe 但無法以單筆證據重建",
                     "unclassified": "尚未對上任何模式",
                 }
                 for k in [
@@ -3282,9 +3282,9 @@ def _build_md(lang: str, out_path: Path) -> None:
                     lines.append(Z(
                         f"- `unclassified` × {gs['unclassified']['total']} → "
                         f"{gs['unclassified']['named_after_triage']} 筆已命名，"
-                        f"{gs['unclassified']['blocked_by_missing_vba']} 筆標為 "
-                        f"`blocked_by_missing_frmBaseMaintenance_vba`"
-                        f"（需要 Access 端執行順序才能判斷）。"
+                        f"{gs['unclassified']['blocked_by_runtime_priority_triage_pending']} 筆標為 "
+                        f"`blocked_by_runtime_priority_triage_pending`"
+                        f"（PR M 已 dump frmBaseMaintenance，源碼已在 repo；要逐筆判斷哪邊正確仍需走一遍 runtime 的 priority／iteration 順序）。"
                     ))
                     lines.append(Z(
                         f"- `php_did_not_compute` × "

@@ -1,21 +1,24 @@
-"""Per-row classification of c_index_year drifts using the
-rule-level findings from PR I.
+"""Per-row classification of c_index_year drifts.
 
-NOTE (PR N, 2026-05-03): the rule-level reference this script
-referred to has since been corrected.  PR I's pairing was against
-the BM IY Rule QueryDefs in the DATA mdb, which PR M showed are
-NOT what `CmdIndexYear_Click` runs.  PR N's corrected comparison
-(against the runtime `GetBirthIndexYearSQL`) is the current
-`analysis/index_year_rule_comparison.md`.
+Updated 2026-05-03 (PR X) — the rule-level reference is now PR
+N's `analysis/index_year_rule_comparison.md`, which pairs the
+runtime VBA `GetBirthIndexYearSQL` (dumped by PR M from
+`frmBaseMaintenance`) against PHP `IndexYearRebuildService.php`
+by emitted `c_index_year_type_code`.  PR N's verdict at the
+rule level is **22 matched / 8 matched_minor_diff / 0
+logic_diff / 3 access_only**, i.e. at the rule level the two
+sides agree almost everywhere.
 
-This script's per-row buckets remain valid (they only reference
-type_codes, not PR I's incorrect rule labels) and the JSON output
-in `reports/index_year_drift_rule_classification.json` is still
-the canonical per-row breakdown.  But the hypothesis-test
-sub-buckets named after PR I's `+N`/`-N` sign-flip
-(`explained_by_birthyear_offset`, `explained_by_entry_sign_flip`,
-`explained_by_husband_formula`) all came back at 0 in K1 anyway,
-so the practical impact is small.
+That changes the framing of this script's per-row buckets:
+they are no longer testing PR I's `+N`/`-N` sign-flip
+hypothesis (which PR N showed was an artefact of comparing PHP
+against the wrong Access source — the vestigial
+`BM IY Rule …` QueryDefs).  The per-row buckets stay because
+they're indexed by type_codes only, not by PR I's rule labels.
+But the `explained_by_*` sub-buckets are best read as
+**signature-based hypothesis probes** rather than evidence of
+PR I-style logic divergence; in K1 they all came back at 0 so
+they're effectively dormant probes today.
 
 Scope: only c_index_year.  c_index_addr_id (the much larger
 `index_addr_only_diff` bucket) is deferred to a separate PR.
@@ -28,11 +31,13 @@ What this script does:
      `index_year_only_diff` and `index_both_diff` buckets):
        - Pull all the diagnostic fields we have on both sides
          (year, type_code, source_id, birthyear, deathyear).
-       - For PHP type_codes that have a known divergence pattern
-         from PR I, test the hypothesis row-by-row using whatever
-         supporting data we can pull from the User MDB.
-  3. Bucket each row.  Buckets came partly from PR I's flagged
-     divergences and partly from inspecting the actual data:
+       - For PHP type_codes whose runtime VBA Access path is
+         known from PR N (the entry rules `05`-`10`, the
+         birthyear rule `01`, the wife-from-husband rules `03`
+         / `17`), probe whether a matching evidence row on
+         the User MDB side reconstructs both sides' values.
+  3. Bucket each row.  Buckets are evidence categories, not
+     bug labels:
 
        - php_returned_sentinel
            PHP value is ≥ 9999 (looks like a garbage / sentinel —
@@ -50,20 +55,37 @@ What this script does:
            PHP didn't, or vice versa.
        - explained_by_birthyear_offset
            PHP type_code '01' AND access == birthyear + 59 AND
-           php == birthyear (Access Rule 01B / Rule 03 BY adds 59).
+           php == birthyear.  Historical probe: matches the
+           vestigial BM IY Rule 03 BY's +59 offset that PR I
+           hypothesised; PR N showed runtime Access Rule 01 uses
+           raw c_birthyear like PHP, so this probe is dormant.
+           Kept in case future divergence surfaces the pattern.
        - explained_by_entry_sign_flip
-           PHP entry rule (tcode 05–10) AND access - php == 2N
-           AND we can locate the matching ENTRY_DATA row.
+           PHP entry rule (tcode 05–10) AND |access - php| == 2N
+           AND we can locate a matching ENTRY_DATA row at the
+           midpoint.  Historical probe: PR I hypothesised
+           Access used `+N` while PHP used `-N`; PR N showed
+           runtime Access uses `-N` like PHP, so this probe is
+           dormant.  A 2N gap that *did* surface today would
+           more likely indicate the two sides picked different
+           ENTRY_DATA rows.
        - explained_by_husband_formula
-           PHP type_code 03/17 AND a husband row reconstructs both
-           sides exactly.
+           PHP type_code 03/17 AND a husband row reconstructs
+           both sides via Access `husband.c_birthyear + 62` vs
+           PHP `husband.c_index_year + 3`.  Historical probe;
+           PR N's runtime comparison shows Access actually uses
+           `husband.c_index_year + 3` (matching PHP), so this
+           probe is dormant.  Retained for the same reason.
        - consistent_within_rule
-           Multiple rows share the same (PHP tcode, Access tcode,
-           diff) — strong signal of a single rule-level cause that
-           we haven't fully named yet.
+           Multiple rows share the same (PHP tcode, Access
+           tcode, diff) — strong signal of a single rule-level
+           cause to investigate.  K2 then names each
+           signature group with PR N rule context.
        - candidate_algorithm_divergence
-           Matches the *shape* of a rule diff from PR I but doesn't
-           reconstruct exactly.
+           A row's shape matches one of the dormant probes
+           above (entry-rule 2N gap, etc.) but the supporting
+           evidence row can't be located.  Kept as
+           "investigate further" rather than confirmed.
        - unclassified
            No matching pattern fits.
 
@@ -93,8 +115,9 @@ SQLITE_DIR = ROOT / "data" / "cbdb_online_sqlite"
 RULE_COMPARISON_JSON = ROOT / "analysis" / "index_year_rule_comparison.json"
 OUT = ROOT / "reports" / "index_year_drift_rule_classification.json"
 
-# Known rule N values per PHP entry-type code, from PR I's PAIR_MAP /
-# the PHP Phase A registration list.  Used by the sign-flip test.
+# Known rule N values per PHP entry-type code, from PR N's
+# `analysis/index_year_rule_comparison.md` (Phase A entry rules
+# 05-10).  Used by the dormant 2N-diff probe — see docstring.
 PHP_ENTRY_RULE_N = {
     "05": 30,  # sqlEntryRule('040101', 30, '05') — jinshi
     "06": 27,  # sqlWifeFromEntryRule('040101', 27, '06')
@@ -210,7 +233,7 @@ def main() -> int:
     print(f"  pids with ENTRY_DATA rows: {len(entry_by_pid)}")
 
     # Look up husband personid for wife rows (kin_code = 134).
-    print("loading wife→husband KIN_DATA for candidates ...")
+    print("loading wife->husband KIN_DATA for candidates ...")
     husband_by_pid: dict[int, list[int]] = {}
     if year_diffs:
         for i in range(0, len(year_diffs), 500):
@@ -381,12 +404,13 @@ def main() -> int:
             classified["explained_by_birthyear_offset"].append(record)
             continue
 
-        # --- Hypothesis 2: entry-rule sign flip (+N vs -N)
-        # PHP type_code in 05..10 ⇒ rule used MIN(c_year)±N.
-        # We test: does there exist an ENTRY_DATA row whose c_year =
-        # mid such that mid + N == access AND mid - N == php?
-        # Equivalent: |diff| == 2N AND mid = (access + php) / 2 and an
-        # entry row matches mid.
+        # --- Hypothesis 2: entry-rule 2N-diff signature
+        # PHP type_code in 05..10 → rule uses MIN(c_year) - N.
+        # Per PR N runtime Access uses the same -N constant, so a
+        # 2N gap shouldn't appear from a sign flip.  But if both
+        # sides happened to pick *different ENTRY_DATA rows* whose
+        # c_years differ by exactly 2N, the symptom would mimic
+        # PR I's old sign-flip pattern.  Probe for that here.
         if php_tcode in PHP_ENTRY_RULE_N:
             n = PHP_ENTRY_RULE_N[php_tcode]
             if diff == 2 * n:
@@ -402,24 +426,31 @@ def main() -> int:
                         break
                 if hit is not None:
                     record["explanation"] = (
-                        f"Sign-flip on PHP type_code '{php_tcode}' "
-                        f"(N={n}).  ENTRY_DATA row "
-                        f"c_entry_code={hit['entry_code']} "
-                        f"c_year={hit['year']}; "
-                        f"+{n}={access_year} (Access); "
-                        f"-{n}={php_year} (PHP); diff={diff}=2*{n}."
+                        f"Entry-rule 2N-diff signature on PHP "
+                        f"type_code '{php_tcode}' (N={n}).  "
+                        f"Both sides apply -N per PR N; a single "
+                        f"ENTRY_DATA row at the midpoint "
+                        f"(c_entry_code={hit['entry_code']}, "
+                        f"c_year={hit['year']}) would reconstruct "
+                        f"both values via Access {hit['year']}+{n}"
+                        f"={access_year} / PHP {hit['year']}-{n}"
+                        f"={php_year} only if Access was using the "
+                        f"old +N path — which PR N showed it is "
+                        f"NOT.  More likely the two sides picked "
+                        f"different ENTRY_DATA rows whose c_years "
+                        f"happen to differ by 2N."
                     )
                     classified["explained_by_entry_sign_flip"].append(record)
                     continue
             # Diff is in the right ballpark but doesn't fully line up
-            # (different entry row picked, or different N) — flag
-            # as candidate.
+            # — flag as candidate (likely two-different-rows pick).
             record["explanation"] = (
                 f"PHP type_code '{php_tcode}' is an entry rule "
-                f"(expected diff = ±2*{n} = ±{2*n}); observed "
-                f"diff = {diff}.  Likely sign-flip pattern but "
-                f"the two sides may have picked different ENTRY_DATA "
-                f"rows."
+                f"(2N for N={n} would be ±{2*n}); observed "
+                f"diff = {diff}.  Per PR N both sides use -N, so "
+                f"a 2N gap suggests the two sides picked different "
+                f"ENTRY_DATA rows; needs row-by-row evidence to "
+                f"confirm which rows."
             )
             classified["candidate_algorithm_divergence"].append(record)
             continue
@@ -477,8 +508,9 @@ def main() -> int:
 
         # --- Default: unclassified
         record["explanation"] = (
-            f"No matching hypothesis from PR I's flagged divergences "
-            f"(php_tcode={php_tcode!r}, access_tcode={access_tcode!r})."
+            f"No matching signature from PR N's runtime-vs-PHP "
+            f"rule comparison (php_tcode={php_tcode!r}, "
+            f"access_tcode={access_tcode!r})."
         )
         classified["unclassified"].append(record)
 

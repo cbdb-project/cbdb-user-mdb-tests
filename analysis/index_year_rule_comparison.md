@@ -107,37 +107,42 @@ Access's `iif(parent='01','12',parent + '12')`).
 
 ## Implications for K1 / K2 (per-row year-drift classification)
 
-The K1 / K2 buckets were built on the assumption that PR I's
-`logic_diff` flags (especially the `+N`/`-N` sign-flip) explained
-some of the year drifts.  PR N now removes that assumption: at
-the rule level the runtime Access path matches PHP everywhere
-*except* the off-by-1 / off-by-3 for type_codes `29` / `30`
-(`matched_minor_diff`).
+K1 / K2 originally referenced PR I's `logic_diff` flags
+(especially the `+N`/`-N` sign-flip) as the working hypothesis
+behind several per-row buckets.  PR N removed that assumption
+at the rule level: runtime Access matches PHP everywhere
+*except* the off-by-1 / off-by-3 on type_codes `29` / `30`
+(`matched_minor_diff`).  PR X then re-derived K1 / K2's
+docstrings, in-script rationales, and JSON output strings to
+reference PR N's runtime comparison.  The buckets themselves
+are unchanged because they're indexed by type_codes only, not
+by PR I's rule labels.  Reading them against PR N now:
 
-That doesn't invalidate K1 / K2's per-row buckets — those came
-from PR G's per-personid diff list and only reference type_codes,
-not the wrong rule labels.  Reading them now:
-
-  - **`php_did_not_compute` × 19** — biggest sub-bucket from K2
-    is `access_tcode='05'` × 7.  With PR N's finding that Access
-    Rule 05 is `c_year - 30 with ENTRY_CODE_TYPE_REL.c_entry_type
-    = '040101'` (matching PHP), the gap is more likely upstream
-    in `ENTRY_CODE_TYPE_REL` membership — the entries aren't
-    classified into `'040101'` on whichever side, so neither
-    rule fires for those personids.  Worth a quick PHP-side
-    check.
+  - **`php_did_not_compute` × 19** — biggest sub-group is
+    `access_tcode='05'` × 7.  Per PR N runtime Rule 05 is
+    `c_year - 30` joined to `ENTRY_CODE_TYPE_REL.c_entry_type =
+    '040101'`, matching PHP's `sqlEntryRule('040101', 30,
+    '05')`.  The gap is therefore most likely upstream in
+    `ENTRY_CODE_TYPE_REL` membership — the entries aren't
+    mapped into `'040101'` on whichever side, so neither rule
+    fires for those personids.  K2 labels this group
+    `candidate_php_entry_code_mapping_gap`.  Row evidence
+    supports the gap; not yet labelled a confirmed bug.
   - **`consistent_within_rule` × 14** — the diff = -20 cluster
-    across PHP type_codes 11 / 13 / 15 / 19 is interesting given
-    that Rules 13, 15, 19 are all `matched_minor_diff` (staging
-    vs subquery aggregate).  The shared `-20` could reflect a
-    consistent staging-step pick that picks the same wrong row
-    each time.  Maintainer-investigatable.
-  - **`iteration_order_diff` × 5** — both sides do CONCAT the
-    same way, so this is most likely a Phase-C iteration-count
-    difference (PHP caps at 2 loops; Access also caps at
-    "tLoopCount < 3" i.e. 2 loops — both same!  Yet the data
-    show divergence).  The most likely remaining cause is the
-    order rules fire WITHIN each loop pass.  Worth confirming.
+    across PHP type_codes 11 / 13 / 15 / 19 is the standout
+    pattern.  Per PR N rules 13 / 15 / 19 are
+    `matched_minor_diff` (staging vs subquery aggregate,
+    equivalent on the happy path); rule 11 is matched.  The
+    shared `-20` therefore wants a **runtime-rule / phase-
+    order triage** — walk `GetBirthIndexYearSQL`'s staging
+    step against PHP's subquery to see whether the staging
+    step picks a consistently wrong row.  K2 names every
+    consistent_within_rule signature with this rationale.
+  - **`iteration_order_diff` × 5** — both sides CONCAT the
+    same way and both cap at 2 Phase-C loops, yet the data
+    show divergence.  Most likely remaining cause is the
+    order rules fire WITHIN each loop pass.  Same runtime-
+    rule / phase-order triage as above.
 
 ## Limitations
 
@@ -151,10 +156,17 @@ not the wrong rule labels.  Reading them now:
   hand-curated `VERDICT_BY_TYPE_CODE` table covers every paired
   code.  When a new code appears (Access or PHP), it'll default
   to `needs_manual_review` until added to the table.
-- **PR I's `logic_diff` flags are not actively in repo any more,
-  but the K1 / K2 outputs are unchanged** (their per-row buckets
-  don't depend on PR I's verdict labels).  K1 / K2 docs gain a
-  pointer at this updated comparator.
+- **PR I's `logic_diff` flags are not active in repo any
+  more.**  K1 / K2 outputs are structurally unchanged (per-row
+  buckets are indexed by type_codes), but their docstrings,
+  in-script rationales, and JSON `explanation` strings have
+  been re-derived against PR N by PR X.  The blocker label
+  formerly emitted as `blocked_by_missing_frmBaseMaintenance_
+  vba` is now `blocked_by_runtime_priority_triage_pending` —
+  PR M dumped `frmBaseMaintenance` so the source is in repo;
+  the blocker is now "we have the source but need to walk
+  the runtime priority/iteration order to decide which
+  side's choice is intentional".
 - **Off-by-1 / off-by-3 on Rules 29 / 30 (matched_minor_diff) is
   the closest thing to a real divergence we have at the rule
   level.**  Worth maintainer confirmation that the difference is

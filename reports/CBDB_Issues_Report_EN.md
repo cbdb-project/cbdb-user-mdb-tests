@@ -640,7 +640,7 @@ Net diffs: **563** of 657,245 (0.086 %).  Of those, **16** are clearly attributa
 
 ### Year-only diffs — per-row rule classification
 
-Of the **69** year-only diffs, each row was tested against the rule-level divergences flagged in PR I (`analysis/index_year_rule_comparison.md`).  Conservative buckets (rows count once each):
+Of the **69** year-only diffs, each row was bucketed against PR N's rule-level runtime-vs-PHP comparison (`analysis/index_year_rule_comparison.md`).  Conservative buckets (rows count once each):
 
 | Bucket | Count |
 |---|---:|
@@ -657,7 +657,7 @@ None of these are confirmed bugs.  Full per-row output is in `reports/index_year
 Deeper triage (PR K2, `analysis/triage_index_year_drift_groups.py` → `reports/index_year_drift_rule_groups.json`) named the leftover buckets:
 
 - `consistent_within_rule` × 14 → 5 signature groups, all `candidate_same_rule_tie_break_or_aggregation_diff`.  Recurring diff=-20 across Rules 11/13/15/19 is the standout pattern.
-- `unclassified` × 18 → 18 named, 17 flagged `blocked_by_missing_frmBaseMaintenance_vba` (need Access execution-order to resolve).
+- `unclassified` × 18 → 18 named, 17 flagged `blocked_by_runtime_priority_triage_pending` (PR M dumped frmBaseMaintenance, so the source is in repo; resolving each row still needs a per-row walk of the runtime priority/iteration order).
 - `php_did_not_compute` × 19 → 6 groups by Access tcode; biggest is `access_tcode='05'` × 7 (`candidate_php_entry_code_mapping_gap` for jinshi).
 
 ### c_index_addr_id diffs — per-row classification

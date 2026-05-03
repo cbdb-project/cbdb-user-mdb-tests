@@ -640,7 +640,7 @@ _**Hypothetical** popup, reconstructed in PIL.  Users currently CAN'T trigger th
 
 ### 年份差異 —— 逐筆 rule 分類
 
-在 **69** 筆「只有 c_index_year 不一致」的行中，逐筆比對 PR I (`analysis/index_year_rule_comparison.md`) 標記的規則級差異。保守分類如下：
+在 **69** 筆「只有 c_index_year 不一致」的行中，逐筆比對 PR N (`analysis/index_year_rule_comparison.md`) 的runtime-vs-PHP 規則級差異。保守分類如下：
 
 | 分桶 | 筆數 |
 |---|---:|
@@ -649,7 +649,7 @@ _**Hypothetical** popup, reconstructed in PIL.  Users currently CAN'T trigger th
 | `access_did_not_compute` (Access 沒算出值（覆蓋率缺口）) | 7 |
 | `iteration_order_diff` (Phase-C 迭代次數不同) | 5 |
 | `consistent_within_rule` (多列共享同一 (php_tcode, access_tcode, diff)) | 14 |
-| `candidate_algorithm_divergence` (形狀符合 PR I 標記但無法精確重建) | 5 |
+| `candidate_algorithm_divergence` (形狀符合 K1 的歷史 hypothesis probe 但無法以單筆證據重建) | 5 |
 | `unclassified` (尚未對上任何模式) | 18 |
 
 以上沒有任何一筆被視為已確認的 bug。逐筆輸出見 `reports/index_year_drift_rule_classification.json`。
@@ -657,7 +657,7 @@ _**Hypothetical** popup, reconstructed in PIL.  Users currently CAN'T trigger th
 PR K2 進一步的 triage (`analysis/triage_index_year_drift_groups.py` → `reports/index_year_drift_rule_groups.json`) 把剩下的桶命名清楚：
 
 - `consistent_within_rule` × 14 → 5 個 signature 分組，全部標為 `candidate_same_rule_tie_break_or_aggregation_diff`。最顯眼的是 Rule 11/13/15/19 反覆出現的 diff=-20。
-- `unclassified` × 18 → 18 筆已命名，17 筆標為 `blocked_by_missing_frmBaseMaintenance_vba`（需要 Access 端執行順序才能判斷）。
+- `unclassified` × 18 → 18 筆已命名，17 筆標為 `blocked_by_runtime_priority_triage_pending`（PR M 已 dump frmBaseMaintenance，原始碼已在 repo；要逐筆判斷哪邊正確仍需走一遍 runtime 的 priority／iteration 順序）。
 - `php_did_not_compute` × 19 → 按 Access tcode 分 6 組；最大的是 `access_tcode='05'` × 7（jinshi 進士類的 `candidate_php_entry_code_mapping_gap`）。
 
 ### c_index_addr_id 差異 —— 逐筆分類

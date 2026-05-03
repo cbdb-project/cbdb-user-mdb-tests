@@ -9,7 +9,7 @@
       "total": 18,
       "named_after_triage": 18,
       "still_unclassified": 0,
-      "blocked_by_missing_vba": 17
+      "blocked_by_runtime_priority_triage_pending": 17
     },
     "php_did_not_compute": {
       "groups": 6,
@@ -25,7 +25,7 @@
       },
       "size": 5,
       "named_as": "candidate_same_rule_tie_break_or_aggregation_diff",
-      "rationale": "Both sides claim type_code '11' (child = father.c_birthyear + 30 (kin 75)) but produce different values (diff=1).  Most likely cause is a tie-break or aggregation difference (e.g. PHP picks MIN evidence row, Access picks first-row or different-MIN due to NULL handling).  diff sign tells which side picked the higher value.",
+      "rationale": "Both sides claim type_code '11' (child = father.c_birthyear + 30 (kin 75)) but produce different values (diff=1).  PR N has this rule as matched (or matched_minor_diff) at the source level, so the divergence is most likely a tie-break / aggregation detail — PHP and runtime Access can pick different evidence rows when multiple candidates have the same priority (NULL handling, MIN-vs-first-row under different storage orders, staging-step row pick, etc.).  diff sign tells which side picked the higher value.  Needs runtime-rule / phase-order triage against GetBirthIndexYearSQL to decide whether the divergence is intentional.",
       "examples": [
         {
           "personid": 523820,
@@ -59,7 +59,7 @@
       },
       "size": 3,
       "named_as": "candidate_same_rule_tie_break_or_aggregation_diff",
-      "rationale": "Both sides claim type_code '19' (older brother MAX(c_birthyear) + 2 (kin 125,165)) but produce different values (diff=-20).  Most likely cause is a tie-break or aggregation difference (e.g. PHP picks MIN evidence row, Access picks first-row or different-MIN due to NULL handling).  diff sign tells which side picked the higher value.",
+      "rationale": "Both sides claim type_code '19' (older brother MAX(c_birthyear) + 2 (kin 125,165)) but produce different values (diff=-20).  PR N has this rule as matched (or matched_minor_diff) at the source level, so the divergence is most likely a tie-break / aggregation detail — PHP and runtime Access can pick different evidence rows when multiple candidates have the same priority (NULL handling, MIN-vs-first-row under different storage orders, staging-step row pick, etc.).  diff sign tells which side picked the higher value.  Needs runtime-rule / phase-order triage against GetBirthIndexYearSQL to decide whether the divergence is intentional.",
       "examples": [
         {
           "personid": 228111,
@@ -91,7 +91,7 @@
       },
       "size": 2,
       "named_as": "candidate_same_rule_tie_break_or_aggregation_diff",
-      "rationale": "Both sides claim type_code '13' (father from MIN(child.c_birthyear) - 30) but produce different values (diff=-20).  Most likely cause is a tie-break or aggregation difference (e.g. PHP picks MIN evidence row, Access picks first-row or different-MIN due to NULL handling).  diff sign tells which side picked the higher value.",
+      "rationale": "Both sides claim type_code '13' (father from MIN(child.c_birthyear) - 30) but produce different values (diff=-20).  PR N has this rule as matched (or matched_minor_diff) at the source level, so the divergence is most likely a tie-break / aggregation detail — PHP and runtime Access can pick different evidence rows when multiple candidates have the same priority (NULL handling, MIN-vs-first-row under different storage orders, staging-step row pick, etc.).  diff sign tells which side picked the higher value.  Needs runtime-rule / phase-order triage against GetBirthIndexYearSQL to decide whether the divergence is intentional.",
       "examples": [
         {
           "personid": 228102,
@@ -117,7 +117,7 @@
       },
       "size": 2,
       "named_as": "candidate_same_rule_tie_break_or_aggregation_diff",
-      "rationale": "Both sides claim type_code '15' (mother from MIN(child.c_birthyear) - 27) but produce different values (diff=-20).  Most likely cause is a tie-break or aggregation difference (e.g. PHP picks MIN evidence row, Access picks first-row or different-MIN due to NULL handling).  diff sign tells which side picked the higher value.",
+      "rationale": "Both sides claim type_code '15' (mother from MIN(child.c_birthyear) - 27) but produce different values (diff=-20).  PR N has this rule as matched (or matched_minor_diff) at the source level, so the divergence is most likely a tie-break / aggregation detail — PHP and runtime Access can pick different evidence rows when multiple candidates have the same priority (NULL handling, MIN-vs-first-row under different storage orders, staging-step row pick, etc.).  diff sign tells which side picked the higher value.  Needs runtime-rule / phase-order triage against GetBirthIndexYearSQL to decide whether the divergence is intentional.",
       "examples": [
         {
           "personid": 228104,
@@ -143,7 +143,7 @@
       },
       "size": 2,
       "named_as": "candidate_same_rule_tie_break_or_aggregation_diff",
-      "rationale": "Both sides claim type_code '11' (child = father.c_birthyear + 30 (kin 75)) but produce different values (diff=-20).  Most likely cause is a tie-break or aggregation difference (e.g. PHP picks MIN evidence row, Access picks first-row or different-MIN due to NULL handling).  diff sign tells which side picked the higher value.",
+      "rationale": "Both sides claim type_code '11' (child = father.c_birthyear + 30 (kin 75)) but produce different values (diff=-20).  PR N has this rule as matched (or matched_minor_diff) at the source level, so the divergence is most likely a tie-break / aggregation detail — PHP and runtime Access can pick different evidence rows when multiple candidates have the same priority (NULL handling, MIN-vs-first-row under different storage orders, staging-step row pick, etc.).  diff sign tells which side picked the higher value.  Needs runtime-rule / phase-order triage against GetBirthIndexYearSQL to decide whether the divergence is intentional.",
       "examples": [
         {
           "personid": 228114,
@@ -171,8 +171,8 @@
       "access_tcode": "13",
       "diff_access_minus_php": 12,
       "named_as": "candidate_priority_order_or_rule_selection_diff",
-      "rationale": "PHP ran rule '0512' (?); Access ran rule '13' (father from MIN(child.c_birthyear) - 30).  Different priority order or evidence preference.  Without the frmBaseMaintenance VBA execution-order source we can't tell which side's choice is intentional.  Blocker: blocked_by_missing_frmBaseMaintenance_vba.",
-      "blocker": "blocked_by_missing_frmBaseMaintenance_vba"
+      "rationale": "PHP ran rule '0512' (?); Access ran rule '13' (father from MIN(child.c_birthyear) - 30).  Different priority order or evidence preference.  PR M dumped the runtime VBA (GetBirthIndexYearSQL inside frmBaseMaintenance), so the source is in repo, but resolving which side's choice is intentional still needs a per-row walk of the runtime priority/iteration order.  Blocker: blocked_by_runtime_priority_triage_pending.",
+      "blocker": "blocked_by_runtime_priority_triage_pending"
     },
     {
       "personid": 16267,
@@ -182,8 +182,8 @@
       "access_tcode": "1312",
       "diff_access_minus_php": -37,
       "named_as": "candidate_priority_order_or_rule_selection_diff",
-      "rationale": "PHP ran rule '14' (Phase C: father from MIN(child.c_index_year) - 30); Access ran rule '1312' (?).  Different priority order or evidence preference.  Without the frmBaseMaintenance VBA execution-order source we can't tell which side's choice is intentional.  Blocker: blocked_by_missing_frmBaseMaintenance_vba.",
-      "blocker": "blocked_by_missing_frmBaseMaintenance_vba"
+      "rationale": "PHP ran rule '14' (Phase C: father from MIN(child.c_index_year) - 30); Access ran rule '1312' (?).  Different priority order or evidence preference.  PR M dumped the runtime VBA (GetBirthIndexYearSQL inside frmBaseMaintenance), so the source is in repo, but resolving which side's choice is intentional still needs a per-row walk of the runtime priority/iteration order.  Blocker: blocked_by_runtime_priority_triage_pending.",
+      "blocker": "blocked_by_runtime_priority_triage_pending"
     },
     {
       "personid": 31573,
@@ -193,8 +193,8 @@
       "access_tcode": "14",
       "diff_access_minus_php": -471,
       "named_as": "candidate_priority_order_or_rule_selection_diff",
-      "rationale": "PHP ran rule '1112' (?); Access ran rule '14' (Phase C: father from MIN(child.c_index_year) - 30).  Different priority order or evidence preference.  Without the frmBaseMaintenance VBA execution-order source we can't tell which side's choice is intentional.  Blocker: blocked_by_missing_frmBaseMaintenance_vba.",
-      "blocker": "blocked_by_missing_frmBaseMaintenance_vba"
+      "rationale": "PHP ran rule '1112' (?); Access ran rule '14' (Phase C: father from MIN(child.c_index_year) - 30).  Different priority order or evidence preference.  PR M dumped the runtime VBA (GetBirthIndexYearSQL inside frmBaseMaintenance), so the source is in repo, but resolving which side's choice is intentional still needs a per-row walk of the runtime priority/iteration order.  Blocker: blocked_by_runtime_priority_triage_pending.",
+      "blocker": "blocked_by_runtime_priority_triage_pending"
     },
     {
       "personid": 133312,
@@ -204,8 +204,8 @@
       "access_tcode": "05",
       "diff_access_minus_php": 20,
       "named_as": "candidate_priority_order_or_rule_selection_diff",
-      "rationale": "PHP ran rule '22' (Phase C: younger brother -2); Access ran rule '05' (entry: jinshi - 30 (entry_type 040101)).  Different priority order or evidence preference.  Without the frmBaseMaintenance VBA execution-order source we can't tell which side's choice is intentional.  Blocker: blocked_by_missing_frmBaseMaintenance_vba.",
-      "blocker": "blocked_by_missing_frmBaseMaintenance_vba"
+      "rationale": "PHP ran rule '22' (Phase C: younger brother -2); Access ran rule '05' (entry: jinshi - 30 (entry_type 040101)).  Different priority order or evidence preference.  PR M dumped the runtime VBA (GetBirthIndexYearSQL inside frmBaseMaintenance), so the source is in repo, but resolving which side's choice is intentional still needs a per-row walk of the runtime priority/iteration order.  Blocker: blocked_by_runtime_priority_triage_pending.",
+      "blocker": "blocked_by_runtime_priority_triage_pending"
     },
     {
       "personid": 208758,
@@ -215,8 +215,8 @@
       "access_tcode": "03",
       "diff_access_minus_php": -1,
       "named_as": "candidate_priority_order_or_rule_selection_diff",
-      "rationale": "PHP ran rule '15' (mother from MIN(child.c_birthyear) - 27); Access ran rule '03' (wife from husband.c_index_year + 3 (kin 134)).  Different priority order or evidence preference.  Without the frmBaseMaintenance VBA execution-order source we can't tell which side's choice is intentional.  Blocker: blocked_by_missing_frmBaseMaintenance_vba.",
-      "blocker": "blocked_by_missing_frmBaseMaintenance_vba"
+      "rationale": "PHP ran rule '15' (mother from MIN(child.c_birthyear) - 27); Access ran rule '03' (wife from husband.c_index_year + 3 (kin 134)).  Different priority order or evidence preference.  PR M dumped the runtime VBA (GetBirthIndexYearSQL inside frmBaseMaintenance), so the source is in repo, but resolving which side's choice is intentional still needs a per-row walk of the runtime priority/iteration order.  Blocker: blocked_by_runtime_priority_triage_pending.",
+      "blocker": "blocked_by_runtime_priority_triage_pending"
     },
     {
       "personid": 222080,
@@ -226,8 +226,8 @@
       "access_tcode": "14",
       "diff_access_minus_php": -9,
       "named_as": "candidate_priority_order_or_rule_selection_diff",
-      "rationale": "PHP ran rule '22' (Phase C: younger brother -2); Access ran rule '14' (Phase C: father from MIN(child.c_index_year) - 30).  Different priority order or evidence preference.  Without the frmBaseMaintenance VBA execution-order source we can't tell which side's choice is intentional.  Blocker: blocked_by_missing_frmBaseMaintenance_vba.",
-      "blocker": "blocked_by_missing_frmBaseMaintenance_vba"
+      "rationale": "PHP ran rule '22' (Phase C: younger brother -2); Access ran rule '14' (Phase C: father from MIN(child.c_index_year) - 30).  Different priority order or evidence preference.  PR M dumped the runtime VBA (GetBirthIndexYearSQL inside frmBaseMaintenance), so the source is in repo, but resolving which side's choice is intentional still needs a per-row walk of the runtime priority/iteration order.  Blocker: blocked_by_runtime_priority_triage_pending.",
+      "blocker": "blocked_by_runtime_priority_triage_pending"
     },
     {
       "personid": 228110,
@@ -237,7 +237,7 @@
       "access_tcode": "21",
       "diff_access_minus_php": -20,
       "named_as": "candidate_same_rule_tie_break_or_aggregation_diff",
-      "rationale": "Both sides claim type_code '21' (younger brother MIN(c_birthyear) - 2 (kin 126,166)) but produce different values (diff=-20).  Most likely cause is a tie-break or aggregation difference (e.g. PHP picks MIN evidence row, Access picks first-row or different-MIN due to NULL handling).  diff sign tells which side picked the higher value.",
+      "rationale": "Both sides claim type_code '21' (younger brother MIN(c_birthyear) - 2 (kin 126,166)) but produce different values (diff=-20).  PR N has this rule as matched (or matched_minor_diff) at the source level, so the divergence is most likely a tie-break / aggregation detail — PHP and runtime Access can pick different evidence rows when multiple candidates have the same priority (NULL handling, MIN-vs-first-row under different storage orders, staging-step row pick, etc.).  diff sign tells which side picked the higher value.  Needs runtime-rule / phase-order triage against GetBirthIndexYearSQL to decide whether the divergence is intentional.",
       "blocker": null
     },
     {
@@ -248,8 +248,8 @@
       "access_tcode": "05",
       "diff_access_minus_php": -27,
       "named_as": "candidate_priority_order_or_rule_selection_diff",
-      "rationale": "PHP ran rule '14' (Phase C: father from MIN(child.c_index_year) - 30); Access ran rule '05' (entry: jinshi - 30 (entry_type 040101)).  Different priority order or evidence preference.  Without the frmBaseMaintenance VBA execution-order source we can't tell which side's choice is intentional.  Blocker: blocked_by_missing_frmBaseMaintenance_vba.",
-      "blocker": "blocked_by_missing_frmBaseMaintenance_vba"
+      "rationale": "PHP ran rule '14' (Phase C: father from MIN(child.c_index_year) - 30); Access ran rule '05' (entry: jinshi - 30 (entry_type 040101)).  Different priority order or evidence preference.  PR M dumped the runtime VBA (GetBirthIndexYearSQL inside frmBaseMaintenance), so the source is in repo, but resolving which side's choice is intentional still needs a per-row walk of the runtime priority/iteration order.  Blocker: blocked_by_runtime_priority_triage_pending.",
+      "blocker": "blocked_by_runtime_priority_triage_pending"
     },
     {
       "personid": 233060,
@@ -259,8 +259,8 @@
       "access_tcode": "07",
       "diff_access_minus_php": -4,
       "named_as": "candidate_priority_order_or_rule_selection_diff",
-      "rationale": "PHP ran rule '19' (older brother MAX(c_birthyear) + 2 (kin 125,165)); Access ran rule '07' (entry: juren - 27 (entry_type 040102)).  Different priority order or evidence preference.  Without the frmBaseMaintenance VBA execution-order source we can't tell which side's choice is intentional.  Blocker: blocked_by_missing_frmBaseMaintenance_vba.",
-      "blocker": "blocked_by_missing_frmBaseMaintenance_vba"
+      "rationale": "PHP ran rule '19' (older brother MAX(c_birthyear) + 2 (kin 125,165)); Access ran rule '07' (entry: juren - 27 (entry_type 040102)).  Different priority order or evidence preference.  PR M dumped the runtime VBA (GetBirthIndexYearSQL inside frmBaseMaintenance), so the source is in repo, but resolving which side's choice is intentional still needs a per-row walk of the runtime priority/iteration order.  Blocker: blocked_by_runtime_priority_triage_pending.",
+      "blocker": "blocked_by_runtime_priority_triage_pending"
     },
     {
       "personid": 235747,
@@ -270,8 +270,8 @@
       "access_tcode": "05",
       "diff_access_minus_php": 5,
       "named_as": "candidate_priority_order_or_rule_selection_diff",
-      "rationale": "PHP ran rule '13' (father from MIN(child.c_birthyear) - 30); Access ran rule '05' (entry: jinshi - 30 (entry_type 040101)).  Different priority order or evidence preference.  Without the frmBaseMaintenance VBA execution-order source we can't tell which side's choice is intentional.  Blocker: blocked_by_missing_frmBaseMaintenance_vba.",
-      "blocker": "blocked_by_missing_frmBaseMaintenance_vba"
+      "rationale": "PHP ran rule '13' (father from MIN(child.c_birthyear) - 30); Access ran rule '05' (entry: jinshi - 30 (entry_type 040101)).  Different priority order or evidence preference.  PR M dumped the runtime VBA (GetBirthIndexYearSQL inside frmBaseMaintenance), so the source is in repo, but resolving which side's choice is intentional still needs a per-row walk of the runtime priority/iteration order.  Blocker: blocked_by_runtime_priority_triage_pending.",
+      "blocker": "blocked_by_runtime_priority_triage_pending"
     },
     {
       "personid": 275802,
@@ -281,8 +281,8 @@
       "access_tcode": "13",
       "diff_access_minus_php": 33,
       "named_as": "candidate_priority_order_or_rule_selection_diff",
-      "rationale": "PHP ran rule '14' (Phase C: father from MIN(child.c_index_year) - 30); Access ran rule '13' (father from MIN(child.c_birthyear) - 30).  Different priority order or evidence preference.  Without the frmBaseMaintenance VBA execution-order source we can't tell which side's choice is intentional.  Blocker: blocked_by_missing_frmBaseMaintenance_vba.",
-      "blocker": "blocked_by_missing_frmBaseMaintenance_vba"
+      "rationale": "PHP ran rule '14' (Phase C: father from MIN(child.c_index_year) - 30); Access ran rule '13' (father from MIN(child.c_birthyear) - 30).  Different priority order or evidence preference.  PR M dumped the runtime VBA (GetBirthIndexYearSQL inside frmBaseMaintenance), so the source is in repo, but resolving which side's choice is intentional still needs a per-row walk of the runtime priority/iteration order.  Blocker: blocked_by_runtime_priority_triage_pending.",
+      "blocker": "blocked_by_runtime_priority_triage_pending"
     },
     {
       "personid": 295840,
@@ -292,8 +292,8 @@
       "access_tcode": "14",
       "diff_access_minus_php": -3,
       "named_as": "candidate_priority_order_or_rule_selection_diff",
-      "rationale": "PHP ran rule '13' (father from MIN(child.c_birthyear) - 30); Access ran rule '14' (Phase C: father from MIN(child.c_index_year) - 30).  Different priority order or evidence preference.  Without the frmBaseMaintenance VBA execution-order source we can't tell which side's choice is intentional.  Blocker: blocked_by_missing_frmBaseMaintenance_vba.",
-      "blocker": "blocked_by_missing_frmBaseMaintenance_vba"
+      "rationale": "PHP ran rule '13' (father from MIN(child.c_birthyear) - 30); Access ran rule '14' (Phase C: father from MIN(child.c_index_year) - 30).  Different priority order or evidence preference.  PR M dumped the runtime VBA (GetBirthIndexYearSQL inside frmBaseMaintenance), so the source is in repo, but resolving which side's choice is intentional still needs a per-row walk of the runtime priority/iteration order.  Blocker: blocked_by_runtime_priority_triage_pending.",
+      "blocker": "blocked_by_runtime_priority_triage_pending"
     },
     {
       "personid": 295847,
@@ -303,8 +303,8 @@
       "access_tcode": "22",
       "diff_access_minus_php": -3,
       "named_as": "candidate_priority_order_or_rule_selection_diff",
-      "rationale": "PHP ran rule '21' (younger brother MIN(c_birthyear) - 2 (kin 126,166)); Access ran rule '22' (Phase C: younger brother -2).  Different priority order or evidence preference.  Without the frmBaseMaintenance VBA execution-order source we can't tell which side's choice is intentional.  Blocker: blocked_by_missing_frmBaseMaintenance_vba.",
-      "blocker": "blocked_by_missing_frmBaseMaintenance_vba"
+      "rationale": "PHP ran rule '21' (younger brother MIN(c_birthyear) - 2 (kin 126,166)); Access ran rule '22' (Phase C: younger brother -2).  Different priority order or evidence preference.  PR M dumped the runtime VBA (GetBirthIndexYearSQL inside frmBaseMaintenance), so the source is in repo, but resolving which side's choice is intentional still needs a per-row walk of the runtime priority/iteration order.  Blocker: blocked_by_runtime_priority_triage_pending.",
+      "blocker": "blocked_by_runtime_priority_triage_pending"
     },
     {
       "personid": 528285,
@@ -314,8 +314,8 @@
       "access_tcode": "14",
       "diff_access_minus_php": 10,
       "named_as": "candidate_priority_order_or_rule_selection_diff",
-      "rationale": "PHP ran rule '13' (father from MIN(child.c_birthyear) - 30); Access ran rule '14' (Phase C: father from MIN(child.c_index_year) - 30).  Different priority order or evidence preference.  Without the frmBaseMaintenance VBA execution-order source we can't tell which side's choice is intentional.  Blocker: blocked_by_missing_frmBaseMaintenance_vba.",
-      "blocker": "blocked_by_missing_frmBaseMaintenance_vba"
+      "rationale": "PHP ran rule '13' (father from MIN(child.c_birthyear) - 30); Access ran rule '14' (Phase C: father from MIN(child.c_index_year) - 30).  Different priority order or evidence preference.  PR M dumped the runtime VBA (GetBirthIndexYearSQL inside frmBaseMaintenance), so the source is in repo, but resolving which side's choice is intentional still needs a per-row walk of the runtime priority/iteration order.  Blocker: blocked_by_runtime_priority_triage_pending.",
+      "blocker": "blocked_by_runtime_priority_triage_pending"
     },
     {
       "personid": 684842,
@@ -325,8 +325,8 @@
       "access_tcode": "03",
       "diff_access_minus_php": 72,
       "named_as": "candidate_priority_order_or_rule_selection_diff",
-      "rationale": "PHP ran rule '15' (mother from MIN(child.c_birthyear) - 27); Access ran rule '03' (wife from husband.c_index_year + 3 (kin 134)).  Different priority order or evidence preference.  Without the frmBaseMaintenance VBA execution-order source we can't tell which side's choice is intentional.  Blocker: blocked_by_missing_frmBaseMaintenance_vba.",
-      "blocker": "blocked_by_missing_frmBaseMaintenance_vba"
+      "rationale": "PHP ran rule '15' (mother from MIN(child.c_birthyear) - 27); Access ran rule '03' (wife from husband.c_index_year + 3 (kin 134)).  Different priority order or evidence preference.  PR M dumped the runtime VBA (GetBirthIndexYearSQL inside frmBaseMaintenance), so the source is in repo, but resolving which side's choice is intentional still needs a per-row walk of the runtime priority/iteration order.  Blocker: blocked_by_runtime_priority_triage_pending.",
+      "blocker": "blocked_by_runtime_priority_triage_pending"
     },
     {
       "personid": 684843,
@@ -336,8 +336,8 @@
       "access_tcode": "11",
       "diff_access_minus_php": 74,
       "named_as": "candidate_priority_order_or_rule_selection_diff",
-      "rationale": "PHP ran rule '21' (younger brother MIN(c_birthyear) - 2 (kin 126,166)); Access ran rule '11' (child = father.c_birthyear + 30 (kin 75)).  Different priority order or evidence preference.  Without the frmBaseMaintenance VBA execution-order source we can't tell which side's choice is intentional.  Blocker: blocked_by_missing_frmBaseMaintenance_vba.",
-      "blocker": "blocked_by_missing_frmBaseMaintenance_vba"
+      "rationale": "PHP ran rule '21' (younger brother MIN(c_birthyear) - 2 (kin 126,166)); Access ran rule '11' (child = father.c_birthyear + 30 (kin 75)).  Different priority order or evidence preference.  PR M dumped the runtime VBA (GetBirthIndexYearSQL inside frmBaseMaintenance), so the source is in repo, but resolving which side's choice is intentional still needs a per-row walk of the runtime priority/iteration order.  Blocker: blocked_by_runtime_priority_triage_pending.",
+      "blocker": "blocked_by_runtime_priority_triage_pending"
     },
     {
       "personid": 699457,
@@ -347,8 +347,8 @@
       "access_tcode": "1104",
       "diff_access_minus_php": 4,
       "named_as": "candidate_priority_order_or_rule_selection_diff",
-      "rationale": "PHP ran rule '15' (mother from MIN(child.c_birthyear) - 27); Access ran rule '1104' (?).  Different priority order or evidence preference.  Without the frmBaseMaintenance VBA execution-order source we can't tell which side's choice is intentional.  Blocker: blocked_by_missing_frmBaseMaintenance_vba.",
-      "blocker": "blocked_by_missing_frmBaseMaintenance_vba"
+      "rationale": "PHP ran rule '15' (mother from MIN(child.c_birthyear) - 27); Access ran rule '1104' (?).  Different priority order or evidence preference.  PR M dumped the runtime VBA (GetBirthIndexYearSQL inside frmBaseMaintenance), so the source is in repo, but resolving which side's choice is intentional still needs a per-row walk of the runtime priority/iteration order.  Blocker: blocked_by_runtime_priority_triage_pending.",
+      "blocker": "blocked_by_runtime_priority_triage_pending"
     },
     {
       "personid": 699493,
@@ -358,8 +358,8 @@
       "access_tcode": "23",
       "diff_access_minus_php": 5,
       "named_as": "candidate_priority_order_or_rule_selection_diff",
-      "rationale": "PHP ran rule '14' (Phase C: father from MIN(child.c_index_year) - 30); Access ran rule '23' (son-in-law male target -27 (kin 181,201,224,332)).  Different priority order or evidence preference.  Without the frmBaseMaintenance VBA execution-order source we can't tell which side's choice is intentional.  Blocker: blocked_by_missing_frmBaseMaintenance_vba.",
-      "blocker": "blocked_by_missing_frmBaseMaintenance_vba"
+      "rationale": "PHP ran rule '14' (Phase C: father from MIN(child.c_index_year) - 30); Access ran rule '23' (son-in-law male target -27 (kin 181,201,224,332)).  Different priority order or evidence preference.  PR M dumped the runtime VBA (GetBirthIndexYearSQL inside frmBaseMaintenance), so the source is in repo, but resolving which side's choice is intentional still needs a per-row walk of the runtime priority/iteration order.  Blocker: blocked_by_runtime_priority_triage_pending.",
+      "blocker": "blocked_by_runtime_priority_triage_pending"
     }
   ],
   "php_did_not_compute_groups": [
@@ -367,7 +367,7 @@
       "access_tcode": "05",
       "size": 7,
       "candidate_named_as": "candidate_php_rule_coverage_gap",
-      "rationale": "Access wrote via Rule 05 JS (jinshi entry +30).  PHP sqlEntryRule joins ENTRY_CODE_TYPE_REL on c_entry_type='040101' — if the SQLite snapshot's ENTRY_CODE_TYPE_REL doesn't map this person's c_entry_code to '040101', PHP doesn't fire and leaves the value at 0/null.  candidate_php_entry_code_mapping_gap.",
+      "rationale": "Access wrote via runtime Rule 05 (entry c_year - 30 with ENTRY_CODE_TYPE_REL.c_entry_type = '040101', per PR N matched against PHP sqlEntryRule).  For PHP to NOT fire, the SQLite snapshot's ENTRY_CODE_TYPE_REL must not map this person's c_entry_code to '040101'.  Row evidence in K1 supports this for the 7 affected rows.  candidate_php_entry_code_mapping_gap.",
       "examples": [
         {
           "personid": 63311,
@@ -474,7 +474,7 @@
       "access_tcode": "07",
       "size": 1,
       "candidate_named_as": "candidate_missing_php_rule_07_xc",
-      "rationale": "Access wrote via Rule 07 XC (writes to tmpBM_NIY with c_year+39, c_entry_code=257).  PHP has no obvious entry-code-257 path.  See PR I needs_manual_review for Rule 07 XC.",
+      "rationale": "Access wrote via Rule 07 XC (writes to tmpBM_NIY with c_year+39, c_entry_code=257).  PHP has no obvious entry-code-257 path in PR N's runtime comparison.  Needs runtime-rule triage to confirm whether the Access path is intentional or a vestigial branch.",
       "examples": [
         {
           "personid": 411288,

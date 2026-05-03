@@ -1,37 +1,56 @@
 """Deep triage of the c_index_year drift buckets that PR K1 left
 under-named.
 
-NOTE (PR N, 2026-05-03): the PHP_RULE_BY_TCODE table below was
-populated from PR I's reading of the BM IY Rule QueryDefs.  PR M
-showed those QueryDefs are NOT what CmdIndexYear_Click runs; the
-runtime path is GetBirthIndexYearSQL.  PR N's corrected rule
-comparison in `analysis/index_year_rule_comparison.md` shows
-runtime Access matches PHP on most type_codes (no logic_diff).
-The buckets this script outputs (consistent_within_rule,
-iteration_order_diff, php_did_not_compute, etc.) are still valid
-because they only reference type_codes, not PR I's incorrect
-rule labels.  But the per-bucket rationales below are best
-re-read against PR N's comparison rather than PR I's.
+Updated 2026-05-03 (PR X) — `PHP_RULE_BY_TCODE` below was
+re-derived from PR N's `analysis/index_year_rule_comparison.md`
+(runtime `GetBirthIndexYearSQL` paired against PHP
+`IndexYearRebuildService.php` by emitted type_code).  Per PR N
+runtime Access agrees with PHP on most type_codes (22 matched
+/ 8 matched_minor_diff / 0 logic_diff / 3 access_only).  The
+buckets this script outputs (consistent_within_rule,
+iteration_order_diff, php_did_not_compute, etc.) are unchanged
+— they're indexed by type_codes only — but each bucket's
+rationale text now references PR N's runtime comparison
+rather than PR I's vestigial-QueryDef comparison.
+
+The blocker label `blocked_by_missing_frmBaseMaintenance_vba`
+that appeared in earlier output is also stale: PR M dumped
+`frmBaseMaintenance` via `SaveAsText` in 2026-05-03.  This
+script now emits `blocked_by_runtime_priority_triage_pending`
+for the same rows — the blocker is no longer "we don't have
+the source", it's "we have the source but need to walk the
+priority/iteration order to decide which side's choice was
+intentional".
 
 Reads:
   - reports/index_year_drift_rule_classification.json (PR K1 output)
 
 Three things this script does:
 
-  1. `consistent_within_rule` (14 rows in the current snapshot) —
-     group by (php_tcode, access_tcode, diff) signature, then
-     attempt to name each group from the PR I rule-mapping.
+  1. `consistent_within_rule` — group by (php_tcode,
+     access_tcode, diff) signature, then label each group
+     using PR N's rule mapping.  diff = -20 across rules 11 /
+     13 / 15 / 19 is the standout pattern; per PR N rules 13
+     / 15 / 19 are `matched_minor_diff` (staging vs subquery
+     aggregate equivalent on the happy path), so the -20
+     cluster needs a runtime-rule / phase-order triage to
+     decide whether the staging step picks a consistently
+     wrong row.
 
-  2. `unclassified` (18 rows) — for each row, emit either a
-     candidate cause or an explicit blocker label saying what
-     evidence we'd need to classify it.
+  2. `unclassified` — for each row, emit either a candidate
+     cause or an explicit blocker label.  Blocker now means
+     "needs runtime priority/iteration-order triage against
+     `GetBirthIndexYearSQL`".
 
-  3. `php_did_not_compute` (19 rows) — group by Access tcode and
-     map each group to the PR I `missing_in_php` / `needs_manual_
-     review` hypothesis that best fits.
+  3. `php_did_not_compute` — group by Access tcode and label
+     each group with the PHP-side coverage gap suggested by
+     the runtime rule.  Biggest group (`access_tcode='05'`)
+     still reads as `candidate_php_entry_code_mapping_gap` —
+     the row evidence supports PHP missing the entry-code →
+     '040101' map for those persons.
 
-Conservative: nothing here is labelled as a confirmed bug.  The
-output uses `candidate_*` / `blocked_by_*` labels.
+Conservative: nothing here is labelled as a confirmed bug.
+The output uses `candidate_*` / `blocked_by_*` labels.
 
 Writes `reports/index_year_drift_rule_groups.json`.
 """
@@ -46,8 +65,10 @@ K1_JSON = ROOT / "reports" / "index_year_drift_rule_classification.json"
 OUT = ROOT / "reports" / "index_year_drift_rule_groups.json"
 
 
-# Rule-name lookup, derived from PR I (analysis/index_year_rule_comparison.md).
-# Keyed by PHP type_code; value = (rule_intent, php_method_in_pr_i).
+# Rule-name lookup, derived from PR N's
+# `analysis/index_year_rule_comparison.md` (runtime
+# GetBirthIndexYearSQL ↔ PHP IndexYearRebuildService pairing).
+# Keyed by PHP type_code; value = (rule_intent, php_method).
 PHP_RULE_BY_TCODE: dict[str, tuple[str, str]] = {
     "01": ("c_index_year = c_birthyear (raw birthyear)", "sqlRule01"),
     "02": ("c_index_year = c_deathyear - c_death_age + 1",
@@ -142,24 +163,34 @@ def _name_by_signature(php_t: str, access_t: str, diff: int) -> dict:
             ),
         }
 
-    # Same tcode on both sides — different rule outcome from the same
-    # rule.  Could be tie-break / aggregation difference.
+    # Same tcode on both sides — different rule outcome from the
+    # same rule.  Per PR N this rule is matched (or matched_minor_
+    # diff) at the source level, so the divergence almost
+    # certainly comes from row-pick (tie-break) or aggregation
+    # detail rather than a logic divergence.
     if php_t == access_t and php_t:
         intent = PHP_RULE_BY_TCODE.get(php_t, ("unknown rule", ""))[0]
         return {
             "label": "candidate_same_rule_tie_break_or_aggregation_diff",
             "rationale": (
                 f"Both sides claim type_code {php_t!r} ({intent}) "
-                f"but produce different values (diff={diff}).  Most "
-                f"likely cause is a tie-break or aggregation "
-                f"difference (e.g. PHP picks MIN evidence row, "
-                f"Access picks first-row or different-MIN due to "
-                f"NULL handling).  diff sign tells which side picked "
-                f"the higher value."
+                f"but produce different values (diff={diff}).  PR "
+                f"N has this rule as matched (or matched_minor_"
+                f"diff) at the source level, so the divergence is "
+                f"most likely a tie-break / aggregation detail — "
+                f"PHP and runtime Access can pick different "
+                f"evidence rows when multiple candidates have the "
+                f"same priority (NULL handling, MIN-vs-first-row "
+                f"under different storage orders, staging-step "
+                f"row pick, etc.).  diff sign tells which side "
+                f"picked the higher value.  Needs runtime-rule / "
+                f"phase-order triage against GetBirthIndexYearSQL "
+                f"to decide whether the divergence is intentional."
             ),
         }
 
-    # Different rules picked on each side — order of priority diverged
+    # Different rules picked on each side — priority order or
+    # evidence preference diverged at the rule-selection layer.
     if php_t and access_t and php_t != access_t:
         return {
             "label": "candidate_priority_order_or_rule_selection_diff",
@@ -167,10 +198,13 @@ def _name_by_signature(php_t: str, access_t: str, diff: int) -> dict:
                 f"PHP ran rule {php_t!r} ({PHP_RULE_BY_TCODE.get(php_t,('?', ''))[0]}); "
                 f"Access ran rule {access_t!r} ({PHP_RULE_BY_TCODE.get(access_t,('?', ''))[0]}).  "
                 f"Different priority order or evidence preference.  "
-                f"Without the frmBaseMaintenance VBA execution-order "
-                f"source we can't tell which side's choice is "
-                f"intentional.  Blocker: blocked_by_missing_"
-                f"frmBaseMaintenance_vba."
+                f"PR M dumped the runtime VBA "
+                f"(GetBirthIndexYearSQL inside frmBaseMaintenance), "
+                f"so the source is in repo, but resolving which "
+                f"side's choice is intentional still needs a "
+                f"per-row walk of the runtime priority/iteration "
+                f"order.  Blocker: blocked_by_runtime_priority_"
+                f"triage_pending."
             ),
         }
 
@@ -238,7 +272,7 @@ def main() -> int:
             "named_as": named["label"],
             "rationale": named["rationale"],
             "blocker": (
-                "blocked_by_missing_frmBaseMaintenance_vba"
+                "blocked_by_runtime_priority_triage_pending"
                 if named["label"] in (
                     "candidate_priority_order_or_rule_selection_diff",
                     "needs_manual_review",
@@ -254,27 +288,32 @@ def main() -> int:
     php_missing_groups = []
     for tcode, rows in sorted(by_access_tcode.items(),
                                key=lambda kv: -len(kv[1])):
-        # Use PR I's intent string as the candidate "what PHP missed".
+        # Use PR N's intent string as the candidate "what PHP missed".
         intent_first = _decompose_tcode(tcode)[0] if tcode else ""
         intent = PHP_RULE_BY_TCODE.get(intent_first,
                                         ("unknown rule",
                                          "unknown method"))[0]
-        # Specific PR I notes per common Access tcode
+        # Per-tcode rationales aligned with PR N's runtime-vs-PHP
+        # comparison.  Conservative: each is `candidate_*`; row
+        # evidence cited where it specifically supports the gap.
         notes = {
             "05": (
-                "Access wrote via Rule 05 JS (jinshi entry +30).  "
-                "PHP sqlEntryRule joins ENTRY_CODE_TYPE_REL on "
-                "c_entry_type='040101' — if the SQLite snapshot's "
-                "ENTRY_CODE_TYPE_REL doesn't map this person's "
-                "c_entry_code to '040101', PHP doesn't fire and "
-                "leaves the value at 0/null.  candidate_php_entry_"
-                "code_mapping_gap."
+                "Access wrote via runtime Rule 05 (entry c_year - "
+                "30 with ENTRY_CODE_TYPE_REL.c_entry_type = "
+                "'040101', per PR N matched against PHP "
+                "sqlEntryRule).  For PHP to NOT fire, the SQLite "
+                "snapshot's ENTRY_CODE_TYPE_REL must not map this "
+                "person's c_entry_code to '040101'.  Row evidence "
+                "in K1 supports this for the 7 affected rows.  "
+                "candidate_php_entry_code_mapping_gap."
             ),
             "07": (
                 "Access wrote via Rule 07 XC (writes to tmpBM_NIY "
                 "with c_year+39, c_entry_code=257).  PHP has no "
-                "obvious entry-code-257 path.  See PR I "
-                "needs_manual_review for Rule 07 XC."
+                "obvious entry-code-257 path in PR N's runtime "
+                "comparison.  Needs runtime-rule triage to confirm "
+                "whether the Access path is intentional or a "
+                "vestigial branch."
             ),
             "11": (
                 "Access wrote via Rule 11 (child = father.c_birthyear "
@@ -345,7 +384,7 @@ def main() -> int:
                     if d["named_as"] != "needs_manual_review"
                 ),
                 "still_unclassified": remaining_unclassified,
-                "blocked_by_missing_vba": sum(
+                "blocked_by_runtime_priority_triage_pending": sum(
                     1 for d in unclassified_diag
                     if d["blocker"]
                 ),
@@ -376,7 +415,7 @@ def main() -> int:
     print(f"=== unclassified: {len(unclassified_diag)} rows ===")
     print(f"  named after triage:        {len(unclassified_diag) - remaining_unclassified}")
     print(f"  still needs manual review: {remaining_unclassified}")
-    print(f"  blocked_by_missing_vba:    {sum(1 for d in unclassified_diag if d['blocker'])}")
+    print(f"  blocked_by_runtime_priority_triage_pending: {sum(1 for d in unclassified_diag if d['blocker'])}")
     print()
     print(f"=== php_did_not_compute: {len(php_missing_groups)} groups ===")
     for g in php_missing_groups:

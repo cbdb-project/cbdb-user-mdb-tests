@@ -165,7 +165,12 @@ Access `+N` vs PHP `-N`) were comparing PHP against the wrong
 Access source.  PR N's corrected comparator pairs runtime VBA
 against PHP and emits zero `logic_diff`.  Earlier wording in
 this document and in PR I's superseded JSON/MD has been replaced
-with the PR N-aligned framing above.
+with the PR N-aligned framing above.  PR X then propagated the
+re-framing into K1 / K2 (`classify_index_year_drift_by_rule.py`
+and `triage_index_year_drift_groups.py`): docstrings, comment
+rationales, JSON `explanation` strings, and the
+`blocked_by_*` label all now reference the runtime VBA path
+instead of PR I's vestigial-QueryDef hypotheses.
 
 ### `c_index_addr_id` trigger path
 

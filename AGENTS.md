@@ -509,10 +509,11 @@ and `reports/index_year_drift_rule_classification.json`.  Headline:
                                        cause to investigate)
   -  1 `php_returned_sentinel`       (PHP value ≥ 9999, looks like
                                        overflow / garbage)
-  -  5 `candidate_algorithm_divergence` (rule shape matches PR I's
-                                          flagged divergence but
-                                          numbers don't reconstruct
-                                          exactly)
+  -  5 `candidate_algorithm_divergence` (row's signature matches
+                                          one of K1's dormant
+                                          historical probes but
+                                          can't reconstruct from
+                                          a single evidence row)
   - 18 `unclassified`
 
 Total 69, ~74 % bucketed into named patterns (still none labelled
@@ -530,20 +531,26 @@ pass on what K1 left under-named:
     break or aggregation diff suspected).  A recurring **diff =
     -20 across Rules 11 / 13 / 15 / 19** stands out.
   - **unclassified** (18 rows): all 18 named after triage; 17
-    flagged `blocked_by_missing_frmBaseMaintenance_vba` (the
-    different-rules-on-each-side cases need Access's execution
-    order to resolve, which lives in the not-yet-extracted
-    frmBaseMaintenance VBA — see PR J prerequisite).
+    flagged `blocked_by_runtime_priority_triage_pending`
+    (different rules picked on each side; PR M dumped
+    `frmBaseMaintenance` so the source is in repo, but
+    deciding which side's choice is intentional still needs a
+    per-row walk of the runtime priority / iteration order in
+    `GetBirthIndexYearSQL`).  PR X renamed this label from
+    the older `blocked_by_missing_frmBaseMaintenance_vba`,
+    which became stale once PR M shipped.
   - **php_did_not_compute** (19 rows): 6 groups by Access tcode.
-    Biggest is `access_tcode='05'` × 7 — likely a PHP
-    `ENTRY_CODE_TYPE_REL` mapping gap for jinshi entries
-    (`candidate_php_entry_code_mapping_gap`).
+    Biggest is `access_tcode='05'` × 7 — `candidate_php_entry_
+    code_mapping_gap`.  PR N has runtime Rule 05 matched
+    against `sqlEntryRule('040101', 30, '05')`; the row
+    evidence supports PHP missing the entry-code → '040101'
+    map for those 7 personids.
 
-After K2, only 17 rows out of the original 69 are blocked on a
-missing source artefact (the Admin/maintenance VBA that drives
-frmBaseMaintenance).  Re-run the comparator + classifier + triage
-after every fresh SQLite snapshot or any change to the index-
-recompute path on either side.
+After K2, the 17 leftover rows are blocked on **runtime
+priority / iteration-order triage** (not on missing source —
+that was PR M's job).  Re-run the comparator + classifier +
+triage after every fresh SQLite snapshot or any change to the
+index-recompute path on either side.
 
 PR L (`analysis/classify_index_addr_drift.py` →
 `reports/index_addr_drift_classification.json`) classifies the
@@ -598,11 +605,16 @@ path" for the long version):
      `IndexYearRebuildService.php` (subtractive offsets like
      `c_year - 30`, `ENTRY_CODE_TYPE_REL` joins, etc.).  It does
      NOT call the 37 saved `BM IY Rule` QueryDefs PR I compared
-     against.  PR I's "logic_diff" sign-flip flag is largely
+     against.  PR I's "logic_diff" sign-flip flag is
      **invalidated**: the runtime path matches PHP on those
      rules.  PR I's JSON / markdown stay in repo as historical
-     evidence + a methodological warning; re-deriving against
-     `GetBirthIndexYearSQL` is left as follow-up.
+     evidence + a methodological warning.  PR X re-derived K1 /
+     K2's docstrings + in-script rationales + JSON output
+     strings against PR N's runtime comparison and renamed
+     the stale `blocked_by_missing_frmBaseMaintenance_vba`
+     label to `blocked_by_runtime_priority_triage_pending`
+     (the source is in repo since PR M; the blocker is now
+     the priority/iteration-order walk).
   2. The **`CmdIndexAddress` button** uses a per-rank UPDATE that
      does **NOT** explicitly aggregate by `MAX(c_sequence)` (the
      way PHP and the front-end `Form_frmIndexAddr.vb` do).  When

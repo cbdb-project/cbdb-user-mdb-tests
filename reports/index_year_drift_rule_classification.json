@@ -991,7 +991,7 @@
         "birthyear": 0,
         "deathyear": 0,
         "diff_access_minus_php": -11,
-        "explanation": "PHP type_code '06' is an entry rule (expected diff = ±2*27 = ±54); observed diff = -11.  Likely sign-flip pattern but the two sides may have picked different ENTRY_DATA rows."
+        "explanation": "PHP type_code '06' is an entry rule (2N for N=27 would be ±54); observed diff = -11.  Per PR N both sides use -N, so a 2N gap suggests the two sides picked different ENTRY_DATA rows; needs row-by-row evidence to confirm which rows."
       },
       {
         "personid": 295845,
@@ -1031,7 +1031,7 @@
         "birthyear": 0,
         "deathyear": 0,
         "diff_access_minus_php": 12,
-        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='0512', access_tcode='13')."
+        "explanation": "No matching signature from PR N's runtime-vs-PHP rule comparison (php_tcode='0512', access_tcode='13')."
       },
       {
         "personid": 16267,
@@ -1050,7 +1050,7 @@
         "birthyear": 0,
         "deathyear": 0,
         "diff_access_minus_php": -37,
-        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='14', access_tcode='1312')."
+        "explanation": "No matching signature from PR N's runtime-vs-PHP rule comparison (php_tcode='14', access_tcode='1312')."
       },
       {
         "personid": 31573,
@@ -1069,7 +1069,7 @@
         "birthyear": 0,
         "deathyear": 0,
         "diff_access_minus_php": -471,
-        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='1112', access_tcode='14')."
+        "explanation": "No matching signature from PR N's runtime-vs-PHP rule comparison (php_tcode='1112', access_tcode='14')."
       },
       {
         "personid": 133312,
@@ -1088,7 +1088,7 @@
         "birthyear": 0,
         "deathyear": 0,
         "diff_access_minus_php": 20,
-        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='22', access_tcode='05')."
+        "explanation": "No matching signature from PR N's runtime-vs-PHP rule comparison (php_tcode='22', access_tcode='05')."
       },
       {
         "personid": 208758,
@@ -1107,7 +1107,7 @@
         "birthyear": 0,
         "deathyear": 0,
         "diff_access_minus_php": -1,
-        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='15', access_tcode='03')."
+        "explanation": "No matching signature from PR N's runtime-vs-PHP rule comparison (php_tcode='15', access_tcode='03')."
       },
       {
         "personid": 222080,
@@ -1126,7 +1126,7 @@
         "birthyear": 0,
         "deathyear": 0,
         "diff_access_minus_php": -9,
-        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='22', access_tcode='14')."
+        "explanation": "No matching signature from PR N's runtime-vs-PHP rule comparison (php_tcode='22', access_tcode='14')."
       },
       {
         "personid": 228110,
@@ -1145,7 +1145,7 @@
         "birthyear": 0,
         "deathyear": 0,
         "diff_access_minus_php": -20,
-        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='21', access_tcode='21')."
+        "explanation": "No matching signature from PR N's runtime-vs-PHP rule comparison (php_tcode='21', access_tcode='21')."
       },
       {
         "personid": 232015,
@@ -1164,7 +1164,7 @@
         "birthyear": 0,
         "deathyear": 0,
         "diff_access_minus_php": -27,
-        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='14', access_tcode='05')."
+        "explanation": "No matching signature from PR N's runtime-vs-PHP rule comparison (php_tcode='14', access_tcode='05')."
       },
       {
         "personid": 233060,
@@ -1183,7 +1183,7 @@
         "birthyear": 0,
         "deathyear": 0,
         "diff_access_minus_php": -4,
-        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='19', access_tcode='07')."
+        "explanation": "No matching signature from PR N's runtime-vs-PHP rule comparison (php_tcode='19', access_tcode='07')."
       },
       {
         "personid": 235747,
@@ -1202,7 +1202,7 @@
         "birthyear": 0,
         "deathyear": 0,
         "diff_access_minus_php": 5,
-        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='13', access_tcode='05')."
+        "explanation": "No matching signature from PR N's runtime-vs-PHP rule comparison (php_tcode='13', access_tcode='05')."
       },
       {
         "personid": 275802,
@@ -1221,7 +1221,7 @@
         "birthyear": 0,
         "deathyear": 0,
         "diff_access_minus_php": 33,
-        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='14', access_tcode='13')."
+        "explanation": "No matching signature from PR N's runtime-vs-PHP rule comparison (php_tcode='14', access_tcode='13')."
       },
       {
         "personid": 295840,
@@ -1240,7 +1240,7 @@
         "birthyear": 0,
         "deathyear": 0,
         "diff_access_minus_php": -3,
-        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='13', access_tcode='14')."
+        "explanation": "No matching signature from PR N's runtime-vs-PHP rule comparison (php_tcode='13', access_tcode='14')."
       },
       {
         "personid": 295847,
@@ -1259,7 +1259,7 @@
         "birthyear": 0,
         "deathyear": 0,
         "diff_access_minus_php": -3,
-        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='21', access_tcode='22')."
+        "explanation": "No matching signature from PR N's runtime-vs-PHP rule comparison (php_tcode='21', access_tcode='22')."
       },
       {
         "personid": 528285,
@@ -1278,7 +1278,7 @@
         "birthyear": 0,
         "deathyear": 0,
         "diff_access_minus_php": 10,
-        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='13', access_tcode='14')."
+        "explanation": "No matching signature from PR N's runtime-vs-PHP rule comparison (php_tcode='13', access_tcode='14')."
       },
       {
         "personid": 684842,
@@ -1297,7 +1297,7 @@
         "birthyear": 0,
         "deathyear": 0,
         "diff_access_minus_php": 72,
-        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='15', access_tcode='03')."
+        "explanation": "No matching signature from PR N's runtime-vs-PHP rule comparison (php_tcode='15', access_tcode='03')."
       },
       {
         "personid": 684843,
@@ -1316,7 +1316,7 @@
         "birthyear": 0,
         "deathyear": 0,
         "diff_access_minus_php": 74,
-        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='21', access_tcode='11')."
+        "explanation": "No matching signature from PR N's runtime-vs-PHP rule comparison (php_tcode='21', access_tcode='11')."
       },
       {
         "personid": 699457,
@@ -1335,7 +1335,7 @@
         "birthyear": 0,
         "deathyear": 0,
         "diff_access_minus_php": 4,
-        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='15', access_tcode='1104')."
+        "explanation": "No matching signature from PR N's runtime-vs-PHP rule comparison (php_tcode='15', access_tcode='1104')."
       },
       {
         "personid": 699493,
@@ -1354,7 +1354,7 @@
         "birthyear": 0,
         "deathyear": 0,
         "diff_access_minus_php": 5,
-        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='14', access_tcode='23')."
+        "explanation": "No matching signature from PR N's runtime-vs-PHP rule comparison (php_tcode='14', access_tcode='23')."
       }
     ]
   }
