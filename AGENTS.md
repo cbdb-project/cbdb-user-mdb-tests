@@ -477,9 +477,16 @@ tables (BIOG_ADDR_DATA, ENTRY_DATA, NIAN_HAO, fl_*_year, etc.)
 that the classifier does not compare.  Per-row triage required.
 
 Algorithm pointers (each side, where the source code lives) are in
-`analysis/index_drift_algorithm_notes.md`.  Re-run the classifier
-after every cbdb-online-main-server SQLite refresh, or after any
-change to the User MDB index-recompute path.
+`analysis/index_drift_algorithm_notes.md`.  PR I has a first
+rule-by-rule comparison of Access BM IY queries against PHP
+`IndexYearRebuildService.php` (pinned commit `a642f7a`) in
+`analysis/index_year_rule_comparison.md` /
+`.json`: 8 candidate `logic_diff`s flagged (most notably a sign
+flip in entry-based rules, +N vs -N), 4 missing-on-one-side, 15
+needing manual review.  None confirmed as bugs.  Re-run the
+classifier and the rule comparator after every cbdb-online-main-
+server SQLite refresh, or after any change to the User MDB
+index-recompute path.
 
 ## Test inventory snapshot (run this to get current state)
 

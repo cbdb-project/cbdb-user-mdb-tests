@@ -98,8 +98,15 @@ WHERE (((BIOG_MAIN.c_index_year) Is Null
 
 The full set of dumped rules is the side-by-side reference for
 auditing PHP `IndexYearRebuildService.php` against the Access
-implementation.  Per-rule comparison is the actionable next step
-for classifying the 547 unclassified diffs from PR G.
+implementation.  PR I's first pass at that comparison is in
+[`analysis/index_year_rule_comparison.md`](index_year_rule_comparison.md)
+(structured copy:
+[`analysis/index_year_rule_comparison.json`](index_year_rule_comparison.json)).
+Headline: 8 candidate `logic_diff`s, 4 missing-on-one-side, 15
+needing manual review, 0 confirmed `matched` yet.  The most
+prominent single divergence is a **sign flip in entry-based
+rules** (Access uses `c_year + N`, PHP uses `c_year - N`).  None
+of these are confirmed bugs; the maintainer needs to look.
 
 What's still missing:
 
