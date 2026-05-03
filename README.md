@@ -204,7 +204,7 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 
 | Form | Real-VBA matrix | Real export | StoreID / RecallID | Import-list | Save-list | Notes |
 |------|-----------------|-------------|---------------------|-------------|-----------|-------|
-| LookAtEntry            | ✅ `test_vba_matrix.py` | ✅ CmdGIS (byte-diff) | ✅ Store; round-trip → Kinship ✅ | ✅ EntryCodes + Places | ✅ EntryCodes (3-col) | Bug #3 confirmed in this form only |
+| LookAtEntry            | ✅ `test_vba_matrix.py` | ✅ CmdGIS (byte-diff) | ✅ Store; round-trip → Kinship ✅ | ✅ EntryCodes + Places | ✅ EntryCodes (3-col) | Bug #3 was historically suspected here; re-verified 2026-05-02 as NOT REPRODUCIBLE |
 | LookAtStatus           | ✅ 3 fixtures | ✅ CmdGIS (struct) | ✅ Store | ✅ StatusCodes + Places | ✅ StatusCodes (3-col) | 17 023 + 4 931 rows |
 | LookAtTexts            | ✅ biblcat 1 | ✅ CmdGIS (struct) | ✅ Store | ✅ TextCategories + Places | ✅ TextCategories (3-col) | 15 774 rows |
 | LookAtAssociations     | ✅ 3 fixtures | ✅ CmdGIS (struct) | ✅ Store | ✅ Associations + Places | ✅ Associations (3-col) | 11 867 rows |
@@ -226,36 +226,63 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 ### Confirmed bugs
 
 Tagged by user-impact priority: 🔴 silent data issue (no user
-warning); 🟡 visible crash with no data corruption; 🟢 setup-time
-or dead-code only.
+warning); 🟡 visible crash with no data corruption; 🟢 setup-time,
+dead-code, dormant, or latent (defect real but no UI trigger on
+current dump).
 
-1. 🔴 **Bug #3** (`findings.md`) — `LookAtEntry.CmdQuery_Click`
-   backfill `UPDATE` silently fails on the multi-table join (only
-   this form; confirmed by cross-form matrix). Wrong columns show
-   NULL.
-2. 🔴 **Bug #1** — `View_StatusData` alias swap (`c_fy_range_*`
-   columns show last-year values). Silent — wrong data shown.
+> **Re-verification 2026-05-02.** Five issues that earlier reports
+> graded 🔴/🟡 were re-checked end-to-end (SQL probes + UI
+> reachability). Three categories emerged and the report generator
+> (`reports/generate_report.py`) was updated accordingly; these are
+> the source of truth, the README list below mirrors the new state:
+>
+> - **DORMANT** — defect would fire but no row in the current dump
+>   triggers it.  Bug #1, Bug #3.
+> - **LATENT** — defect is real in code but the UI control that
+>   would trigger it is missing or unreachable.  Bug #4 (blocked by
+>   Bug #15), Bug #5 (blocked by Bug #16), Bug #14 (host sub-form
+>   has no parent).
+> - **REAL** — currently visible to users.  Everything else.
+
+1. 🟢 **Bug #3** (HISTORICAL / DORMANT — re-verified 2026-05-02 as
+   NOT REPRODUCIBLE) — `LookAtEntry.CmdQuery_Click`'s multi-table
+   backfill `UPDATE` was originally reported to silently leave
+   c_entry_desc / c_addr_name NULL on >30 k-row results.  We re-fired
+   CmdQuery on the same fixture (entry 36, no year filter, 92,514
+   rows) and counted **0 NULL backfill rows**; the maintainer also
+   confirmed the UI shows correct desc / addr columns.  The suspect
+   SQL is still in the source code, but its behaviour on the current
+   dump is correct.  Verification: `python analysis/verify_bug3.py`.
+2. 🟢 **Bug #1** (DORMANT — re-verified 2026-05-02) — `View_StatusData`
+   has an alias swap that *would* show last-year values in
+   `c_fy_range_*` columns, but a SQL probe of the current dump found
+   0 STATUS_DATA rows where `c_ly_range > 0` AND `c_fy_range = 0`,
+   so no row in the dump actually triggers the symptom.  Code defect
+   is real; resurfaces the moment the underlying data picks up rows
+   that hit it.
 3. 🟢 **Bug #2** — `dao360.dll` reference broken on Office 2016+
    (one-time manual fix).
-4. 🟡 **Bug #4** (NEW, found 2026-05-02) —
-   `Form_LookAtPlace.CmdGIS_Click` references a non-existent control
-   `GISFrame` (should be `CodeFrame`). Real users clicking GIS on
-   LookAtPlace see "Object required" + no file written. Visible
-   crash, no data corruption. Test driver rewrites `GISFrame.Value
-   → CodeFrame.Value` as a workaround.
-5. 🟡 **Bug #5** (NEW, found 2026-05-02) —
-   `Form_LookAtStatus.CmdPajek_Click` is broken at multiple levels:
-   references non-existent control `ChkIDs` AND its INSERT SQL
-   projects three columns that don't exist on `ZZ_SCRATCH_STATUS`
-   (`c_person_id` / `c_status_id` / `c_status_count` — the actual
-   names are `c_personid` / `c_status_code` / no count column at
-   all). The whole sub was copy-pasted from
-   `LookAtAssociations.CmdPajek_Click` and the column names were
+4. 🟢 **Bug #4** (NEW, found 2026-05-02 — LATENT, masked by Bug
+   #15) — `Form_LookAtPlace.CmdGIS_Click` references a non-existent
+   control `GISFrame` (should be `CodeFrame`).  *If* the user could
+   click the GIS button on LookAtPlace, they would see "Object
+   required" + no file written. But Bug #15 (LookAtPlace has no
+   `CmdGIS` button on the form) means there's no UI trigger today,
+   so users never reach this code path.  Test driver rewrites
+   `GISFrame.Value → CodeFrame.Value` as a workaround for when the
+   button is restored.
+5. 🟢 **Bug #5** (NEW, found 2026-05-02 — LATENT, masked by Bug
+   #16) — `Form_LookAtStatus.CmdPajek_Click` is broken at multiple
+   levels: references non-existent control `ChkIDs` AND its INSERT
+   SQL projects three columns that don't exist on
+   `ZZ_SCRATCH_STATUS` (`c_person_id` / `c_status_id` /
+   `c_status_count` — actual names are `c_personid` /
+   `c_status_code` / no count column).  Sub was copy-pasted from
+   `LookAtAssociations.CmdPajek_Click` and column names were
    text-replaced `ASSOC → STATUS` without verifying the renamed
-   columns existed on the Status side. Real users see "Object
-   required". Test driver only patches the `ChkIDs` reference; the
-   SQL still fails — proper fix is for CBDB to rewrite the sub.
-   Found by `analysis/audit_missing_controls.py` +
+   columns existed on the Status side.  LATENT because Bug #16
+   (no `CmdPajek` button on LookAtStatus) means users can't trigger
+   it.  Found by `analysis/audit_missing_controls.py` +
    `analysis/audit_sql_columns.py`.
 6. 🟡 **Bug #6** (NEW, found 2026-05-02) —
    `Form_LookAtGroupData.queryEntry` (called by `CmdRun_Click` when

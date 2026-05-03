@@ -11,17 +11,12 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
 ## 目錄
 
 - [P0 — 靜默資料錯誤](#p0--靜默資料錯誤)
-  - [Issue #1 — View_StatusData 把首年份範圍顯示成了末年份範圍](#issue-1--view_statusdata-把首年份範圍顯示成了末年份範圍)
-  - [Issue #3 — LookAtEntry.CmdQuery 的回填 UPDATE 在大結果集上靜默失敗](#issue-3--lookatentrycmdquery-的回填-update-在大結果集上靜默失敗)
   - [Issue #7 — LookAtPlace.CmdNeo4j 在寫入第一條 people-CSV 時靜默失敗](#issue-7--lookatplacecmdneo4j-在寫入第一條-people-csv-時靜默失敗)
   - [Issue #8 — LookAtNetworks.CmdNeo4j 的 people/place CSV 在第一條上靜默失敗](#issue-8--lookatnetworkscmdneo4j-的-peopleplace-csv-在第一條上靜默失敗)
   - [Issue #9 — LookAtEntry.CmdNeo4j 的機構 (Institutions) 部分用錯了記錄集變數](#issue-9--lookatentrycmdneo4j-的機構-institutions-部分用錯了記錄集變數)
 - [P1 — 可見的執行時報錯](#p1--可見的執行時報錯)
-  - [Issue #4 — LookAtPlace.CmdGIS 報「Object required」（引用了不存在的控制元件）](#issue-4--lookatplacecmdgis-報object-required引用了不存在的控制元件)
-  - [Issue #5 — LookAtStatus.CmdPajek 引用了不存在的控制元件，且 SQL 用了三個不存在的列](#issue-5--lookatstatuscmdpajek-引用了不存在的控制元件且-sql-用了三個不存在的列)
   - [Issue #6 — LookAtGroupData 的 ChkEntry 路徑引用了不存在的列 ENTRY_DATA.c_parental_status](#issue-6--lookatgroupdata-的-chkentry-路徑引用了不存在的列-entry_datac_parental_status)
   - [Issue #13 — BIOG_MAIN_2 子表單試圖開啟一個不存在的 picker 表單 (frmPickNIAN_HAO)](#issue-13--biog_main_2-子表單試圖開啟一個不存在的-picker-表單-frmpicknian_hao)
-  - [Issue #14 — KIN_DATA 子表單試圖開啟不存在的 picker 表單 (frmPickKINSHIP_CODES)](#issue-14--kin_data-子表單試圖開啟不存在的-picker-表單-frmpickkinship_codes)
 - [P2 — 靜默顯示問題](#p2--靜默顯示問題)
   - [Issue #10 — EVENT_ADDR_2 子表單的地址列默默地顯示為空（ControlSource 寫錯了）](#issue-10--event_addr_2-子表單的地址列默默地顯示為空controlsource-寫錯了)
   - [Issue #11 — EVENTS_DATA_2 子表單上有一個控制元件繫結到不存在的列 c_event_record_id](#issue-11--events_data_2-子表單上有一個控制元件繫結到不存在的列-c_event_record_id)
@@ -34,6 +29,12 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
   - [Issue #19 — LookAtOffice 缺少 CmdGUESS 按鈕](#issue-19--lookatoffice-缺少-cmdguess-按鈕)
 - [P4 — 安裝設定](#p4--安裝設定)
   - [Issue #2 — VBA 工程引用了過時的 dao360.dll，Office 2016+ 機器上沒這個檔案](#issue-2--vba-工程引用了過時的-dao360dlloffice-2016-機器上沒這個檔案)
+- [P5 — 已解決 / 當前無法復現](#p5--已解決--當前無法復現)
+  - [Issue #1 — View_StatusData 會把首年份範圍顯示成末年份範圍 — DORMANT（當前 dump 沒有源資料能觸發）](#issue-1--view_statusdata-會把首年份範圍顯示成末年份範圍--dormant當前-dump-沒有源資料能觸發)
+  - [Issue #3 — LookAtEntry.CmdQuery 回填 UPDATE — 歷史 Bug #3，當前 dump 上已無法復現](#issue-3--lookatentrycmdquery-回填-update--歷史-bug-3當前-dump-上已無法復現)
+  - [Issue #4 — LookAtPlace.CmdGIS 會報「Object required」 — LATENT，被 Issue #15（表單上沒有 CmdGIS 按鈕）所遮蔽](#issue-4--lookatplacecmdgis-會報object-required--latent被-issue-15表單上沒有-cmdgis-按鈕所遮蔽)
+  - [Issue #5 — LookAtStatus.CmdPajek 引用了不存在的控制元件，且 SQL 用了三個不存在的列](#issue-5--lookatstatuscmdpajek-引用了不存在的控制元件且-sql-用了三個不存在的列)
+  - [Issue #14 — KIN_DATA 子表單的 CmdPickKinRel 呼叫不存在的 picker（frmPickKINSHIP_CODES）——但目前該子表單在主表中無入口（LATENT）](#issue-14--kin_data-子表單的-cmdpickkinrel-呼叫不存在的-pickerfrmpickkinship_codes但目前該子表單在主表中無入口latent)
 - [嚴重等級說明](#嚴重等級說明)
 - [附錄 —— c_index_year / c_index_addr_id 與 cbdb-online-main-server 快照之間的偏差（非缺陷）](#附錄--c_index_year--c_index_addr_id-與-cbdb-online-main-server-快照之間的偏差非缺陷)
 - [結語](#結語)
@@ -45,56 +46,9 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
 - P2 — 靜默顯示問題：表單欄位本應有資料，卻顯示為空。
 - P3 — 缺失介面：程式碼裡實現了某功能，但介面上沒有按鈕去觸發它。
 - P4 — 安裝設定：每臺新機器需要一次性處理。
+- P5 — 已解決 / 當前無法復現：保留作為歷史記錄；我們在當前 dump 上重新驗證過，無法再觸發症狀。
 
 ## P0 — 靜默資料錯誤
-
-### Issue #1 — View_StatusData 把首年份範圍顯示成了末年份範圍
-
-**涉及位置:** `View_StatusData`
-
-**嚴重等級:** P0 — 靜默資料錯位
-
-#### 問題描述
-
-存檔查詢 `View_StatusData` 把 `YEAR_RANGE_CODES` 表 JOIN 了兩次（其中一次別名是 `YEAR_RANGE_CODES_1`，用於末年份範圍），但 SELECT 列表裡所有範圍欄位都從 _1 別名取值。結果是 Status 子資料表裡每一行顯示的「首年份範圍」其實是末年份範圍。
-
-#### 復現步驟
-
-⚠ **在當前資料快照下無法在 UI 上復現——請看下方說明**
-
-在當前資料快照下，這個 bug 處於 **潛伏 (dormant) 狀態**——STATUS_DATA 共 70,761 行，但只有 13 行 c_fy_range > 0、0 行 c_ly_range > 0；兩個都有值且不同的只有 0 行。所以目前沒有任何人物能在 UI 上重現這個別名錯位。SQL 缺陷仍然存在；只要未來某次資料更新插入一條 fy/ly range 都填了且不同的 STATUS_DATA 記錄，對應的子資料表那一行就會顯示錯誤文字。今天若要驗證這個 bug，可以直接跑 SQL：
-  SELECT c_personid, c_fy_range, c_fy_range_desc, c_ly_range, c_ly_range_desc FROM View_StatusData WHERE c_fy_range > 0 OR c_ly_range > 0;
-
-1. 由於本 .mdb 當前快照下，沒有任何 STATUS_DATA 列同時填了 c_fy_range 和 c_ly_range，這個 bug 暫時無法在 UI 上復現。請直接用 SQL 驗證：
-2. 在 Access 裡開啟 .mdb，按 F11 顯示導航窗格，雙擊查詢 **View_StatusData**。
-3. 檢視 SELECT 子句：所有 `c_fy_range_*` 別名都從 `YEAR_RANGE_CODES_1` 取值，但 FROM 子句把這個別名 JOIN 在末年份範圍上——這就是錯位。
-4. （可選）在 Access 查詢視窗執行 `SELECT TOP 100 c_personid, c_fy_range, c_fy_range_desc, c_ly_range, c_ly_range_desc FROM View_StatusData WHERE c_fy_range > 0 OR c_ly_range > 0` ——未來某次資料更新如果同時填了這兩個欄位且取值不同，每一條結果都會顯示錯誤的首年份文字。
-
-#### 建議修復方案
-
-在 `View_StatusData` 中，把 `YEAR_RANGE_CODES_1.c_range AS c_fy_range_desc` 和 `YEAR_RANGE_CODES_1.c_range_chn AS c_fy_range_chn` 改成不帶別名的 `YEAR_RANGE_CODES.*`（FROM 子句已經按 `c_fy_range` JOIN 了它）。
-
-### Issue #3 — LookAtEntry.CmdQuery 的回填 UPDATE 在大結果集上靜默失敗
-
-**涉及位置:** `Form_LookAtEntry.CmdQuery_Click`
-
-**嚴重等級:** P0 — 靜默資料錯位
-
-#### 問題描述
-
-`Form_LookAtEntry.vb:1778-1789` 用一條 UPDATE 把七張以上 lookup 表 JOIN 到 `ZZ_SCRATCH_ENTRY` 上，回填 `c_entry_desc`、`c_addr_name`、`c_kin_name` 等描述欄位。當結果集足夠大時（大約 30000 行以上），JET 引擎會靜默地不更新這些欄位——使用者看到的查詢結果裡相關列全是空，但完全沒有報錯。這個問題僅在 LookAtEntry 上重現；Status / Texts / Associations 在相近行數下都能正確回填，原因是它們的 UPDATE JOIN 鏈更簡單。
-
-#### 復現步驟
-
-1. 開啟 **LookAtEntry**。
-2. 選一個高頻入仕途徑，例如 **36（進士及第）**，不加任何年份或地點篩選。
-3. 點 **Run Query**，等查詢跑完。
-4. 開啟結果表 `ZZ_SCRATCH_ENTRY`，檢視 `c_entry_desc`、`c_addr_name`、`c_kin_name` 等列。
-5. 許多行的描述欄位都是空的，儘管對應的 lookup 行在源表中其實存在。
-
-#### 建議修復方案
-
-把這條龐大的多表 UPDATE 拆成若干條小 UPDATE——每條只 JOIN 一張 lookup 表（UPDATE … LEFT JOIN INDEXYEAR_TYPE_CODES、UPDATE … LEFT JOIN BIOG_MAIN……）。Status / Texts / Associations 已經用這種寫法，執行良好。
 
 ### Issue #7 — LookAtPlace.CmdNeo4j 在寫入第一條 people-CSV 時靜默失敗
 
@@ -175,68 +129,6 @@ _The popup users see (re-rendered for the report; the real popup blocks the COM 
 
 ## P1 — 可見的執行時報錯
 
-### Issue #4 — LookAtPlace.CmdGIS 報「Object required」（引用了不存在的控制元件）
-
-**涉及位置:** `Form_LookAtPlace.CmdGIS_Click`
-
-**嚴重等級:** P1 — 可見的報錯，阻塞匯出
-
-#### 問題描述
-
-說明：在當前 .mdb 上這個問題暫時不會被使用者觸發，因為 LookAtPlace的設計視圖裡根本沒有 CmdGIS 按鈕（即 Issue #15）——使用者無法點選。但底層 VBA 問題依然存在：`Form_LookAtPlace.vb` 第 1539 行寫的是 `If GISFrame.Value = 1 Then`，而該表單上根本沒有 `GISFrame` 控制元件（真正的編碼選擇控制元件叫 `CodeFrame`）。一旦 Issue #15 裡把缺失的按鈕加回去而沒先修這一行，每一次點選都會拋錯。
-
-#### 復現步驟
-
-1. （在 Issue #15 修好之後才能復現）開啟 **LookAtPlace**。
-2. 跑任意一次查詢。
-3. 點 GIS 按鈕。
-4. 彈出 `執行時錯誤 424 ——必要的物件（Object required）` 對話方塊，匯出什麼都沒做。
-
-#### 截圖
-
-![bug4_step1_annotated.png](screenshots/bug4_step1_annotated.png)
-
-![bug4_step2_annotated.png](screenshots/bug4_step2_annotated.png)
-
-![bug4_step3_faux_popup.png](screenshots/bug4_step3_faux_popup.png)
-
-_Re-rendered popup — exact runtime error users would see if the button were present._
-
-#### 建議修復方案
-
-把 `Form_LookAtPlace.vb` 第 1539 行的 `GISFrame.Value` 改成 `CodeFrame.Value`。同表單的 `CmdNeo4j_Click`、`CmdGephi_Click`、`CmdPajek_Click` 已經寫對了，可以參考。
-
-### Issue #5 — LookAtStatus.CmdPajek 引用了不存在的控制元件，且 SQL 用了三個不存在的列
-
-**涉及位置:** `Form_LookAtStatus.CmdPajek_Click`
-
-**嚴重等級:** P1 — 可見的報錯（兩個相關缺陷）
-
-#### 問題描述
-
-同一個 handler 裡有兩個相關缺陷：
-
-  (a) 第 2308 行寫 `If ChkIDs.Value Then`，但 Status 上沒有名為 `ChkIDs` 的控制元件——只有 `ChkXYRef`、`ChkKML`、`ChkSubUnits`。
-
-  (b) 第 2335–2338 行構造的 SELECT 引用 `ZZ_SCRATCH_STATUS.c_person_id`、`c_status_id`、`c_status_count`——這三列都不在 schema 裡（真實列名是 `c_personid`、`c_status_code`，count 列根本沒有）。
-
-整段 sub 看起來是從 `LookAtAssociations.CmdPajek_Click` 整段拷過來的，那邊列名都對得上；改名時這兩處都漏了。和 Issue #4 一樣，因為 LookAtStatus 當前也沒有 Pajek 按鈕（Issue #16），使用者暫時碰不到；但只要按鈕加回去而沒先修這兩處，使用者就會立刻看到錯誤。
-
-#### 復現步驟
-
-1. （在 Issue #16 修好之後才能復現）開啟 **LookAtStatus**。
-2. 跑一次查詢，然後點 Pajek 按鈕。
-3. 第一次會彈 `Object required`（ChkIDs 引用所致）。
-4. 如果繞過它，下一次點就會觸發 SQL：因為 SELECT 引用了三個不存在的列，會報 `No such field` 之類的錯誤。
-
-#### 建議修復方案
-
-兩處都要改：
-  (a) 把 `ChkIDs.Value` 替換成常量 `False`（如果這個可選行為可以去掉），或者在 LookAtStatus 的設計視圖裡真的加一個 ChkIDs 控制元件。
-  (b) 把 SELECT 改成 `ZZ_SCRATCH_STATUS.c_personid` 和 `ZZ_SCRATCH_STATUS.c_status_code`，並去掉對 `c_status_count` 的聚合，或用別的方式計算（源表裡就沒有 c_status_count 列）。
-
-建議整段 sub 通盤重寫而不是單點修補——它顯然是從另一個表單整段複製過來的，列名沒校對過。
-
 ### Issue #6 — LookAtGroupData 的 ChkEntry 路徑引用了不存在的列 ENTRY_DATA.c_parental_status
 
 **涉及位置:** `Form_LookAtGroupData.queryEntry`
@@ -289,30 +181,6 @@ _Re-rendered popup — exact runtime error users would see if the button were pr
 #### 建議修復方案
 
 要麼把 `frmPickNIAN_HAO` 表單恢復回來，要麼在 `Form_BIOG_MAIN_2_Subform.c_fl_ey_notes_Click` 裡把呼叫改成替代的那個 picker 表單。
-
-### Issue #14 — KIN_DATA 子表單試圖開啟不存在的 picker 表單 (frmPickKINSHIP_CODES)
-
-**涉及位置:** `Form_KIN_DATA_Subform`
-
-**嚴重等級:** P1 — 使用者點選時可見的報錯
-
-#### 問題描述
-
-症狀與 Issue #13 相同，只是在另一個子表單上。KIN_DATA_Subform 中選擇 kinship 編碼的邏輯呼叫 `DoCmd.OpenForm "frmPickKINSHIP_CODES"`，並引用 `Forms!frmPickKINSHIP_CODES!frmKINSHIP_CODES.Form!c_kincode`。這兩個表單當前 .mdb 裡都沒有。
-
-#### 復現步驟
-
-**建議使用的範例人物：** `c_personid=1`（安惇，An Dun）
-
-開啟人物 1（安惇，An Dun）。KIN_DATA 子資料表會顯示 5 條親屬記錄——點任一條的「kinship code」picker 欄位即可觸發這個有缺陷的 Sub。 _由 `reports/probe_demo_persons.py` 透過 SQL probe 挑選；之所以選這位，是因為其底層記錄數確實滿足這個 bug 的觸發條件。_
-
-1. 開啟人物 **c_personid = 1（安惇 An Dun）** 的生平詳情——他有 4 條 KIN_DATA 記錄，足夠用來做一次點選測試。
-2. 在 KIN_DATA 子表單上，點任一列的「kinship code」picker 欄位。
-3. 彈出「集合中找不到專案」對話方塊（Sub 試圖 `DoCmd.OpenForm "frmPickKINSHIP_CODES"`，該表單也不存在）。
-
-#### 建議修復方案
-
-與 Issue #13 相同：把 picker 表單恢復，或把呼叫方改成指向新的 picker 表單。
 
 ## P2 — 靜默顯示問題
 
@@ -561,6 +429,153 @@ _LookAtPlace as it ships — no GIS button is rendered, even though `Sub CmdGIS_
   4. 儲存 .mdb。
 
 然後重新分發修好的檔案。以後的終端使用者什麼都不用做。
+
+## P5 — 已解決 / 當前無法復現
+
+_本層的條目作為歷史 / 潛伏記錄保留。可分為三類：(a) DORMANT 潛伏 — 已驗證當前源資料無法觸發該症狀；(b) RESOLVED 已解決 — 症狀不再出現，雖然可疑程式碼仍在（可能是某次 Office / JET 更新或更早一次修補解決的）；(c) LATENT 被遮蔽 — 原始碼缺陷確實存在，但因為另一個 issue（例如某個 UI 按鈕缺失）擋住了使用路徑，使用者目前碰不到。本層條目當下都不是使用者會遇到的問題；若要當成緊急問題處理，請先諮詢。_
+
+### Issue #1 — View_StatusData 會把首年份範圍顯示成末年份範圍 — DORMANT（當前 dump 沒有源資料能觸發）
+
+**涉及位置:** `View_StatusData`
+
+**嚴重等級:** P5 — 在當前 dump 上潛伏（若任何 STATUS_DATA 列同時填了 fy/ly range 且不同，會升為 P0）
+
+#### 問題描述
+
+存檔查詢 `View_StatusData` 把 `YEAR_RANGE_CODES` 表 JOIN 了兩次（其中一次別名是 `YEAR_RANGE_CODES_1`，用於末年份範圍），但 SELECT 列表裡所有範圍欄位都從 _1 別名取值。結果是 Status 子資料表裡每一行顯示的「首年份範圍」其實是末年份範圍。
+
+#### 復現步驟
+
+⚠ **在當前資料快照下無法在 UI 上復現——請看下方說明**
+
+在當前資料快照下，這個 bug 處於 **潛伏 (dormant) 狀態**——STATUS_DATA 共 70,761 行，但只有 13 行 c_fy_range > 0、0 行 c_ly_range > 0；兩個都有值且不同的只有 0 行。所以目前沒有任何人物能在 UI 上重現這個別名錯位。SQL 缺陷仍然存在；只要未來某次資料更新插入一條 fy/ly range 都填了且不同的 STATUS_DATA 記錄，對應的子資料表那一行就會顯示錯誤文字。今天若要驗證這個 bug，可以直接跑 SQL：
+  SELECT c_personid, c_fy_range, c_fy_range_desc, c_ly_range, c_ly_range_desc FROM View_StatusData WHERE c_fy_range > 0 OR c_ly_range > 0;
+
+1. 由於本 .mdb 當前快照下，沒有任何 STATUS_DATA 列同時填了 c_fy_range 和 c_ly_range，這個 bug 暫時無法在 UI 上復現。請直接用 SQL 驗證：
+2. 在 Access 裡開啟 .mdb，按 F11 顯示導航窗格，雙擊查詢 **View_StatusData**。
+3. 檢視 SELECT 子句：所有 `c_fy_range_*` 別名都從 `YEAR_RANGE_CODES_1` 取值，但 FROM 子句把這個別名 JOIN 在末年份範圍上——這就是錯位。
+4. （可選）在 Access 查詢視窗執行 `SELECT TOP 100 c_personid, c_fy_range, c_fy_range_desc, c_ly_range, c_ly_range_desc FROM View_StatusData WHERE c_fy_range > 0 OR c_ly_range > 0` ——未來某次資料更新如果同時填了這兩個欄位且取值不同，每一條結果都會顯示錯誤的首年份文字。
+
+#### 建議修復方案
+
+在 `View_StatusData` 中，把 `YEAR_RANGE_CODES_1.c_range AS c_fy_range_desc` 和 `YEAR_RANGE_CODES_1.c_range_chn AS c_fy_range_chn` 改成不帶別名的 `YEAR_RANGE_CODES.*`（FROM 子句已經按 `c_fy_range` JOIN 了它）。
+
+### Issue #3 — LookAtEntry.CmdQuery 回填 UPDATE — 歷史 Bug #3，當前 dump 上已無法復現
+
+**涉及位置:** `Form_LookAtEntry.CmdQuery_Click`
+
+**嚴重等級:** P5 — 已解決 / 當前 dump 上無法復現
+
+#### 問題描述
+
+歷史背景：早期某次 dump 的 `Form_LookAtEntry.vb`（第 1778-1789 行，用一條 UPDATE JOIN 七張以上 lookup 表回填 `c_entry_desc` / `c_addr_name` / `c_kin_name` 到 `ZZ_SCRATCH_ENTRY`）被報告在結果集 ~30000 行以上時靜默地讓這些欄位保持 NULL。
+
+**在當前 dump 上重新驗證（2026-05-02）：無法復現。** 我們用同樣的 fixture（入仕途徑 36 進士及第，不限年份，`ZZ_SCRATCH_ENTRY` 共 92,514 行）觸發 CmdQuery，精確統計 `c_entry_code IS NOT NULL` 且 `c_entry_desc IS NULL` 的行數為 **0**；`c_addr_id > 0` 且 `c_addr_name IS NULL` 也是 0。維護者本人也確認 UI 上 desc / addr 欄位顯示正確。
+
+那條龐大的多表 UPDATE SQL 仍在 VBA 模組裡（原始碼沒被重寫），所以結構上當時被懷疑的 SQL 寫法仍在；但在當前 dump 上，其執行時行為已能正確回填 —— 可能是某次 JET / Office 更新改善了複雜 UPDATE 的執行計畫，或當時的診斷本身就是假陽性。
+
+**建議：** 視為已解決，除非有人能在當前 dump 上重新提出可復現的反例。驗證指令碼：`analysis/verify_bug3.py`。
+
+#### 復現步驟
+
+1. 在 repo 根目錄執行 `python analysis/verify_bug3.py`。
+2. 指令碼會開啟 LookAtEntry，對入仕 36 不加年份篩選觸發 CmdQuery，並回報 `c_entry_code` 非空但 `c_entry_desc` 為 NULL 的行數。
+3. 在當前 dump 上這個數字是 0 —— bug 已不再可見。若未來 dump 回歸退化，同一個指令碼會報非零行數。
+
+#### 建議修復方案
+
+在當前 dump 上不需要任何動作。若未來再次回歸：把那條龐大的多表 UPDATE 拆成若干條小 UPDATE（每條只 JOIN 一張 lookup 表），與 Status / Texts / Associations 已使用的寫法一致。
+
+### Issue #4 — LookAtPlace.CmdGIS 會報「Object required」 — LATENT，被 Issue #15（表單上沒有 CmdGIS 按鈕）所遮蔽
+
+**涉及位置:** `Form_LookAtPlace.CmdGIS_Click`
+
+**嚴重等級:** P5 — 潛伏（若先修了 Issue #15 而沒同時修本條，會變成 P1）
+
+#### 問題描述
+
+說明：在當前 .mdb 上這個問題暫時不會被使用者觸發，因為 LookAtPlace的設計視圖裡根本沒有 CmdGIS 按鈕（即 Issue #15）——使用者無法點選。但底層 VBA 問題依然存在：`Form_LookAtPlace.vb` 第 1539 行寫的是 `If GISFrame.Value = 1 Then`，而該表單上根本沒有 `GISFrame` 控制元件（真正的編碼選擇控制元件叫 `CodeFrame`）。一旦 Issue #15 裡把缺失的按鈕加回去而沒先修這一行，每一次點選都會拋錯。
+
+#### 復現步驟
+
+1. （在 Issue #15 修好之後才能復現）開啟 **LookAtPlace**。
+2. 跑任意一次查詢。
+3. 點 GIS 按鈕。
+4. 彈出 `執行時錯誤 424 ——必要的物件（Object required）` 對話方塊，匯出什麼都沒做。
+
+#### 截圖
+
+![bug4_step1_annotated.png](screenshots/bug4_step1_annotated.png)
+
+![bug4_step2_annotated.png](screenshots/bug4_step2_annotated.png)
+
+![bug4_step3_faux_popup.png](screenshots/bug4_step3_faux_popup.png)
+
+_Re-rendered popup — exact runtime error users would see if the button were present._
+
+#### 建議修復方案
+
+把 `Form_LookAtPlace.vb` 第 1539 行的 `GISFrame.Value` 改成 `CodeFrame.Value`。同表單的 `CmdNeo4j_Click`、`CmdGephi_Click`、`CmdPajek_Click` 已經寫對了，可以參考。
+
+### Issue #5 — LookAtStatus.CmdPajek 引用了不存在的控制元件，且 SQL 用了三個不存在的列
+
+**涉及位置:** `Form_LookAtStatus.CmdPajek_Click`
+
+**嚴重等級:** P5 — 潛伏（若先修了 Issue #16 而沒同時修本條，會變成 P1）
+
+#### 問題描述
+
+同一個 handler 裡有兩個相關缺陷：
+
+  (a) 第 2308 行寫 `If ChkIDs.Value Then`，但 Status 上沒有名為 `ChkIDs` 的控制元件——只有 `ChkXYRef`、`ChkKML`、`ChkSubUnits`。
+
+  (b) 第 2335–2338 行構造的 SELECT 引用 `ZZ_SCRATCH_STATUS.c_person_id`、`c_status_id`、`c_status_count`——這三列都不在 schema 裡（真實列名是 `c_personid`、`c_status_code`，count 列根本沒有）。
+
+整段 sub 看起來是從 `LookAtAssociations.CmdPajek_Click` 整段拷過來的，那邊列名都對得上；改名時這兩處都漏了。和 Issue #4 一樣，因為 LookAtStatus 當前也沒有 Pajek 按鈕（Issue #16），使用者暫時碰不到；但只要按鈕加回去而沒先修這兩處，使用者就會立刻看到錯誤。
+
+#### 復現步驟
+
+1. （在 Issue #16 修好之後才能復現）開啟 **LookAtStatus**。
+2. 跑一次查詢，然後點 Pajek 按鈕。
+3. 第一次會彈 `Object required`（ChkIDs 引用所致）。
+4. 如果繞過它，下一次點就會觸發 SQL：因為 SELECT 引用了三個不存在的列，會報 `No such field` 之類的錯誤。
+
+#### 建議修復方案
+
+兩處都要改：
+  (a) 把 `ChkIDs.Value` 替換成常量 `False`（如果這個可選行為可以去掉），或者在 LookAtStatus 的設計視圖裡真的加一個 ChkIDs 控制元件。
+  (b) 把 SELECT 改成 `ZZ_SCRATCH_STATUS.c_personid` 和 `ZZ_SCRATCH_STATUS.c_status_code`，並去掉對 `c_status_count` 的聚合，或用別的方式計算（源表裡就沒有 c_status_count 列）。
+
+建議整段 sub 通盤重寫而不是單點修補——它顯然是從另一個表單整段複製過來的，列名沒校對過。
+
+### Issue #14 — KIN_DATA 子表單的 CmdPickKinRel 呼叫不存在的 picker（frmPickKINSHIP_CODES）——但目前該子表單在主表中無入口（LATENT）
+
+**涉及位置:** `Form_KIN_DATA_Subform`
+
+**嚴重等級:** P5 — Latent（若日後把 `KIN_DATA Subform` 重新嵌入使用者可達的位置，會回到 P1）
+
+#### 問題描述
+
+**靜態缺陷確實存在，但執行時的觸發路徑當前不可達。**`Form_KIN_DATA_Subform` 第 52 行的 Sub `CmdPickKinRel_Click` 呼叫 `DoCmd.OpenForm "frmPickKINSHIP_CODES"`，並引用 `Forms!frmPickKINSHIP_CODES!frmKINSHIP_CODES.Form!c_kincode`。這兩個表單在目前的 .mdb 都不存在——形狀與 Issue #13 相同。
+
+**為何 LATENT。**承載該按鈕的子表單 `KIN_DATA Subform` （即擁有 `CmdPickKinRel` 按鈕者）在當前的 `control_inventory.json` 裡沒有被任何 active 表單包含。使用者實際從 CBDB_Browser_2 進入的親屬介面是 `BIOG_MAIN_2_Subform`，而它包含的是 `KIN_DATA_2 Subform`（另一個版本，15 個控制元件全是唯讀欄位，沒有 `CmdPickKinRel`按鈕）。唯一仍然嵌入該子表單的位置是 `Form__TMPCLP487951`，那是設計時的備份快照，不是可導航的表單。
+
+因為沒有任何使用者介面能走到那個 picker 按鈕，正常使用下不會彈出錯誤。但只要日後有人把 `KIN_DATA Subform` 重新嵌進可達的位置，這條潛在錯誤路徑就會立刻浮現，所以底層的修復仍值得做。
+
+#### 復現步驟
+
+**建議使用的範例人物：** `c_personid=1`（安惇，An Dun）
+
+開啟人物 1（安惇，An Dun）。KIN_DATA 子資料表會顯示 5 條親屬記錄——點任一條的「kinship code」picker 欄位即可觸發這個有缺陷的 Sub。 _由 `reports/probe_demo_persons.py` 透過 SQL probe 挑選；之所以選這位，是因為其底層記錄數確實滿足這個 bug 的觸發條件。_
+
+1. 驗證路徑**只能靜態驗證**——當前 .mdb 中並無主表單嵌入受影響的子表單，因此無法在執行時重現點選。
+2. 靜態證據 (1)：開啟 `analysis/dump/vba/Form_KIN_DATA_Subform.vb` 第 52 行——可見該 Sub 確實呼叫 `DoCmd.OpenForm "frmPickKINSHIP_CODES"`。
+3. 靜態證據 (2)：開啟 `analysis/dump/control_inventory.json`，以 `"frmPickKINSHIP_CODES"` 為鍵搜尋——不存在。該 picker 表單已不存在於 .mdb 中。
+4. 可達性證據：在同一份 JSON 中搜索 `"KIN_DATA Subform"` 作為 `source_object` 或子表單控制元件名——只有 `Form__TMPCLP487951`（設計時備份快照）引用它。使用者實際走到的 `BIOG_MAIN_2_Subform` 嵌入的是 `KIN_DATA_2 Subform`，那一版沒有 `CmdPickKinRel` 按鈕。
+
+#### 建議修復方案
+
+與 Issue #13 相同：把 picker 表單恢復，或把呼叫方改成指向替代的 picker。雖然目前執行路徑不可達，靜態缺陷仍應清理，以免日後 `KIN_DATA Subform` 被重新嵌入時又冒出來。
 
 ## 附錄 —— c_index_year / c_index_addr_id 與 cbdb-online-main-server 快照之間的偏差（非缺陷）
 

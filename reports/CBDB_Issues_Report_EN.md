@@ -11,17 +11,12 @@ The issues are ordered by severity (P0 highest). Each entry includes a concise d
 ## Table of Contents
 
 - [P0 — Silent data corruption](#p0--silent-data-corruption)
-  - [Issue #1 — View_StatusData displays last-year range in the first-year column](#issue-1--view_statusdata-displays-last-year-range-in-the-first-year-column)
-  - [Issue #3 — LookAtEntry.CmdQuery backfill UPDATE silently fails on large result sets](#issue-3--lookatentrycmdquery-backfill-update-silently-fails-on-large-result-sets)
   - [Issue #7 — LookAtPlace.CmdNeo4j people-CSV silently fails on the first record](#issue-7--lookatplacecmdneo4j-people-csv-silently-fails-on-the-first-record)
   - [Issue #8 — LookAtNetworks.CmdNeo4j people/place CSVs silently fail on the first record](#issue-8--lookatnetworkscmdneo4j-peopleplace-csvs-silently-fail-on-the-first-record)
   - [Issue #9 — LookAtEntry.CmdNeo4j Institutions block uses the wrong recordset variable](#issue-9--lookatentrycmdneo4j-institutions-block-uses-the-wrong-recordset-variable)
 - [P1 — Visible runtime crash](#p1--visible-runtime-crash)
-  - [Issue #4 — LookAtPlace.CmdGIS aborts with 'Object required' (references a control that doesn't exist)](#issue-4--lookatplacecmdgis-aborts-with-object-required-references-a-control-that-doesnt-exist)
-  - [Issue #5 — LookAtStatus.CmdPajek references a missing control AND uses three columns that don't exist](#issue-5--lookatstatuscmdpajek-references-a-missing-control-and-uses-three-columns-that-dont-exist)
   - [Issue #6 — LookAtGroupData ChkEntry path references a non-existent column ENTRY_DATA.c_parental_status](#issue-6--lookatgroupdata-chkentry-path-references-a-non-existent-column-entry_datac_parental_status)
   - [Issue #13 — BIOG_MAIN_2 Subform tries to open a picker form (frmPickNIAN_HAO) that doesn't exist](#issue-13--biog_main_2-subform-tries-to-open-a-picker-form-frmpicknian_hao-that-doesnt-exist)
-  - [Issue #14 — KIN_DATA Subform tries to open a picker form (frmPickKINSHIP_CODES) that doesn't exist](#issue-14--kin_data-subform-tries-to-open-a-picker-form-frmpickkinship_codes-that-doesnt-exist)
 - [P2 — Silent display](#p2--silent-display)
   - [Issue #10 — EVENT_ADDR_2 Subform address columns silently render blank (wrong ControlSource)](#issue-10--event_addr_2-subform-address-columns-silently-render-blank-wrong-controlsource)
   - [Issue #11 — EVENTS_DATA_2 Subform has a control bound to a non-existent column c_event_record_id](#issue-11--events_data_2-subform-has-a-control-bound-to-a-non-existent-column-c_event_record_id)
@@ -34,6 +29,12 @@ The issues are ordered by severity (P0 highest). Each entry includes a concise d
   - [Issue #19 — LookAtOffice is missing its CmdGUESS button](#issue-19--lookatoffice-is-missing-its-cmdguess-button)
 - [P4 — Setup](#p4--setup)
   - [Issue #2 — VBA project references the legacy dao360.dll which isn't on Office 2016+ machines](#issue-2--vba-project-references-the-legacy-dao360dll-which-isnt-on-office-2016-machines)
+- [P5 — Resolved / not currently reproducible](#p5--resolved--not-currently-reproducible)
+  - [Issue #1 — View_StatusData would display last-year range in the first-year column — DORMANT (no source rows trigger it on this dump)](#issue-1--view_statusdata-would-display-last-year-range-in-the-first-year-column--dormant-no-source-rows-trigger-it-on-this-dump)
+  - [Issue #3 — LookAtEntry.CmdQuery backfill UPDATE — historical Bug #3, NOT reproducible on the current dump](#issue-3--lookatentrycmdquery-backfill-update--historical-bug-3-not-reproducible-on-the-current-dump)
+  - [Issue #4 — LookAtPlace.CmdGIS would abort with 'Object required' — LATENT, masked by Issue #15 (no CmdGIS button on the form)](#issue-4--lookatplacecmdgis-would-abort-with-object-required--latent-masked-by-issue-15-no-cmdgis-button-on-the-form)
+  - [Issue #5 — LookAtStatus.CmdPajek references a missing control AND uses three columns that don't exist](#issue-5--lookatstatuscmdpajek-references-a-missing-control-and-uses-three-columns-that-dont-exist)
+  - [Issue #14 — KIN_DATA Subform's CmdPickKinRel calls a missing picker (frmPickKINSHIP_CODES) — but the host sub-form is currently an orphan (LATENT)](#issue-14--kin_data-subforms-cmdpickkinrel-calls-a-missing-picker-frmpickkinship_codes--but-the-host-sub-form-is-currently-an-orphan-latent)
 - [Severity legend](#severity-legend)
 - [Appendix — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (not bugs)](#appendix--c_index_year--c_index_addr_id-drift-vs-the-cbdb-online-main-server-snapshot-not-bugs)
 - [Closing note](#closing-note)
@@ -45,56 +46,9 @@ The issues are ordered by severity (P0 highest). Each entry includes a concise d
 - P2 — Silent display: form fields render blank when they should show data.
 - P3 — Missing UI: a feature exists in code but no button invokes it.
 - P4 — Setup: one-time hurdle on each new install.
+- P5 — Resolved / not currently reproducible: kept as historical record; we re-checked on the current dump and could not trigger the symptom.
 
 ## P0 — Silent data corruption
-
-### Issue #1 — View_StatusData displays last-year range in the first-year column
-
-**Affected sub:** `View_StatusData`
-
-**Severity:** P0 — Silent data corruption
-
-#### Description
-
-The saved query `View_StatusData` joins `YEAR_RANGE_CODES` twice (once aliased as `YEAR_RANGE_CODES_1` for the last-year range), but the SELECT list pulls every range field from the _1 alias. As a result, every status row displayed in the Status sub-datasheet shows the last-year range value in the first-year range column.
-
-#### Steps to reproduce
-
-⚠ **Currently UI-dormant on this data snapshot — see note below**
-
-On this data snapshot the bug is **DORMANT** — STATUS_DATA has 70,761 rows, but only 13 have c_fy_range > 0 and 0 have c_ly_range > 0; 0 have both populated AND different. So no person currently surfaces the alias swap through the UI.  The SQL bug still exists; the moment a future data refresh adds a STATUS_DATA row with both fy/ly range codes set differently, the corresponding sub-datasheet line will display the wrong text.  To verify the bug today, run the SQL directly:
-  SELECT c_personid, c_fy_range, c_fy_range_desc, c_ly_range, c_ly_range_desc FROM View_StatusData WHERE c_fy_range > 0 OR c_ly_range > 0;
-
-1. Because no STATUS_DATA row in the current dump has both c_fy_range AND c_ly_range populated, this bug cannot be demonstrated through the UI today.  Verify it directly in SQL instead:
-2. Open the .mdb in Access.  Press F11 to show the navigation pane, then double-click query **View_StatusData**.
-3. Inspect the SELECT clause: every `c_fy_range_*` alias is pulled from `YEAR_RANGE_CODES_1`, but the FROM clause joins that alias on the LAST-year range.  That's the swap.
-4. (Optional) Run `SELECT TOP 100 c_personid, c_fy_range, c_fy_range_desc, c_ly_range, c_ly_range_desc FROM View_StatusData WHERE c_fy_range > 0 OR c_ly_range > 0` in the Access query window — once a future data refresh populates both fields differently, every such row will display the wrong first-year text.
-
-#### Suggested fix
-
-In `View_StatusData` change `YEAR_RANGE_CODES_1.c_range AS c_fy_range_desc` and `YEAR_RANGE_CODES_1.c_range_chn AS c_fy_range_chn` to use the un-aliased `YEAR_RANGE_CODES.*` fields (which the FROM clause already joins on `c_fy_range`).
-
-### Issue #3 — LookAtEntry.CmdQuery backfill UPDATE silently fails on large result sets
-
-**Affected sub:** `Form_LookAtEntry.CmdQuery_Click`
-
-**Severity:** P0 — Silent data corruption
-
-#### Description
-
-`Form_LookAtEntry.vb:1778-1789` runs a single UPDATE that joins seven+ lookup tables to backfill descriptive columns (`c_entry_desc`, `c_addr_name`, `c_kin_name`, …) into `ZZ_SCRATCH_ENTRY`. When the result set is large enough (roughly 30,000+ rows), JET silently leaves those columns NULL — the user sees a query result with empty description fields and no error message. Confirmed only on LookAtEntry; Status / Texts / Associations all backfill correctly at similar row counts because their UPDATE chains are simpler.
-
-#### Steps to reproduce
-
-1. Open **LookAtEntry**.
-2. Pick a high-frequency entry code such as **36 (jinshi general)** without any year or place filters.
-3. Click **Run Query**. Wait for the query to complete.
-4. Open the result table `ZZ_SCRATCH_ENTRY` and inspect the `c_entry_desc`, `c_addr_name`, `c_kin_name` columns.
-5. Many rows have NULL values where descriptive text should be, even though the matching lookup rows exist in the source tables.
-
-#### Suggested fix
-
-Split the giant multi-table UPDATE into several smaller ones — one per lookup join (UPDATE … LEFT JOIN INDEXYEAR_TYPE_CODES, UPDATE … LEFT JOIN BIOG_MAIN, etc.). Same pattern Status / Texts / Associations already use successfully.
 
 ### Issue #7 — LookAtPlace.CmdNeo4j people-CSV silently fails on the first record
 
@@ -175,68 +129,6 @@ Change `With tRstAssocCodes` on line 1425 to `With tRstInstitutions`. Single-cha
 
 ## P1 — Visible runtime crash
 
-### Issue #4 — LookAtPlace.CmdGIS aborts with 'Object required' (references a control that doesn't exist)
-
-**Affected sub:** `Form_LookAtPlace.CmdGIS_Click`
-
-**Severity:** P1 — Visible crash, blocks the export
-
-#### Description
-
-Note: this issue is moot in the current dump because there is no CmdGIS button on LookAtPlace's design (Issue #15) — users physically cannot click it. But the underlying VBA problem remains: line 1539 of `Form_LookAtPlace.vb` reads `If GISFrame.Value = 1 Then`, and there is no control named `GISFrame` on this form (the actual encoding control is `CodeFrame`). If the missing button is ever re-added (Issue #15) without first fixing this line, every click will throw.
-
-#### Steps to reproduce
-
-1. (Hypothetical, after Issue #15 is fixed.) Open **LookAtPlace**.
-2. Run any query.
-3. Click the GIS button.
-4. A `Run-time error 424 — Object required` popup appears, the export does nothing.
-
-#### Screenshots
-
-![bug4_step1_annotated.png](screenshots/bug4_step1_annotated.png)
-
-![bug4_step2_annotated.png](screenshots/bug4_step2_annotated.png)
-
-![bug4_step3_faux_popup.png](screenshots/bug4_step3_faux_popup.png)
-
-_Re-rendered popup — exact runtime error users would see if the button were present._
-
-#### Suggested fix
-
-Change `GISFrame.Value` to `CodeFrame.Value` on line 1539 of `Form_LookAtPlace.vb`. Same change `CmdNeo4j_Click`, `CmdGephi_Click`, and `CmdPajek_Click` on the same form already use correctly.
-
-### Issue #5 — LookAtStatus.CmdPajek references a missing control AND uses three columns that don't exist
-
-**Affected sub:** `Form_LookAtStatus.CmdPajek_Click`
-
-**Severity:** P1 — Visible crash (cluster of two)
-
-#### Description
-
-Two related defects in the same handler:
-
-  (a) Line 2308 reads `If ChkIDs.Value Then`, but Status has no control named `ChkIDs` — only `ChkXYRef`, `ChkKML`, and `ChkSubUnits`.
-
-  (b) Lines 2335–2338 build a SELECT that references `ZZ_SCRATCH_STATUS.c_person_id`, `c_status_id`, and `c_status_count` — none of which exist in the schema (the real columns are `c_personid`, `c_status_code`, no count column at all).
-
-The whole sub looks copy-pasted from `LookAtAssociations.CmdPajek_Click` where these names ARE valid; the rename pass missed both spots. Like Issue #4 this is also somewhat moot because LookAtStatus has no Pajek button (Issue #16); the SQL still fails the moment the sub is invoked though, so adding the button without fixing the SQL would just expose the failure to users.
-
-#### Steps to reproduce
-
-1. (Hypothetical, after Issue #16 is fixed.) Open **LookAtStatus**.
-2. Run a query, then click the Pajek button.
-3. First: an `Object required` popup appears (the ChkIDs reference).
-4. If that's worked around, the next click hits the SQL: a `No such field` error from the SELECT that references three non-existent columns.
-
-#### Suggested fix
-
-Two fixes:
-  (a) Replace `ChkIDs.Value` with either a constant `False` (if the optional behaviour isn't needed) or add a real ChkIDs control to LookAtStatus's design.
-  (b) Rewrite the SELECT to use `ZZ_SCRATCH_STATUS.c_personid` and `ZZ_SCRATCH_STATUS.c_status_code`, and either drop the count aggregate or compute it some other way (the source table doesn't have `c_status_count`).
-
-Realistically the whole sub probably needs a thoughtful rewrite rather than spot fixes — it was clearly inherited from another form without verification.
-
 ### Issue #6 — LookAtGroupData ChkEntry path references a non-existent column ENTRY_DATA.c_parental_status
 
 **Affected sub:** `Form_LookAtGroupData.queryEntry`
@@ -289,30 +181,6 @@ Open person 5 (查籥, Zha Yue). Their `c_fl_ey_notes` field has actual text in 
 #### Suggested fix
 
 Either restore the picker form `frmPickNIAN_HAO`, or update the caller in `Form_BIOG_MAIN_2_Subform.c_fl_ey_notes_Click` to use whichever picker form replaced it.
-
-### Issue #14 — KIN_DATA Subform tries to open a picker form (frmPickKINSHIP_CODES) that doesn't exist
-
-**Affected sub:** `Form_KIN_DATA_Subform`
-
-**Severity:** P1 — Visible crash on a user click
-
-#### Description
-
-Same shape as Issue #13, on a different sub-form. The kinship-code picker logic in KIN_DATA_Subform calls `DoCmd.OpenForm "frmPickKINSHIP_CODES"` and references `Forms!frmPickKINSHIP_CODES!frmKINSHIP_CODES.Form!c_kincode`. Neither form exists in the current .mdb.
-
-#### Steps to reproduce
-
-**Recommended demo person:** `c_personid=1` (安惇, An Dun)
-
-Open person 1 (安惇, An Dun). The KIN_DATA sub-datasheet shows 5 kinship row(s) — click any one's kinship-code picker to trigger the broken Sub. _Picked by `reports/probe_demo_persons.py`; a SQL probe selected this person because their row counts genuinely satisfy the precondition the bug needs._
-
-1. Open the biographical detail form for **c_personid = 1 (An Dun 安惇)** — he has 4 KIN_DATA rows, plenty to land on for a click test.
-2. On the KIN_DATA subform, click the kinship-code picker field on any row.
-3. An `Item not found in this collection.` popup appears (the Sub tries `DoCmd.OpenForm "frmPickKINSHIP_CODES"`, which doesn't exist either).
-
-#### Suggested fix
-
-Same as Issue #13: restore the picker form or update the caller to point at its replacement.
 
 ## P2 — Silent display
 
@@ -561,6 +429,153 @@ Once, on the maintainer's machine, do:
   4. Save the .mdb.
 
 Then re-distribute the fixed file. Future end users won't need to do anything.
+
+## P5 — Resolved / not currently reproducible
+
+_Items in this tier are kept as historical / latent record.  They fall into three categories: (a) DORMANT — verified that current source data doesn't trigger the symptom; (b) RESOLVED — the symptom no longer occurs even though the suspect code is still present (likely fixed by some Office / JET update or a previous iteration); (c) LATENT — the source-code defect is real, but the user can't reach it because another issue (e.g. a missing UI button) blocks the path.  None of these are user-facing today; please consult before treating any of them as urgent._
+
+### Issue #1 — View_StatusData would display last-year range in the first-year column — DORMANT (no source rows trigger it on this dump)
+
+**Affected sub:** `View_StatusData`
+
+**Severity:** P5 — Dormant on this dump (would be P0 if any STATUS_DATA row had both fy/ly range codes set differently)
+
+#### Description
+
+The saved query `View_StatusData` joins `YEAR_RANGE_CODES` twice (once aliased as `YEAR_RANGE_CODES_1` for the last-year range), but the SELECT list pulls every range field from the _1 alias. As a result, every status row displayed in the Status sub-datasheet shows the last-year range value in the first-year range column.
+
+#### Steps to reproduce
+
+⚠ **Currently UI-dormant on this data snapshot — see note below**
+
+On this data snapshot the bug is **DORMANT** — STATUS_DATA has 70,761 rows, but only 13 have c_fy_range > 0 and 0 have c_ly_range > 0; 0 have both populated AND different. So no person currently surfaces the alias swap through the UI.  The SQL bug still exists; the moment a future data refresh adds a STATUS_DATA row with both fy/ly range codes set differently, the corresponding sub-datasheet line will display the wrong text.  To verify the bug today, run the SQL directly:
+  SELECT c_personid, c_fy_range, c_fy_range_desc, c_ly_range, c_ly_range_desc FROM View_StatusData WHERE c_fy_range > 0 OR c_ly_range > 0;
+
+1. Because no STATUS_DATA row in the current dump has both c_fy_range AND c_ly_range populated, this bug cannot be demonstrated through the UI today.  Verify it directly in SQL instead:
+2. Open the .mdb in Access.  Press F11 to show the navigation pane, then double-click query **View_StatusData**.
+3. Inspect the SELECT clause: every `c_fy_range_*` alias is pulled from `YEAR_RANGE_CODES_1`, but the FROM clause joins that alias on the LAST-year range.  That's the swap.
+4. (Optional) Run `SELECT TOP 100 c_personid, c_fy_range, c_fy_range_desc, c_ly_range, c_ly_range_desc FROM View_StatusData WHERE c_fy_range > 0 OR c_ly_range > 0` in the Access query window — once a future data refresh populates both fields differently, every such row will display the wrong first-year text.
+
+#### Suggested fix
+
+In `View_StatusData` change `YEAR_RANGE_CODES_1.c_range AS c_fy_range_desc` and `YEAR_RANGE_CODES_1.c_range_chn AS c_fy_range_chn` to use the un-aliased `YEAR_RANGE_CODES.*` fields (which the FROM clause already joins on `c_fy_range`).
+
+### Issue #3 — LookAtEntry.CmdQuery backfill UPDATE — historical Bug #3, NOT reproducible on the current dump
+
+**Affected sub:** `Form_LookAtEntry.CmdQuery_Click`
+
+**Severity:** P5 — Resolved / not reproducible on current dump
+
+#### Description
+
+Historical context: an earlier dump of `Form_LookAtEntry.vb` (line 1778-1789, a single UPDATE joining seven+ lookup tables to backfill `c_entry_desc` / `c_addr_name` / `c_kin_name` etc. into `ZZ_SCRATCH_ENTRY`) was reported to silently leave those columns NULL on result sets above ~30 000 rows.
+
+**RE-VERIFIED on the current dump (2026-05-02): cannot reproduce.**  We fired CmdQuery on the same fixture (entry code 36 jinshi general, no year filter, 92,514 rows in `ZZ_SCRATCH_ENTRY`) and counted exactly **0 rows** with `c_entry_code IS NOT NULL` AND `c_entry_desc IS NULL`; same for `c_addr_id > 0` AND `c_addr_name IS NULL`.  The maintainer also confirmed the UI shows correct desc / addr columns.
+
+The giant multi-table UPDATE statement is still in the VBA module (the source code wasn't rewritten), so structurally the SQL pattern that was suspect remains.  But its runtime behaviour now produces correct backfills on this dump — likely because of a JET / Office update changing how it schedules complex UPDATE plans, or because the original diagnosis was a false positive.
+
+**Recommendation:** treat as resolved unless someone can produce a fresh repro on a current dump.  Verification script: `analysis/verify_bug3.py`.
+
+#### Steps to reproduce
+
+1. Run `python analysis/verify_bug3.py` from the repo root.
+2. It opens LookAtEntry, fires CmdQuery on entry code 36 with no year filter, and reports the count of rows whose `c_entry_desc` is NULL despite a non-null `c_entry_code`.
+3. On the current dump the count is 0 — the bug is no longer observable.  If a future dump regresses, this same script will report a non-zero count.
+
+#### Suggested fix
+
+No action required for this dump.  If a future regression is observed: split the giant multi-table UPDATE into several smaller ones — one per lookup join — matching the pattern Status / Texts / Associations already use.
+
+### Issue #4 — LookAtPlace.CmdGIS would abort with 'Object required' — LATENT, masked by Issue #15 (no CmdGIS button on the form)
+
+**Affected sub:** `Form_LookAtPlace.CmdGIS_Click`
+
+**Severity:** P5 — Latent (would be P1 if Issue #15 fixed without first fixing this)
+
+#### Description
+
+Note: this issue is moot in the current dump because there is no CmdGIS button on LookAtPlace's design (Issue #15) — users physically cannot click it. But the underlying VBA problem remains: line 1539 of `Form_LookAtPlace.vb` reads `If GISFrame.Value = 1 Then`, and there is no control named `GISFrame` on this form (the actual encoding control is `CodeFrame`). If the missing button is ever re-added (Issue #15) without first fixing this line, every click will throw.
+
+#### Steps to reproduce
+
+1. (Hypothetical, after Issue #15 is fixed.) Open **LookAtPlace**.
+2. Run any query.
+3. Click the GIS button.
+4. A `Run-time error 424 — Object required` popup appears, the export does nothing.
+
+#### Screenshots
+
+![bug4_step1_annotated.png](screenshots/bug4_step1_annotated.png)
+
+![bug4_step2_annotated.png](screenshots/bug4_step2_annotated.png)
+
+![bug4_step3_faux_popup.png](screenshots/bug4_step3_faux_popup.png)
+
+_Re-rendered popup — exact runtime error users would see if the button were present._
+
+#### Suggested fix
+
+Change `GISFrame.Value` to `CodeFrame.Value` on line 1539 of `Form_LookAtPlace.vb`. Same change `CmdNeo4j_Click`, `CmdGephi_Click`, and `CmdPajek_Click` on the same form already use correctly.
+
+### Issue #5 — LookAtStatus.CmdPajek references a missing control AND uses three columns that don't exist
+
+**Affected sub:** `Form_LookAtStatus.CmdPajek_Click`
+
+**Severity:** P5 — Latent (would be P1 if Issue #16 fixed without first fixing this)
+
+#### Description
+
+Two related defects in the same handler:
+
+  (a) Line 2308 reads `If ChkIDs.Value Then`, but Status has no control named `ChkIDs` — only `ChkXYRef`, `ChkKML`, and `ChkSubUnits`.
+
+  (b) Lines 2335–2338 build a SELECT that references `ZZ_SCRATCH_STATUS.c_person_id`, `c_status_id`, and `c_status_count` — none of which exist in the schema (the real columns are `c_personid`, `c_status_code`, no count column at all).
+
+The whole sub looks copy-pasted from `LookAtAssociations.CmdPajek_Click` where these names ARE valid; the rename pass missed both spots. Like Issue #4 this is also somewhat moot because LookAtStatus has no Pajek button (Issue #16); the SQL still fails the moment the sub is invoked though, so adding the button without fixing the SQL would just expose the failure to users.
+
+#### Steps to reproduce
+
+1. (Hypothetical, after Issue #16 is fixed.) Open **LookAtStatus**.
+2. Run a query, then click the Pajek button.
+3. First: an `Object required` popup appears (the ChkIDs reference).
+4. If that's worked around, the next click hits the SQL: a `No such field` error from the SELECT that references three non-existent columns.
+
+#### Suggested fix
+
+Two fixes:
+  (a) Replace `ChkIDs.Value` with either a constant `False` (if the optional behaviour isn't needed) or add a real ChkIDs control to LookAtStatus's design.
+  (b) Rewrite the SELECT to use `ZZ_SCRATCH_STATUS.c_personid` and `ZZ_SCRATCH_STATUS.c_status_code`, and either drop the count aggregate or compute it some other way (the source table doesn't have `c_status_count`).
+
+Realistically the whole sub probably needs a thoughtful rewrite rather than spot fixes — it was clearly inherited from another form without verification.
+
+### Issue #14 — KIN_DATA Subform's CmdPickKinRel calls a missing picker (frmPickKINSHIP_CODES) — but the host sub-form is currently an orphan (LATENT)
+
+**Affected sub:** `Form_KIN_DATA_Subform`
+
+**Severity:** P5 — Latent (would be P1 if `KIN_DATA Subform` were re-embedded somewhere users can reach)
+
+#### Description
+
+**Static defect is real, runtime trigger is not currently reachable.** The Sub `CmdPickKinRel_Click` in `Form_KIN_DATA_Subform` (line 52) calls `DoCmd.OpenForm "frmPickKINSHIP_CODES"` and references `Forms!frmPickKINSHIP_CODES!frmKINSHIP_CODES.Form!c_kincode`. Neither form exists in the current .mdb — same shape as Issue #13.
+
+**Why LATENT.** The host sub-form `KIN_DATA Subform` (which owns the `CmdPickKinRel` button) is not contained by any active form in the current `control_inventory.json`. `BIOG_MAIN_2_Subform` (the kinship surface users actually navigate to via CBDB_Browser_2) embeds `KIN_DATA_2 Subform` instead — and that variant has no `CmdPickKinRel` button (its 15 controls are all read-only fields). The only place the embedding still appears is `Form__TMPCLP487951` (a design-time backup snapshot, not a navigable form).
+
+Because no user-facing navigation reaches the picker button, users cannot trigger the popup from normal use. The latent code path will resurface the moment a developer re-embeds `KIN_DATA Subform` somewhere reachable, so the underlying fix is still worth applying.
+
+#### Steps to reproduce
+
+**Recommended demo person:** `c_personid=1` (安惇, An Dun)
+
+Open person 1 (安惇, An Dun). The KIN_DATA sub-datasheet shows 5 kinship row(s) — click any one's kinship-code picker to trigger the broken Sub. _Picked by `reports/probe_demo_persons.py`; a SQL probe selected this person because their row counts genuinely satisfy the precondition the bug needs._
+
+1. Verification path is **static-only** — the runtime click cannot be reproduced in the current .mdb because no parent form embeds the affected sub-form.
+2. Static evidence (1): open `analysis/dump/vba/Form_KIN_DATA_Subform.vb` line 52 — confirms the Sub calls `DoCmd.OpenForm "frmPickKINSHIP_CODES"`.
+3. Static evidence (2): open `analysis/dump/control_inventory.json` and search for `"frmPickKINSHIP_CODES"` as a key — absent. The picker form does not exist.
+4. Reachability evidence: in the same JSON, search for `"KIN_DATA Subform"` as a `source_object` or sub-form control name — only `Form__TMPCLP487951` (a design backup) references it. `BIOG_MAIN_2_Subform` embeds `KIN_DATA_2 Subform` instead, which has no `CmdPickKinRel` button.
+
+#### Suggested fix
+
+Same as Issue #13: restore the picker form (or update the caller to its replacement). Even though the runtime path is not currently reachable, the static defect should be cleaned up so it doesn't resurface when `KIN_DATA Subform` is re-embedded.
 
 ## Appendix — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (not bugs)
 
