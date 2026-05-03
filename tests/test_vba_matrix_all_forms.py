@@ -292,7 +292,7 @@ def _xfail_marks(fx: CrossFixture):
     """Skip three forms whose CmdQuery/CmdRun does very heavy
     recursive expansion (network / pair-wise / cross-form group
     aggregation).  Need either smaller fixtures, lower distance
-    constraints, or longer timeouts.  See findings.md.
+    constraints, or longer timeouts.  See reports/CBDB_Issues_Report_EN.md.
 
     Working in matrix:
       Entry/Status/Texts/Associations/Office/Place/Kinship

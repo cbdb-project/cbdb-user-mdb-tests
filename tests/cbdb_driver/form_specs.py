@@ -364,7 +364,7 @@ ALL_IMPORTS: list[ImportSpec] = [
                "BIOG_MAIN", "c_personid",
                file_sep=" "),
     # ---- LookAtNetworks ---- (form open hangs in this driver — see
-    # findings.md / matrix `_xfail_marks` — but we still record the
+    # reports/CBDB_Issues_Report_EN.md / matrix `_xfail_marks` — but we still record the
     # spec so the test file can mark them skip without re-deriving.)
     ImportSpec("LookAtNetworks", "CmdImportPeople",
                "ZZ_SCRATCH_IMPORT_PEOPLE", "c_person_id",

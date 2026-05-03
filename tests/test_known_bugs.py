@@ -169,7 +169,7 @@ def test_bug8_lookat_networks_cmdneo4j_select_missing_xy():
 
 
 def test_bug6_groupdata_query_entry_wrong_field():
-    """Bug #6 (findings.md) — Form_LookAtGroupData.queryEntry projects
+    """Bug #6 (reports/CBDB_Issues_Report_EN.md) — Form_LookAtGroupData.queryEntry projects
     `ENTRY_DATA.c_parental_status` (no `_code` suffix), but the actual
     schema column is `c_parental_status_code`.  The INSERT...SELECT
     statement must reference `ENTRY_DATA.c_parental_status_code` to be
@@ -197,7 +197,7 @@ def test_bug6_groupdata_query_entry_wrong_field():
 
 
 def test_bug7_lookat_place_cmdneo4j_select_missing_dynasty_female():
-    """Bug #7 (findings_en.md) — Form_LookAtPlace.CmdNeo4j builds a
+    """Bug #7 (reports/CBDB_Issues_Report_EN.md) — Form_LookAtPlace.CmdNeo4j builds a
     People-CSV from a SELECT that omits c_dynasty / c_dynasty_chn /
     c_female, but the loop reads them.  Detected by
     `analysis/audit_recordset_sql_projection.py`.  This regression

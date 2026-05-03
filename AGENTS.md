@@ -21,23 +21,35 @@ User's stated pain points (in priority order):
 5. Specific parameter combinations (entry method × dynasty × address)
    are the real test surface — random fixtures often hit sparse data
 
-## Single source of truth: README "Plan & status"
+## Single source of truth (two of them, scoped)
 
-The roadmap, current coverage table, confirmed bugs, and per-item
-status all live in **`README.md` § Plan & status**. That is the
-*single* place to look — and the *single* place to update.
+This project keeps **two** authoritative documents and nothing
+else.  Do not duplicate their content elsewhere — copies drift.
 
-**Hard rule for any agent (or human contributor):** if your change
-moves a roadmap item from open → in-progress → done, or completes /
-discovers / skips a fixture, **you must update the corresponding row
-in the README's Plan & status table in the same PR**. Do not leave
-the README out of sync. Do not duplicate plan content into other
-files. CI/reviewers should fail PRs that change `tests/` substantively
-without touching `README.md`.
+1. **Roadmap, coverage table, fixture status** →
+   **`README.md` § Plan & status**.
+2. **Issues / bugs (all 19 of them, content + tier + severity +
+   reproduction steps)** → the `ISSUES` dict in
+   **`reports/generate_report.py`**, which auto-generates the four
+   `reports/CBDB_Issues_Report_*.{md,docx}` outputs (en/zh × md/docx).
 
-This file (`AGENTS.md`) holds *operational* knowledge — the COM
-landmines, JET quirks, driver patterns. Plan/status content does *not*
-belong here.
+**Hard rules for any agent (or human contributor):**
+
+- If your change moves a roadmap item from open → in-progress →
+  done, or completes / discovers / skips a fixture, **update the
+  corresponding row in `README.md`'s Plan & status table in the
+  same PR**.  CI/reviewers should fail PRs that change `tests/`
+  substantively without touching `README.md`.
+- If your change discovers, fixes, reclassifies, or invalidates
+  an issue, **edit the entry in `reports/generate_report.py`'s
+  `ISSUES` dict and re-run `python reports/generate_report.py`
+  in the same PR**.  Don't paste bug content into `README.md`,
+  `AGENTS.md`, or any other markdown — link to the report instead.
+  `analysis/reverify_all_issues.py` cross-checks the classifier
+  against the report and should be run when you touch any issue.
+- This file (`AGENTS.md`) holds *operational* knowledge — the COM
+  landmines, JET quirks, driver patterns.  Plan/status and issue
+  content do *not* belong here.
 
 ## Repo layout
 
@@ -56,7 +68,7 @@ cbdb-user-mdb-tests/
 │   ├── discover_test_inputs.py   # ⭐ scan DATA for high-density inputs
 │   ├── probe_pywinauto.py        # ⭐ standalone-working VBA driver demo
 │   ├── audit_view_aliases.py     # heuristic SQL audit
-│   ├── ...                       # see findings.md for what each found
+│   ├── ...                       # see reports/CBDB_Issues_Report_EN.md for what each found
 ├── tests/
 │   ├── conftest.py               # session/fn-scoped fixtures
 │   ├── cbdb_driver/              # COM + pywinauto drivers
@@ -80,10 +92,11 @@ cbdb-user-mdb-tests/
 │   ├── test_vba_integrity.py     # 12 data-integrity dimensions
 │   ├── test_vba_matrix.py        # ⭐ data-driven param matrix
 │   └── test_other_forms_skeletons.py
-├── findings.md / findings_en.md  # confirmed bugs report
-├── MANUAL_SMOKE.md               # 5-min checklist (UI things tests miss)
-├── PHASE1_BREAKTHROUGH.md        # why pywinauto works in probe
-├── VALIDATION_DIMENSIONS.md      # menu of test dimensions
+├── reports/                      # auto-generated bilingual issue report
+│   ├── generate_report.py        #   ⭐ source of truth for all 19 issues
+│   └── CBDB_Issues_Report_*.{md,docx}
+├── tests/MANUAL_SMOKE.md         # 5-min checklist (UI things tests miss)
+├── tests/VALIDATION_DIMENSIONS.md  # menu of test dimensions
 └── FINAL_STATE.md                # last regenerated state
 ```
 
@@ -263,50 +276,27 @@ To find VBA bugs use `test_vba_differential.py` /
 `test_vba_matrix.py` patterns: drive REAL VBA via pywinauto, compare
 with INDEPENDENT source SQL (not the Python replay).
 
-## Confirmed bugs in the live .mdb (findings.md)
+## Confirmed bugs in the live .mdb
 
-Each bug is tagged with **user-impact priority**:
-- 🔴 **HIGH** = silent data corruption / wrong query results the user
-  can't easily detect.
-- 🟡 **MEDIUM** = feature crashes with a visible error message but no
-  data corruption — user notices and can avoid the broken button.
-- 🟢 **LOW** = setup-time annoyance, dead code, code smell — no
-  runtime impact on either data or workflow.
+→ **All 19 issues + reproduction steps live in
+[`reports/CBDB_Issues_Report_EN.md`](reports/CBDB_Issues_Report_EN.md)**
+([中文](reports/CBDB_Issues_Report_ZH-Hant.md)). The `ISSUES` dict
+in `reports/generate_report.py` is the source of truth — do **not**
+reproduce bug content in this file or in `README.md`.
 
-When triaging future findings, weight HIGH bugs heavier than MEDIUM /
-LOW. Static scans tend to surface a lot of LOW-priority noise — flag
-it, but don't let it crowd out the HIGH stuff.
+Triage convention used by the report:
 
-1. 🔴 **`View_StatusData` alias swap** (Bug #1) — `c_fy_range_desc` /
-   `c_fy_range_chn` pull from `YEAR_RANGE_CODES_1` (the LY join).
-   First-year range value displayed is actually the LY value.
-   *Silent — wrong values surfaced through any query that uses this
-   view.*
-2. 🟢 **DAO 3.6 reference broken** (Bug #2) — see #7 above. *One-time
-   setup fix for new machines; no runtime impact once fixed.*
-3. 🔴 **Backfill `UPDATE` silently fails on LookAtEntry CmdQuery for
-   >10k-row results** (Bug #3) — xfailed in `tests/test_vba_matrix.py`.
-   *Silent — c_entry_desc / c_addr_name etc. show NULL when they
-   should have values. Easy to miss unless the user stares at the
-   result table.*
-4. 🟡 **`LookAtPlace.CmdGIS_Click` references a non-existent control
-   `GISFrame`** (Bug #4) — should be `CodeFrame`. Real users clicking
-   GIS on LookAtPlace see "Object required". Test driver workaround
-   in `cbdb_driver.vba_session._PER_FORM_CMDGIS_PATCHES`. *Visible
-   crash, no data corruption.*
-5. 🟡 **`LookAtStatus.CmdPajek_Click` is broken at multiple levels**
-   (Bug #5) — references non-existent control `ChkIDs` AND its SQL
-   projects three columns that don't exist on `ZZ_SCRATCH_STATUS`.
-   Whole sub was bad-copy from `LookAtAssociations.CmdPajek_Click`.
-   Test driver only patches the control ref; the SQL is still broken
-   and CBDB needs to rewrite the sub. *Visible crash, no data
-   corruption.*
-6. 🟡 **`LookAtGroupData.queryEntry` references non-existent column
-   `ENTRY_DATA.c_parental_status`** (Bug #6) — should be
-   `c_parental_status_code` (which is what `LookAtEntry.vb:1650`
-   uses correctly). One-line SQL fix on the CBDB side. Crashes
-   when user runs the GroupData "Entry" subtype. *Visible crash, no
-   data corruption.*
+- **P0** silent data corruption — user can't detect from the UI
+- **P1** visible runtime crash — error popup on a normal click
+- **P2** silent display — sub-form column shows blank where data exists
+- **P3** missing UI — handler exists but no button to fire it
+- **P4** setup — one-time install fix
+- **P5** dormant / latent / resolved — defect real but doesn't fire
+  on the current dump or has no UI trigger today
+
+When triaging future findings, weight P0/P1 heavier than P2-P5.
+Static scans tend to surface a lot of low-priority noise — flag it,
+but don't let it crowd out the P0/P1 stuff.
 
 Re-run ALL FOUR static auditors on every CBDB release — they're
 cheap (seconds) and they keep finding bugs:
@@ -421,7 +411,9 @@ The test's role is to catch it the moment that stops being true:
 Don't open issues against CBDB for individual person diffs from this
 test unless the per-rule type-code distribution itself drifts (which
 WOULD indicate algorithm-version skew).  Full background and per-pid
-examples in `findings.md` Open Question #1.
+examples in `reports/CBDB_Issues_Report_EN.md` § Appendix
+("c_index_year / c_index_addr_id drift vs the cbdb-online-main-server
+snapshot").
 
 ## Test inventory snapshot (run this to get current state)
 

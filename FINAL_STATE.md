@@ -37,7 +37,7 @@ python -m pytest tests/ -W ignore --ignore=tests/test_infra_smoke.py
 | 「触发错误提示」 | 部分（VBA 已注入 ZZ_TEST_ERRORS 钩子，待 COM driver 跑通） | MANUAL_SMOKE §1, §2 |
 | 「按钮要满足前提」 | 部分（precondition 图已抽出在 `analysis/dump/precondition_graph.md`） | MANUAL_SMOKE §2 |
 
-## 已知 bug（findings.md / findings_en.md）
+## 已知 bug（reports/CBDB_Issues_Report_EN.md / reports/CBDB_Issues_Report_EN.md）
 
 1. **View_StatusData 别名错位** — `c_fy_range_desc` 显示的是 ly 的范围
 2. **DAO 3.6 引用断** — `dao360.dll` 不存在新机器；自动化已修复
@@ -96,7 +96,7 @@ CBDB Access Tests/
 │   │   ├── vba_inject.py
 │   │   └── form_driver.py
 │   └── test_*.py
-├── findings.md / findings_en.md    # 审查报告
+├── reports/CBDB_Issues_Report_EN.md / reports/CBDB_Issues_Report_EN.md    # 审查报告
 ├── DESIGN.md / PHASE1_*.md         # 阶段决策档案
 └── FINAL_STATE.md                  # 本文件
 ```

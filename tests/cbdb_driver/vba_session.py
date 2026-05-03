@@ -286,10 +286,10 @@ class VbaSession:
     # tests — applied during _inject_autodetect.  These are NOT fixes
     # we'd ship into production CBDB; they're workarounds so tests can
     # exercise the rest of the affected sub.  Each entry MUST also
-    # be documented as a Bug #N in findings.md so users / contributors
+    # be documented as a Bug #N in reports/CBDB_Issues_Report_EN.md so users / contributors
     # know the underlying CBDB code is still broken.
     _PER_FORM_CMDGIS_PATCHES = {
-        # Bug #4 (findings.md): Form_LookAtPlace.CmdGIS_Click references
+        # Bug #4 (reports/CBDB_Issues_Report_EN.md): Form_LookAtPlace.CmdGIS_Click references
         # a non-existent `GISFrame` control — copy-paste from Status/
         # Texts/Associations that wasn't updated.  The right control on
         # Place is `CodeFrame` (used correctly by every other export
@@ -297,7 +297,7 @@ class VbaSession:
         # with "Object required" the moment it executes.
         "Form_LookAtPlace": [(r"\bGISFrame\.Value\b", "CodeFrame.Value")],
 
-        # Bug #5 (findings.md): Form_LookAtStatus.CmdPajek_Click
+        # Bug #5 (reports/CBDB_Issues_Report_EN.md): Form_LookAtStatus.CmdPajek_Click
         # references a non-existent `ChkIDs` control.  Other forms
         # have either `ChkIDs` (Associations) or `ChkIncludeID`
         # (Networks/Kinship/AssociationPairs); LookAtStatus has

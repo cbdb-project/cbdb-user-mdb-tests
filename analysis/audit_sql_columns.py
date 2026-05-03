@@ -3,7 +3,7 @@ SQL string literals where the column doesn't exist on that table.
 
 Catches the kind of silent SQL bug that *would* corrupt query
 results (rather than crash with a visible error).  Bug #1 in
-findings.md (View_StatusData alias swap) is exactly this shape.
+reports/CBDB_Issues_Report_EN.md (View_StatusData alias swap) is exactly this shape.
 
 Conservative on purpose:
 - Only flags `<TABLE>.<column>` where TABLE matches an actual table
