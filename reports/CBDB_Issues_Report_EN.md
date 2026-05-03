@@ -14,6 +14,7 @@ The issues are ordered by severity (P0 highest). Each entry includes a concise d
   - [Issue #7 — LookAtPlace.CmdNeo4j people-CSV silently fails on the first record](#issue-7--lookatplacecmdneo4j-people-csv-silently-fails-on-the-first-record)
   - [Issue #8 — LookAtNetworks.CmdNeo4j people/place CSVs silently fail on the first record](#issue-8--lookatnetworkscmdneo4j-peopleplace-csvs-silently-fail-on-the-first-record)
   - [Issue #9 — LookAtEntry.CmdNeo4j Institutions block uses the wrong recordset variable](#issue-9--lookatentrycmdneo4j-institutions-block-uses-the-wrong-recordset-variable)
+  - [Issue #20 — BOM-prefixed address names can become embedded tabs and misalign GIS exports](#issue-20--bom-prefixed-address-names-can-become-embedded-tabs-and-misalign-gis-exports)
 - [P1 — Visible runtime crash](#p1--visible-runtime-crash)
   - [Issue #6 — LookAtGroupData ChkEntry path references a non-existent column ENTRY_DATA.c_parental_status](#issue-6--lookatgroupdata-chkentry-path-references-a-non-existent-column-entry_datac_parental_status)
   - [Issue #13 — BIOG_MAIN_2 Subform tries to open a picker form (frmPickNIAN_HAO) that doesn't exist](#issue-13--biog_main_2-subform-tries-to-open-a-picker-form-frmpicknian_hao-that-doesnt-exist)
@@ -143,6 +144,37 @@ _Step 2 — the popup users see when the With block on line 1425 reads `!c_inst_
 #### Suggested fix
 
 Change `With tRstAssocCodes` on line 1425 to `With tRstInstitutions`. Single-character class of fix; the underlying recordset variable was simply mis-named.
+
+### Issue #20 — BOM-prefixed address names can become embedded tabs and misalign GIS exports
+
+**Affected sub:** `ADDR_CODES + Form_LookAt*.CmdGIS_Click`
+
+**Severity:** P0 — Silent export column misalignment (numeric fields land in text columns; values shifted by one and one extra trailing column appears)
+
+#### Description
+
+315 rows of `ADDR_CODES` carry a stray `U+FEFF` (BOM) prefix in **both** `c_name` and `c_name_chn`, almost certainly the residue of a UTF-8-with-BOM paste at data-import time. When `LookAtStatus.CmdQuery` (and the equivalent CmdQuery / CmdRun on the other LookAt forms) copies one of these rows into its scratch staging table via SQL UPDATE/INSERT, JET strips the BOM and re-interprets the remaining UTF-16 LE bytes as single-byte chars — promoting them back to Unicode but with mangled values. For `c_addr_id = 702559` (Wei Shi / 尉氏) the source string `﻿尉氏` (UTF-16 bytes `ff fe 09 5c 0f 6c`) becomes the staged string `\t\\\x0fl` (UTF-16 bytes `09 00 5c 00 0f 00 6c 00`) — with a literal **TAB character at position 0**.
+
+`Form_LookAtStatus.CmdGIS_Click` (lines 1554–1636) then writes each cell as `tStr + value + tC` with `tC = Chr(9)` (line 1552) — no escaping is performed. The embedded TAB becomes a delimiter, splits AddrChn into two cells, and silently shifts every column to its right. A user opening the resulting `.tab` file in Excel sees coordinates land in the wrong column and an extra trailing column. The same `tStr + value + tC` pattern is present in the CmdGIS body of LookAtTexts / LookAtPlace / LookAtAssociations / LookAtOffice / LookAtKinship, so any LookAt form whose query happens to include one of the 315 dirty addresses reproduces the same misalignment.
+
+Evidence — full byte-level trace in `analysis/gis_status_embedded_delim_root_cause.md`; source-side scan in `reports/gis_embedded_delimiter_findings.json`; exported-file dump in `reports/gis_status_export_bytes_dump.json`. The regression test `tests/test_addr_codes_embedded_delim.py` will fail (intentionally) if the upstream data is cleaned, prompting a re-evaluation.
+
+#### Steps to reproduce
+
+1. Open **LookAtStatus**. Pick the status picker and choose status code **40** (Provincial Graduate / 进士) without setting any year filter — `FrameFilterYears = 1` in the test fixture.
+2. Click **Run Query**. ~17 000 rows populate the result grid.
+3. Click **GIS** with the encoding selector set to UTF-8 (`GISFrame = 1`). Save the resulting `.tab` file.
+4. Open the file in any tab-aware tool (Excel / a text editor with column rulers). Around row **11476** (corresponding to person Ruan Fu / 阮孚, `c_addr_id = 702559` / Wei Shi 尉氏) one row has 10 tab cells against the 9-column header. AddrChn is blank, X column contains text, the real X / Y values have all shifted one column to the right.
+
+#### Suggested fix
+
+Two complementary fixes, both worth doing:
+
+  1. **One-shot data cleanup.** Strip the leading `U+FEFF` from the 315 affected `ADDR_CODES.c_name` / `c_name_chn` rows (e.g. `UPDATE ADDR_CODES SET c_name = Mid(c_name, 2) WHERE Left(c_name, 1) = ChrW(65279)` and the parallel statement for `c_name_chn`). This removes the immediate user-visible misalignment.
+
+  2. **Defensive sanitisation in the export writers.** Before each `tStr = tStr + value + tC` append in the CmdGIS bodies of LookAtStatus / Texts / Place / Associations / Office / Kinship, replace any embedded Chr(9), Chr(10), Chr(13), Chr(11), Chr(12), or `U+FEFF` in `value` with a space. This protects the same export writers against any future similar dirty data — without it, the next tab character that creeps into `ADDR_CODES.c_name` (or `BIOG_MAIN.c_name`, or any other text field these exports touch) will reproduce the same silent misalignment.
+
+  3. **Optional pre-release audit.** A short script scanning every export-bound text column for delimiter or control characters before each release would catch this class of dirty-data issue before it ships. `analysis/probe_status_gis_embedded_delim.py` is a concrete starting point.
 
 ## P1 — Visible runtime crash
 

@@ -14,6 +14,7 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
   - [Issue #7 — LookAtPlace.CmdNeo4j 在寫入第一條 people-CSV 時靜默失敗](#issue-7--lookatplacecmdneo4j-在寫入第一條-people-csv-時靜默失敗)
   - [Issue #8 — LookAtNetworks.CmdNeo4j 的 people/place CSV 在第一條上靜默失敗](#issue-8--lookatnetworkscmdneo4j-的-peopleplace-csv-在第一條上靜默失敗)
   - [Issue #9 — LookAtEntry.CmdNeo4j 的機構 (Institutions) 部分用錯了記錄集變數](#issue-9--lookatentrycmdneo4j-的機構-institutions-部分用錯了記錄集變數)
+  - [Issue #20 — 地址名中的 BOM 會在 GIS 匯出中變成 tab，造成欄位錯位](#issue-20--地址名中的-bom-會在-gis-匯出中變成-tab造成欄位錯位)
 - [P1 — 可見的執行時報錯](#p1--可見的執行時報錯)
   - [Issue #6 — LookAtGroupData 的 ChkEntry 路徑引用了不存在的列 ENTRY_DATA.c_parental_status](#issue-6--lookatgroupdata-的-chkentry-路徑引用了不存在的列-entry_datac_parental_status)
   - [Issue #13 — BIOG_MAIN_2 子表單試圖開啟一個不存在的 picker 表單 (frmPickNIAN_HAO)](#issue-13--biog_main_2-子表單試圖開啟一個不存在的-picker-表單-frmpicknian_hao)
@@ -143,6 +144,37 @@ _Step 2 — the popup users see when the With block on line 1425 reads `!c_inst_
 #### 建議修復方案
 
 把第 1425 行的 `With tRstAssocCodes` 改成 `With tRstInstitutions`。屬於一字之差的筆誤，底層記錄集變數只是寫錯了。
+
+### Issue #20 — 地址名中的 BOM 會在 GIS 匯出中變成 tab，造成欄位錯位
+
+**涉及位置:** `ADDR_CODES + Form_LookAt*.CmdGIS_Click`
+
+**嚴重等級:** P0 — 靜默匯出欄位錯位（數字欄位落到文字欄，所有欄位向右挪一格，結尾多出一欄）
+
+#### 問題描述
+
+`ADDR_CODES` 中有 315 行在 `c_name` **和** `c_name_chn` 裡都帶著 `U+FEFF`（BOM）字首，幾乎可以確定是資料匯入時從 UTF-8-with-BOM 文件複製貼上留下的痕跡。當 `LookAtStatus.CmdQuery`（以及其他 LookAt 表單的對應 CmdQuery / CmdRun）把這些行透過 SQL UPDATE/INSERT 複製到自己的 scratch 暫存表時，JET 會先把 BOM 去掉，再把剩下的 UTF-16 LE 位元組重新當成單位元組字元——升回 Unicode 之後值就被破壞了。以 `c_addr_id = 702559`（尉氏）為例，源字串 `﻿尉氏`（UTF-16 位元組 `ff fe 09 5c 0f 6c`）變成了暫存字串 `\t\\\x0fl`（UTF-16 位元組 `09 00 5c 00 0f 00 6c 00`），第 0 位上多了一個**真正的 TAB 字元**。
+
+隨後 `Form_LookAtStatus.CmdGIS_Click`（第 1554–1636 行）把每個欄位寫成 `tStr + value + tC`，其中 `tC = Chr(9)` （第 1552 行）——完全沒有做任何轉義。這個嵌入的 TAB 就被當作分隔符，把 AddrChn 拆成兩欄，往後所有的欄位都悄無聲息地往右挪一格。使用者在 Excel 裡開啟這份 `.tab` 檔，會看到座標落在錯誤的欄位、還多出一個尾欄。LookAtTexts / LookAtPlace / LookAtAssociations / LookAtOffice / LookAtKinship 的 CmdGIS 都用同樣的 `tStr + value + tC` 模式，所以任何 LookAt 表單只要查詢結果裡碰到這 315 個髒地址裡的任何一個，都會重現同樣的欄位錯位。
+
+證據——完整的位元組級追蹤在 `analysis/gis_status_embedded_delim_root_cause.md`；源端掃描在 `reports/gis_embedded_delimiter_findings.json`；實際匯出檔的位元組級 dump 在 `reports/gis_status_export_bytes_dump.json`。迴歸測試 `tests/test_addr_codes_embedded_delim.py` 會在上游資料被清理後**主動失敗**，提醒重新評估。
+
+#### 復現步驟
+
+1. 開啟 **LookAtStatus**。在 status picker 裡挑 status code **40**（進士），不要設年份過濾——測試 fixture 裡 `FrameFilterYears = 1`。
+2. 點 **Run Query**。結果網格里大約填進 17 000 行。
+3. 點 **GIS**，把編碼選成 UTF-8（`GISFrame = 1`）。把匯出的 `.tab` 檔存下來。
+4. 在任意支援 tab 的工具（Excel / 帶欄位標尺的文字編輯器）裡開啟這個檔。第 **11476** 行附近（對應人物阮孚，`c_addr_id = 702559` / 尉氏）有一行包含 10 個 tab 欄位、卻對著 9 欄的表頭。AddrChn 是空的、X 欄裡塞了文字，真正的 X / Y 值都往右挪了一欄。
+
+#### 建議修復方案
+
+兩條互補的修法，建議都做：
+
+  1. **一次性資料清理。** 把這 315 行 `ADDR_CODES.c_name` / `c_name_chn` 開頭的 `U+FEFF` 去掉（例如 `UPDATE ADDR_CODES SET c_name = Mid(c_name, 2) WHERE Left(c_name, 1) = ChrW(65279)`，再對 `c_name_chn` 重複一遍）。這一步可以立即解決使用者能看到的欄位錯位。
+
+  2. **匯出端做防禦性 sanitisation。** 在 LookAtStatus / Texts / Place / Associations / Office / Kinship 各自的 CmdGIS 裡，每一個 `tStr = tStr + value + tC` 之前，先把 `value` 裡的 Chr(9)、Chr(10)、Chr(13)、Chr(11)、Chr(12)、`U+FEFF` 全部替換成空格。這樣以後任何 text 欄位如果再混進類似的髒字符，匯出依然能保持欄位對齊——少了這一層，下一次只要 `ADDR_CODES.c_name`（或 `BIOG_MAIN.c_name`、或其他這些匯出會碰到的 text 欄位）裡悄悄塞進一個 tab 字元，又會重現完全一樣的靜默錯位。
+
+  3. **建議增加一個釋出前的檢查指令碼。** 寫一個簡短的指令碼，釋出前掃描所有會被匯出的 text 欄位，看裡面有沒有分隔符或控制字元，可以在每次釋出前提前抓到這一類髒資料問題。`analysis/probe_status_gis_embedded_delim.py` 是一個現成的起點。
 
 ## P1 — 可見的執行時報錯
 

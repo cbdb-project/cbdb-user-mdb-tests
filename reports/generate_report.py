@@ -335,6 +335,168 @@ ISSUES = [
         "severity_en": "P0 — Silent data corruption (export silently produces nothing)",
         "severity_zh": "P0 — 静默数据缺失（导出无声地什么都没生成）",
     },
+    {
+        "id": 20,
+        "tier": "P0_silent_data",
+        "form": "ADDR_CODES + Form_LookAt*.CmdGIS_Click",
+        "title_en": "BOM-prefixed address names can become embedded tabs and misalign GIS exports",
+        "title_zh": "地址名中的 BOM 会在 GIS 导出中变成 tab，造成栏位错位",
+        "summary_en": (
+            "315 rows of `ADDR_CODES` carry a stray `U+FEFF` (BOM) "
+            "prefix in **both** `c_name` and `c_name_chn`, almost "
+            "certainly the residue of a UTF-8-with-BOM paste at "
+            "data-import time. When `LookAtStatus.CmdQuery` (and the "
+            "equivalent CmdQuery / CmdRun on the other LookAt forms) "
+            "copies one of these rows into its scratch staging table "
+            "via SQL UPDATE/INSERT, JET strips the BOM and "
+            "re-interprets the remaining UTF-16 LE bytes as "
+            "single-byte chars — promoting them back to Unicode but "
+            "with mangled values. For `c_addr_id = 702559` (Wei Shi / "
+            "尉氏) the source string `﻿尉氏` (UTF-16 bytes "
+            "`ff fe 09 5c 0f 6c`) becomes the staged string "
+            "`\\t\\\\\\x0fl` (UTF-16 bytes `09 00 5c 00 0f 00 6c 00`) — "
+            "with a literal **TAB character at position 0**.\n\n"
+            "`Form_LookAtStatus.CmdGIS_Click` (lines 1554–1636) then "
+            "writes each cell as `tStr + value + tC` with `tC = "
+            "Chr(9)` (line 1552) — no escaping is performed. The "
+            "embedded TAB becomes a delimiter, splits AddrChn into "
+            "two cells, and silently shifts every column to its "
+            "right. A user opening the resulting `.tab` file in "
+            "Excel sees coordinates land in the wrong column and "
+            "an extra trailing column. The same `tStr + value + tC` "
+            "pattern is present in the CmdGIS body of "
+            "LookAtTexts / LookAtPlace / LookAtAssociations / "
+            "LookAtOffice / LookAtKinship, so any LookAt form whose "
+            "query happens to include one of the 315 dirty addresses "
+            "reproduces the same misalignment.\n\n"
+            "Evidence — full byte-level trace in "
+            "`analysis/gis_status_embedded_delim_root_cause.md`; "
+            "source-side scan in "
+            "`reports/gis_embedded_delimiter_findings.json`; "
+            "exported-file dump in "
+            "`reports/gis_status_export_bytes_dump.json`. The "
+            "regression test "
+            "`tests/test_addr_codes_embedded_delim.py` will fail "
+            "(intentionally) if the upstream data is cleaned, "
+            "prompting a re-evaluation."
+        ),
+        "summary_zh": (
+            "`ADDR_CODES` 中有 315 行在 `c_name` **和** `c_name_chn` "
+            "里都带着 `U+FEFF`（BOM）前缀，几乎可以确定是数据导入"
+            "时从 UTF-8-with-BOM 文档复制粘贴留下的痕迹。"
+            "当 `LookAtStatus.CmdQuery`（以及其他 LookAt 表单的对应 "
+            "CmdQuery / CmdRun）把这些行通过 SQL UPDATE/INSERT 复制"
+            "到自己的 scratch 暂存表时，JET 会先把 BOM 去掉，再把"
+            "剩下的 UTF-16 LE 字节重新当成单字节字符——升回 Unicode "
+            "之后值就被破坏了。以 `c_addr_id = 702559`（尉氏）为例，"
+            "源字符串 `﻿尉氏`（UTF-16 字节 "
+            "`ff fe 09 5c 0f 6c`）变成了暂存字符串 "
+            "`\\t\\\\\\x0fl`（UTF-16 字节 "
+            "`09 00 5c 00 0f 00 6c 00`），第 0 位上多了一个**真正的 "
+            "TAB 字符**。\n\n"
+            "随后 `Form_LookAtStatus.CmdGIS_Click`（第 1554–1636 行）"
+            "把每个字段写成 `tStr + value + tC`，其中 `tC = Chr(9)` "
+            "（第 1552 行）——完全没有做任何转义。这个嵌入的 TAB 就"
+            "被当作分隔符，把 AddrChn 拆成两栏，往后所有的栏位都"
+            "悄无声息地往右挪一格。用户在 Excel 里打开这份 `.tab` "
+            "档，会看到坐标落在错误的栏位、还多出一个尾栏。"
+            "LookAtTexts / LookAtPlace / LookAtAssociations / "
+            "LookAtOffice / LookAtKinship 的 CmdGIS 都用同样的 "
+            "`tStr + value + tC` 模式，所以任何 LookAt 表单只要查询"
+            "结果里碰到这 315 个脏地址里的任何一个，都会重现同样的"
+            "栏位错位。\n\n"
+            "证据——完整的字节级追踪在 "
+            "`analysis/gis_status_embedded_delim_root_cause.md`；"
+            "源端扫描在 "
+            "`reports/gis_embedded_delimiter_findings.json`；"
+            "实际导出档的字节级 dump 在 "
+            "`reports/gis_status_export_bytes_dump.json`。回归测试 "
+            "`tests/test_addr_codes_embedded_delim.py` 会在上游数据"
+            "被清理后**主动失败**，提醒重新评估。"
+        ),
+        "steps_en": [
+            "Open **LookAtStatus**. Pick the status picker and "
+            "choose status code **40** (Provincial Graduate / 进士) "
+            "without setting any year filter — `FrameFilterYears = 1` "
+            "in the test fixture.",
+            "Click **Run Query**. ~17 000 rows populate the result "
+            "grid.",
+            "Click **GIS** with the encoding selector set to UTF-8 "
+            "(`GISFrame = 1`). Save the resulting `.tab` file.",
+            "Open the file in any tab-aware tool (Excel / a text "
+            "editor with column rulers). Around row **11476** "
+            "(corresponding to person Ruan Fu / 阮孚, "
+            "`c_addr_id = 702559` / Wei Shi 尉氏) one row has 10 "
+            "tab cells against the 9-column header. AddrChn is "
+            "blank, X column contains text, the real X / Y values "
+            "have all shifted one column to the right.",
+        ],
+        "steps_zh": [
+            "打开 **LookAtStatus**。在 status picker 里挑 status "
+            "code **40**（进士），不要设年份过滤——测试 fixture 里 "
+            "`FrameFilterYears = 1`。",
+            "点 **Run Query**。结果网格里大约填进 17 000 行。",
+            "点 **GIS**，把编码选成 UTF-8（`GISFrame = 1`）。把"
+            "导出的 `.tab` 档存下来。",
+            "在任意支援 tab 的工具（Excel / 带栏位标尺的文本编辑器）"
+            "里打开这个档。第 **11476** 行附近（对应人物阮孚，"
+            "`c_addr_id = 702559` / 尉氏）有一行包含 10 个 tab 栏位、"
+            "却对着 9 栏的表头。AddrChn 是空的、X 栏里塞了文字，"
+            "真正的 X / Y 值都往右挪了一栏。",
+        ],
+        "fix_en": (
+            "Two complementary fixes, both worth doing:\n\n"
+            "  1. **One-shot data cleanup.** Strip the leading "
+            "`U+FEFF` from the 315 affected `ADDR_CODES.c_name` / "
+            "`c_name_chn` rows (e.g. `UPDATE ADDR_CODES SET c_name "
+            "= Mid(c_name, 2) WHERE Left(c_name, 1) = ChrW(65279)` "
+            "and the parallel statement for `c_name_chn`). This "
+            "removes the immediate user-visible misalignment.\n\n"
+            "  2. **Defensive sanitisation in the export writers.** "
+            "Before each `tStr = tStr + value + tC` append in the "
+            "CmdGIS bodies of LookAtStatus / Texts / Place / "
+            "Associations / Office / Kinship, replace any embedded "
+            "Chr(9), Chr(10), Chr(13), Chr(11), Chr(12), or `U+FEFF` "
+            "in `value` with a space. This protects the same export "
+            "writers against any future similar dirty data — "
+            "without it, the next tab character that creeps into "
+            "`ADDR_CODES.c_name` (or `BIOG_MAIN.c_name`, or any "
+            "other text field these exports touch) will reproduce "
+            "the same silent misalignment.\n\n"
+            "  3. **Optional pre-release audit.** A short script "
+            "scanning every export-bound text column for delimiter "
+            "or control characters before each release would "
+            "catch this class of dirty-data issue before it ships. "
+            "`analysis/probe_status_gis_embedded_delim.py` is a "
+            "concrete starting point."
+        ),
+        "fix_zh": (
+            "两条互补的修法，建议都做：\n\n"
+            "  1. **一次性数据清理。** 把这 315 行 `ADDR_CODES.c_name` / "
+            "`c_name_chn` 开头的 `U+FEFF` 去掉（例如 "
+            "`UPDATE ADDR_CODES SET c_name = Mid(c_name, 2) "
+            "WHERE Left(c_name, 1) = ChrW(65279)`，再对 "
+            "`c_name_chn` 重复一遍）。这一步可以立即解决用户能看到的"
+            "栏位错位。\n\n"
+            "  2. **导出端做防御性 sanitisation。** 在 LookAtStatus / "
+            "Texts / Place / Associations / Office / Kinship 各自"
+            "的 CmdGIS 里，每一个 `tStr = tStr + value + tC` 之前，"
+            "先把 `value` 里的 Chr(9)、Chr(10)、Chr(13)、Chr(11)、"
+            "Chr(12)、`U+FEFF` 全部替换成空格。这样以后任何 text "
+            "字段如果再混进类似的脏字符，导出依然能保持栏位对齐"
+            "——少了这一层，下一次只要 `ADDR_CODES.c_name`（或 "
+            "`BIOG_MAIN.c_name`、或其他这些导出会碰到的 text 字段）"
+            "里悄悄塞进一个 tab 字符，又会重现完全一样的静默错位。\n\n"
+            "  3. **建议增加一个发布前的检查脚本。** 写一个简短的"
+            "脚本，发布前扫描所有会被导出的 text 栏位，看里面有没有"
+            "分隔符或控制字符，可以在每次发布前提前抓到这一类脏"
+            "数据问题。`analysis/probe_status_gis_embedded_delim.py` "
+            "是一个现成的起点。"
+        ),
+        "screenshots": [],
+        "severity_en": "P0 — Silent export column misalignment (numeric fields land in text columns; values shifted by one and one extra trailing column appears)",
+        "severity_zh": "P0 — 静默导出栏位错位（数字字段落到文本栏，所有栏位向右挪一格，结尾多出一栏）",
+    },
     # ========== Tier 2: visible runtime crash (popup blocks user) ==========
     {
         "id": 4,
