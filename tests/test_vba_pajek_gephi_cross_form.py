@@ -165,3 +165,203 @@ def test_export_button_produces_file(vba: VbaSession, case: Case, tmp_path):
     )
     print(f"[{spec.name}] {case.cmd} OK ({sz} bytes, {len(lines)} lines)",
           flush=True)
+
+    # ---- Depth checks (PR R) ----------------------------------
+    if case.cmd == "CmdPajek":
+        _assert_pajek_depth(spec.name, lines)
+    elif case.cmd == "CmdGephi":
+        _assert_gephi_depth(spec.name, lines)
+
+
+# ----------------------------------------------------------------------
+# PR R: Pajek + Gephi/GUESS export depth helpers
+# ----------------------------------------------------------------------
+
+def _assert_pajek_depth(form_name: str, lines: list[str]) -> None:
+    """Pajek `.net`:
+        *Vertices N
+        1 "label1"
+        2 "label2"
+        ...
+        *Edges  (or *Arcs)
+        src dst weight
+        ...
+    Assertions:
+      * `*Vertices N` parses (N is an integer)
+      * exactly N vertex rows follow before the next `*` section
+      * each vertex row's first token is a unique 1-based id
+      * edge / arc section, if present, has at least one row whose
+        first two tokens are integer vertex ids in [1, N]
+    """
+    import re
+    # Find *Vertices N marker (case-insensitive).
+    head = lines[0].strip()
+    m = re.match(r"\*[Vv]ertices\s+(\d+)", head)
+    assert m, f"[{form_name}] Pajek: header isn't `*Vertices N`: {head!r}"
+    n_vertices = int(m.group(1))
+
+    # Walk lines until next `*` section to count vertex rows.
+    vertex_rows: list[str] = []
+    edge_rows: list[str] = []
+    in_edges = False
+    for ln in lines[1:]:
+        s = ln.strip()
+        if s.startswith("*"):
+            # Either *Edges or *Arcs (or *Matrix) — switch mode.
+            in_edges = True
+            continue
+        if not in_edges:
+            vertex_rows.append(s)
+        else:
+            edge_rows.append(s)
+
+    assert len(vertex_rows) == n_vertices, (
+        f"[{form_name}] Pajek: header declared {n_vertices} vertices "
+        f"but found {len(vertex_rows)} vertex rows before the next "
+        f"`*` section.  Off-by-N → silent vertex-export bug."
+    )
+
+    # Each vertex row's first token is the vertex id.  Demand 1..N
+    # all present exactly once (Pajek convention).
+    vertex_ids: list[int] = []
+    for i, row in enumerate(vertex_rows, start=1):
+        first = row.split(None, 1)[0]
+        try:
+            vid = int(first)
+        except ValueError:
+            raise AssertionError(
+                f"[{form_name}] Pajek: vertex row {i} doesn't start "
+                f"with an integer id: {row[:120]!r}"
+            )
+        vertex_ids.append(vid)
+    assert len(set(vertex_ids)) == len(vertex_ids), (
+        f"[{form_name}] Pajek: duplicate vertex ids in {n_vertices} "
+        f"rows — set size {len(set(vertex_ids))}"
+    )
+    assert min(vertex_ids) == 1 and max(vertex_ids) == n_vertices, (
+        f"[{form_name}] Pajek: vertex ids should be 1..{n_vertices}; "
+        f"got min={min(vertex_ids)} max={max(vertex_ids)}"
+    )
+
+    # Edges (if present): first two tokens are integer vertex ids in
+    # range.  Spot-check up to 100 rows to keep this O(small).
+    if edge_rows:
+        for i, row in enumerate(edge_rows[:100], start=1):
+            toks = row.split()
+            if len(toks) < 2:
+                raise AssertionError(
+                    f"[{form_name}] Pajek: edge row {i} has fewer "
+                    f"than 2 tokens: {row[:120]!r}"
+                )
+            try:
+                a = int(toks[0]); b = int(toks[1])
+            except ValueError:
+                raise AssertionError(
+                    f"[{form_name}] Pajek: edge row {i} first two "
+                    f"tokens not integers: {row[:120]!r}"
+                )
+            assert 1 <= a <= n_vertices, (
+                f"[{form_name}] Pajek: edge row {i} src {a} out of "
+                f"[1, {n_vertices}]"
+            )
+            assert 1 <= b <= n_vertices, (
+                f"[{form_name}] Pajek: edge row {i} dst {b} out of "
+                f"[1, {n_vertices}]"
+            )
+    print(f"[{form_name}] Pajek depth: {n_vertices} vertices, "
+          f"{len(edge_rows)} edges; all ids unique and in range",
+          flush=True)
+
+
+def _assert_gephi_depth(form_name: str, lines: list[str]) -> None:
+    """Gephi/GUESS `.gdf`:
+        nodedef> name VARCHAR, label VARCHAR, ...
+        node1, "label1", ...
+        ...
+        edgedef> node1 VARCHAR, node2 VARCHAR, ...
+        a, b, ...
+
+    Assertions:
+      * `nodedef>` line parses to ≥ 1 column
+      * every node row's field count matches nodedef columns
+      * `edgedef>` (if present) parses similarly
+      * every edge row's field count matches edgedef columns
+      * the first column of every node row (`name`) is non-empty
+    """
+    head = lines[0].strip()
+    assert head.lower().startswith("nodedef>"), (
+        f"[{form_name}] Gephi: first line isn't `nodedef>`: {head!r}"
+    )
+    node_cols = [c.strip() for c in head[len("nodedef>"):].split(",")
+                 if c.strip()]
+    n_node_cols = len(node_cols)
+    assert n_node_cols >= 1, (
+        f"[{form_name}] Gephi: nodedef> declared 0 columns: {head!r}"
+    )
+
+    # Walk node rows until edgedef> (if present).
+    node_rows: list[str] = []
+    edge_rows: list[str] = []
+    edge_cols: list[str] = []
+    in_edges = False
+    for ln in lines[1:]:
+        s = ln.strip()
+        if s.lower().startswith("edgedef>"):
+            in_edges = True
+            edge_cols = [c.strip() for c in s[len("edgedef>"):].split(",")
+                         if c.strip()]
+            continue
+        (edge_rows if in_edges else node_rows).append(s)
+
+    # Per-row width for nodes.  Gephi field values can contain commas
+    # inside quoted labels, so be lenient: width must be at least
+    # n_node_cols (some rows may have escaping bumps), but no row
+    # should have wildly more.
+    bad_node = []
+    for i, row in enumerate(node_rows, start=1):
+        cells = row.split(",")
+        if len(cells) < n_node_cols or len(cells) > n_node_cols + 5:
+            bad_node.append((i, len(cells), row[:120]))
+        if len(bad_node) >= 5:
+            break
+    assert not bad_node, (
+        f"[{form_name}] Gephi: node rows with bad field count "
+        f"(nodedef has {n_node_cols} cols).  First mismatches:\n"
+        + "\n".join(f"  row {i}: {n} cells — {snip!r}"
+                     for i, n, snip in bad_node)
+    )
+
+    # Node `name` column (first one) must be non-empty for every row.
+    bad_name = []
+    for i, row in enumerate(node_rows, start=1):
+        first = row.split(",", 1)[0].strip()
+        if not first:
+            bad_name.append((i, row[:120]))
+        if len(bad_name) >= 5:
+            break
+    assert not bad_name, (
+        f"[{form_name}] Gephi: node rows with empty `name` column.  "
+        f"First mismatches: {bad_name!r}"
+    )
+
+    if edge_cols:
+        n_edge_cols = len(edge_cols)
+        bad_edge = []
+        for i, row in enumerate(edge_rows[:200], start=1):
+            cells = row.split(",")
+            if len(cells) < n_edge_cols or len(cells) > n_edge_cols + 5:
+                bad_edge.append((i, len(cells), row[:120]))
+            if len(bad_edge) >= 5:
+                break
+        assert not bad_edge, (
+            f"[{form_name}] Gephi: edge rows with bad field count "
+            f"(edgedef has {n_edge_cols} cols).  First mismatches:\n"
+            + "\n".join(f"  row {i}: {n} cells — {snip!r}"
+                         for i, n, snip in bad_edge)
+        )
+
+    print(f"[{form_name}] Gephi depth: {len(node_rows)} nodes "
+          f"({n_node_cols} cols), {len(edge_rows)} edges "
+          f"({len(edge_cols) or '0/no edgedef'} cols); "
+          f"all `name` columns non-empty",
+          flush=True)

@@ -115,3 +115,9 @@ def test_cmd_guess_produces_file(vba: VbaSession, fx: CrossFixture, tmp_path):
     )
     print(f"[{spec.name}] CmdGUESS OK ({sz} bytes, {len(lines)} lines)",
           flush=True)
+
+    # ---- Depth checks (PR R) ----------------------------------
+    # CmdGUESS shares the .gdf format with CmdGephi; reuse the same
+    # depth helper from test_vba_pajek_gephi_cross_form.py.
+    from test_vba_pajek_gephi_cross_form import _assert_gephi_depth
+    _assert_gephi_depth(spec.name, lines)
