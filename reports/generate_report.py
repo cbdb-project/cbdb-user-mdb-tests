@@ -1350,6 +1350,7 @@ def _numbered(document, items: list[str]) -> None:
 
 
 DRIFT_JSON = REPO / "reports" / "index_drift_examples.json"
+CLASSIFICATION_JSON = REPO / "reports" / "index_drift_classification.json"
 DEMO_PERSONS_JSON = REPO / "reports" / "demo_persons.json"
 KNOWN_BUGS_STATUS_JSON = REPO / "reports" / "known_bugs_status.json"
 
@@ -1531,6 +1532,101 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
     )
     for para in intro.split("\n\n"):
         doc.add_paragraph(Z(para))
+
+    # ---- Classification summary ----
+    if CLASSIFICATION_JSON.exists():
+        cls = _json.loads(CLASSIFICATION_JSON.read_text(encoding="utf-8"))
+        cs = cls["summary"]
+        b = cs["buckets"]
+        if is_en:
+            _h(doc, 2, Z("Classification summary"))
+            doc.add_paragraph(Z(
+                f"Compared {cs['common']:,} personids common to both "
+                f"databases (User MDB total {cs['user_mdb_total']:,}; "
+                f"SQLite total {cs['sqlite_total']:,}; "
+                f"User-only {cs['in_user_only']:,}; "
+                f"SQLite-only {cs['in_sqlite_only']:,})."
+            ))
+            for b_key, label in [
+                ("exact_match",
+                 "exact match on all four compared fields"),
+                ("source_drift_index_agrees",
+                 "source drift but indices agreed (algorithms "
+                 "tolerated the drift)"),
+                ("source_drift_index_diffs_too",
+                 "source drift AND at least one index field "
+                 "differs (consistent with simple data-drift "
+                 "hypothesis)"),
+                ("index_year_only_diff",
+                 "c_birthyear+c_deathyear identical, only "
+                 "c_index_year differs — needs follow-up"),
+                ("index_addr_only_diff",
+                 "c_birthyear+c_deathyear identical, only "
+                 "c_index_addr_id differs — needs follow-up"),
+                ("index_both_diff",
+                 "c_birthyear+c_deathyear identical, BOTH index "
+                 "fields differ — strongest signal of compound "
+                 "divergence, needs follow-up"),
+            ]:
+                doc.add_paragraph(Z(
+                    f"  • {b[b_key]:>7,} ({100.0*b[b_key]/max(cs['common'],1):.3f}%)"
+                    f"  — {label}"
+                ))
+            doc.add_paragraph(Z(
+                f"Net diffs: {cs['common']-b['exact_match']:,} of "
+                f"{cs['common']:,} ({100.0*(cs['common']-b['exact_match'])/max(cs['common'],1):.3f}%).  "
+                f"Of those, {b['source_drift_index_agrees']+b['source_drift_index_diffs_too']:,} are "
+                f"clearly attributable to source drift in birthyear/"
+                f"deathyear; {b['index_year_only_diff']+b['index_addr_only_diff']+b['index_both_diff']:,} "
+                f"need per-row follow-up (could be PHP↔VBA "
+                f"divergence, or drift in evidence tables — "
+                f"BIOG_ADDR_DATA / ENTRY_DATA / NIAN_HAO etc. — "
+                f"that this classifier does not compare).  Full "
+                f"output: `reports/index_drift_classification.json`; "
+                f"algorithm pointers: "
+                f"`analysis/index_drift_algorithm_notes.md`."
+            ))
+        else:
+            _h(doc, 2, Z("分類匯總"))
+            doc.add_paragraph(Z(
+                f"比對了兩邊都有的 {cs['common']:,} 個 personid"
+                f"（User MDB 共 {cs['user_mdb_total']:,} 筆；"
+                f"SQLite 共 {cs['sqlite_total']:,} 筆；"
+                f"僅 User MDB 有 {cs['in_user_only']:,} 筆；"
+                f"僅 SQLite 有 {cs['in_sqlite_only']:,} 筆）。"
+            ))
+            for b_key, label in [
+                ("exact_match", "四個欄位全部一致"),
+                ("source_drift_index_agrees",
+                 "源資料有漂移但兩邊 index 都一致"
+                 "（演算法吸收了漂移）"),
+                ("source_drift_index_diffs_too",
+                 "源資料有漂移、且至少一個 index 不同"
+                 "（與簡單資料漂移假說相符）"),
+                ("index_year_only_diff",
+                 "生年/卒年一致，但只有 c_index_year 不同 —— 待追查"),
+                ("index_addr_only_diff",
+                 "生年/卒年一致，但只有 c_index_addr_id 不同 —— 待追查"),
+                ("index_both_diff",
+                 "生年/卒年一致，但兩個 index 都不同 —— 複合差異"
+                 "的最強單列訊號，待追查"),
+            ]:
+                doc.add_paragraph(Z(
+                    f"  • {b[b_key]:>7,} ({100.0*b[b_key]/max(cs['common'],1):.3f}%)"
+                    f"  —— {label}"
+                ))
+            doc.add_paragraph(Z(
+                f"淨差異：{cs['common']-b['exact_match']:,} / "
+                f"{cs['common']:,}（{100.0*(cs['common']-b['exact_match'])/max(cs['common'],1):.3f}%）。"
+                f"其中 {b['source_drift_index_agrees']+b['source_drift_index_diffs_too']:,} "
+                f"筆能明確歸因於 birthyear/deathyear 的源資料漂移；"
+                f"剩下 {b['index_year_only_diff']+b['index_addr_only_diff']+b['index_both_diff']:,} "
+                f"筆需要逐筆追查（可能是 PHP↔VBA 演算法差異，"
+                f"也可能是本分類器沒有比較的 evidence 表"
+                f"（BIOG_ADDR_DATA / ENTRY_DATA / NIAN_HAO 等）裡的漂移）。"
+                f"完整輸出見 `reports/index_drift_classification.json`，"
+                f"算法來源指標見 `analysis/index_drift_algorithm_notes.md`。"
+            ))
 
     # ---- Per bucket ----
     bucket_meta = {
@@ -2426,6 +2522,106 @@ def _build_md(lang: str, out_path: Path) -> None:
         )
         lines.append(Z(intro_drift))
         lines.append("")
+
+        # ---- Classification summary (markdown copy) ----
+        if CLASSIFICATION_JSON.exists():
+            cls = _json.loads(
+                CLASSIFICATION_JSON.read_text(encoding="utf-8"))
+            cs = cls["summary"]
+            b = cs["buckets"]
+            net = cs["common"] - b["exact_match"]
+            attributable = (b["source_drift_index_agrees"]
+                            + b["source_drift_index_diffs_too"])
+            unclassified = (b["index_year_only_diff"]
+                            + b["index_addr_only_diff"]
+                            + b["index_both_diff"])
+            if is_en:
+                lines.append(f"### {Z('Classification summary')}")
+                lines.append("")
+                lines.append(Z(
+                    f"Compared **{cs['common']:,}** personids common to "
+                    f"both databases (User MDB total {cs['user_mdb_total']:,}; "
+                    f"SQLite total {cs['sqlite_total']:,}; "
+                    f"User-only {cs['in_user_only']:,}; "
+                    f"SQLite-only {cs['in_sqlite_only']:,})."
+                ))
+                lines.append("")
+                lines.append("| Bucket | Count | % of common | Meaning |")
+                lines.append("|---|---:|---:|---|")
+                rows = [
+                    ("exact_match", "exact match on all four compared fields"),
+                    ("source_drift_index_agrees",
+                     "source drift but indices agreed"),
+                    ("source_drift_index_diffs_too",
+                     "source drift AND ≥1 index differs"),
+                    ("index_year_only_diff",
+                     "source matched, only c_index_year differs — needs follow-up"),
+                    ("index_addr_only_diff",
+                     "source matched, only c_index_addr_id differs — needs follow-up"),
+                    ("index_both_diff",
+                     "source matched, both indices differ — strongest signal"),
+                ]
+                for k, label in rows:
+                    pct = 100.0 * b[k] / max(cs['common'], 1)
+                    lines.append(f"| `{k}` | {b[k]:,} | {pct:.3f}% | {Z(label)} |")
+                lines.append("")
+                lines.append(Z(
+                    f"Net diffs: **{net:,}** of {cs['common']:,} "
+                    f"({100.0*net/max(cs['common'],1):.3f} %).  Of those, "
+                    f"**{attributable}** are clearly attributable to source "
+                    f"drift in birthyear / deathyear; **{unclassified}** need "
+                    f"per-row follow-up.  These could be PHP↔VBA divergence, "
+                    f"or drift in evidence tables (BIOG_ADDR_DATA / "
+                    f"ENTRY_DATA / NIAN_HAO etc.) that this classifier does "
+                    f"not compare.  Full output: "
+                    f"`reports/index_drift_classification.json`; algorithm "
+                    f"pointers: `analysis/index_drift_algorithm_notes.md`."
+                ))
+                lines.append("")
+            else:
+                lines.append(f"### {Z('分類匯總')}")
+                lines.append("")
+                lines.append(Z(
+                    f"比對了兩邊都有的 **{cs['common']:,}** 個 personid"
+                    f"（User MDB 共 {cs['user_mdb_total']:,} 筆；"
+                    f"SQLite 共 {cs['sqlite_total']:,} 筆；"
+                    f"僅 User MDB 有 {cs['in_user_only']:,} 筆；"
+                    f"僅 SQLite 有 {cs['in_sqlite_only']:,} 筆）。"
+                ))
+                lines.append("")
+                lines.append("| 分桶 | 筆數 | 佔比 | 含義 |")
+                lines.append("|---|---:|---:|---|")
+                rows = [
+                    ("exact_match", "四個欄位全部一致"),
+                    ("source_drift_index_agrees",
+                     "源資料有漂移但兩邊 index 都一致"),
+                    ("source_drift_index_diffs_too",
+                     "源資料有漂移、且至少一個 index 不同"),
+                    ("index_year_only_diff",
+                     "生年/卒年一致，但只有 c_index_year 不同 —— 待追查"),
+                    ("index_addr_only_diff",
+                     "生年/卒年一致，但只有 c_index_addr_id 不同 —— 待追查"),
+                    ("index_both_diff",
+                     "生年/卒年一致，但兩個 index 都不同 —— 複合差異最強信號"),
+                ]
+                for k, label in rows:
+                    pct = 100.0 * b[k] / max(cs['common'], 1)
+                    lines.append(f"| `{k}` | {b[k]:,} | {pct:.3f}% | {Z(label)} |")
+                lines.append("")
+                lines.append(Z(
+                    f"淨差異：**{net:,}** / {cs['common']:,}"
+                    f"（{100.0*net/max(cs['common'],1):.3f} %）。其中 "
+                    f"**{attributable}** 筆能明確歸因於 birthyear / "
+                    f"deathyear 的源資料漂移；剩下 **{unclassified}** 筆"
+                    f"需要逐筆追查（可能是 PHP↔VBA 演算法差異，"
+                    f"也可能是本分類器沒有比較的 evidence 表"
+                    f"（BIOG_ADDR_DATA / ENTRY_DATA / NIAN_HAO 等）裡的"
+                    f"漂移）。完整輸出見 "
+                    f"`reports/index_drift_classification.json`，"
+                    f"算法來源指標見 "
+                    f"`analysis/index_drift_algorithm_notes.md`。"
+                ))
+                lines.append("")
 
         data = _json.loads(DRIFT_JSON.read_text(encoding="utf-8"))
         bucket_meta = {

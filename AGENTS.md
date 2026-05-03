@@ -446,6 +446,31 @@ across 3 buckets) is illustrative, not statistically
 representative.  Don't open or close CBDB issues based on it
 without classification.
 
+**Classification framework (`analysis/classify_index_drift.py`).**
+Runs the full per-personid taxonomy and writes
+`reports/index_drift_classification.json`.  Latest run on the
+shipped dump (657 245 common personids):
+
+| Bucket | Count | Meaning |
+|---|---:|---|
+| `exact_match` | 656 682 | all four compared fields agree |
+| `source_drift_index_agrees` | 2 | source drift but indices agreed |
+| `source_drift_index_diffs_too` | 14 | source drift AND ≥1 index differs (consistent with simple data-drift hypothesis) |
+| `index_year_only_diff` | 59 | source matched, only c_index_year differs — needs follow-up |
+| `index_addr_only_diff` | 478 | source matched, only c_index_addr_id differs — needs follow-up |
+| `index_both_diff` | 10 | source matched, both indices differ — strongest single-row signal |
+
+Net diffs 563 / 657 245.  16 attributable to source drift; **547
+unclassified**.  The unclassified buckets are not automatically
+bugs — they could be PHP↔VBA divergence OR drift in evidence
+tables (BIOG_ADDR_DATA, ENTRY_DATA, NIAN_HAO, fl_*_year, etc.)
+that the classifier does not compare.  Per-row triage required.
+
+Algorithm pointers (each side, where the source code lives) are in
+`analysis/index_drift_algorithm_notes.md`.  Re-run the classifier
+after every cbdb-online-main-server SQLite refresh, or after any
+change to the User MDB index-recompute path.
+
 ## Test inventory snapshot (run this to get current state)
 
 ```bash

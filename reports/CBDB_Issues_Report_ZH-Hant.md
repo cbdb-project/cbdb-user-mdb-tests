@@ -589,6 +589,21 @@ _**Hypothetical** popup, reconstructed in PIL.  Users currently CAN'T trigger th
 
 **我們並沒有對目前看到的 ~575 / 657 246 筆差異做完整分類。**下方列舉的樣本（目前共 13 筆、3 種分桶，來自 `reports/index_drift_examples.json`）只是**示範**這些差異**長什麼樣**，並非統計上有代表性，是後續逐筆分類的起點，不是結論。
 
+### 分類匯總
+
+比對了兩邊都有的 **657,245** 個 personid（User MDB 共 657,784 筆；SQLite 共 657,478 筆；僅 User MDB 有 539 筆；僅 SQLite 有 233 筆）。
+
+| 分桶 | 筆數 | 佔比 | 含義 |
+|---|---:|---:|---|
+| `exact_match` | 656,682 | 99.914% | 四個欄位全部一致 |
+| `source_drift_index_agrees` | 2 | 0.000% | 源資料有漂移但兩邊 index 都一致 |
+| `source_drift_index_diffs_too` | 14 | 0.002% | 源資料有漂移、且至少一個 index 不同 |
+| `index_year_only_diff` | 59 | 0.009% | 生年/卒年一致，但只有 c_index_year 不同 —— 待追查 |
+| `index_addr_only_diff` | 478 | 0.073% | 生年/卒年一致，但只有 c_index_addr_id 不同 —— 待追查 |
+| `index_both_diff` | 10 | 0.002% | 生年/卒年一致，但兩個 index 都不同 —— 複合差異最強訊號 |
+
+淨差異：**563** / 657,245（0.086 %）。其中 **16** 筆能明確歸因於 birthyear / deathyear 的源資料漂移；剩下 **547** 筆需要逐筆追查（可能是 PHP↔VBA 演演算法差異，也可能是本分類器沒有比較的 evidence 表（BIOG_ADDR_DATA / ENTRY_DATA / NIAN_HAO 等）裡的漂移）。完整輸出見 `reports/index_drift_classification.json`，演算法來源指標見 `analysis/index_drift_algorithm_notes.md`。
+
 ### 僅 c_index_year 不一致的樣例
 
 **`c_personid = 3501` — 李孝稱 (Li Xiaocheng)**
