@@ -128,17 +128,19 @@ python analysis/check_vba_refs.py
 ## Running the tests
 
 ```bash
-# fast SQL-replay tests (no Access process; ~30s)
-python -m pytest tests/ -W ignore --ignore=tests/test_infra_smoke.py \
-  --ignore=tests/test_vba_matrix.py \
-  --ignore=tests/test_vba_matrix_all_forms.py \
-  --ignore=tests/test_vba_export.py
+# Fast SQL-replay + static-data tests (no Access process; ~30s).
+# This is the CI-safe entry point — every test_vba_*.py file (which
+# needs Windows + Access COM) is automatically skipped, so this command
+# stays green on headless / Linux / fresh machines.
+python -m pytest tests/ -W ignore
 
-# real-VBA cross-form matrix (boots Access; ~2 min)
-python -m pytest tests/test_vba_matrix_all_forms.py -v -W ignore
+# Add --include-vba to also run the Access-COM suite (Windows + Office
+# only; ~10 minutes for the full battery).  Boots Access for each
+# function-scoped fixture, so it's slow but covers the real VBA path.
+python -m pytest tests/ -W ignore --include-vba
 
-# real export byte-level diff (boots Access; ~10s)
-python -m pytest tests/test_vba_export.py -v -W ignore -s
+# A single VBA test file (when you don't want all of them):
+python -m pytest tests/test_vba_export.py -v -W ignore --include-vba
 ```
 
 ### After each CBDB `.mdb` refresh
@@ -147,14 +149,18 @@ python -m pytest tests/test_vba_export.py -v -W ignore -s
 python analysis/dump_metadata.py        # refreshes analysis/dump/*.json
 python analysis/dump_vba.py             # refreshes analysis/dump/vba/
 python analysis/discover_test_inputs.py # picks fresh fixtures
-python analysis/run_all_audits.py       # one-shot regression sweep
-                                         # — 19 static audits, ~6.5s
-python -m pytest tests/ -W ignore       # full run
+python analysis/run_all_audits.py       # human-readable audit sweep
+                                         # — 21 static audits, ~6-7s
+python -m pytest tests/ -W ignore       # fast suite (no Access)
+python -m pytest tests/ -W ignore --include-vba   # full suite
 ```
 
 `run_all_audits.py` prints a FLAGGED / CLEAN summary.  As of the
-shipped dump (2026-05-02): 6 of 19 audits flag known bugs (#1-#19);
-the remaining 13 act as long-term regression guards.  When a CBDB
+shipped dump (2026-05-02): 6 of 21 audits flag known bugs (#1-#19);
+the remaining 15 act as long-term regression guards.  Use
+`--ci` to exit non-zero ONLY on findings ABOVE the recorded baseline
+(`analysis/audit_baseline.json`); use `--update-baseline` after
+intentionally accepting a new finding or a fix.  When a CBDB
 release adds new code, anything that newly flags is your investigation
 queue; anything that newly drops back to clean means a bug was
 fixed (also flip the matching marker in `tests/test_known_bugs.py`).
@@ -187,7 +193,7 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 **Latest Import-list run** (`tests/test_vba_import_lists.py`): `15 passed, 2 skipped in 142.04s`.
 **Latest Save-list run** (`tests/test_vba_save_lists.py`): `5 passed in 43.31s`.
 **Latest Bilingual run** (`tests/test_vba_bilingual_ui.py`): `9 passed in 145.73s`.
-**Latest CmdGIS-other-forms run** (`tests/test_vba_cmdgis_other_forms.py`): `4 passed, 2 skipped in 123.75s`.
+**Latest CmdGIS-other-forms run** (`tests/test_vba_cmdgis_other_forms.py`): `6 passed in ~190s` (Status / Texts / Associations / Office / Place / Kinship — all six forms now pass via the GISFrame→CodeFrame and subform-requery driver patches).
 **Combined regression** (all 8 test files, 71 tests): `59 passed, 8 skipped, 4 xfailed in 837.76s`.
 
 ### Confirmed bugs
@@ -371,17 +377,18 @@ CBDB 用戶端是給歷史學家用的 Windows-only Access 介面，每次資料
 ## 執行
 
 ```bash
-# 快速 SQL replay 測試（不啟 Access；~30 秒）
-python -m pytest tests/ -W ignore \
-  --ignore=tests/test_vba_matrix.py \
-  --ignore=tests/test_vba_matrix_all_forms.py \
-  --ignore=tests/test_vba_export.py
+# 快速 SQL replay + 靜態檢查（不啟 Access；~30 秒）。
+# 這是 CI 安全的入口 —— 所有 test_vba_*.py（需 Windows + Access COM）
+# 都會被自動跳過，在無界面 / Linux / 全新機器上也能 stable 跑綠。
+python -m pytest tests/ -W ignore
 
-# 真 VBA 跨表單 matrix（會啟 Access；~2 分鐘）
-python -m pytest tests/test_vba_matrix_all_forms.py -v -W ignore
+# 加 --include-vba 才會跑 Access-COM 套件（僅限 Windows + Office；全套
+# 約 10 分鐘）。每個 function 級 fixture 都會啟一個 Access 進程，所以慢，
+# 但能覆蓋真實的 VBA 路徑。
+python -m pytest tests/ -W ignore --include-vba
 
-# 真匯出位元組級對比（~10 秒）
-python -m pytest tests/test_vba_export.py -v -W ignore -s
+# 只跑某一個 VBA 測試檔案：
+python -m pytest tests/test_vba_export.py -v -W ignore --include-vba
 ```
 
 ## 專案計畫與當前狀態
