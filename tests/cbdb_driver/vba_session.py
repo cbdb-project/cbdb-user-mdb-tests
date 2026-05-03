@@ -35,7 +35,10 @@ from typing import Iterable
 import pandas as pd
 import pyodbc
 import win32com.client
+import win32process
 from pywinauto import Application as PWA
+
+from .access_app import kill_access_pid
 
 
 ACEDAO_CANDIDATES = [
@@ -44,11 +47,19 @@ ACEDAO_CANDIDATES = [
 ]
 
 
-def _kill_orphan_access():
-    subprocess.run(
-        ["taskkill", "/F", "/IM", "MSACCESS.EXE"],
-        capture_output=True, check=False,
-    )
+def _pid_for_access_app(app) -> int | None:
+    """PID of an Access.Application COM object via its main HWND."""
+    try:
+        hwnd = int(app.hWndAccessApp)
+    except Exception:
+        return None
+    if hwnd == 0:
+        return None
+    try:
+        _tid, pid = win32process.GetWindowThreadProcessId(hwnd)
+    except Exception:
+        return None
+    return int(pid) if pid else None
 
 
 class VbaSession:
@@ -61,16 +72,30 @@ class VbaSession:
         self.conn: pyodbc.Connection | None = None
         self._pwa = None
         self._form_open: str | None = None
+        self._pid: int | None = None
 
     # ---------- lifecycle ----------
     def open(self) -> "VbaSession":
-        _kill_orphan_access()
+        # Used to call `_kill_orphan_access()` (taskkill /F /IM
+        # MSACCESS.EXE) here unconditionally, which also killed any
+        # Access database the developer was editing manually.  Each
+        # VbaSession now does a scoped per-PID kill in close() — clean
+        # shutdown leaves nothing for the next .open() to clean up.
         if self.work.exists():
             try:
                 self.work.unlink()
-            except PermissionError:
-                time.sleep(1)
-                self.work.unlink()
+            except PermissionError as e:
+                # Likely a previous session crashed and left an orphan
+                # MSACCESS.EXE holding the working copy.  Surface it
+                # rather than nuke every Access window on the box.
+                raise PermissionError(
+                    f"cannot remove stale working copy {self.work}: {e}.  "
+                    f"A previous test run probably left an orphan "
+                    f"MSACCESS.EXE.  Either close it manually, or set "
+                    f"CBDB_KILL_ALL_ACCESS=1 and call "
+                    f"`from cbdb_driver.access_app import "
+                    f"kill_orphan_access; kill_orphan_access()` once."
+                ) from e
         self.work.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(self.src, self.work)
 
@@ -98,6 +123,9 @@ class VbaSession:
             pass
         self.app.Visible = True
         self.app.OpenCurrentDatabase(str(self.work))
+        # Capture PID early — close() needs it for a scoped taskkill
+        # and the HWND may already be gone by then.
+        self._pid = _pid_for_access_app(self.app)
 
         # Fix DAO ref if broken
         proj = self.app.VBE.VBProjects(1)
@@ -569,7 +597,8 @@ class VbaSession:
             # Don't bother with DoCmd.Close / CloseCurrentDatabase / Quit
             # — these can hang for minutes if Access is still doing
             # background work (e.g. subform render after a 37k-row
-            # CmdQuery_Click).  taskkill /F below is reliable.
+            # CmdQuery_Click).  Scoped taskkill /F /PID below is
+            # reliable AND won't kill any other Access window.
             self._form_open = None
             self.app = None
         # Release pywinauto's UIA proxies BEFORE the process dies — if
@@ -579,7 +608,9 @@ class VbaSession:
         self._pwa = None
         gc.collect()
         gc.collect()
-        _kill_orphan_access()
+        if self._pid is not None:
+            kill_access_pid(self._pid)
+            self._pid = None
         # Final gc after kill to flush any handles that the kill freed.
         gc.collect()
 
