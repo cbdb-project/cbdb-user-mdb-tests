@@ -604,6 +604,22 @@ Compared **657,245** personids common to both databases (User MDB total 657,784;
 
 Net diffs: **563** of 657,245 (0.086 %).  Of those, **16** are clearly attributable to source drift in birthyear / deathyear; **547** need per-row follow-up.  These could be PHP↔VBA divergence, or drift in evidence tables (BIOG_ADDR_DATA / ENTRY_DATA / NIAN_HAO etc.) that this classifier does not compare.  Full output: `reports/index_drift_classification.json`; algorithm pointers: `analysis/index_drift_algorithm_notes.md`.
 
+### Year-only diffs — per-row rule classification
+
+Of the **69** year-only diffs, each row was tested against the rule-level divergences flagged in PR I (`analysis/index_year_rule_comparison.md`).  Conservative buckets (rows count once each):
+
+| Bucket | Count |
+|---|---:|
+| `php_returned_sentinel` | 1 |
+| `php_did_not_compute` | 19 |
+| `access_did_not_compute` | 7 |
+| `iteration_order_diff` | 5 |
+| `consistent_within_rule` | 14 |
+| `candidate_algorithm_divergence` | 5 |
+| `unclassified` | 18 |
+
+None of these are confirmed bugs.  Full per-row output is in `reports/index_year_drift_rule_classification.json`.
+
 ### Examples where only c_index_year disagrees
 
 **`c_personid = 3501` — 李孝稱 (Li Xiaocheng)**

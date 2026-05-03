@@ -1351,6 +1351,7 @@ def _numbered(document, items: list[str]) -> None:
 
 DRIFT_JSON = REPO / "reports" / "index_drift_examples.json"
 CLASSIFICATION_JSON = REPO / "reports" / "index_drift_classification.json"
+RULE_CLASSIFICATION_JSON = REPO / "reports" / "index_year_drift_rule_classification.json"
 DEMO_PERSONS_JSON = REPO / "reports" / "demo_persons.json"
 KNOWN_BUGS_STATUS_JSON = REPO / "reports" / "known_bugs_status.json"
 
@@ -1640,6 +1641,80 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
                 f"（BIOG_ADDR_DATA / ENTRY_DATA / NIAN_HAO 等）裡的漂移）。"
                 f"完整輸出見 `reports/index_drift_classification.json`，"
                 f"算法來源指標見 `analysis/index_drift_algorithm_notes.md`。"
+            ))
+
+    # ---- Year-drift rule classification (PR K1) ----
+    if RULE_CLASSIFICATION_JSON.exists():
+        rcls = _json.loads(
+            RULE_CLASSIFICATION_JSON.read_text(encoding="utf-8"))
+        rs = rcls["summary"]
+        rb = rs["buckets"]
+        if is_en:
+            _h(doc, 2, Z(
+                "Year-only diffs — per-row rule classification"
+            ))
+            doc.add_paragraph(Z(
+                f"Of the {rs['total_year_diffs']} year-only diffs, "
+                f"each row was tested against the rule-level "
+                f"divergences flagged in PR I "
+                f"(`analysis/index_year_rule_comparison.md`).  "
+                f"Conservative buckets (rows count once each):"
+            ))
+            for k in [
+                "php_returned_sentinel",
+                "php_did_not_compute",
+                "access_did_not_compute",
+                "iteration_order_diff",
+                "consistent_within_rule",
+                "candidate_algorithm_divergence",
+                "unclassified",
+            ]:
+                if rb[k] == 0:
+                    continue
+                doc.add_paragraph(Z(
+                    f"  • {rb[k]:>3,}  {k}"
+                ))
+            doc.add_paragraph(Z(
+                f"None of these are confirmed bugs.  Full per-row "
+                f"output (with the source-data evidence we used to "
+                f"bucket each one) is in "
+                f"`reports/index_year_drift_rule_classification.json`."
+            ))
+        else:
+            _h(doc, 2, Z("年份差異 —— 逐筆 rule 分類"))
+            doc.add_paragraph(Z(
+                f"在 {rs['total_year_diffs']} 筆「只有 c_index_year "
+                f"不一致」的行中，逐筆比對 PR I "
+                f"(`analysis/index_year_rule_comparison.md`) 標記的"
+                f"規則級差異。保守分類如下："
+            ))
+            label_zh = {
+                "php_returned_sentinel": "PHP 寫了 sentinel／溢位值",
+                "php_did_not_compute": "PHP 沒算出值（覆蓋率缺口）",
+                "access_did_not_compute": "Access 沒算出值（覆蓋率缺口）",
+                "iteration_order_diff": "Phase-C 迭代次數不同",
+                "consistent_within_rule": "多列共享同一 (php_tcode, access_tcode, diff) — 單一規則差異訊號",
+                "candidate_algorithm_divergence": "形狀符合 PR I 標記但無法精確重建",
+                "unclassified": "尚未對上任何模式",
+            }
+            for k in [
+                "php_returned_sentinel",
+                "php_did_not_compute",
+                "access_did_not_compute",
+                "iteration_order_diff",
+                "consistent_within_rule",
+                "candidate_algorithm_divergence",
+                "unclassified",
+            ]:
+                if rb[k] == 0:
+                    continue
+                doc.add_paragraph(Z(
+                    f"  • {rb[k]:>3,}  {label_zh[k]}"
+                ))
+            doc.add_paragraph(Z(
+                f"以上沒有任何一筆被視為已確認的 bug。"
+                f"逐筆輸出（含分桶所依據的源資料證據）見 "
+                f"`reports/index_year_drift_rule_classification.json`。"
             ))
 
     # ---- Per bucket ----
@@ -2646,6 +2721,85 @@ def _build_md(lang: str, out_path: Path) -> None:
                     f"`reports/index_drift_classification.json`，"
                     f"算法來源指標見 "
                     f"`analysis/index_drift_algorithm_notes.md`。"
+                ))
+                lines.append("")
+
+        # ---- Year-drift rule classification (PR K1) — markdown ----
+        if RULE_CLASSIFICATION_JSON.exists():
+            rcls = _json.loads(
+                RULE_CLASSIFICATION_JSON.read_text(encoding="utf-8"))
+            rs = rcls["summary"]
+            rb = rs["buckets"]
+            if is_en:
+                lines.append(f"### {Z('Year-only diffs — per-row rule classification')}")
+                lines.append("")
+                lines.append(Z(
+                    f"Of the **{rs['total_year_diffs']}** year-only "
+                    f"diffs, each row was tested against the rule-"
+                    f"level divergences flagged in PR I "
+                    f"(`analysis/index_year_rule_comparison.md`).  "
+                    f"Conservative buckets (rows count once each):"
+                ))
+                lines.append("")
+                lines.append("| Bucket | Count |")
+                lines.append("|---|---:|")
+                bucket_meta_zh = None
+                for k in [
+                    "php_returned_sentinel",
+                    "php_did_not_compute",
+                    "access_did_not_compute",
+                    "iteration_order_diff",
+                    "consistent_within_rule",
+                    "candidate_algorithm_divergence",
+                    "unclassified",
+                ]:
+                    if rb[k] == 0:
+                        continue
+                    lines.append(f"| `{k}` | {rb[k]} |")
+                lines.append("")
+                lines.append(Z(
+                    f"None of these are confirmed bugs.  Full per-row "
+                    f"output is in "
+                    f"`reports/index_year_drift_rule_classification.json`."
+                ))
+                lines.append("")
+            else:
+                lines.append(f"### {Z('年份差異 —— 逐筆 rule 分類')}")
+                lines.append("")
+                lines.append(Z(
+                    f"在 **{rs['total_year_diffs']}** 筆「只有 "
+                    f"c_index_year 不一致」的行中，逐筆比對 PR I "
+                    f"(`analysis/index_year_rule_comparison.md`) 標記"
+                    f"的規則級差異。保守分類如下："
+                ))
+                lines.append("")
+                lines.append("| 分桶 | 筆數 |")
+                lines.append("|---|---:|")
+                label_zh = {
+                    "php_returned_sentinel": "PHP 寫了 sentinel／溢位值",
+                    "php_did_not_compute": "PHP 沒算出值（覆蓋率缺口）",
+                    "access_did_not_compute": "Access 沒算出值（覆蓋率缺口）",
+                    "iteration_order_diff": "Phase-C 迭代次數不同",
+                    "consistent_within_rule": "多列共享同一 (php_tcode, access_tcode, diff)",
+                    "candidate_algorithm_divergence": "形狀符合 PR I 標記但無法精確重建",
+                    "unclassified": "尚未對上任何模式",
+                }
+                for k in [
+                    "php_returned_sentinel",
+                    "php_did_not_compute",
+                    "access_did_not_compute",
+                    "iteration_order_diff",
+                    "consistent_within_rule",
+                    "candidate_algorithm_divergence",
+                    "unclassified",
+                ]:
+                    if rb[k] == 0:
+                        continue
+                    lines.append(f"| `{k}` ({label_zh[k]}) | {rb[k]} |")
+                lines.append("")
+                lines.append(Z(
+                    f"以上沒有任何一筆被視為已確認的 bug。逐筆輸出見 "
+                    f"`reports/index_year_drift_rule_classification.json`。"
                 ))
                 lines.append("")
 

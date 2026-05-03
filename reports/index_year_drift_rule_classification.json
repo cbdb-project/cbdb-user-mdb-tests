@@ -1,0 +1,1361 @@
+{
+  "summary": {
+    "total_year_diffs": 69,
+    "buckets": {
+      "php_returned_sentinel": 1,
+      "php_did_not_compute": 19,
+      "access_did_not_compute": 7,
+      "iteration_order_diff": 5,
+      "explained_by_birthyear_offset": 0,
+      "explained_by_entry_sign_flip": 0,
+      "explained_by_husband_formula": 0,
+      "consistent_within_rule": 14,
+      "candidate_algorithm_divergence": 5,
+      "unclassified": 18
+    },
+    "rule_comparison_source": "analysis\\index_year_rule_comparison.json",
+    "unclassified_by_php_type_code": {
+      "17": 1,
+      "03": 3,
+      "06": 1,
+      "0512": 1,
+      "14": 4,
+      "1112": 1,
+      "22": 2,
+      "15": 3,
+      "21": 3,
+      "19": 1,
+      "13": 3
+    }
+  },
+  "buckets": {
+    "php_returned_sentinel": [
+      {
+        "personid": 685781,
+        "name_py": "Li Wan",
+        "name_chn": "李萬",
+        "user": {
+          "index_year": 1178,
+          "index_year_type_code": "05",
+          "index_year_source_id": null
+        },
+        "sqlite": {
+          "index_year": 32737,
+          "index_year_type_code": "05",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -31559,
+        "explanation": "PHP value 32737 looks like a sentinel (>=9999, e.g. 32767 = signed int overflow).  Worth flagging upstream as a likely bug in PHP output, not a rule disagreement."
+      }
+    ],
+    "php_did_not_compute": [
+      {
+        "personid": 40258,
+        "name_py": "Chen Zhi",
+        "name_chn": "陳埴",
+        "user": {
+          "index_year": 1157,
+          "index_year_type_code": "11",
+          "index_year_source_id": 47622
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 1157,
+        "explanation": "Access wrote 1157 (tcode='11') but PHP wrote 0 / null.  PHP rule chain didn't reach a value for this person — possible PHP coverage gap."
+      },
+      {
+        "personid": 40848,
+        "name_py": "Li Zhongyou",
+        "name_chn": "李中祐",
+        "user": {
+          "index_year": 985,
+          "index_year_type_code": "20",
+          "index_year_source_id": 40845
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 985,
+        "explanation": "Access wrote 985 (tcode='20') but PHP wrote 0 / null.  PHP rule chain didn't reach a value for this person — possible PHP coverage gap."
+      },
+      {
+        "personid": 47242,
+        "name_py": "Zhang Yunqing",
+        "name_chn": "張雲卿",
+        "user": {
+          "index_year": 1029,
+          "index_year_type_code": "11",
+          "index_year_source_id": 46642
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 1029,
+        "explanation": "Access wrote 1029 (tcode='11') but PHP wrote 0 / null.  PHP rule chain didn't reach a value for this person — possible PHP coverage gap."
+      },
+      {
+        "personid": 63311,
+        "name_py": "Feng Ren",
+        "name_chn": "馮任",
+        "user": {
+          "index_year": 1577,
+          "index_year_type_code": "05",
+          "index_year_source_id": null
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 1577,
+        "explanation": "Access wrote 1577 (tcode='05') but PHP wrote 0 / null.  PHP rule chain didn't reach a value for this person — possible PHP coverage gap."
+      },
+      {
+        "personid": 93384,
+        "name_py": "Zhang Wenfu",
+        "name_chn": "張文伏",
+        "user": {
+          "index_year": 896,
+          "index_year_type_code": "05",
+          "index_year_source_id": null
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 896,
+        "explanation": "Access wrote 896 (tcode='05') but PHP wrote 0 / null.  PHP rule chain didn't reach a value for this person — possible PHP coverage gap."
+      },
+      {
+        "personid": 95362,
+        "name_py": "Fei Shufen",
+        "name_chn": "費淑芬",
+        "user": {
+          "index_year": 1769,
+          "index_year_type_code": "11",
+          "index_year_source_id": 57530
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 1769,
+        "explanation": "Access wrote 1769 (tcode='11') but PHP wrote 0 / null.  PHP rule chain didn't reach a value for this person — possible PHP coverage gap."
+      },
+      {
+        "personid": 98908,
+        "name_py": "Wei Zhaodu",
+        "name_chn": "魏昭度",
+        "user": {
+          "index_year": 956,
+          "index_year_type_code": "14",
+          "index_year_source_id": 700139
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 956,
+        "explanation": "Access wrote 956 (tcode='14') but PHP wrote 0 / null.  PHP rule chain didn't reach a value for this person — possible PHP coverage gap."
+      },
+      {
+        "personid": 122141,
+        "name_py": "Wu Zongwen",
+        "name_chn": "吳宗文",
+        "user": {
+          "index_year": 1570,
+          "index_year_type_code": "11",
+          "index_year_source_id": 128144
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 1570,
+        "explanation": "Access wrote 1570 (tcode='11') but PHP wrote 0 / null.  PHP rule chain didn't reach a value for this person — possible PHP coverage gap."
+      },
+      {
+        "personid": 126960,
+        "name_py": "Mao Shilong",
+        "name_chn": "毛士龍",
+        "user": {
+          "index_year": 1583,
+          "index_year_type_code": "05",
+          "index_year_source_id": null
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 1583,
+        "explanation": "Access wrote 1583 (tcode='05') but PHP wrote 0 / null.  PHP rule chain didn't reach a value for this person — possible PHP coverage gap."
+      },
+      {
+        "personid": 129702,
+        "name_py": "Sun Ziliang",
+        "name_chn": "孫子良",
+        "user": {
+          "index_year": 1374,
+          "index_year_type_code": "05",
+          "index_year_source_id": null
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 1374,
+        "explanation": "Access wrote 1374 (tcode='05') but PHP wrote 0 / null.  PHP rule chain didn't reach a value for this person — possible PHP coverage gap."
+      },
+      {
+        "personid": 131550,
+        "name_py": "Hua Yu",
+        "name_chn": "華鈺",
+        "user": {
+          "index_year": 1565,
+          "index_year_type_code": "05",
+          "index_year_source_id": null
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 1565,
+        "explanation": "Access wrote 1565 (tcode='05') but PHP wrote 0 / null.  PHP rule chain didn't reach a value for this person — possible PHP coverage gap."
+      },
+      {
+        "personid": 131912,
+        "name_py": "Ge Yinliang",
+        "name_chn": "葛寅亮",
+        "user": {
+          "index_year": 1571,
+          "index_year_type_code": "05",
+          "index_year_source_id": null
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 1571,
+        "explanation": "Access wrote 1571 (tcode='05') but PHP wrote 0 / null.  PHP rule chain didn't reach a value for this person — possible PHP coverage gap."
+      },
+      {
+        "personid": 132564,
+        "name_py": "Jiang Lin",
+        "name_chn": "蔣琳",
+        "user": {
+          "index_year": 1408,
+          "index_year_type_code": "11",
+          "index_year_source_id": 132576
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 1408,
+        "explanation": "Access wrote 1408 (tcode='11') but PHP wrote 0 / null.  PHP rule chain didn't reach a value for this person — possible PHP coverage gap."
+      },
+      {
+        "personid": 319765,
+        "name_py": "Ying Ju",
+        "name_chn": "應巨",
+        "user": {
+          "index_year": 1427,
+          "index_year_type_code": "14",
+          "index_year_source_id": 696184
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 1427,
+        "explanation": "Access wrote 1427 (tcode='14') but PHP wrote 0 / null.  PHP rule chain didn't reach a value for this person — possible PHP coverage gap."
+      },
+      {
+        "personid": 391451,
+        "name_py": "Liu Yingqi",
+        "name_chn": "劉應旂",
+        "user": {
+          "index_year": 1502,
+          "index_year_type_code": "14",
+          "index_year_source_id": 699808
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 1502,
+        "explanation": "Access wrote 1502 (tcode='14') but PHP wrote 0 / null.  PHP rule chain didn't reach a value for this person — possible PHP coverage gap."
+      },
+      {
+        "personid": 411288,
+        "name_py": "Jiang Jiong",
+        "name_chn": "江炯",
+        "user": {
+          "index_year": 1720,
+          "index_year_type_code": "07",
+          "index_year_source_id": null
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 1720,
+        "explanation": "Access wrote 1720 (tcode='07') but PHP wrote 0 / null.  PHP rule chain didn't reach a value for this person — possible PHP coverage gap."
+      },
+      {
+        "personid": 696467,
+        "name_py": "Zheng Zhun",
+        "name_chn": "鄭准",
+        "user": {
+          "index_year": 1434,
+          "index_year_type_code": "05",
+          "index_year_source_id": null
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 1434,
+        "explanation": "Access wrote 1434 (tcode='05') but PHP wrote 0 / null.  PHP rule chain didn't reach a value for this person — possible PHP coverage gap."
+      },
+      {
+        "personid": 698292,
+        "name_py": "Jiang Xiaochun",
+        "name_chn": "蔣斆淳",
+        "user": {
+          "index_year": 1689,
+          "index_year_type_code": "14",
+          "index_year_source_id": 696916
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 1689,
+        "explanation": "Access wrote 1689 (tcode='14') but PHP wrote 0 / null.  PHP rule chain didn't reach a value for this person — possible PHP coverage gap."
+      },
+      {
+        "personid": 699389,
+        "name_py": "Su Shi (Eldest Daughter of Su Tong)",
+        "name_chn": "蘇氏(蘇通長女)",
+        "user": {
+          "index_year": 986,
+          "index_year_type_code": "2304",
+          "index_year_source_id": 699393
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 986,
+        "explanation": "Access wrote 986 (tcode='2304') but PHP wrote 0 / null.  PHP rule chain didn't reach a value for this person — possible PHP coverage gap."
+      }
+    ],
+    "access_did_not_compute": [
+      {
+        "personid": 93859,
+        "name_py": "Zheng Zhun",
+        "name_chn": "鄭准",
+        "user": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "sqlite": {
+          "index_year": 1434,
+          "index_year_type_code": "05",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -1434,
+        "explanation": "PHP wrote 1434 (tcode='05') but Access wrote 0 / null.  Access rule chain didn't reach a value for this person — possible Access coverage gap."
+      },
+      {
+        "personid": 549501,
+        "name_py": "Lin Jizhou",
+        "name_chn": "林濟舟",
+        "user": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "sqlite": {
+          "index_year": 1229,
+          "index_year_type_code": "05",
+          "index_year_source_id": null
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -1229,
+        "explanation": "PHP wrote 1229 (tcode='05') but Access wrote 0 / null.  Access rule chain didn't reach a value for this person — possible Access coverage gap."
+      },
+      {
+        "personid": 697651,
+        "name_py": "Lu Shi (Second Daughter of Lu Zhen)",
+        "name_chn": "盧氏(盧震二女兒)",
+        "user": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "sqlite": {
+          "index_year": 1042,
+          "index_year_type_code": "11",
+          "index_year_source_id": 697621
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -1042,
+        "explanation": "PHP wrote 1042 (tcode='11') but Access wrote 0 / null.  Access rule chain didn't reach a value for this person — possible Access coverage gap."
+      },
+      {
+        "personid": 699484,
+        "name_py": "Li Shi (lizongmengsinv)",
+        "name_chn": "李氏(李宗孟四女)",
+        "user": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "sqlite": {
+          "index_year": 1037,
+          "index_year_type_code": "11",
+          "index_year_source_id": 699428
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -1037,
+        "explanation": "PHP wrote 1037 (tcode='11') but Access wrote 0 / null.  Access rule chain didn't reach a value for this person — possible Access coverage gap."
+      },
+      {
+        "personid": 699485,
+        "name_py": "Li Shi (lizongmengwunv)",
+        "name_chn": "李氏(李宗孟五女)",
+        "user": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "sqlite": {
+          "index_year": 1037,
+          "index_year_type_code": "11",
+          "index_year_source_id": 699428
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -1037,
+        "explanation": "PHP wrote 1037 (tcode='11') but Access wrote 0 / null.  Access rule chain didn't reach a value for this person — possible Access coverage gap."
+      },
+      {
+        "personid": 699658,
+        "name_py": "Yao Mou (Grandson of Yao Shi)",
+        "name_chn": "<待删除>",
+        "user": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "sqlite": {
+          "index_year": 1075,
+          "index_year_type_code": "27",
+          "index_year_source_id": 43532
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -1075,
+        "explanation": "PHP wrote 1075 (tcode='27') but Access wrote 0 / null.  Access rule chain didn't reach a value for this person — possible Access coverage gap."
+      },
+      {
+        "personid": 699714,
+        "name_py": "Yao Mou (Grandson of Yao Shi)",
+        "name_chn": "<待删除>",
+        "user": {
+          "index_year": 0,
+          "index_year_type_code": "",
+          "index_year_source_id": null
+        },
+        "sqlite": {
+          "index_year": 1075,
+          "index_year_type_code": "27",
+          "index_year_source_id": 43532
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -1075,
+        "explanation": "PHP wrote 1075 (tcode='27') but Access wrote 0 / null.  Access rule chain didn't reach a value for this person — possible Access coverage gap."
+      }
+    ],
+    "iteration_order_diff": [
+      {
+        "personid": 3501,
+        "name_py": "Li Xiaocheng",
+        "name_chn": "李孝稱",
+        "user": {
+          "index_year": 1018,
+          "index_year_type_code": "19",
+          "index_year_source_id": 19149
+        },
+        "sqlite": {
+          "index_year": 1028,
+          "index_year_type_code": "1912",
+          "index_year_source_id": 3479
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -10,
+        "explanation": "Access tcode '19' vs PHP tcode '1912' — one side ran an extra Phase-C propagation step.  PHP's Phase-C rules CONCAT the new code onto the parent's; Access likely does the same.  diff=-10 comes from the extra propagation hop's offset."
+      },
+      {
+        "personid": 113856,
+        "name_py": "Aiyashili",
+        "name_chn": "愛牙失里",
+        "user": {
+          "index_year": 1303,
+          "index_year_type_code": "1112",
+          "index_year_source_id": 134481
+        },
+        "sqlite": {
+          "index_year": 1296,
+          "index_year_type_code": "11",
+          "index_year_source_id": 100383
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 7,
+        "explanation": "Access tcode '1112' vs PHP tcode '11' — one side ran an extra Phase-C propagation step.  PHP's Phase-C rules CONCAT the new code onto the parent's; Access likely does the same.  diff=7 comes from the extra propagation hop's offset."
+      },
+      {
+        "personid": 114273,
+        "name_py": "Puna",
+        "name_chn": "普納",
+        "user": {
+          "index_year": 1303,
+          "index_year_type_code": "1112",
+          "index_year_source_id": 134481
+        },
+        "sqlite": {
+          "index_year": 1296,
+          "index_year_type_code": "11",
+          "index_year_source_id": 100383
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 7,
+        "explanation": "Access tcode '1112' vs PHP tcode '11' — one side ran an extra Phase-C propagation step.  PHP's Phase-C rules CONCAT the new code onto the parent's; Access likely does the same.  diff=7 comes from the extra propagation hop's offset."
+      },
+      {
+        "personid": 114995,
+        "name_py": "Yilihaya",
+        "name_chn": "亦里哈牙",
+        "user": {
+          "index_year": 1303,
+          "index_year_type_code": "1112",
+          "index_year_source_id": 134481
+        },
+        "sqlite": {
+          "index_year": 1296,
+          "index_year_type_code": "11",
+          "index_year_source_id": 100383
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 7,
+        "explanation": "Access tcode '1112' vs PHP tcode '11' — one side ran an extra Phase-C propagation step.  PHP's Phase-C rules CONCAT the new code onto the parent's; Access likely does the same.  diff=7 comes from the extra propagation hop's offset."
+      },
+      {
+        "personid": 133295,
+        "name_py": "Xue Jinyan",
+        "name_chn": "薛近兗",
+        "user": {
+          "index_year": 1565,
+          "index_year_type_code": "05",
+          "index_year_source_id": null
+        },
+        "sqlite": {
+          "index_year": 1535,
+          "index_year_type_code": "0512",
+          "index_year_source_id": 30627
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 30,
+        "explanation": "Access tcode '05' vs PHP tcode '0512' — one side ran an extra Phase-C propagation step.  PHP's Phase-C rules CONCAT the new code onto the parent's; Access likely does the same.  diff=30 comes from the extra propagation hop's offset."
+      }
+    ],
+    "explained_by_birthyear_offset": [],
+    "explained_by_entry_sign_flip": [],
+    "explained_by_husband_formula": [],
+    "consistent_within_rule": [
+      {
+        "personid": 228102,
+        "name_py": "Wang Bangxian",
+        "name_chn": "王邦憲",
+        "user": {
+          "index_year": 1527,
+          "index_year_type_code": "13",
+          "index_year_source_id": 123710
+        },
+        "sqlite": {
+          "index_year": 1547,
+          "index_year_type_code": "13",
+          "index_year_source_id": 123710
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -20,
+        "explanation": "2 rows share the exact triple (php_tcode='13', access_tcode='13', diff=-20).  Strong signal of a single rule-level cause — investigate that pairing rather than per-row."
+      },
+      {
+        "personid": 228104,
+        "name_py": "Mou Shi (Mother of Wangtu)",
+        "name_chn": "某氏(王圖母)",
+        "user": {
+          "index_year": 1530,
+          "index_year_type_code": "15",
+          "index_year_source_id": 123710
+        },
+        "sqlite": {
+          "index_year": 1550,
+          "index_year_type_code": "15",
+          "index_year_source_id": 123710
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -20,
+        "explanation": "2 rows share the exact triple (php_tcode='15', access_tcode='15', diff=-20).  Strong signal of a single rule-level cause — investigate that pairing rather than per-row."
+      },
+      {
+        "personid": 228111,
+        "name_py": "Wang Cui",
+        "name_chn": "王萃",
+        "user": {
+          "index_year": 1559,
+          "index_year_type_code": "19",
+          "index_year_source_id": 123710
+        },
+        "sqlite": {
+          "index_year": 1579,
+          "index_year_type_code": "19",
+          "index_year_source_id": 123710
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -20,
+        "explanation": "3 rows share the exact triple (php_tcode='19', access_tcode='19', diff=-20).  Strong signal of a single rule-level cause — investigate that pairing rather than per-row."
+      },
+      {
+        "personid": 228112,
+        "name_py": "Wang Wei",
+        "name_chn": "王圍",
+        "user": {
+          "index_year": 1559,
+          "index_year_type_code": "19",
+          "index_year_source_id": 123710
+        },
+        "sqlite": {
+          "index_year": 1579,
+          "index_year_type_code": "19",
+          "index_year_source_id": 123710
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -20,
+        "explanation": "3 rows share the exact triple (php_tcode='19', access_tcode='19', diff=-20).  Strong signal of a single rule-level cause — investigate that pairing rather than per-row."
+      },
+      {
+        "personid": 228113,
+        "name_py": "Wang Haishi",
+        "name_chn": "王海實",
+        "user": {
+          "index_year": 1559,
+          "index_year_type_code": "19",
+          "index_year_source_id": 123710
+        },
+        "sqlite": {
+          "index_year": 1579,
+          "index_year_type_code": "19",
+          "index_year_source_id": 123710
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -20,
+        "explanation": "3 rows share the exact triple (php_tcode='19', access_tcode='19', diff=-20).  Strong signal of a single rule-level cause — investigate that pairing rather than per-row."
+      },
+      {
+        "personid": 228114,
+        "name_py": "Wang Shubian",
+        "name_chn": "王淑抃",
+        "user": {
+          "index_year": 1587,
+          "index_year_type_code": "11",
+          "index_year_source_id": 123710
+        },
+        "sqlite": {
+          "index_year": 1607,
+          "index_year_type_code": "11",
+          "index_year_source_id": 123710
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -20,
+        "explanation": "2 rows share the exact triple (php_tcode='11', access_tcode='11', diff=-20).  Strong signal of a single rule-level cause — investigate that pairing rather than per-row."
+      },
+      {
+        "personid": 248797,
+        "name_py": "Wu Ying",
+        "name_chn": "武英",
+        "user": {
+          "index_year": 1402,
+          "index_year_type_code": "13",
+          "index_year_source_id": 198975
+        },
+        "sqlite": {
+          "index_year": 1422,
+          "index_year_type_code": "13",
+          "index_year_source_id": 199710
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -20,
+        "explanation": "2 rows share the exact triple (php_tcode='13', access_tcode='13', diff=-20).  Strong signal of a single rule-level cause — investigate that pairing rather than per-row."
+      },
+      {
+        "personid": 248799,
+        "name_py": "Zhang Shi (Mother of Wuqing)",
+        "name_chn": "張氏(武清母)",
+        "user": {
+          "index_year": 1405,
+          "index_year_type_code": "15",
+          "index_year_source_id": 198975
+        },
+        "sqlite": {
+          "index_year": 1425,
+          "index_year_type_code": "15",
+          "index_year_source_id": 199710
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -20,
+        "explanation": "2 rows share the exact triple (php_tcode='15', access_tcode='15', diff=-20).  Strong signal of a single rule-level cause — investigate that pairing rather than per-row."
+      },
+      {
+        "personid": 523820,
+        "name_py": "Jin Wenbo",
+        "name_chn": "金文伯",
+        "user": {
+          "index_year": 1398,
+          "index_year_type_code": "11",
+          "index_year_source_id": 34486
+        },
+        "sqlite": {
+          "index_year": 1397,
+          "index_year_type_code": "11",
+          "index_year_source_id": 66728
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 1,
+        "explanation": "5 rows share the exact triple (php_tcode='11', access_tcode='11', diff=1).  Strong signal of a single rule-level cause — investigate that pairing rather than per-row."
+      },
+      {
+        "personid": 523821,
+        "name_py": "Jin Wubo",
+        "name_chn": "金武伯",
+        "user": {
+          "index_year": 1398,
+          "index_year_type_code": "11",
+          "index_year_source_id": 34486
+        },
+        "sqlite": {
+          "index_year": 1397,
+          "index_year_type_code": "11",
+          "index_year_source_id": 66728
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 1,
+        "explanation": "5 rows share the exact triple (php_tcode='11', access_tcode='11', diff=1).  Strong signal of a single rule-level cause — investigate that pairing rather than per-row."
+      },
+      {
+        "personid": 523822,
+        "name_py": "Jin Jianbo",
+        "name_chn": "金堅伯",
+        "user": {
+          "index_year": 1398,
+          "index_year_type_code": "11",
+          "index_year_source_id": 34486
+        },
+        "sqlite": {
+          "index_year": 1397,
+          "index_year_type_code": "11",
+          "index_year_source_id": 66728
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 1,
+        "explanation": "5 rows share the exact triple (php_tcode='11', access_tcode='11', diff=1).  Strong signal of a single rule-level cause — investigate that pairing rather than per-row."
+      },
+      {
+        "personid": 523823,
+        "name_py": "Jin Shoubo",
+        "name_chn": "金壽伯",
+        "user": {
+          "index_year": 1398,
+          "index_year_type_code": "11",
+          "index_year_source_id": 34486
+        },
+        "sqlite": {
+          "index_year": 1397,
+          "index_year_type_code": "11",
+          "index_year_source_id": 66728
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 1,
+        "explanation": "5 rows share the exact triple (php_tcode='11', access_tcode='11', diff=1).  Strong signal of a single rule-level cause — investigate that pairing rather than per-row."
+      },
+      {
+        "personid": 527169,
+        "name_py": "Wang Yuxuan",
+        "name_chn": "王毓玄",
+        "user": {
+          "index_year": 1587,
+          "index_year_type_code": "11",
+          "index_year_source_id": 123710
+        },
+        "sqlite": {
+          "index_year": 1607,
+          "index_year_type_code": "11",
+          "index_year_source_id": 123710
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -20,
+        "explanation": "2 rows share the exact triple (php_tcode='11', access_tcode='11', diff=-20).  Strong signal of a single rule-level cause — investigate that pairing rather than per-row."
+      },
+      {
+        "personid": 696896,
+        "name_py": "Chen Yu",
+        "name_chn": "陳瑜",
+        "user": {
+          "index_year": 1346,
+          "index_year_type_code": "11",
+          "index_year_source_id": 108002
+        },
+        "sqlite": {
+          "index_year": 1345,
+          "index_year_type_code": "11",
+          "index_year_source_id": 108002
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 1,
+        "explanation": "5 rows share the exact triple (php_tcode='11', access_tcode='11', diff=1).  Strong signal of a single rule-level cause — investigate that pairing rather than per-row."
+      }
+    ],
+    "candidate_algorithm_divergence": [
+      {
+        "personid": 95307,
+        "name_py": "Yao Shu",
+        "name_chn": "姚淑",
+        "user": {
+          "index_year": 1616,
+          "index_year_type_code": "06",
+          "index_year_source_id": 77307
+        },
+        "sqlite": {
+          "index_year": 1615,
+          "index_year_type_code": "17",
+          "index_year_source_id": 77307
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 1,
+        "explanation": "PHP type_code '17' is wife-from-husband; could not reconstruct from a single husband row (husbands_found=1)."
+      },
+      {
+        "personid": 228108,
+        "name_py": "An Shi (Wife of Wangtu)",
+        "name_chn": "安氏(王圖妻)",
+        "user": {
+          "index_year": 1560,
+          "index_year_type_code": "03",
+          "index_year_source_id": 123710
+        },
+        "sqlite": {
+          "index_year": 1580,
+          "index_year_type_code": "03",
+          "index_year_source_id": 123710
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -20,
+        "explanation": "PHP type_code '03' is wife-from-husband; could not reconstruct from a single husband row (husbands_found=1)."
+      },
+      {
+        "personid": 248800,
+        "name_py": "Guo Shi (Wife of Wuqing)",
+        "name_chn": "郭氏(武清妻)",
+        "user": {
+          "index_year": 1435,
+          "index_year_type_code": "03",
+          "index_year_source_id": 198975
+        },
+        "sqlite": {
+          "index_year": 1455,
+          "index_year_type_code": "03",
+          "index_year_source_id": 199710
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -20,
+        "explanation": "PHP type_code '03' is wife-from-husband; could not reconstruct from a single husband row (husbands_found=1)."
+      },
+      {
+        "personid": 248801,
+        "name_py": "Wang Shi (Wife of Wuqingji)",
+        "name_chn": "王氏(武清繼妻)",
+        "user": {
+          "index_year": 1437,
+          "index_year_type_code": "06",
+          "index_year_source_id": 198975
+        },
+        "sqlite": {
+          "index_year": 1448,
+          "index_year_type_code": "06",
+          "index_year_source_id": 199710
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -11,
+        "explanation": "PHP type_code '06' is an entry rule (expected diff = ±2*27 = ±54); observed diff = -11.  Likely sign-flip pattern but the two sides may have picked different ENTRY_DATA rows."
+      },
+      {
+        "personid": 295845,
+        "name_py": "Zhang Shi (Wife of Yaoliangbi)",
+        "name_chn": "章氏(姚良弼妻)",
+        "user": {
+          "index_year": 1508,
+          "index_year_type_code": "06",
+          "index_year_source_id": 232015
+        },
+        "sqlite": {
+          "index_year": 1511,
+          "index_year_type_code": "03",
+          "index_year_source_id": 202863
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -3,
+        "explanation": "PHP type_code '03' is wife-from-husband; could not reconstruct from a single husband row (husbands_found=1)."
+      }
+    ],
+    "unclassified": [
+      {
+        "personid": 16266,
+        "name_py": "Qian Menghui",
+        "name_chn": "錢孟回",
+        "user": {
+          "index_year": 1004,
+          "index_year_type_code": "13",
+          "index_year_source_id": 700103
+        },
+        "sqlite": {
+          "index_year": 992,
+          "index_year_type_code": "0512",
+          "index_year_source_id": 3035
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 12,
+        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='0512', access_tcode='13')."
+      },
+      {
+        "personid": 16267,
+        "name_py": "Qian Zhixiong",
+        "name_chn": "錢知雄",
+        "user": {
+          "index_year": 1034,
+          "index_year_type_code": "1312",
+          "index_year_source_id": 16266
+        },
+        "sqlite": {
+          "index_year": 1071,
+          "index_year_type_code": "14",
+          "index_year_source_id": 16269
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -37,
+        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='14', access_tcode='1312')."
+      },
+      {
+        "personid": 31573,
+        "name_py": "Li Yegong",
+        "name_chn": "李野工",
+        "user": {
+          "index_year": 585,
+          "index_year_type_code": "14",
+          "index_year_source_id": 31574
+        },
+        "sqlite": {
+          "index_year": 1056,
+          "index_year_type_code": "1112",
+          "index_year_source_id": 19149
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -471,
+        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='1112', access_tcode='14')."
+      },
+      {
+        "personid": 133312,
+        "name_py": "Xue Fuzheng",
+        "name_chn": "薛敷政",
+        "user": {
+          "index_year": 1577,
+          "index_year_type_code": "05",
+          "index_year_source_id": null
+        },
+        "sqlite": {
+          "index_year": 1557,
+          "index_year_type_code": "22",
+          "index_year_source_id": 30628
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 20,
+        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='22', access_tcode='05')."
+      },
+      {
+        "personid": 208758,
+        "name_py": "Zhuang Shi (Mother of Tanghezheng)",
+        "name_chn": "莊氏(唐鶴徵母)",
+        "user": {
+          "index_year": 1510,
+          "index_year_type_code": "03",
+          "index_year_source_id": 34219
+        },
+        "sqlite": {
+          "index_year": 1511,
+          "index_year_type_code": "15",
+          "index_year_source_id": 34220
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -1,
+        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='15', access_tcode='03')."
+      },
+      {
+        "personid": 222080,
+        "name_py": "Zhu Guozhen",
+        "name_chn": "朱國禎",
+        "user": {
+          "index_year": 1550,
+          "index_year_type_code": "14",
+          "index_year_source_id": 30143
+        },
+        "sqlite": {
+          "index_year": 1559,
+          "index_year_type_code": "22",
+          "index_year_source_id": 30142
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -9,
+        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='22', access_tcode='14')."
+      },
+      {
+        "personid": 228110,
+        "name_py": "Wang Huan",
+        "name_chn": "王圜",
+        "user": {
+          "index_year": 1555,
+          "index_year_type_code": "21",
+          "index_year_source_id": 123710
+        },
+        "sqlite": {
+          "index_year": 1575,
+          "index_year_type_code": "21",
+          "index_year_source_id": 123710
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -20,
+        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='21', access_tcode='21')."
+      },
+      {
+        "personid": 232015,
+        "name_py": "Yao Liangbi",
+        "name_chn": "姚良弼",
+        "user": {
+          "index_year": 1505,
+          "index_year_type_code": "05",
+          "index_year_source_id": null
+        },
+        "sqlite": {
+          "index_year": 1532,
+          "index_year_type_code": "14",
+          "index_year_source_id": 129303
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -27,
+        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='14', access_tcode='05')."
+      },
+      {
+        "personid": 233060,
+        "name_py": "Wu Yan",
+        "name_chn": "吳兗",
+        "user": {
+          "index_year": 1573,
+          "index_year_type_code": "07",
+          "index_year_source_id": null
+        },
+        "sqlite": {
+          "index_year": 1577,
+          "index_year_type_code": "19",
+          "index_year_source_id": 207645
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -4,
+        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='19', access_tcode='07')."
+      },
+      {
+        "personid": 235747,
+        "name_py": "He Erjian",
+        "name_chn": "何爾徤",
+        "user": {
+          "index_year": 1559,
+          "index_year_type_code": "05",
+          "index_year_source_id": null
+        },
+        "sqlite": {
+          "index_year": 1554,
+          "index_year_type_code": "13",
+          "index_year_source_id": 207783
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 5,
+        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='13', access_tcode='05')."
+      },
+      {
+        "personid": 275802,
+        "name_py": "Ying Wenzheng",
+        "name_chn": "應文正",
+        "user": {
+          "index_year": 1454,
+          "index_year_type_code": "13",
+          "index_year_source_id": 275803
+        },
+        "sqlite": {
+          "index_year": 1421,
+          "index_year_type_code": "14",
+          "index_year_source_id": 275803
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 33,
+        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='14', access_tcode='13')."
+      },
+      {
+        "personid": 295840,
+        "name_py": "Yao Yue",
+        "name_chn": "姚鉞",
+        "user": {
+          "index_year": 1475,
+          "index_year_type_code": "14",
+          "index_year_source_id": 232015
+        },
+        "sqlite": {
+          "index_year": 1478,
+          "index_year_type_code": "13",
+          "index_year_source_id": 202863
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -3,
+        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='13', access_tcode='14')."
+      },
+      {
+        "personid": 295847,
+        "name_py": "Yao Liangxiang",
+        "name_chn": "姚良相",
+        "user": {
+          "index_year": 1503,
+          "index_year_type_code": "22",
+          "index_year_source_id": 232015
+        },
+        "sqlite": {
+          "index_year": 1506,
+          "index_year_type_code": "21",
+          "index_year_source_id": 202863
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": -3,
+        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='21', access_tcode='22')."
+      },
+      {
+        "personid": 528285,
+        "name_py": "Guan Ji",
+        "name_chn": "管基",
+        "user": {
+          "index_year": 1718,
+          "index_year_type_code": "14",
+          "index_year_source_id": 55004
+        },
+        "sqlite": {
+          "index_year": 1708,
+          "index_year_type_code": "13",
+          "index_year_source_id": 124528
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 10,
+        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='13', access_tcode='14')."
+      },
+      {
+        "personid": 684842,
+        "name_py": "Chen Shi (Mother of Yingchang)",
+        "name_chn": "陳氏(應昌母)",
+        "user": {
+          "index_year": 1487,
+          "index_year_type_code": "03",
+          "index_year_source_id": 275803
+        },
+        "sqlite": {
+          "index_year": 1415,
+          "index_year_type_code": "15",
+          "index_year_source_id": 275804
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 72,
+        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='15', access_tcode='03')."
+      },
+      {
+        "personid": 684843,
+        "name_py": "Ying Mou",
+        "name_chn": "應某",
+        "user": {
+          "index_year": 1514,
+          "index_year_type_code": "11",
+          "index_year_source_id": 275803
+        },
+        "sqlite": {
+          "index_year": 1440,
+          "index_year_type_code": "21",
+          "index_year_source_id": 275804
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 74,
+        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='21', access_tcode='11')."
+      },
+      {
+        "personid": 699457,
+        "name_py": "Kong Shi (liyiqi)",
+        "name_chn": "孔氏(李益妻)",
+        "user": {
+          "index_year": 984,
+          "index_year_type_code": "1104",
+          "index_year_source_id": 696563
+        },
+        "sqlite": {
+          "index_year": 980,
+          "index_year_type_code": "15",
+          "index_year_source_id": 699428
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 4,
+        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='15', access_tcode='1104')."
+      },
+      {
+        "personid": 699493,
+        "name_py": "Xiang Chuixiang",
+        "name_chn": "項垂象",
+        "user": {
+          "index_year": 1009,
+          "index_year_type_code": "23",
+          "index_year_source_id": 686206
+        },
+        "sqlite": {
+          "index_year": 1004,
+          "index_year_type_code": "14",
+          "index_year_source_id": 699489
+        },
+        "birthyear": 0,
+        "deathyear": 0,
+        "diff_access_minus_php": 5,
+        "explanation": "No matching hypothesis from PR I's flagged divergences (php_tcode='14', access_tcode='23')."
+      }
+    ]
+  }
+}
