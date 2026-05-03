@@ -1,0 +1,3397 @@
+{
+  "tables": [
+    {
+      "name": "ADDR_BELONGS_DATA",
+      "n_columns": 12,
+      "columns": [
+        "c_addr_id",
+        "c_belongs_to",
+        "c_firstyear",
+        "c_lastyear",
+        "c_source",
+        "c_pages",
+        "c_secondary_source_author",
+        "c_notes",
+        "c_created_by",
+        "c_created_date",
+        "c_modified_by",
+        "c_modified_date"
+      ]
+    },
+    {
+      "name": "ADDR_CODES",
+      "n_columns": 12,
+      "columns": [
+        "c_addr_id",
+        "c_name",
+        "c_name_chn",
+        "c_firstyear",
+        "c_lastyear",
+        "c_admin_cat_code",
+        "c_admin_type",
+        "x_coord",
+        "y_coord",
+        "CHGIS_PT_ID",
+        "c_notes",
+        "c_alt_names"
+      ]
+    },
+    {
+      "name": "ADDRESSES",
+      "n_columns": 19,
+      "columns": [
+        "c_addr_id",
+        "c_addr_cbd",
+        "c_name",
+        "c_name_chn",
+        "c_admin_type",
+        "c_firstyear",
+        "c_lastyear",
+        "x_coord",
+        "y_coord",
+        "belongs1_ID",
+        "belongs1_Name",
+        "belongs2_ID",
+        "belongs2_Name",
+        "belongs3_ID",
+        "belongs3_Name",
+        "belongs4_ID",
+        "belongs4_Name",
+        "belongs5_ID",
+        "belongs5_Name"
+      ]
+    },
+    {
+      "name": "ADMIN_CAT_CODE_TYPE_REL",
+      "n_columns": 2,
+      "columns": [
+        "c_admin_cat_code",
+        "c_admin_cat_type_code"
+      ]
+    },
+    {
+      "name": "ADMIN_CAT_CODES",
+      "n_columns": 5,
+      "columns": [
+        "c_admin_cat_code",
+        "c_admin_cat_py",
+        "c_admin_cat_hz",
+        "c_admin_cat_trans",
+        "c_notes"
+      ]
+    },
+    {
+      "name": "ADMIN_CAT_TYPES",
+      "n_columns": 4,
+      "columns": [
+        "c_admin_cat_type_code",
+        "c_admin_cat_type_hz",
+        "c_admin_cat_type_trans",
+        "c_notes"
+      ]
+    },
+    {
+      "name": "ALTNAME_CODES",
+      "n_columns": 3,
+      "columns": [
+        "c_name_type_code",
+        "c_name_type_desc",
+        "c_name_type_desc_chn"
+      ]
+    },
+    {
+      "name": "ALTNAME_DATA",
+      "n_columns": 12,
+      "columns": [
+        "c_personid",
+        "c_alt_name",
+        "c_alt_name_chn",
+        "c_alt_name_type_code",
+        "c_sequence",
+        "c_source",
+        "c_pages",
+        "c_notes",
+        "c_created_by",
+        "c_modified_by",
+        "c_created_date",
+        "c_modified_date"
+      ]
+    },
+    {
+      "name": "APPOINTMENT_CODE_TYPE_REL",
+      "n_columns": 2,
+      "columns": [
+        "c_appt_code",
+        "c_appt_type_code"
+      ]
+    },
+    {
+      "name": "APPOINTMENT_CODES",
+      "n_columns": 6,
+      "columns": [
+        "c_appt_code",
+        "c_appt_desc_chn",
+        "c_appt_desc",
+        "c_appt_desc_chn_alt",
+        "c_appt_desc_alt",
+        "c_notes"
+      ]
+    },
+    {
+      "name": "APPOINTMENT_TYPES",
+      "n_columns": 4,
+      "columns": [
+        "c_appt_type_code",
+        "c_appt_type_desc_chn",
+        "c_appt_type_desc",
+        "c_notes"
+      ]
+    },
+    {
+      "name": "ASSOC_CODE_TYPE_REL",
+      "n_columns": 2,
+      "columns": [
+        "c_assoc_code",
+        "c_assoc_type_code"
+      ]
+    },
+    {
+      "name": "ASSOC_CODES",
+      "n_columns": 8,
+      "columns": [
+        "c_assoc_code",
+        "c_assoc_pair",
+        "c_assoc_pair2",
+        "c_assoc_desc",
+        "c_assoc_desc_chn",
+        "c_assoc_role_type",
+        "c_sortorder",
+        "c_example"
+      ]
+    },
+    {
+      "name": "ASSOC_DATA",
+      "n_columns": 42,
+      "columns": [
+        "c_assoc_code",
+        "c_personid",
+        "c_kin_code",
+        "c_kin_id",
+        "c_assoc_id",
+        "c_assoc_kin_code",
+        "c_assoc_kin_id",
+        "c_tertiary_personid",
+        "c_tertiary_type_notes",
+        "c_assoc_count",
+        "c_sequence",
+        "c_assoc_first_year",
+        "c_assoc_last_year",
+        "c_source",
+        "c_pages",
+        "c_notes",
+        "c_assoc_fy_nh_code",
+        "c_assoc_fy_nh_year",
+        "c_assoc_fy_range",
+        "c_assoc_fy_intercalary",
+        "c_assoc_fy_month",
+        "c_assoc_fy_day",
+        "c_assoc_fy_day_gz",
+        "c_assoc_ly_nh_code",
+        "c_assoc_ly_nh_year",
+        "c_assoc_ly_range",
+        "c_assoc_ly_intercalary",
+        "c_assoc_ly_month",
+        "c_assoc_ly_day",
+        "c_assoc_ly_day_gz",
+        "c_addr_id",
+        "c_litgenre_code",
+        "c_occasion_code",
+        "c_topic_code",
+        "c_inst_code",
+        "c_inst_name_code",
+        "c_text_title",
+        "c_assoc_claimer_id",
+        "c_created_by",
+        "c_modified_by",
+        "c_created_date",
+        "c_modified_date"
+      ]
+    },
+    {
+      "name": "ASSOC_TYPES",
+      "n_columns": 7,
+      "columns": [
+        "c_assoc_type_code",
+        "c_assoc_type_desc",
+        "c_assoc_type_desc_chn",
+        "c_assoc_type_parent_id",
+        "c_assoc_type_level",
+        "c_assoc_type_sortorder",
+        "c_assoc_type_short_desc"
+      ]
+    },
+    {
+      "name": "ASSUME_OFFICE_CODES",
+      "n_columns": 3,
+      "columns": [
+        "c_assume_office_code",
+        "c_assume_office_desc_chn",
+        "c_assume_office_desc"
+      ]
+    },
+    {
+      "name": "BIOG_ADDR_CODES",
+      "n_columns": 6,
+      "columns": [
+        "c_addr_type",
+        "c_addr_desc",
+        "c_addr_desc_chn",
+        "c_addr_note",
+        "c_index_addr_rank",
+        "c_index_addr_default_rank"
+      ]
+    },
+    {
+      "name": "BIOG_ADDR_DATA",
+      "n_columns": 29,
+      "columns": [
+        "c_personid",
+        "c_addr_id",
+        "c_addr_type",
+        "c_sequence",
+        "c_firstyear",
+        "c_lastyear",
+        "c_source",
+        "c_pages",
+        "c_notes",
+        "c_fy_nh_code",
+        "c_ly_nh_code",
+        "c_fy_nh_year",
+        "c_ly_nh_year",
+        "c_fy_range",
+        "c_ly_range",
+        "c_natal",
+        "c_fy_intercalary",
+        "c_ly_intercalary",
+        "c_fy_month",
+        "c_ly_month",
+        "c_fy_day",
+        "c_ly_day",
+        "c_fy_day_gz",
+        "c_ly_day_gz",
+        "c_created_by",
+        "c_modified_by",
+        "c_delete",
+        "c_created_date",
+        "c_modified_date"
+      ]
+    },
+    {
+      "name": "BIOG_INST_CODES",
+      "n_columns": 4,
+      "columns": [
+        "c_bi_role_code",
+        "c_bi_role_desc",
+        "c_bi_role_chn",
+        "c_notes"
+      ]
+    },
+    {
+      "name": "BIOG_INST_DATA",
+      "n_columns": 19,
+      "columns": [
+        "c_personid",
+        "c_inst_name_code",
+        "c_inst_code",
+        "c_bi_role_code",
+        "c_bi_begin_year",
+        "c_bi_by_nh_code",
+        "c_bi_by_nh_year",
+        "c_bi_by_range",
+        "c_bi_end_year",
+        "c_bi_ey_nh_code",
+        "c_bi_ey_nh_year",
+        "c_bi_ey_range",
+        "c_source",
+        "c_pages",
+        "c_notes",
+        "c_created_by",
+        "c_modified_by",
+        "c_created_date",
+        "c_modified_date"
+      ]
+    },
+    {
+      "name": "BIOG_MAIN",
+      "n_columns": 55,
+      "columns": [
+        "c_personid",
+        "c_name",
+        "c_name_chn",
+        "c_index_year",
+        "c_index_year_type_code",
+        "c_index_year_source_id",
+        "c_female",
+        "c_index_addr_id",
+        "c_index_addr_type_code",
+        "c_ethnicity_code",
+        "c_household_status_code",
+        "c_tribe",
+        "c_birthyear",
+        "c_by_nh_code",
+        "c_by_nh_year",
+        "c_by_range",
+        "c_deathyear",
+        "c_dy_nh_code",
+        "c_dy_nh_year",
+        "c_dy_range",
+        "c_death_age",
+        "c_death_age_range",
+        "c_fl_earliest_year",
+        "c_fl_ey_nh_code",
+        "c_fl_ey_nh_year",
+        "c_fl_ey_notes",
+        "c_fl_latest_year",
+        "c_fl_ly_nh_code",
+        "c_fl_ly_nh_year",
+        "c_fl_ly_notes",
+        "c_surname",
+        "c_surname_chn",
+        "c_mingzi",
+        "c_mingzi_chn",
+        "c_dy",
+        "c_choronym_code",
+        "c_notes",
+        "c_by_intercalary",
+        "c_dy_intercalary",
+        "c_by_month",
+        "c_dy_month",
+        "c_by_day",
+        "c_dy_day",
+        "c_by_day_gz",
+        "c_dy_day_gz",
+        "c_surname_proper",
+        "c_mingzi_proper",
+        "c_name_proper",
+        "c_surname_rm",
+        "c_mingzi_rm",
+        "c_name_rm",
+        "c_created_by",
+        "c_modified_by",
+        "c_created_date",
+        "c_modified_date"
+      ]
+    },
+    {
+      "name": "BIOG_SOURCE_DATA",
+      "n_columns": 10,
+      "columns": [
+        "c_personid",
+        "c_textid",
+        "c_pages",
+        "c_notes",
+        "c_main_source",
+        "c_self_bio",
+        "c_created_by",
+        "c_modified_by",
+        "c_created_date",
+        "c_modified_date"
+      ]
+    },
+    {
+      "name": "BIOG_TEXT_DATA",
+      "n_columns": 14,
+      "columns": [
+        "c_textid",
+        "c_personid",
+        "c_role_id",
+        "c_year",
+        "c_nh_code",
+        "c_nh_year",
+        "c_range_code",
+        "c_source",
+        "c_pages",
+        "c_notes",
+        "c_created_by",
+        "c_modified_by",
+        "c_created_date",
+        "c_modified_date"
+      ]
+    },
+    {
+      "name": "CHORONYM_CODES",
+      "n_columns": 3,
+      "columns": [
+        "c_choronym_code",
+        "c_choronym_desc",
+        "c_choronym_chn"
+      ]
+    },
+    {
+      "name": "CopyTables",
+      "n_columns": 2,
+      "columns": [
+        "TableName",
+        "NotProcessed"
+      ]
+    },
+    {
+      "name": "CopyTablesDefault",
+      "n_columns": 2,
+      "columns": [
+        "ID",
+        "TableName"
+      ]
+    },
+    {
+      "name": "COUNTRY_CODES",
+      "n_columns": 3,
+      "columns": [
+        "c_country_code",
+        "c_country_desc",
+        "c_country_desc_chn"
+      ]
+    },
+    {
+      "name": "DYNASTIES",
+      "n_columns": 6,
+      "columns": [
+        "c_dy",
+        "c_dynasty",
+        "c_dynasty_chn",
+        "c_start",
+        "c_end",
+        "c_sort"
+      ]
+    },
+    {
+      "name": "ENTRY_CODE_TYPE_REL",
+      "n_columns": 2,
+      "columns": [
+        "c_entry_code",
+        "c_entry_type"
+      ]
+    },
+    {
+      "name": "ENTRY_CODES",
+      "n_columns": 3,
+      "columns": [
+        "c_entry_code",
+        "c_entry_desc",
+        "c_entry_desc_chn"
+      ]
+    },
+    {
+      "name": "ENTRY_DATA",
+      "n_columns": 28,
+      "columns": [
+        "c_personid",
+        "c_entry_code",
+        "c_sequence",
+        "c_exam_rank",
+        "c_kin_code",
+        "c_kin_id",
+        "c_assoc_code",
+        "c_assoc_id",
+        "c_year",
+        "c_age",
+        "c_entry_dy",
+        "c_entry_nh_id",
+        "c_entry_nh_year",
+        "c_entry_range",
+        "c_inst_code",
+        "c_inst_name_code",
+        "c_exam_field",
+        "c_entry_addr_id",
+        "c_parental_status_code",
+        "c_attempt_count",
+        "c_source",
+        "c_pages",
+        "c_notes",
+        "c_posting_notes",
+        "c_created_by",
+        "c_modified_by",
+        "c_created_date",
+        "c_modified_date"
+      ]
+    },
+    {
+      "name": "ENTRY_TYPES",
+      "n_columns": 6,
+      "columns": [
+        "c_entry_type",
+        "c_entry_type_desc",
+        "c_entry_type_desc_chn",
+        "c_entry_type_parent_id",
+        "c_entry_type_level",
+        "c_entry_type_sortorder"
+      ]
+    },
+    {
+      "name": "ETHNICITY_TRIBE_CODES",
+      "n_columns": 11,
+      "columns": [
+        "c_ethnicity_code",
+        "c_group_code",
+        "c_subgroup_code",
+        "c_altname_code",
+        "c_name_chn",
+        "c_name",
+        "c_ethno_legal_cat",
+        "c_romanized",
+        "c_surname",
+        "c_notes",
+        "c_sortorder"
+      ]
+    },
+    {
+      "name": "EVENT_CODES",
+      "n_columns": 20,
+      "columns": [
+        "c_event_code",
+        "c_event_name_chn",
+        "c_event_name",
+        "c_fy_yr",
+        "c_ly_yr",
+        "c_fy_nh_code",
+        "c_ly_nh_code",
+        "c_fy_nh_yr",
+        "c_ly_nh_yr",
+        "c_fy_intercalary",
+        "c_fy_month",
+        "c_ly_intercalary",
+        "c_ly_month",
+        "c_fy_range",
+        "c_ly_range",
+        "c_addr_id",
+        "c_dy",
+        "c_source",
+        "c_pages",
+        "c_event_notes"
+      ]
+    },
+    {
+      "name": "EVENTS_ADDR",
+      "n_columns": 12,
+      "columns": [
+        "c_personid",
+        "c_event_code",
+        "c_sequence",
+        "c_addr_id",
+        "c_year",
+        "c_nh_code",
+        "c_nh_year",
+        "c_yr_range",
+        "c_intercalary",
+        "c_month",
+        "c_day",
+        "c_day_ganzhi"
+      ]
+    },
+    {
+      "name": "EVENTS_DATA",
+      "n_columns": 21,
+      "columns": [
+        "c_personid",
+        "c_sequence",
+        "c_event_code",
+        "c_role",
+        "c_year",
+        "c_nh_code",
+        "c_nh_year",
+        "c_yr_range",
+        "c_intercalary",
+        "c_month",
+        "c_day",
+        "c_day_ganzhi",
+        "c_addr_id",
+        "c_source",
+        "c_pages",
+        "c_event",
+        "c_notes",
+        "c_created_by",
+        "c_modified_by",
+        "c_created_date",
+        "c_modified_date"
+      ]
+    },
+    {
+      "name": "EXTANT_CODES",
+      "n_columns": 3,
+      "columns": [
+        "c_extant_code",
+        "c_extant_desc",
+        "c_extant_desc_chn"
+      ]
+    },
+    {
+      "name": "ForeignKeys",
+      "n_columns": 10,
+      "columns": [
+        "AccessTblNm",
+        "AccessFldNm",
+        "ForeignKey",
+        "ForeignKeyBaseField",
+        "FKString",
+        "FKName",
+        "skip",
+        "IndexOnField",
+        "DataFormat",
+        "NULL_allowed"
+      ]
+    },
+    {
+      "name": "FormLabels",
+      "n_columns": 5,
+      "columns": [
+        "c_form",
+        "c_label_id",
+        "c_english",
+        "c_jianti",
+        "c_fanti"
+      ]
+    },
+    {
+      "name": "GANZHI_CODES",
+      "n_columns": 3,
+      "columns": [
+        "c_ganzhi_code",
+        "c_ganzhi_chn",
+        "c_ganzhi_py"
+      ]
+    },
+    {
+      "name": "HOUSEHOLD_STATUS_CODES",
+      "n_columns": 3,
+      "columns": [
+        "c_household_status_code",
+        "c_household_status_desc",
+        "c_household_status_desc_chn"
+      ]
+    },
+    {
+      "name": "INDEXYEAR_TYPE_CODES",
+      "n_columns": 4,
+      "columns": [
+        "c_index_year_type_code",
+        "c_index_year_type_desc",
+        "c_index_year_type_hz",
+        "c_notes"
+      ]
+    },
+    {
+      "name": "KIN_DATA",
+      "n_columns": 11,
+      "columns": [
+        "c_personid",
+        "c_kin_id",
+        "c_kin_code",
+        "c_source",
+        "c_pages",
+        "c_notes",
+        "c_autogen_notes",
+        "c_created_by",
+        "c_modified_by",
+        "c_created_date",
+        "c_modified_date"
+      ]
+    },
+    {
+      "name": "KIN_Mourning",
+      "n_columns": 10,
+      "columns": [
+        "c_kinrel",
+        "c_kinrel_alt",
+        "c_kinrel_chn",
+        "c_mourning",
+        "c_mourning_chn",
+        "c_kindist",
+        "c_kintype",
+        "c_kintype_desc",
+        "c_kintype_desc_chn",
+        "c_notes"
+      ]
+    },
+    {
+      "name": "KIN_MOURNING_STEPS",
+      "n_columns": 5,
+      "columns": [
+        "c_kinrel",
+        "c_upstep",
+        "c_dwnstep",
+        "c_marstep",
+        "c_colstep"
+      ]
+    },
+    {
+      "name": "KINSHIP_CODES",
+      "n_columns": 13,
+      "columns": [
+        "c_kincode",
+        "c_kin_pair1",
+        "c_kin_pair2",
+        "c_kin_pair_notes",
+        "c_kinrel_chn",
+        "c_kinrel",
+        "c_kinrel_alt",
+        "c_pick_sorting",
+        "c_upstep",
+        "c_dwnstep",
+        "c_marstep",
+        "c_colstep",
+        "c_kinrel_simplified"
+      ]
+    },
+    {
+      "name": "LITERARYGENRE_CODES",
+      "n_columns": 4,
+      "columns": [
+        "c_lit_genre_code",
+        "c_lit_genre_desc",
+        "c_lit_genre_desc_chn",
+        "c_sortorder"
+      ]
+    },
+    {
+      "name": "MEASURE_CODES",
+      "n_columns": 3,
+      "columns": [
+        "c_measure_code",
+        "c_measure_desc",
+        "c_measure_desc_chn"
+      ]
+    },
+    {
+      "name": "MERGED_PERSON_DATA",
+      "n_columns": 9,
+      "columns": [
+        "c_personid",
+        "c_merged_from_personid",
+        "c_notes",
+        "c_source",
+        "c_pages",
+        "c_created_by",
+        "c_modified_by",
+        "c_created_date",
+        "c_modified_date"
+      ]
+    },
+    {
+      "name": "NIAN_HAO",
+      "n_columns": 7,
+      "columns": [
+        "c_nianhao_id",
+        "c_dy",
+        "c_dynasty_chn",
+        "c_nianhao_chn",
+        "c_nianhao_pin",
+        "c_firstyear",
+        "c_lastyear"
+      ]
+    },
+    {
+      "name": "OCCASION_CODES",
+      "n_columns": 4,
+      "columns": [
+        "c_occasion_code",
+        "c_occasion_desc",
+        "c_occasion_desc_chn",
+        "c_sortorder"
+      ]
+    },
+    {
+      "name": "OFFICE_CATEGORIES",
+      "n_columns": 4,
+      "columns": [
+        "c_office_category_id",
+        "c_category_desc",
+        "c_category_desc_chn",
+        "c_notes"
+      ]
+    },
+    {
+      "name": "OFFICE_CODE_TYPE_REL",
+      "n_columns": 2,
+      "columns": [
+        "c_office_id",
+        "c_office_tree_id"
+      ]
+    },
+    {
+      "name": "OFFICE_CODES",
+      "n_columns": 12,
+      "columns": [
+        "c_office_id",
+        "c_dy",
+        "c_office_pinyin",
+        "c_office_chn",
+        "c_office_pinyin_alt",
+        "c_office_chn_alt",
+        "c_office_trans",
+        "c_office_trans_alt",
+        "c_source",
+        "c_pages",
+        "c_notes",
+        "c_office_id_old"
+      ]
+    },
+    {
+      "name": "OFFICE_CODES_CONVERSION",
+      "n_columns": 4,
+      "columns": [
+        "c_office_id_backup",
+        "c_office_chn_backup",
+        "c_office_id",
+        "c_office_chn"
+      ]
+    },
+    {
+      "name": "OFFICE_TYPE_TREE",
+      "n_columns": 4,
+      "columns": [
+        "c_office_type_node_id",
+        "c_office_type_desc",
+        "c_office_type_desc_chn",
+        "c_parent_id"
+      ]
+    },
+    {
+      "name": "OFFICE_TYPE_TREE_backup",
+      "n_columns": 5,
+      "columns": [
+        "c_office_type_node_id",
+        "c_tts_node_id",
+        "c_office_type_desc",
+        "c_office_type_desc_chn",
+        "c_parent_id"
+      ]
+    },
+    {
+      "name": "PARENTAL_STATUS_CODES",
+      "n_columns": 3,
+      "columns": [
+        "c_parental_status_code",
+        "c_parental_status_desc",
+        "c_parental_status_desc_chn"
+      ]
+    },
+    {
+      "name": "Paste Errors",
+      "n_columns": 24,
+      "columns": [
+        "c_textid",
+        "c_title_chn",
+        "c_title",
+        "c_title_trans",
+        "c_text_type_id",
+        "c_text_year",
+        "c_text_nh_code",
+        "c_text_nh_year",
+        "c_text_range_code",
+        "c_bibl_cat_code",
+        "c_extant",
+        "c_text_country",
+        "c_text_dy",
+        "c_source",
+        "c_pages",
+        "c_url_api",
+        "c_url_api_coda",
+        "c_url_homepage",
+        "c_notes",
+        "c_title_alt_chn",
+        "c_created_by",
+        "c_modified_by",
+        "c_created_date",
+        "c_modified_date"
+      ]
+    },
+    {
+      "name": "POSSESSION_ACT_CODES",
+      "n_columns": 3,
+      "columns": [
+        "c_possession_act_code",
+        "c_possession_act_desc",
+        "c_possession_act_desc_chn"
+      ]
+    },
+    {
+      "name": "POSSESSION_ADDR",
+      "n_columns": 3,
+      "columns": [
+        "c_possession_record_id",
+        "c_personid",
+        "c_addr_id"
+      ]
+    },
+    {
+      "name": "POSSESSION_DATA",
+      "n_columns": 20,
+      "columns": [
+        "c_personid",
+        "c_possession_record_id",
+        "c_sequence",
+        "c_possession_act_code",
+        "c_possession_desc",
+        "c_possession_desc_chn",
+        "c_quantity",
+        "c_measure_code",
+        "c_possession_yr",
+        "c_possession_nh_code",
+        "c_possession_nh_yr",
+        "c_possession_yr_range",
+        "c_addr_id",
+        "c_source",
+        "c_pages",
+        "c_notes",
+        "c_created_by",
+        "c_modified_by",
+        "c_created_date",
+        "c_modified_date"
+      ]
+    },
+    {
+      "name": "POSTED_TO_ADDR_DATA",
+      "n_columns": 8,
+      "columns": [
+        "c_posting_id",
+        "c_personid",
+        "c_office_id",
+        "c_addr_id",
+        "c_created_by",
+        "c_modified_by",
+        "c_created_date",
+        "c_modified_date"
+      ]
+    },
+    {
+      "name": "POSTED_TO_OFFICE_DATA",
+      "n_columns": 35,
+      "columns": [
+        "c_personid",
+        "c_office_id",
+        "c_posting_id",
+        "c_posting_id_old",
+        "c_sequence",
+        "c_firstyear",
+        "c_fy_nh_code",
+        "c_fy_nh_year",
+        "c_fy_range",
+        "c_lastyear",
+        "c_ly_nh_code",
+        "c_ly_nh_year",
+        "c_ly_range",
+        "c_appt_code",
+        "c_assume_office_code",
+        "c_inst_code",
+        "c_inst_name_code",
+        "c_source",
+        "c_pages",
+        "c_notes",
+        "c_office_id_backup",
+        "c_office_category_id",
+        "c_fy_intercalary",
+        "c_fy_month",
+        "c_ly_intercalary",
+        "c_ly_month",
+        "c_fy_day",
+        "c_ly_day",
+        "c_fy_day_gz",
+        "c_ly_day_gz",
+        "c_dy",
+        "c_created_by",
+        "c_modified_by",
+        "c_created_date",
+        "c_modified_date"
+      ]
+    },
+    {
+      "name": "POSTING_DATA",
+      "n_columns": 7,
+      "columns": [
+        "c_personid",
+        "c_posting_id",
+        "c_posting_id_old",
+        "c_created_by",
+        "c_modified_by",
+        "c_created_date",
+        "c_modified_date"
+      ]
+    },
+    {
+      "name": "SCHOLARLYTOPIC_CODES",
+      "n_columns": 7,
+      "columns": [
+        "c_topic_code",
+        "c_topic_desc",
+        "c_topic_desc_chn",
+        "c_topic_type_code",
+        "c_topic_type_desc",
+        "c_topic_type_desc_chn",
+        "c_sortorder"
+      ]
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_ADDR",
+      "n_columns": 11,
+      "columns": [
+        "c_inst_name_code",
+        "c_inst_code",
+        "c_inst_addr_type_code",
+        "c_inst_addr_begin_year",
+        "c_inst_addr_end_year",
+        "c_inst_addr_id",
+        "inst_xcoord",
+        "inst_ycoord",
+        "c_source",
+        "c_pages",
+        "c_notes"
+      ]
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_ADDR_TYPES",
+      "n_columns": 4,
+      "columns": [
+        "c_inst_addr_type_code",
+        "c_inst_addr_type_desc",
+        "c_inst_addr_type_chn",
+        "c_notes"
+      ]
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_ALTNAME_CODES",
+      "n_columns": 4,
+      "columns": [
+        "c_inst_altname_type",
+        "c_inst_altname_desc",
+        "c_inst_altname_chn",
+        "c_notes"
+      ]
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_ALTNAME_DATA",
+      "n_columns": 8,
+      "columns": [
+        "c_inst_name_code",
+        "c_inst_code",
+        "c_inst_altname_type",
+        "c_inst_altname_hz",
+        "c_inst_altname_py",
+        "c_source",
+        "c_pages",
+        "c_notes"
+      ]
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_CODES",
+      "n_columns": 19,
+      "columns": [
+        "c_inst_name_code",
+        "c_inst_code",
+        "c_inst_type_code",
+        "c_inst_begin_year",
+        "c_by_nianhao_code",
+        "c_by_nianhao_year",
+        "c_by_year_range",
+        "c_inst_begin_dy",
+        "c_inst_floruit_dy",
+        "c_inst_first_known_year",
+        "c_inst_end_year",
+        "c_ey_nianhao_code",
+        "c_ey_nianhao_year",
+        "c_ey_year_range",
+        "c_inst_end_dy",
+        "c_inst_last_known_year",
+        "c_source",
+        "c_pages",
+        "c_notes"
+      ]
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_CODES_CONVERSION",
+      "n_columns": 4,
+      "columns": [
+        "c_inst_name_code",
+        "c_inst_code",
+        "c_inst_code_new",
+        "c_new_new_code"
+      ]
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_NAME_CODES",
+      "n_columns": 3,
+      "columns": [
+        "c_inst_name_code",
+        "c_inst_name_hz",
+        "c_inst_name_py"
+      ]
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_TYPES",
+      "n_columns": 3,
+      "columns": [
+        "c_inst_type_code",
+        "c_inst_type_py",
+        "c_inst_type_hz"
+      ]
+    },
+    {
+      "name": "STATUS_CODE_TYPE_REL",
+      "n_columns": 2,
+      "columns": [
+        "c_status_code",
+        "c_status_type_code"
+      ]
+    },
+    {
+      "name": "STATUS_CODES",
+      "n_columns": 3,
+      "columns": [
+        "c_status_code",
+        "c_status_desc",
+        "c_status_desc_chn"
+      ]
+    },
+    {
+      "name": "STATUS_DATA",
+      "n_columns": 19,
+      "columns": [
+        "c_personid",
+        "c_sequence",
+        "c_status_code",
+        "c_firstyear",
+        "c_fy_nh_code",
+        "c_fy_nh_year",
+        "c_fy_range",
+        "c_lastyear",
+        "c_ly_nh_code",
+        "c_ly_nh_year",
+        "c_ly_range",
+        "c_supplement",
+        "c_source",
+        "c_pages",
+        "c_notes",
+        "c_created_by",
+        "c_modified_by",
+        "c_created_date",
+        "c_modified_date"
+      ]
+    },
+    {
+      "name": "STATUS_TYPES",
+      "n_columns": 4,
+      "columns": [
+        "c_status_type_code",
+        "c_status_type_desc",
+        "c_status_type_chn",
+        "c_status_type_parent_code"
+      ]
+    },
+    {
+      "name": "TablesFields",
+      "n_columns": 10,
+      "columns": [
+        "RowNum",
+        "DumpTblNm",
+        "DumpFldNm",
+        "AccessTblNm",
+        "AccessFldNm",
+        "IndexOnField",
+        "DataFormat",
+        "NULL_allowed",
+        "ForeignKey",
+        "ForeignKeyBaseField"
+      ]
+    },
+    {
+      "name": "TablesFieldsChanges",
+      "n_columns": 5,
+      "columns": [
+        "TableName",
+        "FieldName",
+        "Change",
+        "ChangeDate",
+        "ChangeNotes"
+      ]
+    },
+    {
+      "name": "TEXT_BIBLCAT_CODE_TYPE_REL",
+      "n_columns": 2,
+      "columns": [
+        "c_text_cat_code",
+        "c_text_cat_type_id"
+      ]
+    },
+    {
+      "name": "TEXT_BIBLCAT_CODES",
+      "n_columns": 7,
+      "columns": [
+        "c_text_cat_code",
+        "c_text_cat_desc",
+        "c_text_cat_desc_chn",
+        "c_text_cat_pinyin",
+        "c_text_cat_parent_id",
+        "c_text_cat_level",
+        "c_text_cat_sortorder"
+      ]
+    },
+    {
+      "name": "TEXT_BIBLCAT_TYPES",
+      "n_columns": 6,
+      "columns": [
+        "c_text_cat_type_id",
+        "c_text_cat_type_desc",
+        "c_text_cat_type_desc_chn",
+        "c_text_cat_type_parent_id",
+        "c_text_cat_type_level",
+        "c_text_cat_type_sortorder"
+      ]
+    },
+    {
+      "name": "TEXT_CODES",
+      "n_columns": 28,
+      "columns": [
+        "c_textid",
+        "c_title_chn",
+        "c_suffix_version",
+        "c_title",
+        "c_title_trans",
+        "c_text_type_id",
+        "c_text_year",
+        "c_text_nh_code",
+        "c_text_nh_year",
+        "c_text_range_code",
+        "c_period",
+        "c_bibl_cat_code",
+        "c_extant",
+        "c_text_country",
+        "c_text_dy",
+        "c_source",
+        "c_pages",
+        "c_url_api",
+        "c_url_api_coda",
+        "c_url_homepage",
+        "c_notes",
+        "c_number",
+        "c_counter",
+        "c_title_alt_chn",
+        "c_created_by",
+        "c_modified_by",
+        "c_created_date",
+        "c_modified_date"
+      ]
+    },
+    {
+      "name": "TEXT_INSTANCE_DATA",
+      "n_columns": 31,
+      "columns": [
+        "c_textid",
+        "c_text_edition_id",
+        "c_text_instance_id",
+        "c_instance_title_chn",
+        "c_instance_title",
+        "c_instance_title_trans",
+        "c_part_of_instance",
+        "c_part_of_instance_notes",
+        "c_pub_country",
+        "c_pub_dy",
+        "c_pub_year",
+        "c_pub_nh_code",
+        "c_pub_nh_year",
+        "c_pub_range_code",
+        "c_pub_loc",
+        "c_publisher",
+        "c_print",
+        "c_pub_notes",
+        "c_source",
+        "c_pages",
+        "c_extant",
+        "c_url_api",
+        "c_url_homepage",
+        "c_notes",
+        "c_number",
+        "c_counter",
+        "c_title_alt_chn",
+        "c_created_by",
+        "c_modified_by",
+        "c_created_date",
+        "c_modified_date"
+      ]
+    },
+    {
+      "name": "TEXT_ROLE_CODES",
+      "n_columns": 3,
+      "columns": [
+        "c_role_id",
+        "c_role_desc",
+        "c_role_desc_chn"
+      ]
+    },
+    {
+      "name": "TEXT_TYPE",
+      "n_columns": 6,
+      "columns": [
+        "c_text_type_code",
+        "c_text_type_desc",
+        "c_text_type_desc_chn",
+        "c_text_type_parent_id",
+        "c_text_type_level",
+        "c_text_type_sortorder"
+      ]
+    },
+    {
+      "name": "TMP_ADDR_A",
+      "n_columns": 14,
+      "columns": [
+        "c_addr_id",
+        "c_name",
+        "c_name_chn",
+        "c_firstyear",
+        "c_lastyear",
+        "c_admin_type",
+        "x_coord",
+        "y_coord",
+        "c_belongs_to",
+        "c_belongs_first_year",
+        "c_belongs_last_year",
+        "c_belongs_unit_first_year",
+        "c_belongs_unit_last_year",
+        "c_delete"
+      ]
+    },
+    {
+      "name": "TMP_ADDR_B",
+      "n_columns": 14,
+      "columns": [
+        "c_addr_id",
+        "c_name",
+        "c_name_chn",
+        "c_firstyear",
+        "c_lastyear",
+        "c_admin_type",
+        "x_coord",
+        "y_coord",
+        "c_belongs_to",
+        "c_belongs_name",
+        "c_belongs_chn",
+        "c_belongs_first_year",
+        "c_belongs_last_year",
+        "c_del"
+      ]
+    },
+    {
+      "name": "TMP_ADDR_BELONGS",
+      "n_columns": 11,
+      "columns": [
+        "c_addr_id",
+        "c_name",
+        "c_name_chn",
+        "c_admin_type",
+        "c_firstyear",
+        "c_lastyear",
+        "x_coord",
+        "y_coord",
+        "belongs_to_ID",
+        "belongs_to_py",
+        "belongs_to_chn"
+      ]
+    },
+    {
+      "name": "TMP_ADDR_C",
+      "n_columns": 10,
+      "columns": [
+        "c_addr_id",
+        "c_name",
+        "c_name_chn",
+        "c_firstyear",
+        "c_lastyear",
+        "c_admin_type",
+        "x_coord",
+        "y_coord",
+        "Max_c_belongs_last_year",
+        "Min_c_belongs_first_year"
+      ]
+    },
+    {
+      "name": "TMP_ADDR_D",
+      "n_columns": 37,
+      "columns": [
+        "c_addr_id",
+        "c_addr_cbd",
+        "c_name",
+        "c_name_chn",
+        "c_admin_type",
+        "c_firstyear",
+        "c_lastyear",
+        "x_coord",
+        "y_coord",
+        "belongs_first_year",
+        "belongs_last_year",
+        "belongs1_ID",
+        "belongs1_Name",
+        "belongs1_Name_chn",
+        "belongs1_first_year",
+        "belongs1_last_year",
+        "belongs2_ID",
+        "belongs2_Name",
+        "belongs2_Name_chn",
+        "belongs2_first_year",
+        "belongs2_last_year",
+        "belongs3_ID",
+        "belongs3_Name",
+        "belongs3_Name_chn",
+        "belongs3_first_year",
+        "belongs3_last_year",
+        "belongs4_ID",
+        "belongs4_Name",
+        "belongs4_Name_chn",
+        "belongs4_first_year",
+        "belongs4_last_year",
+        "belongs5_ID",
+        "belongs5_Name",
+        "belongs5_Name_chn",
+        "belongs5_first_year",
+        "belongs5_last_year",
+        "c_delete"
+      ]
+    },
+    {
+      "name": "TMP_ADDR_E",
+      "n_columns": 37,
+      "columns": [
+        "c_addr_id",
+        "c_addr_cbd",
+        "c_name",
+        "c_name_chn",
+        "c_admin_type",
+        "c_firstyear",
+        "c_lastyear",
+        "x_coord",
+        "y_coord",
+        "belongs_first_year",
+        "belongs_last_year",
+        "belongs1_ID",
+        "belongs1_Name",
+        "belongs1_Name_chn",
+        "belongs1_first_year",
+        "belongs1_last_year",
+        "belongs2_ID",
+        "belongs2_Name",
+        "belongs2_Name_chn",
+        "belongs2_first_year",
+        "belongs2_last_year",
+        "belongs3_ID",
+        "belongs3_Name",
+        "belongs3_Name_chn",
+        "belongs3_first_year",
+        "belongs3_last_year",
+        "belongs4_ID",
+        "belongs4_Name",
+        "belongs4_Name_chn",
+        "belongs4_first_year",
+        "belongs4_last_year",
+        "belongs5_ID",
+        "belongs5_Name",
+        "belongs5_Name_chn",
+        "belongs5_first_year",
+        "belongs5_last_year",
+        "c_delete"
+      ]
+    },
+    {
+      "name": "TMP_BELONGS_TO",
+      "n_columns": 4,
+      "columns": [
+        "c_belongs_to",
+        "c_addr_id",
+        "c_name_chn",
+        "c_firstyear"
+      ]
+    },
+    {
+      "name": "TMP_DISTANCE_DATA",
+      "n_columns": 8,
+      "columns": [
+        "c_personid",
+        "c_assoc_id",
+        "x_coord",
+        "y_coord",
+        "assoc_xcoord",
+        "assoc_ycoord",
+        "c_t_dist",
+        "c_distance"
+      ]
+    },
+    {
+      "name": "TMP_INDEX_YEAR",
+      "n_columns": 3,
+      "columns": [
+        "c_personid",
+        "c_index_year",
+        "c_index_year_source_id"
+      ]
+    },
+    {
+      "name": "YEAR_RANGE_CODES",
+      "n_columns": 5,
+      "columns": [
+        "c_range_code",
+        "c_range",
+        "c_range_chn",
+        "c_approx",
+        "c_approx_chn"
+      ]
+    },
+    {
+      "name": "ZZZ_ADDRESSES",
+      "n_columns": 25,
+      "columns": [
+        "c_addr_id",
+        "c_name",
+        "c_name_chn",
+        "c_admin_type",
+        "c_firstyear",
+        "c_lastyear",
+        "c_belongs_firstyear",
+        "c_belongs_lastyear",
+        "x_coord",
+        "y_coord",
+        "belongs1_ID",
+        "belongs1_Name",
+        "belongs1_Name_chn",
+        "belongs2_ID",
+        "belongs2_Name",
+        "belongs2_Name_chn",
+        "belongs3_ID",
+        "belongs3_Name",
+        "belongs3_Name_chn",
+        "belongs4_ID",
+        "belongs4_Name",
+        "belongs4_Name_chn",
+        "belongs5_ID",
+        "belongs5_Name",
+        "belongs5_Name_chn"
+      ]
+    },
+    {
+      "name": "ZZZ_BELONGS_TO",
+      "n_columns": 4,
+      "columns": [
+        "c_belongs_to",
+        "c_addr_id",
+        "c_firstyear",
+        "c_lastyear"
+      ]
+    },
+    {
+      "name": "ZZZ_DISTANCE_DATA",
+      "n_columns": 3,
+      "columns": [
+        "c_personid",
+        "c_assoc_id",
+        "c_distance"
+      ]
+    },
+    {
+      "name": "ZZZ_DY_DATA",
+      "n_columns": 2,
+      "columns": [
+        "c_personid",
+        "c_dy"
+      ]
+    },
+    {
+      "name": "ZZZ_NAMES",
+      "n_columns": 3,
+      "columns": [
+        "c_personid",
+        "c_name",
+        "c_name_chn"
+      ]
+    }
+  ],
+  "querydefs": [
+    {
+      "name": "ASSOC_DATA -1 Query",
+      "sql_len": 96
+    },
+    {
+      "name": "BM IY Dynasty fix IY Query",
+      "sql_len": 260
+    },
+    {
+      "name": "BM IY Dynasty Fix Query",
+      "sql_len": 242
+    },
+    {
+      "name": "BM IY Dynasty Query",
+      "sql_len": 315
+    },
+    {
+      "name": "BM IY Rule 01A DY Phase 1 Query",
+      "sql_len": 286
+    },
+    {
+      "name": "BM IY Rule 01A DY Query",
+      "sql_len": 329
+    },
+    {
+      "name": "BM IY Rule 01B DY Phase 1 Query",
+      "sql_len": 316
+    },
+    {
+      "name": "BM IY Rule 01B DY Query",
+      "sql_len": 353
+    },
+    {
+      "name": "BM IY Rule 02 DY Phase 1 Query",
+      "sql_len": 297
+    },
+    {
+      "name": "BM IY Rule 02 DY Query",
+      "sql_len": 361
+    },
+    {
+      "name": "BM IY Rule 03 BY Phase 1 Query",
+      "sql_len": 297
+    },
+    {
+      "name": "BM IY Rule 03 BY Query",
+      "sql_len": 342
+    },
+    {
+      "name": "BM IY Rule 04W Phase 1 Query",
+      "sql_len": 588
+    },
+    {
+      "name": "BM IY Rule 04W Query",
+      "sql_len": 633
+    },
+    {
+      "name": "BM IY Rule 05 JS Phase 1 Query",
+      "sql_len": 360
+    },
+    {
+      "name": "BM IY Rule 05 JS Query",
+      "sql_len": 405
+    },
+    {
+      "name": "BM IY Rule 05W Husband JS Phase 1 Query",
+      "sql_len": 619
+    },
+    {
+      "name": "BM IY Rule 05W Husband JS Query",
+      "sql_len": 840
+    },
+    {
+      "name": "BM IY Rule 06 JR Phase 1 Query",
+      "sql_len": 372
+    },
+    {
+      "name": "BM IY Rule 06W Husband JR Query",
+      "sql_len": 670
+    },
+    {
+      "name": "BM IY Rule 07 XC Query",
+      "sql_len": 305
+    },
+    {
+      "name": "BM IY Rule 07W Husband XC Query",
+      "sql_len": 671
+    },
+    {
+      "name": "BM IY Rule 08 Father BY Phase 1 Query",
+      "sql_len": 417
+    },
+    {
+      "name": "BM IY Rule 08 Father BY Query",
+      "sql_len": 536
+    },
+    {
+      "name": "BM IY Rule 09 Oldest Child BY Father Phase 1 Query",
+      "sql_len": 475
+    },
+    {
+      "name": "BM IY Rule 10 Older Brother BY Phase 1 Query",
+      "sql_len": 501
+    },
+    {
+      "name": "BM IY Rule 12 SIL BY Phase 1 Doublecheck Query",
+      "sql_len": 403
+    },
+    {
+      "name": "BM IY Rule 12 SIL BY Phase 1 Query",
+      "sql_len": 592
+    },
+    {
+      "name": "BM IY Rule 13 Grandfather BY Phase 1 Query",
+      "sql_len": 475
+    },
+    {
+      "name": "BM IY Rule 13 Grandfather BY Phase 2 Null Query",
+      "sql_len": 266
+    },
+    {
+      "name": "BM IY Rule 13 Grandfather BY Phase 2 Query",
+      "sql_len": 292
+    },
+    {
+      "name": "BM IY Rule 14 Father IY Phase 1 Query",
+      "sql_len": 555
+    },
+    {
+      "name": "BM IY Rule 15 Part 1 Father Phase 1 Query",
+      "sql_len": 555
+    },
+    {
+      "name": "BM IY Rule 16 Older Brother IY Phase 1 Query",
+      "sql_len": 585
+    },
+    {
+      "name": "BM IY Rule 17 Younger Brother IY Phase 1 Query",
+      "sql_len": 585
+    },
+    {
+      "name": "BM IY Rule 18 SIL IY Mother Phase 1 Query",
+      "sql_len": 662
+    },
+    {
+      "name": "BM IY Rule 18 SIL IY Phase 1 Query",
+      "sql_len": 663
+    },
+    {
+      "name": "BM IY Rule 19 Grandfather IY Phase 1 Query",
+      "sql_len": 555
+    },
+    {
+      "name": "Query Duplicate Address Codes",
+      "sql_len": 358
+    },
+    {
+      "name": "Query String to Date",
+      "sql_len": 236
+    },
+    {
+      "name": "Query Update ALTNAME_DATA",
+      "sql_len": 113
+    },
+    {
+      "name": "Query update POSTED_TO_OFFICE",
+      "sql_len": 140
+    },
+    {
+      "name": "Query update TEXT_DATA",
+      "sql_len": 83
+    },
+    {
+      "name": "Query UpdateFK",
+      "sql_len": 133
+    },
+    {
+      "name": "Query_ADMIN_CAT_CODE_COUNT",
+      "sql_len": 244
+    },
+    {
+      "name": "Tang tree fix 2 Query",
+      "sql_len": 115
+    },
+    {
+      "name": "Tang tree fix 3 Query",
+      "sql_len": 459
+    },
+    {
+      "name": "Tang Tree fix Query",
+      "sql_len": 167
+    },
+    {
+      "name": "TransferData Query",
+      "sql_len": 62
+    }
+  ],
+  "forms": [
+    {
+      "name": "~TMPCLP487951"
+    },
+    {
+      "name": "~TMPCLP491131"
+    },
+    {
+      "name": "frmBaseMaintenance"
+    },
+    {
+      "name": "FrmCopyTables"
+    }
+  ],
+  "modules": [
+    {
+      "name": "Class1"
+    },
+    {
+      "name": "FixCBDB_extra_programs"
+    },
+    {
+      "name": "Module1"
+    },
+    {
+      "name": "Module2"
+    }
+  ],
+  "macros": [],
+  "scripts": [
+    {
+      "name": "Entry_Address Query"
+    }
+  ],
+  "other_containers": [
+    {
+      "name": "AccessLayout"
+    },
+    {
+      "name": "MSysDb"
+    },
+    {
+      "name": "SummaryInfo"
+    },
+    {
+      "name": "UserDefined"
+    },
+    {
+      "name": "{72298816-55AB-451B-8234-50B7C7938CA3}"
+    },
+    {
+      "name": "ADDR_CODES_ADMIN_CAT_CODE"
+    },
+    {
+      "name": "ADDR_CODESADDR_BELONGS_DATA"
+    },
+    {
+      "name": "ADDR_CODESADDR_BELONGS_DATA1"
+    },
+    {
+      "name": "ADDR_CODESADDRESSES"
+    },
+    {
+      "name": "ADDR_CODESAssoc_data1"
+    },
+    {
+      "name": "ADDR_CODESENTRY_DATA1"
+    },
+    {
+      "name": "ADDR_CODESEVENT_CODES1"
+    },
+    {
+      "name": "ADDR_CODESEVENTS_ADDR1"
+    },
+    {
+      "name": "ADDR_CODESEVENTS_DATA1"
+    },
+    {
+      "name": "ADDR_CODESPOSSESSION_DATA1"
+    },
+    {
+      "name": "ADDR_CODESPOSTED_TO_ADDR_DATA1"
+    },
+    {
+      "name": "ADDR_CODESSOCIAL_INSTITUTION_ADDR1"
+    },
+    {
+      "name": "ALTNAME_CODESALTNAME_DATA"
+    },
+    {
+      "name": "ASSOC TYPESASSOC CODE_TYPE REL"
+    },
+    {
+      "name": "ASSOC_CODESASSOC_CODE_TYPE_REL"
+    },
+    {
+      "name": "ASSOC_CODESASSOC_CODE_TYPE_REL1"
+    },
+    {
+      "name": "ASSOC_CODESASSOC_CODE_TYPE_REL2"
+    },
+    {
+      "name": "ASSOC_CODESASSOC_CODES"
+    },
+    {
+      "name": "ASSOC_CODESASSOC_CODES1"
+    },
+    {
+      "name": "ASSOC_CODESASSOC_CODES2"
+    },
+    {
+      "name": "ASSOC_CODESAssoc_data"
+    },
+    {
+      "name": "ASSOC_CODESENTRY_DATA"
+    },
+    {
+      "name": "ASSOC_TYPESASSOC_TYPES"
+    },
+    {
+      "name": "BIOG_ADDR_CODESBIOG_ADDR_DATA"
+    },
+    {
+      "name": "BIOG_INST_CODESBIOG_INST_DATA"
+    },
+    {
+      "name": "BIOG_MAINAssoc_data"
+    },
+    {
+      "name": "BIOG_MAINAssoc_data1"
+    },
+    {
+      "name": "BIOG_MAINAssoc_data2"
+    },
+    {
+      "name": "BIOG_MAINAssoc_data3"
+    },
+    {
+      "name": "BIOG_MAINAssoc_data4"
+    },
+    {
+      "name": "BIOG_MAINAssoc_data5"
+    },
+    {
+      "name": "BIOG_MAINAssoc_data6"
+    },
+    {
+      "name": "BIOG_MAINBIOG_INST_DATA"
+    },
+    {
+      "name": "BIOG_MAINBIOG_SOURCE_DATA"
+    },
+    {
+      "name": "BIOG_MAINENTRY_DATA"
+    },
+    {
+      "name": "BIOG_MAINENTRY_DATA1"
+    },
+    {
+      "name": "BIOG_MAINENTRY_DATA2"
+    },
+    {
+      "name": "BIOG_MAINEVENTS_DATA"
+    },
+    {
+      "name": "BIOG_MAINFIX_ALTNAMES"
+    },
+    {
+      "name": "BIOG_MAINKIN_DATA"
+    },
+    {
+      "name": "BIOG_MAINKIN_DATA1"
+    },
+    {
+      "name": "BIOG_MAINPOSSESSION_DATA"
+    },
+    {
+      "name": "BIOG_MAINPOSTING_DATA"
+    },
+    {
+      "name": "BIOG_MAINSTATUS_DATA"
+    },
+    {
+      "name": "BIOG_TEXT_DATA_NIAN_HAO"
+    },
+    {
+      "name": "BIOG_TEXT_DATA_PERSON_ID"
+    },
+    {
+      "name": "BIOG_TEXT_DATA_SOURCE_TEXT_ID"
+    },
+    {
+      "name": "BIOG_TEXT_DATA_TEXT_ID"
+    },
+    {
+      "name": "BIOG_TEXT_DATA_TEXT_ROLE_CODE"
+    },
+    {
+      "name": "BIOG_TEXT_DATA_YEAR_RANGE_CODE"
+    },
+    {
+      "name": "CHORONYM_CODESBIOG_MAIN"
+    },
+    {
+      "name": "DYNASTIESBIOG_MAIN"
+    },
+    {
+      "name": "DYNASTIESEVENT_CODES"
+    },
+    {
+      "name": "DYNASTIESNIAN_HAO"
+    },
+    {
+      "name": "DYNASTIESOFFICE_CODES1"
+    },
+    {
+      "name": "DYNASTIESSOCIAL_INSTITUTION_CODES"
+    },
+    {
+      "name": "DYNASTIESSOCIAL_INSTITUTION_CODES4"
+    },
+    {
+      "name": "DYNASTIESSOCIAL_INSTITUTION_CODES5"
+    },
+    {
+      "name": "dynasty"
+    },
+    {
+      "name": "ENTRY TYPESENTRY CODE_TYPE REL"
+    },
+    {
+      "name": "ENTRY_CODESENTRY_CODE_TYPE_REL"
+    },
+    {
+      "name": "ENTRY_CODESENTRY_DATA"
+    },
+    {
+      "name": "ETHNICITY_TRIBE_CODESBIOG_MAIN"
+    },
+    {
+      "name": "EVENTS_ADDREVENTS_DATA"
+    },
+    {
+      "name": "GANZHI_CODESAssoc_data"
+    },
+    {
+      "name": "GANZHI_CODESBIOG_MAIN"
+    },
+    {
+      "name": "GANZHI_CODESBIOG_MAIN1"
+    },
+    {
+      "name": "GANZHI_CODESEVENTS_ADDR"
+    },
+    {
+      "name": "GANZHI_CODESEVENTS_DATA"
+    },
+    {
+      "name": "HOUSEHOLD_STATUS_CODESBIOG_MAIN"
+    },
+    {
+      "name": "KIN_DATA_KIN_CODES"
+    },
+    {
+      "name": "KIN_DATA_KIN_ID"
+    },
+    {
+      "name": "KIN_DATA_PERSON_ID"
+    },
+    {
+      "name": "KIN_DATA_SOURCE_TEXT_CODES"
+    },
+    {
+      "name": "KINSHIP_CODES_KIN_PAIR1"
+    },
+    {
+      "name": "KINSHIP_CODES_KIN_PAIR2"
+    },
+    {
+      "name": "KINSHIP_CODESAssoc_data"
+    },
+    {
+      "name": "KINSHIP_CODESAssoc_data1"
+    },
+    {
+      "name": "KINSHIP_CODESENTRY_DATA"
+    },
+    {
+      "name": "KINSHIP_CODESKIN_DATA"
+    },
+    {
+      "name": "KINSHIP_CODESKINSHIP_CODES"
+    },
+    {
+      "name": "KINSHIP_CODESKINSHIP_CODES1"
+    },
+    {
+      "name": "LITERARYGENRE_CODESAssoc_data"
+    },
+    {
+      "name": "MEASURE_CODESPOSSESSION_DATA"
+    },
+    {
+      "name": "MERGED_PERSON_SOURCE"
+    },
+    {
+      "name": "NIAN_HAOAssoc_data"
+    },
+    {
+      "name": "NIAN_HAOBIOG_INST_DATA"
+    },
+    {
+      "name": "NIAN_HAOBIOG_INST_DATA2"
+    },
+    {
+      "name": "NIAN_HAOBIOG_MAIN"
+    },
+    {
+      "name": "NIAN_HAOBIOG_MAIN1"
+    },
+    {
+      "name": "NIAN_HAOBIOG_MAIN2"
+    },
+    {
+      "name": "NIAN_HAOBIOG_MAIN3"
+    },
+    {
+      "name": "NIAN_HAOENTRY_DATA"
+    },
+    {
+      "name": "NIAN_HAOEVENT_CODES"
+    },
+    {
+      "name": "NIAN_HAOEVENT_CODES1"
+    },
+    {
+      "name": "NIAN_HAOEVENTS_ADDR1"
+    },
+    {
+      "name": "NIAN_HAOEVENTS_DATA1"
+    },
+    {
+      "name": "NIAN_HAOPOSSESSION_DATA"
+    },
+    {
+      "name": "NIAN_HAOSOCIAL_INSTITUTION_CODES"
+    },
+    {
+      "name": "NIAN_HAOSOCIAL_INSTITUTION_CODES2"
+    },
+    {
+      "name": "NIAN_HAOSTATUS_DATA"
+    },
+    {
+      "name": "NIAN_HAOSTATUS_DATA1"
+    },
+    {
+      "name": "OCCASION_CODESAssoc_data"
+    },
+    {
+      "name": "OFFICE_CODE_TYPE_REL_OFFICE_ID"
+    },
+    {
+      "name": "OFFICE_CODE_TYPE_REL_OFFICE_TYPE_TREE"
+    },
+    {
+      "name": "OFFICE_CODES_dynasty"
+    },
+    {
+      "name": "OFFICE_CODES_SOURCE_TEXT_CODES"
+    },
+    {
+      "name": "OFFICE_CODESOFFICE_CODE_TYPE_REL"
+    },
+    {
+      "name": "OFFICE_TYPE_TREE_PARENT"
+    },
+    {
+      "name": "OFFICE_TYPE_TREEOFFICE_CODE_TYPE_REL"
+    },
+    {
+      "name": "PARENTAL_STATUS_CODESENTRY_DATA"
+    },
+    {
+      "name": "POSSESSION_ACT_CODESPOSSESSION_DATA"
+    },
+    {
+      "name": "POSSESSION_ADDR_ADDR_ID"
+    },
+    {
+      "name": "POSSESSION_ADDR_PERSON_ID"
+    },
+    {
+      "name": "POSSESSION_ADDR_possession_id"
+    },
+    {
+      "name": "POSSESSION_DATA_ADDR_ID"
+    },
+    {
+      "name": "POSSESSION_DATA_MEASURE_CODE"
+    },
+    {
+      "name": "POSSESSION_DATA_nian_hao"
+    },
+    {
+      "name": "POSSESSION_DATA_PERSON_ID"
+    },
+    {
+      "name": "POSSESSION_DATA_possession_act_code"
+    },
+    {
+      "name": "POSSESSION_DATA_SOURCE_TEXT_CODE"
+    },
+    {
+      "name": "POSSESSION_DATA_year_range_code"
+    },
+    {
+      "name": "POSTED_TO_ADDR_DATA_ADDR_ID"
+    },
+    {
+      "name": "POSTED_TO_ADDR_DATA_OFFICE_ID"
+    },
+    {
+      "name": "POSTED_TO_ADDR_DATA_PERSON_ID"
+    },
+    {
+      "name": "POSTED_TO_ADDR_DATA_POSTING_ID"
+    },
+    {
+      "name": "POSTED_TO_OFFICE_DATA_appointment_code"
+    },
+    {
+      "name": "POSTED_TO_OFFICE_DATA_assume_office_code"
+    },
+    {
+      "name": "POSTED_TO_OFFICE_DATA_dynasty"
+    },
+    {
+      "name": "POSTED_TO_OFFICE_DATA_GANZHI_FY_DAY"
+    },
+    {
+      "name": "POSTED_TO_OFFICE_DATA_GANZHI_LY_DAY"
+    },
+    {
+      "name": "POSTED_TO_OFFICE_DATA_nian_hao_fy"
+    },
+    {
+      "name": "POSTED_TO_OFFICE_DATA_nian_hao_ly"
+    },
+    {
+      "name": "POSTED_TO_OFFICE_DATA_OFFICE_CATEGORY"
+    },
+    {
+      "name": "POSTED_TO_OFFICE_DATA_OFFICE_ID"
+    },
+    {
+      "name": "POSTED_TO_OFFICE_DATA_PERSON_ID"
+    },
+    {
+      "name": "POSTED_TO_OFFICE_DATA_POSTING_ID"
+    },
+    {
+      "name": "POSTED_TO_OFFICE_DATA_SOCIAL_INSTITUTION_CODE"
+    },
+    {
+      "name": "POSTED_TO_OFFICE_DATA_SOCIAL_INSTITUTION_NAME_CODE"
+    },
+    {
+      "name": "POSTED_TO_OFFICE_DATA_SOURCE_TEXT_CODE"
+    },
+    {
+      "name": "POSTED_TO_OFFICE_DATA_year_range_fy"
+    },
+    {
+      "name": "POSTED_TO_OFFICE_DATA_year_range_ly"
+    },
+    {
+      "name": "POSTING_DATA_PERSON_ID"
+    },
+    {
+      "name": "ScholarlyTopic_CODESAssoc_data"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_ADDR_ADDR_ID"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_ADDR_SOCIAL_INSTITUTION_CODE"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_ADDR_TEXT_CODES"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_ADDR_TYPE"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_ADDR_TYPESSOCIAL_INSTITUTION_ADDR"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_CODES_DYNASTY_BEGIN"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_CODES_DYNASTY_END"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_CODES_NIAN_HAO_BY"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_CODES_NIAN_HAO_EY"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_CODES_SOCIAL_INSTITUTION_NAME_CODE"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_CODES_SOCIAL_INSTITUTION_TYPE_CODE"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_CODES_SOURCE_TEXT_ID"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_CODES_YEAR_RANGE_CODE_BY"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_CODES_YEAR_RANGE_CODE_EY"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_NAME_CODESSOCIAL_INSTITUTION_CODES"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_typesSOCIAL_INSTITUTION_CODES"
+    },
+    {
+      "name": "STATUS_CODE_TYPE_REL_STATUS_CODE"
+    },
+    {
+      "name": "STATUS_CODE_TYPE_REL_STATUS_TYPE"
+    },
+    {
+      "name": "STATUS_CODESSTATUS_CODE_TYPE_REL"
+    },
+    {
+      "name": "STATUS_CODESSTATUS_DATA"
+    },
+    {
+      "name": "STATUS_DATA_nian_hao_fy"
+    },
+    {
+      "name": "STATUS_DATA_nian_hao_ly"
+    },
+    {
+      "name": "STATUS_DATA_PERSON_ID"
+    },
+    {
+      "name": "STATUS_DATA_SOURCE_TEXT_ID"
+    },
+    {
+      "name": "STATUS_DATA_STATUS_CODES"
+    },
+    {
+      "name": "STATUS_DATA_year_range_code_fy"
+    },
+    {
+      "name": "STATUS_DATA_year_range_code_ly"
+    },
+    {
+      "name": "STATUS_TYPESSTATUS_CODE_TYPE_REL"
+    },
+    {
+      "name": "TEXT_BIBLCAT_CODE_TYPE_REL_TEXT_CAT_CODE"
+    },
+    {
+      "name": "TEXT_BIBLCAT_CODE_TYPE_REL_TEXT_CAT_TYPE"
+    },
+    {
+      "name": "TEXT_BIBLCAT_CODESTEXT_BIBLCAT_CODE_TYPE_REL"
+    },
+    {
+      "name": "TEXT_BIBLCAT_CODESTEXT_CODES"
+    },
+    {
+      "name": "TEXT_BIBLCAT_TYPESTEXT_BIBLCAT_CODE_TYPE_REL"
+    },
+    {
+      "name": "TEXT_CODES_COUNTRY_CODE_TEXT"
+    },
+    {
+      "name": "TEXT_CODES_DYNASTY_TEXT"
+    },
+    {
+      "name": "TEXT_CODES_EXTANT_CODE"
+    },
+    {
+      "name": "TEXT_CODES_NIAN_HAO_TEXT"
+    },
+    {
+      "name": "TEXT_CODES_SOURCE_TEXT_ID"
+    },
+    {
+      "name": "TEXT_CODES_TEXT_BIBLCAT_CODE"
+    },
+    {
+      "name": "TEXT_CODES_YEAR_RANGE_CODE_TEXT"
+    },
+    {
+      "name": "TEXT_CODESALTNAME_DATA"
+    },
+    {
+      "name": "TEXT_CODESAssoc_data1"
+    },
+    {
+      "name": "TEXT_CODESBIOG_INST_DATA1"
+    },
+    {
+      "name": "TEXT_CODESBIOG_SOURCE_DATA"
+    },
+    {
+      "name": "TEXT_CODESENTRY_DATA1"
+    },
+    {
+      "name": "TEXT_CODESEVENT_CODES1"
+    },
+    {
+      "name": "TEXT_CODESEVENTS_DATA1"
+    },
+    {
+      "name": "TEXT_CODESKIN_DATA1"
+    },
+    {
+      "name": "TEXT_CODESOFFICE_CODES1"
+    },
+    {
+      "name": "TEXT_CODESPOSSESSION_DATA1"
+    },
+    {
+      "name": "TEXT_CODESSOCIAL_INSTITUTION_ADDR1"
+    },
+    {
+      "name": "TEXT_CODESSOCIAL_INSTITUTION_CODES1"
+    },
+    {
+      "name": "TEXT_CODESSTATUS_DATA1"
+    },
+    {
+      "name": "TEXT_INSTANCE_COUNTRY"
+    },
+    {
+      "name": "TEXT_INSTANCE_PUB_DYNASTY"
+    },
+    {
+      "name": "TEXT_INSTANCE_PUB_NIANHAO"
+    },
+    {
+      "name": "TEXT_INSTANCE_PUB_RANGE"
+    },
+    {
+      "name": "TEXT_INSTANCE_SOURCE_ID"
+    },
+    {
+      "name": "TEXT_INSTANCE_TEXT_ID"
+    },
+    {
+      "name": "YEAR_RANGE_CODESAssoc_data"
+    },
+    {
+      "name": "YEAR_RANGE_CODESBIOG_INST_DATA"
+    },
+    {
+      "name": "YEAR_RANGE_CODESBIOG_INST_DATA1"
+    },
+    {
+      "name": "YEAR_RANGE_CODESBIOG_MAIN"
+    },
+    {
+      "name": "YEAR_RANGE_CODESBIOG_MAIN1"
+    },
+    {
+      "name": "YEAR_RANGE_CODESENTRY_DATA"
+    },
+    {
+      "name": "YEAR_RANGE_CODESEVENT_CODES"
+    },
+    {
+      "name": "YEAR_RANGE_CODESEVENT_CODES1"
+    },
+    {
+      "name": "YEAR_RANGE_CODESEVENTS_ADDR"
+    },
+    {
+      "name": "YEAR_RANGE_CODESEVENTS_DATA"
+    },
+    {
+      "name": "YEAR_RANGE_CODESPOSSESSION_DATA"
+    },
+    {
+      "name": "YEAR_RANGE_CODESSOCIAL_INSTITUTION_CODES"
+    },
+    {
+      "name": "YEAR_RANGE_CODESSOCIAL_INSTITUTION_CODES1"
+    },
+    {
+      "name": "YEAR_RANGE_CODESSTATUS_DATA"
+    },
+    {
+      "name": "YEAR_RANGE_CODESSTATUS_DATA1"
+    },
+    {
+      "name": "Admin"
+    },
+    {
+      "name": "~sq_cAddresses~sq_cBIOG_ADDR_DATA Subform"
+    },
+    {
+      "name": "~sq_cBARE_AUTHORS Subform2~sq_cCmbRole"
+    },
+    {
+      "name": "~sq_cBIOG_ADDR_DATA Subform~sq_cCmbFYGZ"
+    },
+    {
+      "name": "~sq_cBIOG_ADDR_DATA Subform~sq_cCmbFYRG"
+    },
+    {
+      "name": "~sq_cBIOG_ADDR_DATA Subform~sq_cCmbLYGZ"
+    },
+    {
+      "name": "~sq_cBIOG_ADDR_DATA Subform~sq_cCmbLYRG"
+    },
+    {
+      "name": "~sq_cBIOG_ADDR_DATA Subform~sq_cCombo41"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_2_Subform~sq_cALTNAME_DATA_2 Subform"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_2_Subform~sq_cASSOC_DATA_2 Subform"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_2_Subform~sq_cBIOG_ADDR_DATA_2 Subform"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_2_Subform~sq_cENTRY_DATA_2 Subform"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_2_Subform~sq_cEVENTS_DATA_2 Subform"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_2_Subform~sq_cfrmBIOG_INST_CODES"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_2_Subform~sq_cfrmBIOG_SOURCE_DATA"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_2_Subform~sq_cKIN_DATA_2 Subform"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_2_Subform~sq_cPOSSESSION_DATA_2 Subform"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_2_Subform~sq_cPOSTING_DATA_2 Subform"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_2_Subform~sq_cSTATUS_DATA_2 Subform"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_2_Subform~sq_cTEXT_DATA_2 Subform"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_Subform~sq_cASSOC_DATA Subform"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_Subform~sq_cBARE_AUTHORS Subform"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_Subform~sq_cBIOG_ADDR_DATA Subform"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_Subform~sq_cCmbBYGZ"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_Subform~sq_cCmbBYRG"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_Subform~sq_cCmbDeathAppro"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_Subform~sq_cCmbDYGZ"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_Subform~sq_cCmbDYRG"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_Subform~sq_cDeathAgeApprox"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_Subform~sq_cENTRY_DATA Subform"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_Subform~sq_cEVENTS_DATA Subform"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_Subform~sq_cFIX_ALTNAMES Query Subform"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_Subform~sq_cKIN_DATA Subform"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_Subform~sq_cPOSSESSION_DATA Subform"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_Subform~sq_cPOST_DATA Subform"
+    },
+    {
+      "name": "~sq_cBIOG_MAIN_Subform~sq_cSTATUS_DATA Subform"
+    },
+    {
+      "name": "~sq_cCBDB_Browser_2~sq_cBIOG_MAIN_2_Subform"
+    },
+    {
+      "name": "~sq_cCBDB_Browser_old~sq_cfrmPeopleLookup"
+    },
+    {
+      "name": "~sq_cCBDB_Browser~sq_cfrmPeopleLookup"
+    },
+    {
+      "name": "~sq_cCBDB_Editor~sq_cASSOC_DATA Subform"
+    },
+    {
+      "name": "~sq_cCBDB_Editor~sq_cBARE_AUTHORS Subform"
+    },
+    {
+      "name": "~sq_cCBDB_Editor~sq_cBIOG_ADDR_DATA Subform"
+    },
+    {
+      "name": "~sq_cCBDB_Editor~sq_cCmbBYGZ"
+    },
+    {
+      "name": "~sq_cCBDB_Editor~sq_cCmbBYRG"
+    },
+    {
+      "name": "~sq_cCBDB_Editor~sq_cCmbDeathAppro"
+    },
+    {
+      "name": "~sq_cCBDB_Editor~sq_cCmbDYGZ"
+    },
+    {
+      "name": "~sq_cCBDB_Editor~sq_cCmbDYRG"
+    },
+    {
+      "name": "~sq_cCBDB_Editor~sq_cENTRY_DATA Subform"
+    },
+    {
+      "name": "~sq_cCBDB_Editor~sq_cEVENTS_DATA Subform"
+    },
+    {
+      "name": "~sq_cCBDB_Editor~sq_cFIX_ALTNAMES Query Subform"
+    },
+    {
+      "name": "~sq_cCBDB_Editor~sq_cKIN_DATA Subform"
+    },
+    {
+      "name": "~sq_cCBDB_Editor~sq_cPOSSESSION_DATA Subform"
+    },
+    {
+      "name": "~sq_cCBDB_Editor~sq_cPOST_DATA Subform"
+    },
+    {
+      "name": "~sq_cCBDB_Editor~sq_cSTATUS_DATA Subform"
+    },
+    {
+      "name": "~sq_cENTRY_DATA Subform~sq_cCombo44"
+    },
+    {
+      "name": "~sq_cEVENT_CODES EnterForm~sq_cCmbFYRG"
+    },
+    {
+      "name": "~sq_cEVENT_CODES EnterForm~sq_cCmbLYRG"
+    },
+    {
+      "name": "~sq_cEVENTS_DATA Subform~sq_cEVENT_ADDR Subform"
+    },
+    {
+      "name": "~sq_cEVENTS_DATA_2 Subform~sq_cEVENT_ADDR_2 Subform"
+    },
+    {
+      "name": "~sq_cfrmPickADDRESSES~sq_cfrmADDRESSES"
+    },
+    {
+      "name": "~sq_cfrmPickASSOC_CODES~sq_cfrmASSOC_CODES"
+    },
+    {
+      "name": "~sq_cfrmPickChoronym~sq_cfrmChoronyms"
+    },
+    {
+      "name": "~sq_cfrmPickDynasty~sq_cfrmDYNASTIES"
+    },
+    {
+      "name": "~sq_cfrmPickENTRY_CODES~sq_cfrmENTRY_CODES"
+    },
+    {
+      "name": "~sq_cfrmPickEntry~sq_cfrmENTRY"
+    },
+    {
+      "name": "~sq_cfrmPickETHNICITY~sq_cfrmETHNICITY"
+    },
+    {
+      "name": "~sq_cfrmPickEVENT~sq_cfrmEVENT"
+    },
+    {
+      "name": "~sq_cfrmPickInst~sq_cfrmINST_CODES"
+    },
+    {
+      "name": "~sq_cfrmPickKINSHIP_CODES~sq_cfrmKINSHIP_CODES"
+    },
+    {
+      "name": "~sq_cfrmPickNIAN_HAO~sq_cfrmNIAN_HAO"
+    },
+    {
+      "name": "~sq_cfrmPickOFFICE_CODES~sq_cfrmOFFICE_CODES"
+    },
+    {
+      "name": "~sq_cfrmPickPeople~sq_cfrmPerson"
+    },
+    {
+      "name": "~sq_cfrmPickScholarlyTopic~sq_cfrmScholarlyTopic"
+    },
+    {
+      "name": "~sq_cfrmPickSTATUS_CODES~sq_cfrmSTATUS_CODES"
+    },
+    {
+      "name": "~sq_cfrmPickTEXT_BIBLCAT~sq_cfrmTEXT_BIBLCAT"
+    },
+    {
+      "name": "~sq_cfrmPickTEXTS~sq_cfrmTEXTS"
+    },
+    {
+      "name": "~sq_cLookAtEntry~sq_cEntry_Address_Query"
+    },
+    {
+      "name": "~sq_cLookAtKinship (old)~sq_cfrmZZZ_SCRATCH_KIN"
+    },
+    {
+      "name": "~sq_cLookAtKinship (old)~sq_cfrmZZZ_SCRATCH_KINNET"
+    },
+    {
+      "name": "~sq_cLookAtKinship~sq_cfrmZZZ_SCRATCH_KIN"
+    },
+    {
+      "name": "~sq_cLookAtKinship~sq_cfrmZZZ_SCRATCH_KINNET"
+    },
+    {
+      "name": "~sq_cLookAtKinship~sq_cZZZ_SCRATCH_PEOPLE"
+    },
+    {
+      "name": "~sq_cLookAtKinship~sq_cZZZ_SOCIAL_NETWORK"
+    },
+    {
+      "name": "~sq_cLookAtNetworks1~sq_cZZZ_SCRATCH_PEOPLE"
+    },
+    {
+      "name": "~sq_cLookAtNetworks1~sq_cZZZ_SOCIAL_NETWORK"
+    },
+    {
+      "name": "~sq_cLookAtNetworks2 (Old)~sq_cZZZ_SCRATCH_PEOPLE"
+    },
+    {
+      "name": "~sq_cLookAtNetworks2 (Old)~sq_cZZZ_SOCIAL_NETWORK"
+    },
+    {
+      "name": "~sq_cLookAtOffice (Old)~sq_cZZZ_SCRATCH_OFFICE"
+    },
+    {
+      "name": "~sq_cLookAtOffice (Old)~sq_cZZZ_SCRATCH_P_OFFICE"
+    },
+    {
+      "name": "~sq_cLookAtPlace~sq_cZZZ_SCRATCH_ASSOC"
+    },
+    {
+      "name": "~sq_cLookAtPlace~sq_cZZZ_SCRATCH_P_ASSOC"
+    },
+    {
+      "name": "~sq_cPOST_DATA Subform2~sq_cPOST_ADDR Subform"
+    },
+    {
+      "name": "~sq_cPOST_DATA Subform2~sq_cPOSTING_OFFICE_DATA Subform"
+    },
+    {
+      "name": "~sq_cPOSTING_DATA_2 Subform~sq_cPOSTED_TO_OFFICE_DATA_2 Subform"
+    },
+    {
+      "name": "~sq_cPOSTING_OFFICE_DATA Subform2~sq_cCmbApptType"
+    },
+    {
+      "name": "~sq_cPOSTING_OFFICE_DATA Subform2~sq_cCmbAssumeOffice"
+    },
+    {
+      "name": "~sq_cPOSTING_OFFICE_DATA Subform2~sq_cCmbFYGZ"
+    },
+    {
+      "name": "~sq_cPOSTING_OFFICE_DATA Subform2~sq_cCmbFYR"
+    },
+    {
+      "name": "~sq_cPOSTING_OFFICE_DATA Subform2~sq_cCmbLYGZ"
+    },
+    {
+      "name": "~sq_cPOSTING_OFFICE_DATA Subform2~sq_cCmbLYR"
+    },
+    {
+      "name": "~sq_cPOSTING_OFFICE_DATA Subform2~sq_cCmbOfficeCat"
+    },
+    {
+      "name": "~sq_crunQueries~sq_cList2"
+    },
+    {
+      "name": "~sq_ctest~sq_cASSOC_DATA Subform"
+    },
+    {
+      "name": "~sq_ctest~sq_cBARE_AUTHORS Subform"
+    },
+    {
+      "name": "~sq_ctest~sq_cCmbBYGZ"
+    },
+    {
+      "name": "~sq_ctest~sq_cCmbBYRG"
+    },
+    {
+      "name": "~sq_ctest~sq_cCmbDeathAppro"
+    },
+    {
+      "name": "~sq_ctest~sq_cCmbDYGZ"
+    },
+    {
+      "name": "~sq_ctest~sq_cCmbDYRG"
+    },
+    {
+      "name": "~sq_ctest~sq_cENTRY_DATA Subform"
+    },
+    {
+      "name": "~sq_ctest~sq_cEVENTS_DATA Subform"
+    },
+    {
+      "name": "~sq_ctest~sq_cKIN_DATA Subform"
+    },
+    {
+      "name": "~sq_ctest~sq_cPOSSESSION_DATA Subform"
+    },
+    {
+      "name": "~sq_ctest~sq_cPOST_DATA Subform"
+    },
+    {
+      "name": "~sq_ctest~sq_cSTATUS_DATA Subform"
+    },
+    {
+      "name": "~sq_cTEXTS EnterForm~sq_cBARE_AUTHORS Subform by TEXTS"
+    },
+    {
+      "name": "~sq_cTEXTS EnterForm~sq_cCmbCountry"
+    },
+    {
+      "name": "~sq_cTEXTS EnterForm~sq_cCmbExtant"
+    },
+    {
+      "name": "~sq_cTEXTS EnterForm~sq_cCmbPubCountry"
+    },
+    {
+      "name": "~sq_cTEXTS EnterForm~sq_cCmbPubRG"
+    },
+    {
+      "name": "~sq_cTEXTS EnterForm~sq_cCmbTextRG"
+    },
+    {
+      "name": "~sq_cz frmPickASSOC_CODES~sq_cfrmASSOC_CODES"
+    },
+    {
+      "name": "~sq_cZZZ_Poets_main~sq_cZZZ_Poets_Alt_names Subform"
+    },
+    {
+      "name": "~sq_cZZZ_Poets_main~sq_cZZZ_Poets_Entry Subform"
+    },
+    {
+      "name": "~sq_cZZZ_Poets_main~sq_cZZZ_Poets_Postings Subform"
+    },
+    {
+      "name": "~sq_cZZZ_Poets_main1~sq_cZZZ_Poets_Alt_names Subform"
+    },
+    {
+      "name": "~sq_cZZZ_Poets_main1~sq_cZZZ_Poets_Entry Subform"
+    },
+    {
+      "name": "~sq_cZZZ_Poets_main1~sq_cZZZ_Poets_Postings Subform"
+    },
+    {
+      "name": "~sq_rEntry_Address Query"
+    },
+    {
+      "name": "ADDR_BELONGS_DATA"
+    },
+    {
+      "name": "ADDR_CODES"
+    },
+    {
+      "name": "ADDRESSES"
+    },
+    {
+      "name": "ADMIN_CAT_CODE_TYPE_REL"
+    },
+    {
+      "name": "ADMIN_CAT_CODES"
+    },
+    {
+      "name": "ADMIN_CAT_TYPES"
+    },
+    {
+      "name": "ALTNAME_CODES"
+    },
+    {
+      "name": "ALTNAME_DATA"
+    },
+    {
+      "name": "APPOINTMENT_CODE_TYPE_REL"
+    },
+    {
+      "name": "APPOINTMENT_CODES"
+    },
+    {
+      "name": "APPOINTMENT_TYPES"
+    },
+    {
+      "name": "ASSOC_CODE_TYPE_REL"
+    },
+    {
+      "name": "ASSOC_CODES"
+    },
+    {
+      "name": "ASSOC_DATA"
+    },
+    {
+      "name": "ASSOC_DATA -1 Query"
+    },
+    {
+      "name": "ASSOC_TYPES"
+    },
+    {
+      "name": "ASSUME_OFFICE_CODES"
+    },
+    {
+      "name": "BIOG_ADDR_CODES"
+    },
+    {
+      "name": "BIOG_ADDR_DATA"
+    },
+    {
+      "name": "BIOG_INST_CODES"
+    },
+    {
+      "name": "BIOG_INST_DATA"
+    },
+    {
+      "name": "BIOG_MAIN"
+    },
+    {
+      "name": "BIOG_SOURCE_DATA"
+    },
+    {
+      "name": "BIOG_TEXT_DATA"
+    },
+    {
+      "name": "BM IY Dynasty fix IY Query"
+    },
+    {
+      "name": "BM IY Dynasty Fix Query"
+    },
+    {
+      "name": "BM IY Dynasty Query"
+    },
+    {
+      "name": "BM IY Rule 01A DY Phase 1 Query"
+    },
+    {
+      "name": "BM IY Rule 01A DY Query"
+    },
+    {
+      "name": "BM IY Rule 01B DY Phase 1 Query"
+    },
+    {
+      "name": "BM IY Rule 01B DY Query"
+    },
+    {
+      "name": "BM IY Rule 02 DY Phase 1 Query"
+    },
+    {
+      "name": "BM IY Rule 02 DY Query"
+    },
+    {
+      "name": "BM IY Rule 03 BY Phase 1 Query"
+    },
+    {
+      "name": "BM IY Rule 03 BY Query"
+    },
+    {
+      "name": "BM IY Rule 04W Phase 1 Query"
+    },
+    {
+      "name": "BM IY Rule 04W Query"
+    },
+    {
+      "name": "BM IY Rule 05 JS Phase 1 Query"
+    },
+    {
+      "name": "BM IY Rule 05 JS Query"
+    },
+    {
+      "name": "BM IY Rule 05W Husband JS Phase 1 Query"
+    },
+    {
+      "name": "BM IY Rule 05W Husband JS Query"
+    },
+    {
+      "name": "BM IY Rule 06 JR Phase 1 Query"
+    },
+    {
+      "name": "BM IY Rule 06W Husband JR Query"
+    },
+    {
+      "name": "BM IY Rule 07 XC Query"
+    },
+    {
+      "name": "BM IY Rule 07W Husband XC Query"
+    },
+    {
+      "name": "BM IY Rule 08 Father BY Phase 1 Query"
+    },
+    {
+      "name": "BM IY Rule 08 Father BY Query"
+    },
+    {
+      "name": "BM IY Rule 09 Oldest Child BY Father Phase 1 Query"
+    },
+    {
+      "name": "BM IY Rule 10 Older Brother BY Phase 1 Query"
+    },
+    {
+      "name": "BM IY Rule 12 SIL BY Phase 1 Doublecheck Query"
+    },
+    {
+      "name": "BM IY Rule 12 SIL BY Phase 1 Query"
+    },
+    {
+      "name": "BM IY Rule 13 Grandfather BY Phase 1 Query"
+    },
+    {
+      "name": "BM IY Rule 13 Grandfather BY Phase 2 Null Query"
+    },
+    {
+      "name": "BM IY Rule 13 Grandfather BY Phase 2 Query"
+    },
+    {
+      "name": "BM IY Rule 14 Father IY Phase 1 Query"
+    },
+    {
+      "name": "BM IY Rule 15 Part 1 Father Phase 1 Query"
+    },
+    {
+      "name": "BM IY Rule 16 Older Brother IY Phase 1 Query"
+    },
+    {
+      "name": "BM IY Rule 17 Younger Brother IY Phase 1 Query"
+    },
+    {
+      "name": "BM IY Rule 18 SIL IY Mother Phase 1 Query"
+    },
+    {
+      "name": "BM IY Rule 18 SIL IY Phase 1 Query"
+    },
+    {
+      "name": "BM IY Rule 19 Grandfather IY Phase 1 Query"
+    },
+    {
+      "name": "CHORONYM_CODES"
+    },
+    {
+      "name": "CopyTables"
+    },
+    {
+      "name": "CopyTablesDefault"
+    },
+    {
+      "name": "COUNTRY_CODES"
+    },
+    {
+      "name": "DYNASTIES"
+    },
+    {
+      "name": "ENTRY_CODE_TYPE_REL"
+    },
+    {
+      "name": "ENTRY_CODES"
+    },
+    {
+      "name": "ENTRY_DATA"
+    },
+    {
+      "name": "ENTRY_TYPES"
+    },
+    {
+      "name": "ETHNICITY_TRIBE_CODES"
+    },
+    {
+      "name": "EVENT_CODES"
+    },
+    {
+      "name": "EVENTS_ADDR"
+    },
+    {
+      "name": "EVENTS_DATA"
+    },
+    {
+      "name": "EXTANT_CODES"
+    },
+    {
+      "name": "ForeignKeys"
+    },
+    {
+      "name": "FormLabels"
+    },
+    {
+      "name": "GANZHI_CODES"
+    },
+    {
+      "name": "HOUSEHOLD_STATUS_CODES"
+    },
+    {
+      "name": "INDEXYEAR_TYPE_CODES"
+    },
+    {
+      "name": "KIN_DATA"
+    },
+    {
+      "name": "KIN_Mourning"
+    },
+    {
+      "name": "KIN_MOURNING_STEPS"
+    },
+    {
+      "name": "KINSHIP_CODES"
+    },
+    {
+      "name": "LITERARYGENRE_CODES"
+    },
+    {
+      "name": "MEASURE_CODES"
+    },
+    {
+      "name": "MERGED_PERSON_DATA"
+    },
+    {
+      "name": "MSysAccessStorage"
+    },
+    {
+      "name": "MSysAccessXML"
+    },
+    {
+      "name": "MSysACEs"
+    },
+    {
+      "name": "MSysIMEXColumns"
+    },
+    {
+      "name": "MSysIMEXSpecs"
+    },
+    {
+      "name": "MSysNameMap"
+    },
+    {
+      "name": "MSysNavPaneGroupCategories"
+    },
+    {
+      "name": "MSysNavPaneGroups"
+    },
+    {
+      "name": "MSysNavPaneGroupToObjects"
+    },
+    {
+      "name": "MSysNavPaneObjectIDs"
+    },
+    {
+      "name": "MSysObjects"
+    },
+    {
+      "name": "MSysQueries"
+    },
+    {
+      "name": "MSysRelationships"
+    },
+    {
+      "name": "MSysSQLComments"
+    },
+    {
+      "name": "NIAN_HAO"
+    },
+    {
+      "name": "OCCASION_CODES"
+    },
+    {
+      "name": "OFFICE_CATEGORIES"
+    },
+    {
+      "name": "OFFICE_CODE_TYPE_REL"
+    },
+    {
+      "name": "OFFICE_CODES"
+    },
+    {
+      "name": "OFFICE_CODES_CONVERSION"
+    },
+    {
+      "name": "OFFICE_TYPE_TREE"
+    },
+    {
+      "name": "OFFICE_TYPE_TREE_backup"
+    },
+    {
+      "name": "PARENTAL_STATUS_CODES"
+    },
+    {
+      "name": "Paste Errors"
+    },
+    {
+      "name": "POSSESSION_ACT_CODES"
+    },
+    {
+      "name": "POSSESSION_ADDR"
+    },
+    {
+      "name": "POSSESSION_DATA"
+    },
+    {
+      "name": "POSTED_TO_ADDR_DATA"
+    },
+    {
+      "name": "POSTED_TO_OFFICE_DATA"
+    },
+    {
+      "name": "POSTING_DATA"
+    },
+    {
+      "name": "Query Duplicate Address Codes"
+    },
+    {
+      "name": "Query String to Date"
+    },
+    {
+      "name": "Query Update ALTNAME_DATA"
+    },
+    {
+      "name": "Query update POSTED_TO_OFFICE"
+    },
+    {
+      "name": "Query update TEXT_DATA"
+    },
+    {
+      "name": "Query UpdateFK"
+    },
+    {
+      "name": "Query_ADMIN_CAT_CODE_COUNT"
+    },
+    {
+      "name": "SCHOLARLYTOPIC_CODES"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_ADDR"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_ADDR_TYPES"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_ALTNAME_CODES"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_ALTNAME_DATA"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_CODES"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_CODES_CONVERSION"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_NAME_CODES"
+    },
+    {
+      "name": "SOCIAL_INSTITUTION_TYPES"
+    },
+    {
+      "name": "STATUS_CODE_TYPE_REL"
+    },
+    {
+      "name": "STATUS_CODES"
+    },
+    {
+      "name": "STATUS_DATA"
+    },
+    {
+      "name": "STATUS_TYPES"
+    },
+    {
+      "name": "TablesFields"
+    },
+    {
+      "name": "TablesFieldsChanges"
+    },
+    {
+      "name": "Tang tree fix 2 Query"
+    },
+    {
+      "name": "Tang tree fix 3 Query"
+    },
+    {
+      "name": "Tang Tree fix Query"
+    },
+    {
+      "name": "TEXT_BIBLCAT_CODE_TYPE_REL"
+    },
+    {
+      "name": "TEXT_BIBLCAT_CODES"
+    },
+    {
+      "name": "TEXT_BIBLCAT_TYPES"
+    },
+    {
+      "name": "TEXT_CODES"
+    },
+    {
+      "name": "TEXT_INSTANCE_DATA"
+    },
+    {
+      "name": "TEXT_ROLE_CODES"
+    },
+    {
+      "name": "TEXT_TYPE"
+    },
+    {
+      "name": "TMP_ADDR_A"
+    },
+    {
+      "name": "TMP_ADDR_B"
+    },
+    {
+      "name": "TMP_ADDR_BELONGS"
+    },
+    {
+      "name": "TMP_ADDR_C"
+    },
+    {
+      "name": "TMP_ADDR_D"
+    },
+    {
+      "name": "TMP_ADDR_E"
+    },
+    {
+      "name": "TMP_BELONGS_TO"
+    },
+    {
+      "name": "TMP_DISTANCE_DATA"
+    },
+    {
+      "name": "TMP_INDEX_YEAR"
+    },
+    {
+      "name": "TransferData Query"
+    },
+    {
+      "name": "YEAR_RANGE_CODES"
+    },
+    {
+      "name": "ZZZ_ADDRESSES"
+    },
+    {
+      "name": "ZZZ_BELONGS_TO"
+    },
+    {
+      "name": "ZZZ_DISTANCE_DATA"
+    },
+    {
+      "name": "ZZZ_DY_DATA"
+    },
+    {
+      "name": "ZZZ_NAMES"
+    }
+  ]
+}

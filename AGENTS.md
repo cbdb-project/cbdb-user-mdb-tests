@@ -411,9 +411,19 @@ snapshot.  As of 2026-05-02 it reports ~12 source-data drifts and
   its `c_index_addr_id` by `IndexAddressRebuildService.php`.  Both
   PHP services live in
   <https://github.com/cbdb-project/cbdb-online-main-server>.
-- The User MDB's `c_index_year` / `c_index_addr_id` are produced by
-  Access maintenance buttons (the `frmBaseMaintenance` family of
-  forms and their VBA).
+- The User MDB-side rebuild lives in TWO places:
+    - `c_index_addr_id` → `analysis/dump/vba/Form_frmIndexAddr.vb`
+      in the front-end (`CBDB_BJ_User.mdb`).
+    - `c_index_year`    → 37 saved QueryDefs named `BM IY Rule …`
+      in the linked-tables BACKEND
+      (`data/CBDB_<YYYYMMDD>_DATA.mdb`), driven from
+      `frmBaseMaintenance` in the same file.  `analysis/
+      dump_data_mdb_algorithms.py` extracts them to
+      `analysis/dump_data/querydefs_index/*.sql`; the form/module
+      VBA source still needs an interactive Access SaveAsText
+      pass.  (PR G originally claimed the year rebuild was
+      missing — that grep was looking only at the front-end VBA
+      dump.)
 - The PHP services are intended to mirror the MDB/VBA maintenance
   logic, but they are **independent implementations** (likely
   ported, not the same code).  Any of the following can produce a

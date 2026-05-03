@@ -1,0 +1,202 @@
+{
+  "source_file": "CBDB_20260430_DATA.mdb",
+  "needles": [
+    "c_index_year",
+    "c_index_addr",
+    "indexyear",
+    "indexaddr",
+    "bm iy",
+    "tmpindexyear",
+    "tmpindexaddr",
+    "rebuildindex",
+    "rebuild_index"
+  ],
+  "matched_queries": [
+    {
+      "name": "BM IY Dynasty fix IY Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Dynasty_fix_IY_Query.sql",
+      "sql_preview": "UPDATE BIOG_MAIN INNER JOIN tmpBM_NIY_finished ON BIOG_MAIN.c_personid = tmpBM_NIY_finished.c_personid SET BIOG_MAIN.c_index_year = -1000\r\nWHERE (((BIOG_MAIN.c_index_year)>0 And (BIOG_MAIN.c_index_year)<300) AND ((BIOG_MAIN.c_dy)>4 And (BIOG_MAIN.c_dy)<21));\r\n"
+    },
+    {
+      "name": "BM IY Dynasty Fix Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Dynasty_Fix_Query.sql",
+      "sql_preview": "UPDATE BIOG_MAIN1 INNER JOIN BIOG_MAIN ON BIOG_MAIN1.c_personid = BIOG_MAIN.c_personid SET BIOG_MAIN.c_notes = [BIOG_MAIN].[c_notes]+[BIOG_MAIN1].[c_notes]\r\nWHERE (((Right([BIOG_MAIN].[c_notes],36))=\"Dynasty calculated from index year; \"));\r\n"
+    },
+    {
+      "name": "BM IY Dynasty Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Dynasty_Query.sql",
+      "sql_preview": "UPDATE BIOG_MAIN, DYNASTIES SET BIOG_MAIN.c_dy = [DYNASTIES].[c_dy], BIOG_MAIN.c_notes = \"Dynasty calculated from index year; \"\r\nWHERE (((BIOG_MAIN.c_dy) Is Null Or (BIOG_MAIN.c_dy)=0) And ((BIOG_MAIN.c_index_year)>0 And (BIOG_MAIN.c_index_year)>=DYNASTIES.c_start And (BIOG_MAIN.c_index_year)<=DYNAS..."
+    },
+    {
+      "name": "BM IY Rule 01A DY Phase 1 Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_01A_DY_Phase_1_Query.sql",
+      "sql_preview": "INSERT INTO tmpIndexYear ( c_index_year, c_personid )\r\nSELECT BIOG_MAIN.c_deathyear, BIOG_MAIN.c_personid\r\nFROM BIOG_MAIN\r\nWHERE (((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) And ((BIOG_MAIN.c_birthyear)>=BIOG_MAIN.c_deathyear-60) And ((BIOG_MAIN.c_deathyear)>0));\r\n"
+    },
+    {
+      "name": "BM IY Rule 01A DY Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_01A_DY_Query.sql",
+      "sql_preview": "UPDATE BIOG_MAIN SET BIOG_MAIN.c_index_year = [BIOG_MAIN].[c_deathyear], BIOG_MAIN.c_notes = 'Index year algorithmically generated: Rule 13; '+[BIOG_MAIN].[c_notes]\r\nWHERE (((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) And ((BIOG_MAIN.c_birthyear)>=BIOG_MAIN.c_deathyear-60) And ((..."
+    },
+    {
+      "name": "BM IY Rule 01B DY Phase 1 Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_01B_DY_Phase_1_Query.sql",
+      "sql_preview": "INSERT INTO tmpIndexYear ( c_index_year, c_personid )\r\nSELECT BIOG_MAIN.c_birthyear, BIOG_MAIN.c_personid\r\nFROM BIOG_MAIN\r\nWHERE (((BIOG_MAIN.c_birthyear)<=BIOG_MAIN.c_deathyear-59 And (BIOG_MAIN.c_birthyear)>0) And ((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) And ((BIOG_MAIN.c_d..."
+    },
+    {
+      "name": "BM IY Rule 01B DY Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_01B_DY_Query.sql",
+      "sql_preview": "UPDATE BIOG_MAIN SET BIOG_MAIN.c_index_year = [BIOG_MAIN].[c_birthyear]+59, BIOG_MAIN.c_notes = [BIOG_MAIN].[c_notes]='Index year algorithmically generated: Rule 1; '+[BIOG_MAIN].[c_notes]\r\nWHERE (((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) And ((BIOG_MAIN.c_birthyear)<=BIOG_MAI..."
+    },
+    {
+      "name": "BM IY Rule 02 DY Phase 1 Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_02_DY_Phase_1_Query.sql",
+      "sql_preview": "INSERT INTO tmpIndexYear ( c_personid, c_index_year )\r\nSELECT BIOG_MAIN.c_personid, BIOG_MAIN.c_deathyear\r\nFROM BIOG_MAIN\r\nWHERE (((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) AND ((BIOG_MAIN.c_birthyear) Is Null Or (BIOG_MAIN.c_birthyear)=0) AND ((BIOG_MAIN.c_deathyear)>0));\r\n"
+    },
+    {
+      "name": "BM IY Rule 02 DY Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_02_DY_Query.sql",
+      "sql_preview": "UPDATE BIOG_MAIN SET BIOG_MAIN.c_index_year = [BIOG_MAIN].[c_deathyear], BIOG_MAIN.c_notes = [BIOG_MAIN].[c_notes]='Index year algorithmically generated: Rule 1; '+[BIOG_MAIN].[c_notes]\r\nWHERE (((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) AND ((BIOG_MAIN.c_birthyear) Is Null Or (..."
+    },
+    {
+      "name": "BM IY Rule 03 BY Phase 1 Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_03_BY_Phase_1_Query.sql",
+      "sql_preview": "INSERT INTO tmpIndexYear ( c_personid, c_index_year )\r\nSELECT BIOG_MAIN.c_personid, BIOG_MAIN.c_birthyear\r\nFROM BIOG_MAIN\r\nWHERE (((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) AND ((BIOG_MAIN.c_birthyear)>0) AND ((BIOG_MAIN.c_deathyear) Is Null Or (BIOG_MAIN.c_deathyear)=0));\r\n"
+    },
+    {
+      "name": "BM IY Rule 03 BY Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_03_BY_Query.sql",
+      "sql_preview": "UPDATE BIOG_MAIN SET BIOG_MAIN.c_index_year = [BIOG_MAIN].[c_birthyear]+59, BIOG_MAIN.c_notes = 'Index year algorithmically generated: Rule 2; '+[BIOG_MAIN].[c_notes]\r\nWHERE (((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) AND ((BIOG_MAIN.c_birthyear)>0) AND ((BIOG_MAIN.c_deathyear)..."
+    },
+    {
+      "name": "BM IY Rule 04W Phase 1 Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_04W_Phase_1_Query.sql",
+      "sql_preview": "INSERT INTO tmpIndexYear ( c_personid, c_index_year )\r\nSELECT BIOG_MAIN.c_personid, BIOG_MAIN_1.c_birthyear\r\nFROM (BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id) INNER JOIN KIN_DATA AS K..."
+    },
+    {
+      "name": "BM IY Rule 04W Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_04W_Query.sql",
+      "sql_preview": "UPDATE (BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id) INNER JOIN KIN_DATA AS KIN_DATA_1 ON (BIOG_MAIN_1.c_personid = KIN_DATA_1.c_personid) AND (BIOG_MAIN.c_personid = KIN_DATA_1.c_kin_..."
+    },
+    {
+      "name": "BM IY Rule 05 JS Phase 1 Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_05_JS_Phase_1_Query.sql",
+      "sql_preview": "INSERT INTO tmpIndexYear ( c_personid, c_index_year )\r\nSELECT BIOG_MAIN.c_personid, ENTRY_DATA.c_year\r\nFROM BIOG_MAIN INNER JOIN ENTRY_DATA ON BIOG_MAIN.c_personid = ENTRY_DATA.c_personid\r\nWHERE (((ENTRY_DATA.c_year)>0) AND ((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_year)=0) AND ((ENTRY..."
+    },
+    {
+      "name": "BM IY Rule 05 JS Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_05_JS_Query.sql",
+      "sql_preview": "UPDATE BIOG_MAIN INNER JOIN ENTRY_DATA ON BIOG_MAIN.c_personid = ENTRY_DATA.c_personid SET BIOG_MAIN.c_index_year = [ENTRY_DATA].[c_year]+30, BIOG_MAIN.c_notes = 'Index year algorithmically generated: Rule 3; '+[BIOG_MAIN].[c_notes]\r\nWHERE (((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_yea..."
+    },
+    {
+      "name": "BM IY Rule 05W Husband JS Phase 1 Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_05W_Husband_JS_Phase_1_Query.sql",
+      "sql_preview": "INSERT INTO tmpIndexYear ( c_personid, c_index_year )\r\nSELECT BIOG_MAIN_1.c_personid, ENTRY_DATA.c_year\r\nFROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN ((BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_kin_id) INNER JOIN ENTRY_DATA ON BIOG_MAIN.c_personid = ENTRY_DATA.c_personid) ON BIO..."
+    },
+    {
+      "name": "BM IY Rule 05W Husband JS Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_05W_Husband_JS_Query.sql",
+      "sql_preview": "UPDATE (BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN ((BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_kin_id) INNER JOIN ENTRY_DATA ON BIOG_MAIN.c_personid = ENTRY_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_personid) INNER JOIN KIN_DATA AS KIN_DATA_1 ON (BIOG_MAIN.c_personid ..."
+    },
+    {
+      "name": "BM IY Rule 06 JR Phase 1 Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_06_JR_Phase_1_Query.sql",
+      "sql_preview": "UPDATE BIOG_MAIN INNER JOIN ENTRY_DATA ON BIOG_MAIN.c_personid = ENTRY_DATA.c_personid SET BIOG_MAIN.c_index_year = [ENTRY_DATA].[c_year]+33, BIOG_MAIN.c_notes = 'Index year algorithmically generated: Rule 6; '+[BIOG_MAIN].[c_notes]\r\nWHERE (((BIOG_MAIN.c_index_year) Is Null Or (BIOG_MAIN.c_index_yea..."
+    },
+    {
+      "name": "BM IY Rule 06W Husband JR Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_06W_Husband_JR_Query.sql",
+      "sql_preview": "UPDATE (KIN_DATA AS KIN_DATA_1 INNER JOIN ((BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_kin_id) INNER JOIN tmpBM_NIY ON KIN_DATA.c_personid = tmpBM_NIY.c_personid) ON (KIN_DATA_1.c_kin_id = KIN_DATA.c_personid) AND (KIN_DATA_1.c_personid = KIN_DATA.c_kin_id)) INNER JOIN ENTRY_..."
+    },
+    {
+      "name": "BM IY Rule 07 XC Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_07_XC_Query.sql",
+      "sql_preview": "UPDATE ENTRY_DATA INNER JOIN tmpBM_NIY ON ENTRY_DATA.c_personid = tmpBM_NIY.c_personid SET tmpBM_NIY.c_index_year = [ENTRY_DATA].[c_year]+39, tmpBM_NIY.c_rule = \"7\"\r\nWHERE (((tmpBM_NIY.c_index_year) Is Null Or (tmpBM_NIY.c_index_year)=0) AND ((ENTRY_DATA.c_entry_code)=257) AND ((ENTRY_DATA.c_year)>0..."
+    },
+    {
+      "name": "BM IY Rule 07W Husband XC Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_07W_Husband_XC_Query.sql",
+      "sql_preview": "UPDATE (KIN_DATA AS KIN_DATA_1 INNER JOIN ((BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_kin_id) INNER JOIN tmpBM_NIY ON KIN_DATA.c_personid = tmpBM_NIY.c_personid) ON (KIN_DATA_1.c_kin_id = KIN_DATA.c_personid) AND (KIN_DATA_1.c_personid = KIN_DATA.c_kin_id)) INNER JOIN ENTRY_..."
+    },
+    {
+      "name": "BM IY Rule 08 Father BY Phase 1 Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_08_Father_BY_Phase_1_Query.sql",
+      "sql_preview": "INSERT INTO tmpIndexYear ( c_personid, c_index_year )\r\nSELECT BIOG_MAIN_1.c_personid, BIOG_MAIN.c_birthyear\r\nFROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_kin_id) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_personid\r\nWHERE (((BIOG_MAIN_1.c_in..."
+    },
+    {
+      "name": "BM IY Rule 08 Father BY Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_08_Father_BY_Query.sql",
+      "sql_preview": "UPDATE BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_kin_id) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_personid SET BIOG_MAIN_1.c_index_year = [BIOG_MAIN].[c_birthyear]+89, BIOG_MAIN_1.c_notes = 'Index year algorithmically generated: Rule 5W; '+..."
+    },
+    {
+      "name": "BM IY Rule 09 Oldest Child BY Father Phase 1 Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_09_Oldest_Child_BY_Father_Phase_1_Query.sql",
+      "sql_preview": "INSERT INTO tmpIndexYear ( c_personid, c_index_year )\r\nSELECT BIOG_MAIN_1.c_personid, Min(BIOG_MAIN.c_birthyear) AS MinOfc_birthyear\r\nFROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id\r\n..."
+    },
+    {
+      "name": "BM IY Rule 10 Older Brother BY Phase 1 Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_10_Older_Brother_BY_Phase_1_Query.sql",
+      "sql_preview": "INSERT INTO tmpIndexYear ( c_personid, c_index_year )\r\nSELECT BIOG_MAIN.c_personid, Max(BIOG_MAIN_1.c_birthyear) AS MaxOfc_birthyear\r\nFROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id\r\n..."
+    },
+    {
+      "name": "BM IY Rule 12 SIL BY Phase 1 Doublecheck Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_12_SIL_BY_Phase_1_Doublecheck_Query.sql",
+      "sql_preview": "SELECT BIOG_MAIN.c_personid, BIOG_MAIN.c_index_year, BIOG_MAIN_1.c_birthyear\r\nFROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id\r\nWHERE (((BIOG_MAIN_1.c_birthyear)>0) AND ((KIN_DATA.c_ki..."
+    },
+    {
+      "name": "BM IY Rule 12 SIL BY Phase 1 Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_12_SIL_BY_Phase_1_Query.sql",
+      "sql_preview": "INSERT INTO tmpIndexYear ( c_personid, c_index_year )\r\nSELECT BIOG_MAIN.c_personid, Min(BIOG_MAIN_1.c_birthyear) AS MinOfc_birthyear\r\nFROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id\r\n..."
+    },
+    {
+      "name": "BM IY Rule 13 Grandfather BY Phase 1 Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_13_Grandfather_BY_Phase_1_Query.sql",
+      "sql_preview": "INSERT INTO tmpIndexYear ( c_personid, c_index_year )\r\nSELECT BIOG_MAIN_1.c_personid, Max(BIOG_MAIN.c_birthyear) AS MaxOfc_birthyear\r\nFROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_kin_id) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_personid\r\n..."
+    },
+    {
+      "name": "BM IY Rule 13 Grandfather BY Phase 2 Null Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_13_Grandfather_BY_Phase_2_Null_Query.sql",
+      "sql_preview": "UPDATE BIOG_MAIN INNER JOIN tmpIndexYear ON BIOG_MAIN.c_personid = tmpIndexYear.c_personid SET BIOG_MAIN.c_index_year = [tmpIndexYear].[c_index_year]+119, BIOG_MAIN.c_notes = \"Index year algorithmically generated: Rule 13; \"\r\nWHERE (((BIOG_MAIN.c_notes) Is Null));\r\n"
+    },
+    {
+      "name": "BM IY Rule 13 Grandfather BY Phase 2 Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_13_Grandfather_BY_Phase_2_Query.sql",
+      "sql_preview": "UPDATE BIOG_MAIN INNER JOIN tmpIndexYear ON BIOG_MAIN.c_personid = tmpIndexYear.c_personid SET BIOG_MAIN.c_index_year = [tmpIndexYear].[c_index_year]+119, BIOG_MAIN.c_notes = 'Index year algorithmically generated: Rule 13; '+[BIOG_MAIN].[c_notes]\r\nWHERE ((Not (BIOG_MAIN.c_notes) Is Null));\r\n"
+    },
+    {
+      "name": "BM IY Rule 14 Father IY Phase 1 Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_14_Father_IY_Phase_1_Query.sql",
+      "sql_preview": "INSERT INTO tmpIndexYear ( c_index_year, c_personid )\r\nSELECT Max(BIOG_MAIN.c_index_year) AS MaxOfc_index_year, BIOG_MAIN_1.c_personid\r\nFROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_kin_id) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_personid..."
+    },
+    {
+      "name": "BM IY Rule 15 Part 1 Father Phase 1 Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_15_Part_1_Father_Phase_1_Query.sql",
+      "sql_preview": "INSERT INTO tmpIndexYear ( c_personid, c_index_year )\r\nSELECT BIOG_MAIN_1.c_personid, Min(BIOG_MAIN.c_index_year) AS MinOfc_index_year\r\nFROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id..."
+    },
+    {
+      "name": "BM IY Rule 16 Older Brother IY Phase 1 Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_16_Older_Brother_IY_Phase_1_Query.sql",
+      "sql_preview": "INSERT INTO tmpIndexYear ( c_personid, c_index_year )\r\nSELECT BIOG_MAIN_1.c_personid, Min(BIOG_MAIN.c_index_year) AS MinOfc_index_year\r\nFROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id..."
+    },
+    {
+      "name": "BM IY Rule 17 Younger Brother IY Phase 1 Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_17_Younger_Brother_IY_Phase_1_Query.sql",
+      "sql_preview": "INSERT INTO tmpIndexYear ( c_personid, c_index_year )\r\nSELECT BIOG_MAIN_1.c_personid, Min(BIOG_MAIN.c_index_year) AS MinOfc_index_year\r\nFROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id..."
+    },
+    {
+      "name": "BM IY Rule 18 SIL IY Mother Phase 1 Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_18_SIL_IY_Mother_Phase_1_Query.sql",
+      "sql_preview": "INSERT INTO tmpIndexYear ( c_personid, c_index_year )\r\nSELECT BIOG_MAIN.c_personid, Min(BIOG_MAIN_1.c_index_year) AS MinOfc_index_year\r\nFROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id..."
+    },
+    {
+      "name": "BM IY Rule 18 SIL IY Phase 1 Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_18_SIL_IY_Phase_1_Query.sql",
+      "sql_preview": "INSERT INTO tmpIndexYear ( c_personid, c_index_year )\r\nSELECT BIOG_MAIN.c_personid, Min(BIOG_MAIN_1.c_index_year) AS MinOfc_index_year\r\nFROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_personid) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_kin_id..."
+    },
+    {
+      "name": "BM IY Rule 19 Grandfather IY Phase 1 Query",
+      "file": "analysis\\dump_data\\querydefs_index\\BM_IY_Rule_19_Grandfather_IY_Phase_1_Query.sql",
+      "sql_preview": "INSERT INTO tmpIndexYear ( c_index_year, c_personid )\r\nSELECT Max(BIOG_MAIN.c_index_year) AS MaxOfc_index_year, BIOG_MAIN_1.c_personid\r\nFROM BIOG_MAIN AS BIOG_MAIN_1 INNER JOIN (BIOG_MAIN INNER JOIN KIN_DATA ON BIOG_MAIN.c_personid = KIN_DATA.c_kin_id) ON BIOG_MAIN_1.c_personid = KIN_DATA.c_personid..."
+    }
+  ],
+  "out_dir": "analysis\\dump_data\\querydefs_index"
+}

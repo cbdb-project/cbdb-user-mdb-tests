@@ -14,9 +14,14 @@ The algorithm sources we are comparing:
                 in https://github.com/cbdb-project/cbdb-online-main-server
 
   c_index_year:
-    User MDB → not in the shipped User MDB (see notes); the column
-                is read but not rewritten by user-facing forms.
-                Likely produced by an Admin MDB we don't have.
+    User MDB → 37 saved QueryDefs named `BM IY Rule ...` in the
+                linked-tables BACKEND data/CBDB_<YYYYMMDD>_DATA.mdb,
+                driven from frmBaseMaintenance.  Extracted by
+                analysis/dump_data_mdb_algorithms.py to
+                analysis/dump_data/querydefs_index/*.sql.
+                (Earlier wording said "not in shipped User MDB" —
+                that was wrong; the grep was looking only at the
+                front-end VBA, not the DATA mdb's QueryDefs.)
     SQLite   → IndexYearRebuildService.php
                 in the same repo.
 

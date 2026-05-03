@@ -56,33 +56,60 @@ representative.
 
 ### User MDB (Access)
 
-**Status: not in the shipped User MDB.**
+**Lives in the linked-tables backend, not the front-end.**
 
-A grep across `analysis/dump/vba/*.vb` for any UPDATE writing
-`BIOG_MAIN.c_index_year`, `c_index_year_type_code`, or
-`c_index_year_source_id` finds **zero** matches in the user-
-facing forms.  Every reference is a SELECT or an INSERT of
-already-computed values into a ZZ_SCRATCH_* table.
+PR G originally claimed this was missing from the shipped User MDB
+and "likely lives in an Admin MDB we don't have".  PR H found it:
+the rebuild logic is in **`data/CBDB_<YYYYMMDD>_DATA.mdb`** (the
+linked-tables backend that the User MDB sits on top of), not in
+`CBDB_BJ_User.mdb`.  This is why a grep across the front-end's
+dumped VBA returns zero — we were looking in the wrong file.
 
-The likely explanation: index-year recomputation is an admin-only
-maintenance routine that lives in a separate `*Admin*.mdb` we
-don't have access to.  The shipped User MDB just reads the
-pre-computed `c_index_year` column.  This is consistent with the
-fact that `frmIndexAddr` has buttons but no analogous `frmIndexYear`
-form exists (`grep -lE 'IndexYear' analysis/dump/forms.json`
-returns nothing useful).
+`analysis/dump_data_mdb_algorithms.py` extracts the algorithm.
+What it found in `data/CBDB_20260430_DATA.mdb`:
 
-What this means for cross-check classification:
+  - `frmBaseMaintenance` (form) plus 4 standard modules
+    (`Class1`, `FixCBDB_extra_programs`, `Module1`, `Module2`)
+    — VBA *source* of these is not yet extracted; that needs an
+    interactive `Access.Application.SaveAsText` pass, deferred.
+  - **37 saved QueryDefs whose names start with `BM IY Rule …`**
+    — these are the actual UPDATE statements that rebuild
+    `BIOG_MAIN.c_index_year` per person.  Dumped to
+    `analysis/dump_data/querydefs_index/<name>.sql`, indexed in
+    `analysis/dump_data/querydefs_index.json`.
 
-- We **cannot** compare implementations side-by-side for c_index_year
-  the way we can for c_index_addr_id.
-- We can still compare *outputs* per person, and check whether
-  source fields (c_birthyear, c_deathyear) agree.
-- A diff with matching birthyear+deathyear could be either:
-  (a) algorithm divergence between PHP and the (unseen) Admin VBA,
-  or (b) drift in some other source table we don't compare (e.g.
-  ENTRY_DATA exam years, NIAN_HAO mappings, fl_earliest_year /
-  fl_latest_year, etc.).  We can't tell from a 4-field diff alone.
+The naming scheme is `BM IY Rule <NN><suffix> <Source> [Phase N] Query`
+and follows the priority order — Rule 01 is highest priority, Rule 19
+the lowest.  Sample rule from
+`BM_IY_Rule_03_BY_Query.sql` (Rule 03, "use birthyear + 59 when
+deathyear is unknown"):
+
+```sql
+UPDATE BIOG_MAIN
+SET BIOG_MAIN.c_index_year = [BIOG_MAIN].[c_birthyear]+59,
+    BIOG_MAIN.c_notes = 'Index year algorithmically generated: '
+                        'Rule 2; '+[BIOG_MAIN].[c_notes]
+WHERE (((BIOG_MAIN.c_index_year) Is Null
+       Or (BIOG_MAIN.c_index_year)=0)
+   AND ((BIOG_MAIN.c_birthyear)>0)
+   AND ((BIOG_MAIN.c_deathyear) Is Null
+        Or (BIOG_MAIN.c_deathyear)=0));
+```
+
+The full set of dumped rules is the side-by-side reference for
+auditing PHP `IndexYearRebuildService.php` against the Access
+implementation.  Per-rule comparison is the actionable next step
+for classifying the 547 unclassified diffs from PR G.
+
+What's still missing:
+
+  - The *driver* code that runs the rules in order (a VBA Sub on
+    `frmBaseMaintenance`?).  We can see the UPDATE rules but not
+    the loop that fires them.  Extracting the form/module source
+    needs interactive Access (`SaveAsText`), which we haven't
+    automated yet.
+  - The `frmBaseMaintenance` UI itself — same story; we have its
+    name but not its design.
 
 ### cbdb-online-main-server (PHP)
 
