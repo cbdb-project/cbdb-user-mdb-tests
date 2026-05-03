@@ -1930,6 +1930,17 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
                     f"`analysis/index_drift_algorithm_notes.md` 中的 "
                     f"\"Maintenance trigger path\" 段。"
                 ))
+                doc.add_paragraph(Z(
+                    f"PR S（`analysis/deep_dive_addr_same_candidates.py`）"
+                    f"證實 10 筆 `same_candidates_diff_winner` 全部"
+                    f"是 MAX(c_sequence) 的 tie 問題（同一(person, "
+                    f"addr_type) 有多筆 BIOG_ADDR_DATA 行 c_sequence "
+                    f"並列最大）。PHP、Access、以及我方重算各自挑了"
+                    f"不同的 row。兩邊都遵循同一條文件規則，沒有「錯」"
+                    f"的一方。候選緩解：兩邊都加一條明確的二級 "
+                    f"tie-break（如 MIN(c_addr_id)）。逐筆證據見 "
+                    f"`reports/index_addr_same_candidates_deep_dive.json`。"
+                ))
 
     # ---- Per bucket ----
     bucket_meta = {
@@ -3133,6 +3144,34 @@ def _build_md(lang: str, out_path: Path) -> None:
                     f"only candidate algorithm-divergence rows.  "
                     f"Full per-row output: "
                     f"`reports/index_addr_drift_classification.json`."
+                ))
+                lines.append("")
+                lines.append(Z(
+                    f"PR M (`analysis/dump_data_mdb_vba.py`) extracted "
+                    f"`frmBaseMaintenance.CmdIndexAddress_Click` from "
+                    f"the DATA mdb.  It does NOT explicitly "
+                    f"`MAX(c_sequence)`-aggregate the way PHP does — a "
+                    f"candidate algorithmic divergence on top of the "
+                    f"maintenance-cadence issue.  Suggested "
+                    f"release-checklist mitigation: run `CmdIndexYear` "
+                    f"then `CmdIndexAddress` on the DATA mdb before "
+                    f"shipping a new User MDB."
+                ))
+                lines.append("")
+                lines.append(Z(
+                    f"PR S "
+                    f"(`analysis/deep_dive_addr_same_candidates.py`) "
+                    f"confirmed the 10 `same_candidates_diff_winner` "
+                    f"rows are all driven by MAX(c_sequence) ties "
+                    f"(multiple BIOG_ADDR_DATA rows of the same "
+                    f"(person, addr_type) sharing the same max "
+                    f"c_sequence).  PHP, Access, and our recompute "
+                    f"each pick non-deterministically.  Both sides "
+                    f"follow the same documented rule; neither is "
+                    f"wrong.  Candidate mitigation: add an explicit "
+                    f"secondary tie-break (e.g. MIN(c_addr_id)) to "
+                    f"both implementations.  Per-row evidence in "
+                    f"`reports/index_addr_same_candidates_deep_dive.json`."
                 ))
                 lines.append("")
             else:
