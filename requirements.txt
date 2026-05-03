@@ -1,5 +1,24 @@
-pyodbc
-pywin32
-pywinauto
-pandas
-pytest
+# Test-suite dependencies — pinned to versions verified on the
+# maintainer's Windows + Office 2016 + Python 3.12 dev box (lower-
+# bounded; later patch releases should be fine).  This project is
+# highly Windows-/Access-specific and version drift in pywin32 /
+# pywinauto / pyodbc has historically broken silent-but-load-bearing
+# behaviour, so the pins are deliberately tight.
+#
+# To unpin for a specific reason, comment out the version constraint
+# rather than deleting the line — keeping the package list visible
+# matters more than the exact version number.
+
+# ── runtime / driver ──
+pyodbc>=5.1.0,<6
+pywin32>=305,<306         # 306+ changed a few COM null-default semantics
+pywinauto>=0.6.9,<0.7
+pandas>=2.2.0,<3
+
+# ── tests ──
+pytest>=7.4.0,<8
+
+# ── reports/* (Word doc generation + screenshots) ──
+python-docx>=1.2.0,<2
+Pillow>=11.0.0,<12
+opencc>=1.1.9,<2          # Simplified→Traditional Chinese conversion
