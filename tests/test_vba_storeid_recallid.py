@@ -224,7 +224,7 @@ def _recallid_marks(spec: FormSpec):
         return pytest.mark.skip(
             reason="LookAtNetworks Form_Open hangs in this driver "
                    "(subform recordset binding) — same root family as "
-                   "matrix CmdRun timeout.  See findings.md."
+                   "matrix CmdRun timeout.  See reports/CBDB_Issues_Report_EN.md."
         )
     return ()
 

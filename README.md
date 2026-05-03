@@ -31,8 +31,11 @@ test results match what an actual user sees), and asserts:
 - Byte-level equality of GIS / Neo4j / KML exports
 - Foreign-key integrity across joined lookup tables
 
-Confirmed bugs found by the suite live in [`findings.md`](./findings.md)
-([English](./findings_en.md)).
+Confirmed bugs found by the suite live in
+[`reports/CBDB_Issues_Report_EN.md`](./reports/CBDB_Issues_Report_EN.md)
+([中文](./reports/CBDB_Issues_Report_ZH-Hant.md) — all four
+en/zh × md/docx outputs auto-generated from
+[`reports/generate_report.py`](./reports/generate_report.py)).
 
 ---
 
@@ -68,8 +71,9 @@ cbdb-user-mdb-tests/
 │   ├── discover_test_inputs.py # picks fresh fixtures from current data
 │   └── dump/                   # frozen metadata snapshots (committed)
 ├── AGENTS.md                   # contributor / agent guide; landmines
-├── findings.md                 # confirmed bugs + audit notes (中文)
-├── findings_en.md              # same in English
+├── reports/                    # auto-generated bilingual issue report
+│   ├── generate_report.py      #   ⭐ SOURCE OF TRUTH for all 19 issues
+│   └── CBDB_Issues_Report_*.{md,docx}   # EN / ZH-Hant × md / docx
 └── FINAL_STATE.md              # snapshot of test-suite coverage
 ```
 
@@ -225,100 +229,36 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 
 ### Confirmed bugs
 
-Tagged by user-impact priority: 🔴 silent data issue (no user
-warning); 🟡 visible crash with no data corruption; 🟢 setup-time,
-dead-code, dormant, or latent (defect real but no UI trigger on
-current dump).
+**19 documented issues**, all detail in
+[`reports/CBDB_Issues_Report_EN.md`](./reports/CBDB_Issues_Report_EN.md)
+([中文版](./reports/CBDB_Issues_Report_ZH-Hant.md) ·
+[.docx EN](./reports/CBDB_Issues_Report_EN.docx) ·
+[.docx 中文](./reports/CBDB_Issues_Report_ZH-Hant.docx)). All four
+files are auto-generated from the `ISSUES` dict in
+[`reports/generate_report.py`](./reports/generate_report.py) — that
+script is the **single source of truth**, please don't paste bug
+content elsewhere.
 
-> **Re-verification 2026-05-02.** Five issues that earlier reports
-> graded 🔴/🟡 were re-checked end-to-end (SQL probes + UI
-> reachability). Three categories emerged and the report generator
-> (`reports/generate_report.py`) was updated accordingly; these are
-> the source of truth, the README list below mirrors the new state:
->
-> - **DORMANT** — defect would fire but no row in the current dump
->   triggers it.  Bug #1, Bug #3.
-> - **LATENT** — defect is real in code but the UI control that
->   would trigger it is missing or unreachable.  Bug #4 (blocked by
->   Bug #15), Bug #5 (blocked by Bug #16), Bug #14 (host sub-form
->   has no parent).
-> - **REAL** — currently visible to users.  Everything else.
+| Tier | Count | Meaning |
+|------|------:|---------|
+| P0 — Silent data corruption | 3 | wrong data shown, no user warning |
+| P1 — Visible runtime crash  | 2 | error popup on a normal user click |
+| P2 — Silent display         | 3 | sub-form column shows blank where data exists |
+| P3 — Missing UI             | 5 | event handler exists in code but no button on the form |
+| P4 — Setup                  | 1 | one-time install fix (dao360.dll on Office 2016+) |
+| P5 — Resolved / dormant / latent | 5 | defect real but doesn't fire on the current dump or has no UI trigger today (#1, #3 dormant; #4, #5, #14 latent) |
 
-1. 🟢 **Bug #3** (HISTORICAL / DORMANT — re-verified 2026-05-02 as
-   NOT REPRODUCIBLE) — `LookAtEntry.CmdQuery_Click`'s multi-table
-   backfill `UPDATE` was originally reported to silently leave
-   c_entry_desc / c_addr_name NULL on >30 k-row results.  We re-fired
-   CmdQuery on the same fixture (entry 36, no year filter, 92,514
-   rows) and counted **0 NULL backfill rows**; the maintainer also
-   confirmed the UI shows correct desc / addr columns.  The suspect
-   SQL is still in the source code, but its behaviour on the current
-   dump is correct.  Verification: `python analysis/verify_bug3.py`.
-2. 🟢 **Bug #1** (DORMANT — re-verified 2026-05-02) — `View_StatusData`
-   has an alias swap that *would* show last-year values in
-   `c_fy_range_*` columns, but a SQL probe of the current dump found
-   0 STATUS_DATA rows where `c_ly_range > 0` AND `c_fy_range = 0`,
-   so no row in the dump actually triggers the symptom.  Code defect
-   is real; resurfaces the moment the underlying data picks up rows
-   that hit it.
-3. 🟢 **Bug #2** — `dao360.dll` reference broken on Office 2016+
-   (one-time manual fix).
-4. 🟢 **Bug #4** (NEW, found 2026-05-02 — LATENT, masked by Bug
-   #15) — `Form_LookAtPlace.CmdGIS_Click` references a non-existent
-   control `GISFrame` (should be `CodeFrame`).  *If* the user could
-   click the GIS button on LookAtPlace, they would see "Object
-   required" + no file written. But Bug #15 (LookAtPlace has no
-   `CmdGIS` button on the form) means there's no UI trigger today,
-   so users never reach this code path.  Test driver rewrites
-   `GISFrame.Value → CodeFrame.Value` as a workaround for when the
-   button is restored.
-5. 🟢 **Bug #5** (NEW, found 2026-05-02 — LATENT, masked by Bug
-   #16) — `Form_LookAtStatus.CmdPajek_Click` is broken at multiple
-   levels: references non-existent control `ChkIDs` AND its INSERT
-   SQL projects three columns that don't exist on
-   `ZZ_SCRATCH_STATUS` (`c_person_id` / `c_status_id` /
-   `c_status_count` — actual names are `c_personid` /
-   `c_status_code` / no count column).  Sub was copy-pasted from
-   `LookAtAssociations.CmdPajek_Click` and column names were
-   text-replaced `ASSOC → STATUS` without verifying the renamed
-   columns existed on the Status side.  LATENT because Bug #16
-   (no `CmdPajek` button on LookAtStatus) means users can't trigger
-   it.  Found by `analysis/audit_missing_controls.py` +
-   `analysis/audit_sql_columns.py`.
-6. 🟡 **Bug #6** (NEW, found 2026-05-02) —
-   `Form_LookAtGroupData.queryEntry` (called by `CmdRun_Click` when
-   `ChkEntry` is checked) projects `ENTRY_DATA.c_parental_status`
-   into `ZZ_SCRATCH_ENTRY.c_parental_status_code`. The actual
-   ENTRY_DATA column is `c_parental_status_code` — the one-line SQL
-   was never updated when ENTRY_DATA's column was renamed. Compare
-   `Form_LookAtEntry.vb:1650` which uses the right name. SQL
-   crashes with "no such field" when user runs the GroupData
-   "Entry" subtype. Found by `analysis/audit_sql_columns.py`.
-7. 🔴 **Bug #7** (NEW, found 2026-05-02 via behavioural test) —
-   `Form_LookAtPlace.CmdNeo4j_Click:322` builds People-CSV from a
-   SELECT projecting only 4 ZZ_SCRATCH_P_TEXT columns, but the loop
-   reads 7 fields including `c_dynasty` / `c_dynasty_chn` /
-   `c_female`. JET raises "Item not found in this collection" → Err
-   handler silences with MsgBox → SaveToFile never runs → NO files
-   produced for the entire Neo4j export from LookAtPlace. See
-   `findings_en.md` Bug #7.
-8. 🔴 **Bug #8** (NEW, 2026-05-02) —
-   `Form_LookAtNetworks.CmdNeo4j_Click` has the same shape on
-   `tRstPlace` (SQL projects 3 cols, loop reads `!x_coord` /
-   `!y_coord`) and `tRstPeoplePlace` (missing `c_person_id` /
-   `c_index_addr_id`). Same silent-fail symptom as Bug #7.
-9. 🔴 **Bug #9** (NEW, 2026-05-02) —
-   `Form_LookAtEntry.CmdNeo4j_Click:1425` says `With tRstAssocCodes`
-   but the loop reads `!c_inst_*` (institution columns). The
-   recordset variable is a typo from `tRstInstitutions` — bound
-   correctly 10 lines earlier with the right SELECT. Same silent
-   fail. Found by `analysis/audit_recordset_sql_projection.py`
-   (a new 7th static auditor that pairs runtime-built SQL with
-   subsequent recordset field reads — also catches Bugs #7 and #8).
+> **Re-verification 2026-05-02.** Five issues that earlier
+> snapshots graded 🔴/🟡 were re-checked end-to-end (SQL probes +
+> UI reachability) and demoted to P5. The classifier lives in
+> [`analysis/reverify_all_issues.py`](./analysis/reverify_all_issues.py)
+> and is cross-checked against `generate_report.py` so the report
+> can't drift back.
 
-**Regression coverage**: `tests/test_known_bugs.py` now has a CI
-marker for every bug above — when the source dump changes (a fix
-lands), the corresponding test fails with a "Bug #N appears to be
-FIXED — flip the assertion" message.
+**Regression coverage**: `tests/test_known_bugs.py` has a CI marker
+for every issue — when a fix lands in the source dump, the
+corresponding test fails with a "Bug #N appears to be FIXED — flip
+the assertion" message.
 
 ### Roadmap
 
@@ -335,7 +275,7 @@ FIXED — flip the assertion" message.
 | 9 | ✅ done | `tests/conftest.py::pytest_configure` re-runs `analysis/discover_test_inputs.py` automatically at session start when `analysis/dump/test_inputs.json` is missing or older than `data/CBDB_BJ_User.mdb`. Opt-out via `pytest --no-discover-inputs` |
 | 10 | 🟡 partial | First slice landed: `tests/test_vba_pickers_smoke.py` opens each of the 10 `frmPick*` pickers and verifies it loads + has a commit/cancel button (CmdSelect/CmdSelectAll/CmdOK + CmdCancel/CmdExit/CmdClose). 9 pass, 1 skipped (`frmPickTEXT_BIBLCAT` is orphan — 0 callers anywhere in VBA / macros, end users can't reach it). Smoke-only — doesn't drive Treeview/ListBox interaction yet; that's depth-pass work. **Still open for depth pass:** drive a Select+Commit through e.g. `frmPickEntry_multi` and verify the resulting `ZZ_ENTRY_CODE` table contents match the picker's selected items |
 | 11 | ✅ done | Bilingual UI test (`tests/test_vba_bilingual_ui.py`) — for each of the 9 forms with the standard `CmdFanti` / `CmdJianti` toggle pair (Networks uses different names + Form_Open hangs), opens the form, drives one Fanti round-trip to force captions through `changeDisplayLanguage` (so the FormLabels-derived state, not design-time captions, is the baseline), then asserts each toggle changes ≥5 captions and the second toggle restores the baseline exactly. Latest: `9 passed in 145.73s`. **Caveat surfaced:** a few forms (LookAtPlace, LookAtGroupData) ship with design-time captions that don't match `FormLabels` (e.g. `LblFrom = "  From"` with leading spaces vs `FormLabels.c_fanti = "From"`); the design-time text is replaced on the first `changeDisplayLanguage` call. Pre-existing CBDB UX nit, documented in the test |
-| 12 | ✅ done | `tests/test_index_year_xcheck.py` + `analysis/download_hf_sqlite.py` cross-check the User MDB's `BIOG_MAIN` against the weekly cbdb-online-main-server SQLite snapshot at <https://huggingface.co/datasets/cbdb/cbdb-sqlite/blob/main/latest.zip>. Compares 4 fields per `c_personid` — derived (`c_index_year`, `c_index_addr_id`) and source (`c_birthyear`, `c_deathyear`) — with 0.5 % / 0.1 % thresholds. **Algorithm-level agreement confirmed**: both pipelines run cbdb-online-main-server's `IndexYearRebuildService.php` Phase A/B/C; per-rule type-code distributions are nearly identical (137 vs 136 codes; per-rule counts differ by only 5-100 persons). The remaining ~575 person-level diffs (out of 657 246) are pure data-snapshot drift — the online system's source data is updated continuously and the User MDB lags. **Confirmed with maintainer: not bugs.** The test's role is to surface algorithm drift if it ever happens; per-pid data drift is expected. Full background: `findings.md` Note #1 + `AGENTS.md` "NOT a bug" callout |
+| 12 | ✅ done | `tests/test_index_year_xcheck.py` + `analysis/download_hf_sqlite.py` cross-check the User MDB's `BIOG_MAIN` against the weekly cbdb-online-main-server SQLite snapshot at <https://huggingface.co/datasets/cbdb/cbdb-sqlite/blob/main/latest.zip>. Compares 4 fields per `c_personid` — derived (`c_index_year`, `c_index_addr_id`) and source (`c_birthyear`, `c_deathyear`) — with 0.5 % / 0.1 % thresholds. **Algorithm-level agreement confirmed**: both pipelines run cbdb-online-main-server's `IndexYearRebuildService.php` Phase A/B/C; per-rule type-code distributions are nearly identical (137 vs 136 codes; per-rule counts differ by only 5-100 persons). The remaining ~575 person-level diffs (out of 657 246) are pure data-snapshot drift — the online system's source data is updated continuously and the User MDB lags. **Confirmed with maintainer: not bugs.** The test's role is to surface algorithm drift if it ever happens; per-pid data drift is expected. Full background: `AGENTS.md` "NOT a bug" callout + report appendix `c_index_year` / `c_index_addr_id` drift |
 | 13 | ✅ done | Import-list buttons (`tests/test_vba_import_lists.py`) — covers all 11 unique button names across 8 forms (15 of 17 tests pass; the 2 LookAtNetworks ones are skipped for the same Form_Open hang as items 7/15). Drives each via `Form_Timer`, points at a fixture file (whose delimiter / column count matches the saved `MSysIMEXSpecs`), and asserts: (a) the target `ZZ_SCRATCH_*` table contains exactly the valid IDs, (b) `InputErrorList` contains exactly the invalid IDs. The `gUse*` global side-effect is documented per spec but not asserted — an early inject-based reader caused JET re-entrancy hangs in matrix CmdQuery; the table-shape assertion is the meaningful contract. Driver gained: `patch_filedialog` now also handles the `With dlgX` block's `If .Show = -1 Then` (used in import subs) |
 | 14 | ✅ done | Save-list buttons (`tests/test_vba_save_lists.py`) — covers all 5 `CmdSave*_Click` handlers. Pre-populates the source `ZZ_SCRATCH_<X>` table directly (skips CmdQuery), patches `FileDialog(msoFileDialogSaveAs)` via the existing `vba.patch_filedialog`, fires the button, and asserts the resulting tab-separated UTF-8 (BOM-stripped) file contains exactly the seeded IDs — and for the 3-column specs (Entry, Associations, Office, Status, TextCategories) also that the desc / desc_chn fields match an INNER JOIN against the codes table. Latest run: `5 passed in 43.31s`. **Important:** several Form_Open handlers wipe their picker scratch table on form load; the test seeds AFTER `open_form` to avoid this |
 | 15 | ✅ done | `CmdStoreID` / `CmdRecallID` round-trip (`tests/test_vba_storeid_recallid.py`) — covers all 7 query-runnable forms for Store, 3 of 4 forms for Recall (Networks Form_Open hangs in this driver — same family as the matrix Networks skip), plus an end-to-end Entry → Kinship round-trip. Driver gained: `MsgBox "literal"` neutralizer in `_inject_autodetect`; chain+DONE block moved to *after* `Exit_<name>:` so it survives the `Resume Exit` from the form's Err handler |
@@ -374,7 +314,9 @@ PRs welcome. Before submitting:
 - if you change anything that moves a roadmap item, **update
   the [Plan & status](#plan--status) table in this README** in the
   same PR (this is enforced by `AGENTS.md`)
-- new bugs go in `findings.md` with a regression test
+- new bugs go in `reports/generate_report.py` (`ISSUES` dict) with
+  a regression test in `tests/test_known_bugs.py`; regenerate the
+  4 report outputs in the same PR
 - new landmines (Access quirks, JET behavior, COM gotchas) go in
   `AGENTS.md`
 
@@ -414,7 +356,7 @@ CBDB 用戶端是給歷史學家用的 Windows-only Access 介面，每次資料
 - GIS / Neo4j / KML 匯出檔位元組級相等
 - 跨 lookup 表的外鍵完整性
 
-已找到的 bug 在 [`findings.md`](./findings.md)。
+已找到的 bug 在 [`reports/CBDB_Issues_Report_ZH-Hant.md`](./reports/CBDB_Issues_Report_ZH-Hant.md)（共 19 個 issue，由 `reports/generate_report.py` 自動生成 4 份輸出）。
 
 ## 安裝
 
@@ -454,11 +396,11 @@ python -m pytest tests/test_vba_export.py -v -W ignore --include-vba
 - ✅ 7/10 LookAt 表單已納入真 VBA matrix（12 fixtures，110 秒跑完）
 - ✅ 1 個真實匯出位元組對比（`LookAtEntry.CmdGIS`）
 - ✅ 12 維度資料完整性檢查
-- ✅ 已確認 4 個 bug（詳見 `findings.md`，最新一個是 LookAtPlace 的 CmdGIS 引用了不存在的控件 `GISFrame`）
+- ✅ 已確認 19 個 issue（詳見 [`reports/CBDB_Issues_Report_ZH-Hant.md`](./reports/CBDB_Issues_Report_ZH-Hant.md)；P0 ×3 / P1 ×2 / P2 ×3 / P3 ×5 / P4 ×1 / P5 dormant·latent ×5）
 - ⏳ 剩 3 個表單因遞迴展開太慢暫跳過
 - ⏳ 其他匯出按鈕（Neo4j/KML/Pajek/GUESS/Gephi）尚未涵蓋
 - ✅ pytest 啟動時自動偵測 `test_inputs.json` 是否過時並重跑 `discover_test_inputs.py`（`pytest --no-discover-inputs` 可關閉）— roadmap 第 9 項
-- ✅ 比對 User MDB 的 `index year` / `index address` 算法與 [`cbdb-online-main-server`](https://github.com/cbdb-project/cbdb-online-main-server) — roadmap 第 12 項已成。两边跑同一个算法（PHP `IndexYearRebuildService.php`）；少量 person 级差异是线上系统持续更新源数据 vs MDB 用某个时点的快照所致，**与维护者确认这不是 bug**。测试有阈值看门，算法层一旦真飘走会立刻报警。详见 findings.md Note #1 / AGENTS.md "NOT a bug" 段
+- ✅ 比對 User MDB 的 `index year` / `index address` 算法與 [`cbdb-online-main-server`](https://github.com/cbdb-project/cbdb-online-main-server) — roadmap 第 12 項已成。两边跑同一个算法（PHP `IndexYearRebuildService.php`）；少量 person 级差异是线上系统持续更新源数据 vs MDB 用某个时点的快照所致，**与维护者确认这不是 bug**。测试有阈值看门，算法层一旦真飘走会立刻报警。详见 AGENTS.md "NOT a bug" 段 + report 末尾 `c_index_year` / `c_index_addr_id` drift 附录
 - ✅ Import-list 按鈕（`tests/test_vba_import_lists.py`，11 種按鈕跨 8 個表單，15 passed + 2 skipped；只有 LookAtNetworks 兩項因 Form_Open 卡住而 skip）— roadmap 第 13 項
 - ⏳ Save-list 按鈕（`CmdSaveEntryCodes` / `CmdSaveOffices` 等）寫出清單檔的位元組級對比 — roadmap 第 14 項
 - ✅ `CmdStoreID` / `CmdRecallID` 跨 form round-trip 測試（`tests/test_vba_storeid_recallid.py`，11 passed + 1 skipped；含 Entry → Kinship 完整 round-trip）— roadmap 第 15 項

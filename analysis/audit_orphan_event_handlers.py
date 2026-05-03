@@ -15,7 +15,7 @@ the form's design and code drifted apart and a related bug may
 hide nearby (the team probably forgot something else when they
 deleted the control).
 
-`findings.md` Bug #5 mentions 4 such orphans found by
+`reports/CBDB_Issues_Report_EN.md` Bug #5 mentions 4 such orphans found by
 `audit_missing_controls.py` historically.  This audit makes that
 finding ongoing-actionable rather than a one-off note.
 

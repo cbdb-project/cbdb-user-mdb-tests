@@ -165,7 +165,7 @@ def test_index_year_addr_xcheck_sample(mdb, hf_sqlite):
     # are derived and may differ on tiebreaks — we accept up to 0.5%.
     # c_birthyear / c_deathyear are SOURCE data; any divergence above
     # 0.1% would suggest the two CBDB pipelines have meaningfully
-    # diverged on basic person facts (Pattern B in findings.md
+    # diverged on basic person facts (Pattern B in reports/CBDB_Issues_Report_EN.md
     # Open Question #1) — surface as a hard failure so we notice.
     derived_pct = lambda col: 100.0 * len(by_col[col]) / max(1, n)
     source_pct = lambda col: 100.0 * len(by_col[col]) / max(1, n)

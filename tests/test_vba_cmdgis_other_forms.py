@@ -59,7 +59,7 @@ _FORMS_WITH_CMDGIS_TESTABLE_HERE = {
 # cbdb_driver.vba_session._SUBFORMS_TO_REQUERY → it passes.
 #
 # LookAtPlace's CmdGIS used to fail with "Object required" — root
-# cause was Bug #4 in findings.md (CBDB code references a non-
+# cause was Bug #4 in reports/CBDB_Issues_Report_EN.md (CBDB code references a non-
 # existent `GISFrame` control).  The driver now applies a per-form
 # rewrite (`_PER_FORM_CMDGIS_PATCHES["Form_LookAtPlace"]`) that
 # substitutes the correct control name `CodeFrame` so the test

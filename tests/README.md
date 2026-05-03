@@ -29,7 +29,7 @@
 
 **Auto-test 不能覆盖的部分**（需要 5 分钟手动 smoke）：见 [`MANUAL_SMOKE.md`](MANUAL_SMOKE.md)。
 
-## 当前已知 bug（详见 `findings.md`）
+## 当前已知 bug（详见 `reports/CBDB_Issues_Report_EN.md`）
 
 1. **`View_StatusData` 别名错位**：`c_fy_range_desc` / `c_fy_range_chn`
    被错误地从 `YEAR_RANGE_CODES_1`（last-year 那个 join）取值，
