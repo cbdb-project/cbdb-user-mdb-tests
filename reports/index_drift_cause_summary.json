@@ -43,18 +43,18 @@
         "bucket": "php_did_not_compute",
         "count": 19,
         "k2_subgroups": [
-          {"access_tcode": "05", "count": 7, "candidate_label": "candidate_php_entry_code_mapping_gap"},
+          {"access_tcode": "05", "count": 7, "candidate_label": "candidate_php_entry_code_mapping_gap (6) + candidate_php_entry_data_year_missing (1)", "pr_z_verdict": "supported_by_focused_probe"},
           {"access_tcode": "11", "count": 5, "candidate_label": "candidate_php_validyear_gate_excluded_father"},
           {"access_tcode": "14", "count": 4, "candidate_label": "candidate_php_rule_coverage_gap"},
           {"access_tcode": "20", "count": 1, "candidate_label": "candidate_php_rule_coverage_gap"},
           {"access_tcode": "2304", "count": 1, "candidate_label": "candidate_php_rule_coverage_gap"},
           {"access_tcode": "07", "count": 1, "candidate_label": "candidate_missing_php_rule_07_xc"}
         ],
-        "likely_cause": "PHP rule chain didn't reach a value for these persons.  Most likely upstream coverage gap (membership in ENTRY_CODE_TYPE_REL, validYear gate, Phase-C iteration cap, or vestigial Access branch with no PHP equivalent).",
-        "supporting_algorithm_evidence": "PR N pairs Access tcodes 05/11/14/20 with matched PHP rules; for 2304 and 07 the pairing is partial.",
-        "supporting_row_evidence": "K1 bucket holds 19 rows; K2 groups by Access tcode with 3 example personids per group plus all_personids list.",
-        "confidence": "medium-high (for tcode 05 / cleanly testable); medium (for the others)",
-        "next_action": "For tcode 05: pull SQLite ENTRY_CODE_TYPE_REL and check membership.  For tcode 11: confirm father validYear gate.  For Phase-C tcodes (14/20/2304): runtime-rule trace against GetBirthIndexYearSQL loop count.  For tcode 07: triage Rule 07 XC."
+        "likely_cause": "PHP rule chain didn't reach a value for these persons.  PR Z confirmed for the tcode='05' × 7 sub-group that the cause is PHP-side upstream data (6 mapping gaps in ENTRY_CODE_TYPE_REL, 1 ENTRY_DATA.c_year = 0).  Other sub-groups remain candidate coverage gaps.",
+        "supporting_algorithm_evidence": "PR N pairs Access tcodes 05/11/14/20 with matched PHP rules; for 2304 and 07 the pairing is partial.  PR Z (analysis/probe_index_year_tcode05_entry_mapping.py) walked all 7 tcode='05' rows and confirmed Access fires Rule 05 correctly in every case.",
+        "supporting_row_evidence": "K1 bucket holds 19 rows; K2 groups by Access tcode with 3 example personids per group plus all_personids list.  PR Z carries per-personid ENTRY_DATA + ENTRY_CODE_TYPE_REL dump in reports/index_year_tcode05_entry_mapping_probe.json.",
+        "confidence": "tcode='05' × 7: supported_by_focused_probe (PR Z).  tcode='11' × 5: medium.  Phase-C tcodes (14/20/2304): medium.  tcode='07' × 1: medium (vestigial-vs-intentional unresolved).",
+        "next_action": "tcode='05': done by PR Z; forward to cbdb-online-main-server / SQLite-snapshot-build team as upstream data candidates.  tcode='11': confirm father validYear gate.  Phase-C tcodes: runtime-rule trace.  tcode='07': triage Rule 07 XC."
       },
       {
         "bucket": "access_did_not_compute",
@@ -220,7 +220,7 @@
   "suggested_next_investigations_in_priority_order": [
     {"id": 1, "task": "B1 release-process step (CmdIndexYear → CmdIndexAddress before shipping User MDB)", "would_close_rows": 412, "engineering_cost": "zero (process change)"},
     {"id": 2, "task": "B3 secondary tie-break (MIN(c_addr_id)) added to both implementations", "would_close_rows": 10, "engineering_cost": "small algorithm tweak per side"},
-    {"id": 3, "task": "A2 tcode 05 entry-code-mapping check (pull SQLite ENTRY_CODE_TYPE_REL membership)", "would_close_rows": 7, "engineering_cost": "single SQL probe"},
+    {"id": 3, "task": "A2 tcode 05 entry-code-mapping check — DONE by PR Z (6 mapping gaps + 1 c_year=0 gap; all PHP-side upstream data)", "would_close_rows": 7, "engineering_cost": "single SQL probe (already run)", "status": "done"},
     {"id": 4, "task": "A5 -20 cluster deep-dive (single staging-step row pick may explain 9 rows across 4 signature groups)", "would_close_rows": 9, "engineering_cost": "PR-S-style per-row evidence walk"},
     {"id": 5, "task": "A7 priority-order triage (largest remaining unknown; 17 rows; needs a runtime trace)", "would_close_rows": 17, "engineering_cost": "non-trivial — runtime-rule walk"}
   ]

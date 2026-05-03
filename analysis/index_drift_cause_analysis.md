@@ -96,7 +96,7 @@ K2 sub-groups by Access tcode (largest first):
 
 | Access tcode | Count | K2 candidate label | Likely cause |
 | ---: | ---: | --- | --- |
-| `'05'` | 7 | `candidate_php_entry_code_mapping_gap` | PHP `sqlEntryRule('040101', 30, '05')` joins `ENTRY_CODE_TYPE_REL` on `c_entry_type='040101'`; if the SQLite snapshot's `ENTRY_CODE_TYPE_REL` doesn't classify these persons' `c_entry_code` into `'040101'`, PHP doesn't fire and leaves the value at 0/null. |
+| `'05'` | 7 | `candidate_php_entry_code_mapping_gap` (6) + `candidate_php_entry_data_year_missing` (1) — **supported_by_focused_probe** (PR Z) | PHP `sqlEntryRule('040101', 30, '05')` joins `ENTRY_CODE_TYPE_REL` on `c_entry_type='040101'`; PR Z confirmed for 6/7 rows that the SQLite snapshot's `ENTRY_CODE_TYPE_REL` lacks the mapping User MDB has, and for the 1 outlier (pid 93384 Zhang Wenfu) that the SQLite `ENTRY_DATA.c_year` is 0 while User MDB's is 926.  All 7 are PHP-side upstream data gaps; Access fires Rule 05 correctly.  Detail: `analysis/index_year_tcode05_entry_mapping_probe.md`. |
 | `'11'` | 5 | `candidate_php_rule_coverage_gap` | PHP `sqlRule11` requires the father to pass `validYearExpr` (`c_birthyear=0 AND c_dy NOT IN [2,25,29,46,83]`).  Likely the father was excluded by that gate on PHP's side. |
 | `'14'` | 4 | `candidate_php_rule_coverage_gap` | Phase-C `sqlLoopOldestChildIndexToFatherRule` only fires inside the Phase-C loop; possibly an iteration-count difference. |
 | `'20'` | 1 | `candidate_php_rule_coverage_gap` | Phase-C older-brother propagation; iteration-count diff suspected. |
@@ -111,15 +111,18 @@ K2 sub-groups by Access tcode (largest first):
 - **Row evidence.** K1 / K2 group rows by Access tcode; per
   group the `examples` field carries 3 representative
   personids, `all_personids` the full list.
-- **Confidence.** **Medium-high** for `'05'` (the
-  ENTRY_CODE_TYPE_REL membership story is testable); **medium**
-  for `'11'` (PHP gate logic explicit, would need PHP-side
-  pull); **medium** for the Phase-C groups (need iteration
-  trace).
+- **Confidence.** **Supported by focused probe (PR Z)** for
+  `'05'` × 7 — 6 are confirmed `ENTRY_CODE_TYPE_REL` mapping
+  gaps, 1 is a PHP-side `ENTRY_DATA.c_year = 0` gap; both are
+  PHP-side upstream data issues, not algorithm divergence.
+  **Medium** for `'11'` (PHP gate logic explicit, would need
+  PHP-side pull); **medium** for the Phase-C groups (need
+  iteration trace).
 - **Next action.**
-  - For `'05'` × 7 — pull SQLite `ENTRY_CODE_TYPE_REL` and
-    check whether the 7 persons' `c_entry_code` appears with
-    `c_entry_type='040101'`.
+  - For `'05'` × 7 — **done by PR Z**.  Forward both the 6
+    mapping-gap rows and the 1 c_year=0 row to the
+    cbdb-online-main-server / SQLite-snapshot-build team as
+    upstream data candidates; out-of-scope for this repo.
   - For `'11'` × 5 — pull each father's `c_birthyear` /
     `c_dy` from SQLite and confirm the validYear gate fires.
   - For `'14'` / `'20'` / `'2304'` — runtime-rule trace
@@ -469,9 +472,10 @@ PR L bucketed every row.  No residual.
 2. **B3 secondary tie-break** — small algorithm improvement
    on both sides; closes 10 rows and stops the bucket
    reappearing on every snapshot.
-3. **A2 `'05'` × 7 entry-code-mapping check** — pull SQLite
-   `ENTRY_CODE_TYPE_REL` and confirm the 7 missing
-   memberships.  Cleanly testable.
+3. ~~**A2 `'05'` × 7 entry-code-mapping check**~~ — **done by
+   PR Z**: 6 confirmed mapping gaps, 1 confirmed
+   `ENTRY_DATA.c_year = 0` gap; all 7 PHP-side upstream data
+   issues.  Forward to cbdb-online-main-server team.
 4. **A5 `-20` cluster deep-dive** — single staging-step row
    pick may explain 9 rows across 4 signature groups.
 5. **A7 priority-order triage** — largest remaining unknown

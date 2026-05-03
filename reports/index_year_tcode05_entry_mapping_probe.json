@@ -1,0 +1,278 @@
+{
+  "summary": {
+    "n_rows": 7,
+    "outcome_counts": {
+      "mapping_gap_confirmed_user_has_target_sqlite_missing": 6,
+      "both_sides_have_target_cause_elsewhere": 1
+    },
+    "verdict": "hypothesis_mostly_supported",
+    "verdict_note": "6/7 rows fit the mapping-gap hypothesis cleanly.  Remaining 1 need separate triage.  PR Y's confidence stays at medium-high; the bucket may split.",
+    "php_target_type": "040101",
+    "php_offset": 30
+  },
+  "findings": [
+    {
+      "personid": 63311,
+      "name_chn": "馮任",
+      "name_py": "Feng Ren",
+      "access_index_year": 1577,
+      "php_index_year": 0,
+      "user_entry_data": [
+        {
+          "c_entry_code": 36,
+          "c_year": 0,
+          "c_sequence": 1
+        },
+        {
+          "c_entry_code": 36,
+          "c_year": 1607,
+          "c_sequence": 1
+        }
+      ],
+      "user_entry_type_map": {
+        "36": [
+          "040101"
+        ]
+      },
+      "sqlite_entry_data": [],
+      "sqlite_entry_type_map": {},
+      "user_has_target_040101_mapping": true,
+      "sqlite_has_target_040101_mapping": false,
+      "user_reconstructs_access_via_php_shape": true,
+      "user_reconstructing_entry": {
+        "c_entry_code": 36,
+        "c_year": 1607,
+        "c_sequence": 1
+      },
+      "outcome": "mapping_gap_confirmed_user_has_target_sqlite_missing"
+    },
+    {
+      "personid": 93384,
+      "name_chn": "張文伏",
+      "name_py": "Zhang Wenfu",
+      "access_index_year": 896,
+      "php_index_year": 0,
+      "user_entry_data": [
+        {
+          "c_entry_code": 36,
+          "c_year": 926,
+          "c_sequence": 1
+        }
+      ],
+      "user_entry_type_map": {
+        "36": [
+          "040101"
+        ]
+      },
+      "sqlite_entry_data": [
+        {
+          "c_entry_code": 36,
+          "c_year": 0,
+          "c_sequence": 1
+        }
+      ],
+      "sqlite_entry_type_map": {
+        "36": [
+          "040101"
+        ]
+      },
+      "user_has_target_040101_mapping": true,
+      "sqlite_has_target_040101_mapping": true,
+      "user_reconstructs_access_via_php_shape": true,
+      "user_reconstructing_entry": {
+        "c_entry_code": 36,
+        "c_year": 926,
+        "c_sequence": 1
+      },
+      "outcome": "both_sides_have_target_cause_elsewhere"
+    },
+    {
+      "personid": 126960,
+      "name_chn": "毛士龍",
+      "name_py": "Mao Shilong",
+      "access_index_year": 1583,
+      "php_index_year": 0,
+      "user_entry_data": [
+        {
+          "c_entry_code": 36,
+          "c_year": 1613,
+          "c_sequence": 1
+        }
+      ],
+      "user_entry_type_map": {
+        "36": [
+          "040101"
+        ]
+      },
+      "sqlite_entry_data": [],
+      "sqlite_entry_type_map": {},
+      "user_has_target_040101_mapping": true,
+      "sqlite_has_target_040101_mapping": false,
+      "user_reconstructs_access_via_php_shape": true,
+      "user_reconstructing_entry": {
+        "c_entry_code": 36,
+        "c_year": 1613,
+        "c_sequence": 1
+      },
+      "outcome": "mapping_gap_confirmed_user_has_target_sqlite_missing"
+    },
+    {
+      "personid": 129702,
+      "name_chn": "孫子良",
+      "name_py": "Sun Ziliang",
+      "access_index_year": 1374,
+      "php_index_year": 0,
+      "user_entry_data": [
+        {
+          "c_entry_code": 36,
+          "c_year": 0,
+          "c_sequence": 1
+        },
+        {
+          "c_entry_code": 36,
+          "c_year": 1404,
+          "c_sequence": 1
+        },
+        {
+          "c_entry_code": 169,
+          "c_year": 0,
+          "c_sequence": 0
+        }
+      ],
+      "user_entry_type_map": {
+        "36": [
+          "040101"
+        ],
+        "169": [
+          "0502"
+        ]
+      },
+      "sqlite_entry_data": [],
+      "sqlite_entry_type_map": {},
+      "user_has_target_040101_mapping": true,
+      "sqlite_has_target_040101_mapping": false,
+      "user_reconstructs_access_via_php_shape": true,
+      "user_reconstructing_entry": {
+        "c_entry_code": 36,
+        "c_year": 1404,
+        "c_sequence": 1
+      },
+      "outcome": "mapping_gap_confirmed_user_has_target_sqlite_missing"
+    },
+    {
+      "personid": 131550,
+      "name_chn": "華鈺",
+      "name_py": "Hua Yu",
+      "access_index_year": 1565,
+      "php_index_year": 0,
+      "user_entry_data": [
+        {
+          "c_entry_code": 36,
+          "c_year": 1595,
+          "c_sequence": 1
+        }
+      ],
+      "user_entry_type_map": {
+        "36": [
+          "040101"
+        ]
+      },
+      "sqlite_entry_data": [],
+      "sqlite_entry_type_map": {},
+      "user_has_target_040101_mapping": true,
+      "sqlite_has_target_040101_mapping": false,
+      "user_reconstructs_access_via_php_shape": true,
+      "user_reconstructing_entry": {
+        "c_entry_code": 36,
+        "c_year": 1595,
+        "c_sequence": 1
+      },
+      "outcome": "mapping_gap_confirmed_user_has_target_sqlite_missing"
+    },
+    {
+      "personid": 131912,
+      "name_chn": "葛寅亮",
+      "name_py": "Ge Yinliang",
+      "access_index_year": 1571,
+      "php_index_year": 0,
+      "user_entry_data": [
+        {
+          "c_entry_code": 36,
+          "c_year": 1601,
+          "c_sequence": 1
+        },
+        {
+          "c_entry_code": 39,
+          "c_year": 1600,
+          "c_sequence": 0
+        }
+      ],
+      "user_entry_type_map": {
+        "36": [
+          "040101"
+        ],
+        "39": [
+          "040102"
+        ]
+      },
+      "sqlite_entry_data": [],
+      "sqlite_entry_type_map": {},
+      "user_has_target_040101_mapping": true,
+      "sqlite_has_target_040101_mapping": false,
+      "user_reconstructs_access_via_php_shape": true,
+      "user_reconstructing_entry": {
+        "c_entry_code": 36,
+        "c_year": 1601,
+        "c_sequence": 1
+      },
+      "outcome": "mapping_gap_confirmed_user_has_target_sqlite_missing"
+    },
+    {
+      "personid": 696467,
+      "name_chn": "鄭准",
+      "name_py": "Zheng Zhun",
+      "access_index_year": 1434,
+      "php_index_year": 0,
+      "user_entry_data": [
+        {
+          "c_entry_code": 36,
+          "c_year": 1464,
+          "c_sequence": 1
+        },
+        {
+          "c_entry_code": 39,
+          "c_year": 0,
+          "c_sequence": 1
+        },
+        {
+          "c_entry_code": 47,
+          "c_year": 0,
+          "c_sequence": 1
+        }
+      ],
+      "user_entry_type_map": {
+        "36": [
+          "040101"
+        ],
+        "39": [
+          "040102"
+        ],
+        "47": [
+          "040103"
+        ]
+      },
+      "sqlite_entry_data": [],
+      "sqlite_entry_type_map": {},
+      "user_has_target_040101_mapping": true,
+      "sqlite_has_target_040101_mapping": false,
+      "user_reconstructs_access_via_php_shape": true,
+      "user_reconstructing_entry": {
+        "c_entry_code": 36,
+        "c_year": 1464,
+        "c_sequence": 1
+      },
+      "outcome": "mapping_gap_confirmed_user_has_target_sqlite_missing"
+    }
+  ],
+  "is_confirmed_bug": false
+}

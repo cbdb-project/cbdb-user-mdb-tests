@@ -687,7 +687,7 @@ PR M（`analysis/dump_data_mdb_vba.py`）從 DATA mdb 抽出了 `frmBaseMaintena
 | Bucket | 筆數 | 信心度 |
 |---|---:|---|
 | `php_returned_sentinel` | 1 | high |
-| `php_did_not_compute` | 19 | medium-high (for tcode 05 / cleanly testable); medium (for the others) |
+| `php_did_not_compute` | 19 | tcode='05' × 7: supported_by_focused_probe (PR Z).  tcode='11' × 5: medium.  Phase-C tcodes (14/20/2304): medium.  tcode='07' × 1: medium (vestigial-vs-intentional unresolved). |
 | `access_did_not_compute` | 7 | medium |
 | `iteration_order_diff` | 5 | medium |
 | `consistent_within_rule` | 14 | medium |
@@ -710,7 +710,7 @@ PR M（`analysis/dump_data_mdb_vba.py`）從 DATA mdb 抽出了 `frmBaseMaintena
 
 1. B1 release-process step (CmdIndexYear → CmdIndexAddress before shipping User MDB) —— 可消化 412 筆；工程成本：zero (process change)。
 2. B3 secondary tie-break (MIN(c_addr_id)) added to both implementations —— 可消化 10 筆；工程成本：small algorithm tweak per side。
-3. A2 tcode 05 entry-code-mapping check (pull SQLite ENTRY_CODE_TYPE_REL membership) —— 可消化 7 筆；工程成本：single SQL probe。
+3. A2 tcode 05 entry-code-mapping check — DONE by PR Z (6 mapping gaps + 1 c_year=0 gap; all PHP-side upstream data) —— 可消化 7 筆；工程成本：single SQL probe (already run)。
 
 ### 僅 c_index_year 不一致的樣例
 
