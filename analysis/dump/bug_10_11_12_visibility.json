@@ -1,0 +1,240 @@
+{
+  "targets": [
+    {
+      "bug": 10,
+      "subform": "EVENT_ADDR_2 Subform",
+      "control": "TxtAddrCHN",
+      "found": true,
+      "container_chain": [
+        {
+          "name": "CBDB_Browser_2",
+          "visible": true
+        },
+        {
+          "name": "BIOG_MAIN_2_Subform",
+          "visible": true
+        },
+        {
+          "name": "EVENT_ADDR_2 Subform",
+          "control_type": 112,
+          "control_source": null,
+          "visible": true,
+          "top": 3600,
+          "left": 120,
+          "width": 10350,
+          "height": 930,
+          "tag": "",
+          "value": "<no Value>"
+        }
+      ],
+      "control_summary": {
+        "name": "TxtAddrCHN",
+        "control_type": 109,
+        "control_source": "c_name_chn",
+        "visible": true,
+        "top": 120,
+        "left": 1020,
+        "width": 2340,
+        "height": 240,
+        "tag": "",
+        "value": "<no Value>"
+      },
+      "path": [
+        "CBDB_Browser_2",
+        "BIOG_MAIN_2_Subform",
+        "EVENTS_DATA_2 Subform",
+        "EVENT_ADDR_2 Subform"
+      ],
+      "active_tab": "PageEvents"
+    },
+    {
+      "bug": 10,
+      "subform": "EVENT_ADDR_2 Subform",
+      "control": "TxtAddrPY",
+      "found": true,
+      "container_chain": [
+        {
+          "name": "CBDB_Browser_2",
+          "visible": true
+        },
+        {
+          "name": "BIOG_MAIN_2_Subform",
+          "visible": true
+        },
+        {
+          "name": "EVENT_ADDR_2 Subform",
+          "control_type": 112,
+          "control_source": null,
+          "visible": true,
+          "top": 3600,
+          "left": 120,
+          "width": 10350,
+          "height": 930,
+          "tag": "",
+          "value": "<no Value>"
+        }
+      ],
+      "control_summary": {
+        "name": "TxtAddrPY",
+        "control_type": 109,
+        "control_source": "c_name",
+        "visible": true,
+        "top": 120,
+        "left": 3420,
+        "width": 2100,
+        "height": 240,
+        "tag": "",
+        "value": "<no Value>"
+      },
+      "path": [
+        "CBDB_Browser_2",
+        "BIOG_MAIN_2_Subform",
+        "EVENTS_DATA_2 Subform",
+        "EVENT_ADDR_2 Subform"
+      ],
+      "active_tab": "PageEvents"
+    },
+    {
+      "bug": 11,
+      "subform": "EVENTS_DATA_2 Subform",
+      "control": "c_event_record_id",
+      "found": true,
+      "container_chain": [
+        {
+          "name": "CBDB_Browser_2",
+          "visible": true
+        },
+        {
+          "name": "BIOG_MAIN_2_Subform",
+          "visible": true
+        },
+        {
+          "name": "EVENTS_DATA_2 Subform",
+          "control_type": 112,
+          "control_source": null,
+          "visible": true,
+          "top": 2565,
+          "left": 300,
+          "width": 11130,
+          "height": 5595,
+          "tag": "",
+          "value": "<no Value>"
+        }
+      ],
+      "control_summary": {
+        "name": "c_event_record_id",
+        "control_type": 109,
+        "control_source": "c_event_record_id",
+        "visible": false,
+        "top": 1740,
+        "left": 6180,
+        "width": 240,
+        "height": 270,
+        "tag": "",
+        "value": "<no Value>"
+      },
+      "path": [
+        "CBDB_Browser_2",
+        "BIOG_MAIN_2_Subform",
+        "EVENTS_DATA_2 Subform"
+      ],
+      "active_tab": "PageEvents"
+    },
+    {
+      "bug": 12,
+      "subform": "POSTED_TO_OFFICE_DATA_2 Subform",
+      "control": "c_appt_type_code",
+      "found": true,
+      "container_chain": [
+        {
+          "name": "CBDB_Browser_2",
+          "visible": true
+        },
+        {
+          "name": "BIOG_MAIN_2_Subform",
+          "visible": true
+        },
+        {
+          "name": "POSTED_TO_OFFICE_DATA_2 Subform",
+          "control_type": 112,
+          "control_source": null,
+          "visible": true,
+          "top": 60,
+          "left": 60,
+          "width": 10590,
+          "height": 5400,
+          "tag": "",
+          "value": "<no Value>"
+        }
+      ],
+      "control_summary": {
+        "name": "c_appt_type_code",
+        "control_type": 109,
+        "control_source": "c_appt_type_code",
+        "visible": false,
+        "top": 3600,
+        "left": 9180,
+        "width": 180,
+        "height": 330,
+        "tag": "",
+        "value": "<no Value>"
+      },
+      "path": [
+        "CBDB_Browser_2",
+        "BIOG_MAIN_2_Subform",
+        "POSTING_DATA_2 Subform",
+        "POSTED_TO_OFFICE_DATA_2 Subform"
+      ],
+      "active_tab": "PagePosting"
+    },
+    {
+      "bug": 12,
+      "subform": "POSTED_TO_OFFICE_DATA_2 Subform",
+      "control": "c_appt_type_code",
+      "found": true,
+      "container_chain": [
+        {
+          "name": "CBDB_Browser_2",
+          "visible": true
+        },
+        {
+          "name": "BIOG_MAIN_2_Subform",
+          "visible": true
+        },
+        {
+          "name": "POSTED_TO_OFFICE_DATA_2 Subform",
+          "control_type": 112,
+          "control_source": null,
+          "visible": true,
+          "top": 60,
+          "left": 60,
+          "width": 10590,
+          "height": 5400,
+          "tag": "",
+          "value": "<no Value>"
+        }
+      ],
+      "control_summary": {
+        "name": "c_appt_type_code",
+        "control_type": 109,
+        "control_source": "c_appt_type_code",
+        "visible": false,
+        "top": 3600,
+        "left": 9180,
+        "width": 180,
+        "height": 330,
+        "tag": "",
+        "value": "<no Value>"
+      },
+      "path": [
+        "CBDB_Browser_2",
+        "BIOG_MAIN_2_Subform",
+        "POSTING_DATA_2 Subform",
+        "POSTED_TO_OFFICE_DATA_2 Subform"
+      ],
+      "active_tab": "PagePosting",
+      "personid": 2,
+      "note": "re-probed against c_personid=2 (An Fang) \u2014 Sun Cai 44872 has no POSTING_DATA so the first probe couldn't tell whether the control would have data"
+    }
+  ]
+}

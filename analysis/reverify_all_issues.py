@@ -207,7 +207,14 @@ def main() -> int:
         findings.append((10, "REVIEW",
                          "view actually exposes c_name_chn / c_name now"))
 
-    # ---- Bug #11: EVENTS_DATA_2 c_event_record_id -------------------
+    # ---- Bug #11/#12: hidden internal controls bound to non-projected
+    # columns.  The static defect (control bound to a column that the
+    # form's RecordSource doesn't project) IS real for both, but a live
+    # COM probe in 2026-05-03 confirmed that the offending controls are
+    # `Visible = False` with sub-5mm widths — i.e. hidden internal
+    # join-key holders, never user-facing.  Reclass: LATENT, not REAL.
+    # See `analysis/probe_bug_10_11_12_visibility.py` for the probe
+    # and `analysis/dump/bug_10_11_12_visibility.json` for the result.
     sql11 = _saved_query_sql("View_EventsData")
     aliased11 = {n.lower() for n in _re.findall(
         r"as\s+([a-z_]\w*)", sql11, flags=_re.IGNORECASE
@@ -221,14 +228,21 @@ def main() -> int:
     in_evts = "c_event_record_id" in _table_cols("EVENTS_DATA")
     in_view = "c_event_record_id" in out11
     if not in_evts and not in_view:
-        findings.append((11, "REAL",
+        findings.append((11, "LATENT",
                          "c_event_record_id is in NEITHER EVENTS_DATA "
-                         "nor View_EventsData → bound control shows blank"))
+                         "nor View_EventsData → would render blank, BUT "
+                         "the control is Visible=False (hidden internal "
+                         "control, width=240 twips per COM probe) — user "
+                         "doesn't see it"))
     else:
         findings.append((11, "REVIEW",
                          f"in EVENTS_DATA={in_evts}, in view projection={in_view}"))
 
-    # ---- Bug #12: POSTED_TO_OFFICE_DATA_2 c_appt_type_code ---------
+    # Bug #12: same shape — c_appt_type_code is a hidden internal
+    # control.  The user-facing appointment-type controls
+    # (TxtApptType / TxtApptTypeChn) are bound to c_appt_desc /
+    # c_appt_desc_chn, which ARE in View_PostingOfficeData and render
+    # correctly.
     sql12 = _saved_query_sql("View_PostingOfficeData")
     aliased12 = {n.lower() for n in _re.findall(
         r"as\s+([a-z_]\w*)", sql12, flags=_re.IGNORECASE
@@ -240,9 +254,14 @@ def main() -> int:
         unaliased12.add(tok.lower())
     out12 = aliased12 | unaliased12
     if "c_appt_type_code" not in out12:
-        findings.append((12, "REAL",
+        findings.append((12, "LATENT",
                          "c_appt_type_code not in View_PostingOfficeData "
-                         "projection → bound control shows blank"))
+                         "projection → would render blank, BUT the "
+                         "control is Visible=False (hidden internal "
+                         "control, width=180 twips per COM probe).  "
+                         "The user-facing TxtApptType / TxtApptTypeChn "
+                         "are bound to c_appt_desc / c_appt_desc_chn "
+                         "which ARE in projection and work correctly."))
     else:
         findings.append((12, "REVIEW",
                          "view now exposes c_appt_type_code"))

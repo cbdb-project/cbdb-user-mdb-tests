@@ -19,8 +19,6 @@ The issues are ordered by severity (P0 highest). Each entry includes a concise d
   - [Issue #13 — BIOG_MAIN_2 Subform tries to open a picker form (frmPickNIAN_HAO) that doesn't exist](#issue-13--biog_main_2-subform-tries-to-open-a-picker-form-frmpicknian_hao-that-doesnt-exist)
 - [P2 — Silent display](#p2--silent-display)
   - [Issue #10 — EVENT_ADDR_2 Subform address columns silently render blank (wrong ControlSource)](#issue-10--event_addr_2-subform-address-columns-silently-render-blank-wrong-controlsource)
-  - [Issue #11 — EVENTS_DATA_2 Subform has a control bound to a non-existent column c_event_record_id](#issue-11--events_data_2-subform-has-a-control-bound-to-a-non-existent-column-c_event_record_id)
-  - [Issue #12 — POSTED_TO_OFFICE_DATA_2 Subform appointment-type control bound to wrong column name](#issue-12--posted_to_office_data_2-subform-appointment-type-control-bound-to-wrong-column-name)
 - [P3 — Missing UI](#p3--missing-ui)
   - [Issue #15 — LookAtPlace is missing its CmdGIS button (handler exists but no UI control)](#issue-15--lookatplace-is-missing-its-cmdgis-button-handler-exists-but-no-ui-control)
   - [Issue #16 — LookAtStatus is missing its CmdPajek button](#issue-16--lookatstatus-is-missing-its-cmdpajek-button)
@@ -35,6 +33,8 @@ The issues are ordered by severity (P0 highest). Each entry includes a concise d
   - [Issue #4 — LookAtPlace.CmdGIS would abort with 'Object required' — LATENT, masked by Issue #15 (no CmdGIS button on the form)](#issue-4--lookatplacecmdgis-would-abort-with-object-required--latent-masked-by-issue-15-no-cmdgis-button-on-the-form)
   - [Issue #5 — LookAtStatus.CmdPajek references a missing control AND uses three columns that don't exist](#issue-5--lookatstatuscmdpajek-references-a-missing-control-and-uses-three-columns-that-dont-exist)
   - [Issue #14 — KIN_DATA Subform's CmdPickKinRel calls a missing picker (frmPickKINSHIP_CODES) — but the host sub-form is currently an orphan (LATENT)](#issue-14--kin_data-subforms-cmdpickkinrel-calls-a-missing-picker-frmpickkinship_codes--but-the-host-sub-form-is-currently-an-orphan-latent)
+  - [Issue #11 — EVENTS_DATA_2's c_event_record_id control bound to a non-existent column — but the control is hidden (LATENT)](#issue-11--events_data_2s-c_event_record_id-control-bound-to-a-non-existent-column--but-the-control-is-hidden-latent)
+  - [Issue #12 — POSTED_TO_OFFICE_DATA_2's c_appt_type_code control bound to a non-projected column — but the control is hidden AND the user-facing appointment-type controls work (LATENT)](#issue-12--posted_to_office_data_2s-c_appt_type_code-control-bound-to-a-non-projected-column--but-the-control-is-hidden-and-the-user-facing-appointment-type-controls-work-latent)
 - [Severity legend](#severity-legend)
 - [Appendix — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (not bugs)](#appendix--c_index_year--c_index_addr_id-drift-vs-the-cbdb-online-main-server-snapshot-not-bugs)
 - [Closing note](#closing-note)
@@ -188,7 +188,7 @@ Either restore the picker form `frmPickNIAN_HAO`, or update the caller in `Form_
 
 **Affected sub:** `EVENT_ADDR_2 Subform`
 
-**Severity:** P2 — Silent display (address columns blank)
+**Severity:** P2 — Silent display (EVENT_ADDR_2's TxtAddrCHN / TxtAddrPY render blank for every row)
 
 #### Description
 
@@ -205,81 +205,20 @@ But the form's RecordSource is the saved query `View_EventAddrData`, which alias
 
 Open person 44872 (孫才, Sun Cai). The EVENTS sub-datasheet shows 1 event row(s); 1 of them have an associated address. That's where the bound controls render blank on every row. _Picked by `reports/probe_demo_persons.py`; a SQL probe selected this person because their row counts genuinely satisfy the precondition the bug needs._
 
-1. Open the biographical detail form for **c_personid = 44872 (Sun Cai 孫才)** — picked because he has both EVENTS_DATA and EVENTS_ADDR rows in a small enough quantity to inspect by eye.
-2. Switch to the EVENT_ADDR sub-datasheet.
-3. The Chinese address column and the Pinyin address column are blank on every row, even though the underlying ADDR_CODES rows actually have those fields populated.
+1. Open CBDB_Browser_2 and navigate to **c_personid = 44872 (Sun Cai 孫才)** — picked because he has 1 EVENTS_DATA row with an associated EVENT_ADDR row pointing at `c_addr_id = 12603` (Anfeng / 安豐 in ADDR_CODES).  Switch to the **Events** sub-tab.
+2. Look at the small EVENT_ADDR_2 sub-form embedded inside the event row (it's nested below the main event line).  The two address textboxes there — `TxtAddrCHN` and `TxtAddrPY` — render blank.
+3. **Note:** the parent EVENTS_DATA_2 sub-form has its own address controls (also called TxtAddrCHN / TxtAddrPY but bound to `c_addr_chn` / `c_addr_name`, which `View_EventsData` DOES project) — those work and show '安豐' / 'Anfeng'.  Bug #10 is specifically about the inner EVENT_ADDR_2 sub-form's controls being blank, not about the visible address values on the parent row.
+4. SQL verification (no Access needed): `SELECT c_name_chn FROM View_EventAddrData` raises `Too few parameters. Expected 2.` — JET treats the unknown identifier as a parameter, confirming the column is not in the projection.
 
 #### Screenshots
 
 ![bug10_subform_annotated.png](screenshots/bug10_subform_annotated.png)
 
-_Runtime view: CBDB_Browser_2 with c_personid=44872 (孫才) loaded.  EVENT_ADDR sub-tab shows blank Chinese / Pinyin address columns (control `TxtAddrCHN` is bound to `c_name_chn`, which the form's RecordSource — `View_EventAddrData` — doesn't project).  ADDR_CODES has the values — they're just unreachable from this sub-form._
+_Runtime view of CBDB_Browser_2 → BIOG_MAIN_2 → Events tab with c_personid=44872 (孫才) loaded.  **The visible '安豐' / address values come from the parent EVENTS_DATA_2 sub-form's TxtAddrCHN (correctly bound to `c_addr_chn`).**  Bug #10's blank controls live in the smaller EVENT_ADDR_2 sub-form nested inside the event row — those two controls (TxtAddrCHN / TxtAddrPY bound to `c_name_chn` / `c_name`, neither in `View_EventAddrData`'s projection) render empty.  COM probe confirms both are Visible=True with widths 2340 / 2100 twips (≈4cm / 3.5cm) — i.e. real user-visible blank columns, just smaller than the parent row's address display.  Verification scripts: `analysis/probe_bug_10_11_12_visibility.py` (control visibility) + the SQL probe in the steps above._
 
 #### Suggested fix
 
-In the form designer, change `TxtAddrCHN`.ControlSource from `c_name_chn` to `c_event_addr_chn`, and `TxtAddrPY`.ControlSource from `c_name` to `c_event_addr_name` (the actual aliases in View_EventAddrData).
-
-### Issue #11 — EVENTS_DATA_2 Subform has a control bound to a non-existent column c_event_record_id
-
-**Affected sub:** `EVENTS_DATA_2 Subform`
-
-**Severity:** P2 — Silent display (column blank)
-
-#### Description
-
-The EVENTS_DATA_2 sub-form has a control whose ControlSource is `c_event_record_id`. Neither the source table EVENTS_DATA nor the form's RecordSource (`View_EventsData`) has a column of that name — likely a stale design-time leftover from when the schema had an event-record id, or an intended `c_event_code` that was typo'd. The control silently shows blank for every row.
-
-#### Steps to reproduce
-
-**Recommended demo person:** `c_personid=44872` (孫才, Sun Cai)
-
-Open person 44872 (孫才, Sun Cai). The EVENTS sub-datasheet shows 1 event row(s); 1 of them have an associated address. That's where the bound controls render blank on every row. _Picked by `reports/probe_demo_persons.py`; a SQL probe selected this person because their row counts genuinely satisfy the precondition the bug needs._
-
-1. Open the biographical detail form for **c_personid = 44872 (Sun Cai 孫才)** — same person used for Issue #10 above; he has multiple EVENTS_DATA rows so the offending column renders on each.
-2. Switch to the EVENTS sub-datasheet.
-3. The control bound to `c_event_record_id` is blank for every row (because neither EVENTS_DATA nor View_EventsData has that column).
-
-#### Screenshots
-
-![bug11_subform_annotated.png](screenshots/bug11_subform_annotated.png)
-
-_Runtime view: CBDB_Browser_2 with c_personid=44872 (孫才) loaded.  EVENTS_DATA sub-tab has a control bound to `c_event_record_id`, which doesn't exist in either EVENTS_DATA or `View_EventsData` — every row renders blank silently._
-
-#### Suggested fix
-
-Decide what was intended. If the column is no longer needed, remove the control. If it should map to `c_event_code`, fix the ControlSource to that name. If the schema needs a real event-record-id column, add it to EVENTS_DATA AND project it in View_EventsData.
-
-### Issue #12 — POSTED_TO_OFFICE_DATA_2 Subform appointment-type control bound to wrong column name
-
-**Affected sub:** `POSTED_TO_OFFICE_DATA_2 Subform`
-
-**Severity:** P2 — Silent display (column blank)
-
-#### Description
-
-The control `c_appt_type_code` on POSTED_TO_OFFICE_DATA_2 subform has ControlSource `c_appt_type_code`. The form's RecordSource (`View_PostingOfficeData`) projects `POSTED_TO_OFFICE_DATA.c_appt_code` (no `_type` infix). The control silently shows blank.
-
-Looks like a renamed column the form designer didn't follow.
-
-#### Steps to reproduce
-
-**Recommended demo person:** `c_personid=2` (安邡, An Fang)
-
-Open person 2 (安邡, An Fang). The POSTED-TO-OFFICE sub-datasheet shows 1 posting row(s) with non-null c_appt_code — yet the appointment-type column on every row is blank. _Picked by `reports/probe_demo_persons.py`; a SQL probe selected this person because their row counts genuinely satisfy the precondition the bug needs._
-
-1. Open the biographical detail form for **c_personid = 2 (An Fang 安邡)** — picked because he has a small number of POSTED_TO_OFFICE_DATA rows, all with non-NULL `c_appt_code`, so the column we want to inspect actually has source data.
-2. Switch to the POSTED_TO_OFFICE sub-datasheet.
-3. The appointment-type column is blank for every row, even though c_appt_code in the source table has a real value on each.
-
-#### Screenshots
-
-![bug12_subform_annotated.png](screenshots/bug12_subform_annotated.png)
-
-_Runtime view: CBDB_Browser_2 with c_personid=2 (安邡, An Fang) loaded — picked because he has POSTING_DATA (Sun Cai 44872 has none).  Postings sub-tab is open; the appointment-type column is blank on every row — the bound control's ControlSource (`c_appt_type_code`) is missing from `View_PostingOfficeData`'s projection._
-
-#### Suggested fix
-
-Change the control's ControlSource from `c_appt_type_code` to `c_appt_code` (the actual column projected by View_PostingOfficeData).
+In the form designer for `EVENT_ADDR_2 Subform`, change `TxtAddrCHN`.ControlSource from `c_name_chn` to `c_event_addr_chn`, and `TxtAddrPY`.ControlSource from `c_name` to `c_event_addr_name` (the actual aliases in View_EventAddrData).
 
 ## P3 — Missing UI
 
@@ -576,6 +515,64 @@ Open person 1 (安惇, An Dun). The KIN_DATA sub-datasheet shows 5 kinship row(s
 #### Suggested fix
 
 Same as Issue #13: restore the picker form (or update the caller to its replacement). Even though the runtime path is not currently reachable, the static defect should be cleaned up so it doesn't resurface when `KIN_DATA Subform` is re-embedded.
+
+### Issue #11 — EVENTS_DATA_2's c_event_record_id control bound to a non-existent column — but the control is hidden (LATENT)
+
+**Affected sub:** `EVENTS_DATA_2 Subform`
+
+**Severity:** P5 — Latent (would be P2 if the control were ever made Visible=True or widened past its current 240-twip width)
+
+#### Description
+
+**Static defect is real, runtime symptom is not user-visible.** The EVENTS_DATA_2 sub-form has a control named `c_event_record_id` whose ControlSource is also `c_event_record_id`.  Neither EVENTS_DATA nor `View_EventsData` projects a column of that name (SQL probe confirms — `SELECT c_event_record_id FROM View_EventsData` raises `Too few parameters. Expected 1.`), so the control would render blank if shown.
+
+**Why LATENT.**  A live COM probe of the rendered form (`analysis/probe_bug_10_11_12_visibility.py`) reports the control as `Visible = False`, with width = 240 twips (~4mm) and height = 270 twips — i.e. a hidden internal control, almost certainly a leftover join-key field that was never meant to be shown.  Real users won't see a blank column because they don't see the control at all.  Reclassed from P2 to P5 on 2026-05-03.
+
+#### Steps to reproduce
+
+**Recommended demo person:** `c_personid=44872` (孫才, Sun Cai)
+
+Open person 44872 (孫才, Sun Cai). The EVENTS sub-datasheet shows 1 event row(s); 1 of them have an associated address. That's where the bound controls render blank on every row. _Picked by `reports/probe_demo_persons.py`; a SQL probe selected this person because their row counts genuinely satisfy the precondition the bug needs._
+
+1. Verification path is **static + COM probe only** — there's no UI symptom to demonstrate.
+2. Static evidence: `SELECT c_event_record_id FROM View_EventsData` against the user mdb raises `Too few parameters. Expected 1.`, confirming the column is not in the projection.
+3. Visibility evidence: run `python analysis/probe_bug_10_11_12_visibility.py` and look at the entry for bug #11 in `analysis/dump/bug_10_11_12_visibility.json` — `control_summary.visible` is `False` and `width` is 240 twips.
+
+#### Suggested fix
+
+If the hidden control isn't needed, delete it.  If it's intentionally a hidden join-key holder, change its ControlSource to a real column (e.g. `c_event_code`) so it doesn't carry a stale binding.  Either way, the change is invisible to users; this is code-hygiene only.
+
+### Issue #12 — POSTED_TO_OFFICE_DATA_2's c_appt_type_code control bound to a non-projected column — but the control is hidden AND the user-facing appointment-type controls work (LATENT)
+
+**Affected sub:** `POSTED_TO_OFFICE_DATA_2 Subform`
+
+**Severity:** P5 — Latent (would be P2 if the control were ever made Visible=True or widened past its current 180-twip width)
+
+#### Description
+
+**Static defect is real, runtime symptom is not user-visible.** The hidden internal control `c_appt_type_code` on POSTED_TO_OFFICE_DATA_2 has ControlSource `c_appt_type_code`, which `View_PostingOfficeData` doesn't project (SQL probe: raises `Too few parameters. Expected 1.`).
+
+**Why LATENT.**  Two reasons:
+
+1. The COM probe (`analysis/probe_bug_10_11_12_visibility.py`) reports the control as `Visible = False`, with width = 180 twips (~3mm) and height = 330 twips — a hidden internal control, almost certainly a join-key holder.
+2. The **user-facing** appointment-type controls on the same sub-form are `TxtApptType` (bound to `c_appt_desc`) and `TxtApptTypeChn` (bound to `c_appt_desc_chn`).  Both of those columns ARE in `View_PostingOfficeData`'s projection — SQL probe shows they return real values (e.g. `'Regular Appointment'` / `'正授'`).  So the appointment type IS displayed correctly on the Postings sub-tab; only the hidden `c_appt_type_code` control is broken.
+
+Reclassed from P2 to P5 on 2026-05-03 — the original P2 claim that 'the appointment-type column is blank on every row' was wrong; the user-facing appointment-type column works fine.
+
+#### Steps to reproduce
+
+**Recommended demo person:** `c_personid=2` (安邡, An Fang)
+
+Open person 2 (安邡, An Fang). The POSTED-TO-OFFICE sub-datasheet shows 1 posting row(s) with non-null c_appt_code — yet the appointment-type column on every row is blank. _Picked by `reports/probe_demo_persons.py`; a SQL probe selected this person because their row counts genuinely satisfy the precondition the bug needs._
+
+1. Verification path is **static + COM probe only** — there's no UI symptom to demonstrate.
+2. Static evidence: `SELECT c_appt_type_code FROM View_PostingOfficeData` raises `Too few parameters. Expected 1.`, confirming the column is not projected.
+3. Visibility evidence: run `python analysis/probe_bug_10_11_12_visibility.py` and look at the entry for bug #12 in `analysis/dump/bug_10_11_12_visibility.json` — `control_summary.visible` is `False` and width = 180 twips.
+4. Counter-evidence (what users actually see works fine): `SELECT TOP 1 c_appt_desc, c_appt_desc_chn FROM View_PostingOfficeData` returns real values (e.g. `'Regular Appointment'` / `'正授'`), and those are what `TxtApptType` / `TxtApptTypeChn` (the visible controls) render.
+
+#### Suggested fix
+
+If the hidden control isn't needed, delete it.  If it's an intentional hidden join-key holder, change its ControlSource to a real column (e.g. `c_appt_code`).  Either way the change is invisible to users; this is code-hygiene only.
 
 ## Appendix — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (not bugs)
 
