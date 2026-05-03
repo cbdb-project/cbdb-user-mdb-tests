@@ -1,0 +1,1259 @@
+"""Generate two Word documents (English + Chinese) summarising every
+documented bug in CBDB_BJ_User.mdb, ordered by severity, with
+screenshots from `reports/screenshots/` embedded under each issue.
+
+Run:
+    python reports/generate_report.py
+Outputs:
+    reports/CBDB_Issues_Report_EN.docx
+    reports/CBDB_Issues_Report_ZH.docx
+
+Tone: deferential / polite throughout — the maintainer is a
+respected senior researcher, and these reports are a courtesy hand-
+off, not a pull request.
+"""
+from __future__ import annotations
+
+from pathlib import Path
+
+from docx import Document
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+from docx.oxml.ns import qn
+from docx.oxml import OxmlElement
+from docx.shared import Inches, Pt, RGBColor
+
+import opencc
+_S2T = opencc.OpenCC("s2twp")  # Simplified -> Traditional (Taiwan idiom)
+
+
+def t(s: str) -> str:
+    """Convert Simplified Chinese strings to Traditional (Taiwan).
+    Safe to call on ASCII / English (the converter is a no-op there)."""
+    if not s:
+        return s
+    return _S2T.convert(s)
+
+REPO = Path(__file__).resolve().parent.parent
+SHOT_DIR = REPO / "reports" / "screenshots"
+OUT_EN = REPO / "reports" / "CBDB_Issues_Report_EN.docx"
+OUT_ZH = REPO / "reports" / "CBDB_Issues_Report_ZH-Hant.docx"
+
+
+# ---------------------------------------------------------------------
+# Issue catalogue — single source of truth for both language reports.
+# Ordered by severity (highest first within each tier).
+# ---------------------------------------------------------------------
+
+ISSUES = [
+    # ========== Tier 1: silent data corruption ==========
+    {
+        "id": 1,
+        "tier": "P0_silent_data",
+        "form": "View_StatusData",
+        "title_en": "View_StatusData displays last-year range in the first-year column",
+        "title_zh": "View_StatusData 把首年份范围显示成了末年份范围",
+        "summary_en": (
+            "The saved query `View_StatusData` joins `YEAR_RANGE_CODES` "
+            "twice (once aliased as `YEAR_RANGE_CODES_1` for the last-year "
+            "range), but the SELECT list pulls every range field from the "
+            "_1 alias. As a result, every status row displayed in the "
+            "Status sub-datasheet shows the last-year range value in the "
+            "first-year range column."
+        ),
+        "summary_zh": (
+            "存档查询 `View_StatusData` 把 `YEAR_RANGE_CODES` 表 JOIN 了两次"
+            "（其中一次别名是 `YEAR_RANGE_CODES_1`，用于末年份范围），但"
+            " SELECT 列表里所有范围字段都从 _1 别名取值。结果是 Status 子数据"
+            "表里每一行显示的「首年份范围」其实是末年份范围。"
+        ),
+        "steps_en": [
+            "Open any person's biographical detail form.",
+            "Switch to the **Status** sub-datasheet.",
+            "Compare the column **First-year range** (`c_fy_range_desc`) "
+            "with the column **Last-year range** (`c_ly_range_desc`).",
+            "Whenever the underlying `c_fy_range` and `c_ly_range` codes "
+            "differ, the displayed first-year text actually shows the "
+            "last-year value.",
+        ],
+        "steps_zh": [
+            "打开任意一位人物的生平详情表单。",
+            "切换到 **Status** 子数据表。",
+            "对比 **首年份范围** 列（`c_fy_range_desc`）和 **末年份范围** "
+            "列（`c_ly_range_desc`）。",
+            "只要底层 `c_fy_range` 与 `c_ly_range` 编码不同，显示的首年份"
+            "范围其实都是末年份的值。",
+        ],
+        "fix_en": (
+            "In `View_StatusData` change `YEAR_RANGE_CODES_1.c_range AS "
+            "c_fy_range_desc` and `YEAR_RANGE_CODES_1.c_range_chn AS "
+            "c_fy_range_chn` to use the un-aliased `YEAR_RANGE_CODES.*` "
+            "fields (which the FROM clause already joins on `c_fy_range`)."
+        ),
+        "fix_zh": (
+            "在 `View_StatusData` 中，把 `YEAR_RANGE_CODES_1.c_range AS "
+            "c_fy_range_desc` 和 `YEAR_RANGE_CODES_1.c_range_chn AS "
+            "c_fy_range_chn` 改成不带别名的 `YEAR_RANGE_CODES.*`（FROM "
+            "子句已经按 `c_fy_range` JOIN 了它）。"
+        ),
+        "screenshots": [],
+        "severity_en": "P0 — Silent data corruption",
+        "severity_zh": "P0 — 静默数据错位",
+    },
+    {
+        "id": 3,
+        "tier": "P0_silent_data",
+        "form": "Form_LookAtEntry.CmdQuery_Click",
+        "title_en": "LookAtEntry.CmdQuery backfill UPDATE silently fails on large result sets",
+        "title_zh": "LookAtEntry.CmdQuery 的回填 UPDATE 在大结果集上静默失败",
+        "summary_en": (
+            "`Form_LookAtEntry.vb:1778-1789` runs a single UPDATE that "
+            "joins seven+ lookup tables to backfill descriptive columns "
+            "(`c_entry_desc`, `c_addr_name`, `c_kin_name`, …) into "
+            "`ZZ_SCRATCH_ENTRY`. When the result set is large enough "
+            "(roughly 30,000+ rows), JET silently leaves those columns "
+            "NULL — the user sees a query result with empty description "
+            "fields and no error message. Confirmed only on LookAtEntry; "
+            "Status / Texts / Associations all backfill correctly at "
+            "similar row counts because their UPDATE chains are simpler."
+        ),
+        "summary_zh": (
+            "`Form_LookAtEntry.vb:1778-1789` 用一条 UPDATE 把七张以上 lookup "
+            "表 JOIN 到 `ZZ_SCRATCH_ENTRY` 上，回填 `c_entry_desc`、"
+            "`c_addr_name`、`c_kin_name` 等描述字段。当结果集足够大时（大约"
+            " 30000 行以上），JET 引擎会静默地不更新这些字段——用户看到的查询"
+            "结果里相关列全是空，但完全没有报错。这个问题仅在 LookAtEntry 上"
+            "重现；Status / Texts / Associations 在相近行数下都能正确回填，"
+            "原因是它们的 UPDATE JOIN 链更简单。"
+        ),
+        "steps_en": [
+            "Open **LookAtEntry**.",
+            "Pick a high-frequency entry code such as **36 (jinshi general)** "
+            "without any year or place filters.",
+            "Click **Run Query**. Wait for the query to complete.",
+            "Open the result table `ZZ_SCRATCH_ENTRY` and inspect the "
+            "`c_entry_desc`, `c_addr_name`, `c_kin_name` columns.",
+            "Many rows have NULL values where descriptive text should be, "
+            "even though the matching lookup rows exist in the source tables.",
+        ],
+        "steps_zh": [
+            "打开 **LookAtEntry**。",
+            "选一个高频入仕途径，例如 **36（进士及第）**，不加任何年份或地点筛选。",
+            "点 **Run Query**，等查询跑完。",
+            "打开结果表 `ZZ_SCRATCH_ENTRY`，查看 `c_entry_desc`、`c_addr_name`、"
+            "`c_kin_name` 等列。",
+            "许多行的描述字段都是空的，尽管对应的 lookup 行在源表中其实存在。",
+        ],
+        "fix_en": (
+            "Split the giant multi-table UPDATE into several smaller ones "
+            "— one per lookup join (UPDATE … LEFT JOIN INDEXYEAR_TYPE_CODES, "
+            "UPDATE … LEFT JOIN BIOG_MAIN, etc.). Same pattern Status / "
+            "Texts / Associations already use successfully."
+        ),
+        "fix_zh": (
+            "把这条庞大的多表 UPDATE 拆成若干条小 UPDATE——每条只 JOIN 一张"
+            " lookup 表（UPDATE … LEFT JOIN INDEXYEAR_TYPE_CODES、UPDATE … "
+            "LEFT JOIN BIOG_MAIN……）。Status / Texts / Associations 已经"
+            "用这种写法，运行良好。"
+        ),
+        "screenshots": [],
+        "severity_en": "P0 — Silent data corruption",
+        "severity_zh": "P0 — 静默数据错位",
+    },
+    {
+        "id": 7,
+        "tier": "P0_silent_data",
+        "form": "Form_LookAtPlace.CmdNeo4j_Click",
+        "title_en": "LookAtPlace.CmdNeo4j people-CSV silently fails on the first record",
+        "title_zh": "LookAtPlace.CmdNeo4j 在写入第一条 people-CSV 时静默失败",
+        "summary_en": (
+            "The People-CSV section of `LookAtPlace.CmdNeo4j_Click` "
+            "(line ~322 onward) builds a recordset from a SELECT that "
+            "projects only four `ZZ_SCRATCH_P_TEXT` columns, but the "
+            "row-write loop reads `!c_dynasty`, `!c_dynasty_chn`, and "
+            "`!c_female` from that recordset. As soon as the loop hits "
+            "the first row, JET raises 'Item not found in this collection'. "
+            "The error handler silences it with `MsgBox`, so the user sees "
+            "a single popup, then NO files are produced for any of the "
+            "downstream Neo4j export steps."
+        ),
+        "summary_zh": (
+            "`LookAtPlace.CmdNeo4j_Click` 中负责生成 People-CSV 的部分（约"
+            "第 322 行起）用 SELECT 打开记录集，但 SELECT 里只投影了四个 "
+            "`ZZ_SCRATCH_P_TEXT` 字段；接下来的写入循环却试着读 `!c_dynasty`、"
+            "`!c_dynasty_chn`、`!c_female`。循环一碰到第一行，JET 立即报"
+            "「集合中找不到项目」（Item not found in this collection）。"
+            "错误处理把它弹了一个 MsgBox 就结束了，所以用户只看到一个对话框，"
+            "之后整个 Neo4j 导出链下游的任何文件都不会产生。"
+        ),
+        "steps_en": [
+            "Open **LookAtPlace** and run any successful query.",
+            "Click **Neo4j** to start the multi-file export.",
+            "Pick a save location for the first prompt (People file).",
+            "A `Run-time error 3265 — Item not found in this collection` popup "
+            "appears.",
+            "After clicking OK, no files have been written to the chosen folder.",
+        ],
+        "steps_zh": [
+            "打开 **LookAtPlace** 并跑任意一次能成功的查询。",
+            "点 **Neo4j** 启动多文件导出。",
+            "在第一个保存对话框（People 文件）中选好路径。",
+            "弹出 `运行时错误 3265 ——集合中找不到项目` 对话框。",
+            "点确定后，目标文件夹里一个文件都没有生成。",
+        ],
+        "fix_en": (
+            "Extend the SELECT in the People-CSV branch to project the "
+            "fields the loop reads, e.g. `DYNASTIES.c_dynasty`, "
+            "`DYNASTIES.c_dynasty_chn`, `BIOG_MAIN.c_female` (the JOINs "
+            "already expose them)."
+        ),
+        "fix_zh": (
+            "把 People-CSV 部分的 SELECT 扩展，加入循环里读到的字段，例如 "
+            "`DYNASTIES.c_dynasty`、`DYNASTIES.c_dynasty_chn`、"
+            "`BIOG_MAIN.c_female`（FROM 子句里 JOIN 已经把它们暴露出来了）。"
+        ),
+        "screenshots": [
+            ("bug7_step1_annotated.png", None),
+            ("bug7_step2_faux_popup.png", "The popup users see (re-rendered for the report; the real popup blocks the COM thread our test driver runs in)."),
+        ],
+        "severity_en": "P0 — Silent data corruption (export silently produces nothing)",
+        "severity_zh": "P0 — 静默数据缺失（导出无声地什么都没生成）",
+    },
+    {
+        "id": 8,
+        "tier": "P0_silent_data",
+        "form": "Form_LookAtNetworks.CmdNeo4j_Click",
+        "title_en": "LookAtNetworks.CmdNeo4j people/place CSVs silently fail on the first record",
+        "title_zh": "LookAtNetworks.CmdNeo4j 的 people/place CSV 在第一条上静默失败",
+        "summary_en": (
+            "Same shape as Issue #7 but on a different form. Two SELECTs "
+            "in `LookAtNetworks.CmdNeo4j_Click` are missing fields that "
+            "the row-write loop reads:\n\n"
+            "  • `tRstPlace` SELECT (line 2458) projects 3 columns; the "
+            "loop reads `!x_coord` / `!y_coord` (not projected).\n"
+            "  • `tRstPeoplePlace` SELECT similarly omits `c_person_id` / "
+            "`c_index_addr_id` that the loop reads.\n\n"
+            "Same silent-fail symptom as Issue #7."
+        ),
+        "summary_zh": (
+            "症状与 Issue #7 相同，只是在另一个表单上。"
+            "`LookAtNetworks.CmdNeo4j_Click` 中两条 SELECT 都漏写了循环里要"
+            "读的字段：\n\n"
+            "  • `tRstPlace` 的 SELECT（第 2458 行）只投影 3 个字段，循环"
+            "却读 `!x_coord` / `!y_coord`（没在 SELECT 里）。\n"
+            "  • `tRstPeoplePlace` 的 SELECT 也漏了 `c_person_id` / "
+            "`c_index_addr_id`，循环要读它们。\n\n"
+            "症状与 Issue #7 完全相同：静默失败。"
+        ),
+        "steps_en": [
+            "Open **LookAtNetworks** (note: this form has a known opening-"
+            "delay issue; please allow several seconds).",
+            "Run a query, then click **Neo4j**.",
+            "When the export reaches the People-with-Place file, the same "
+            "`Item not found` popup appears, and no further files are written.",
+        ],
+        "steps_zh": [
+            "打开 **LookAtNetworks**（注意：这个表单已知打开会延迟，请给它几秒钟）。",
+            "跑一次查询，然后点 **Neo4j**。",
+            "导出走到 People-with-Place 文件那一步时，同样的「Item not found」"
+            "对话框弹出来，之后的文件都不会再写了。",
+        ],
+        "fix_en": (
+            "Extend each SELECT to project every field the loop reads. "
+            "For tRstPlace: add `ADDR_CODES.x_coord`, `ADDR_CODES.y_coord`. "
+            "For tRstPeoplePlace: add the missing `c_person_id` / "
+            "`c_index_addr_id` columns from the joined tables."
+        ),
+        "fix_zh": (
+            "把两条 SELECT 都扩展，加入循环里读到的字段。"
+            "对 tRstPlace 加上 `ADDR_CODES.x_coord`、`ADDR_CODES.y_coord`。"
+            "对 tRstPeoplePlace 加上 `c_person_id` 和 `c_index_addr_id`。"
+        ),
+        "screenshots": [],
+        "severity_en": "P0 — Silent data corruption",
+        "severity_zh": "P0 — 静默数据缺失",
+    },
+    {
+        "id": 9,
+        "tier": "P0_silent_data",
+        "form": "Form_LookAtEntry.CmdNeo4j_Click",
+        "title_en": "LookAtEntry.CmdNeo4j Institutions block uses the wrong recordset variable",
+        "title_zh": "LookAtEntry.CmdNeo4j 的机构 (Institutions) 部分用错了记录集变量",
+        "summary_en": (
+            "Line 1415 of `Form_LookAtEntry.vb` opens the institutions "
+            "recordset as `tRstInstitutions = CurrentDb.OpenRecordset("
+            "tQueryStr)`. Ten lines later, line 1425 says `With "
+            "tRstAssocCodes` and the loop reads `!c_inst_code`, "
+            "`!c_inst_name_code`, etc. against THAT recordset — which "
+            "was bound much earlier to the AssocCodes SELECT and doesn't "
+            "have `c_inst_*` columns. Same `Item not found` symptom; "
+            "InstitutionCodes file is never written.\n\n"
+            "Note: triggering this path requires entries with "
+            "`c_inst_code > 0` (i.e. social-institution-bearing entries). "
+            "Not every fixture reaches this With block."
+        ),
+        "summary_zh": (
+            "`Form_LookAtEntry.vb` 第 1415 行打开 institutions 记录集："
+            "`Set tRstInstitutions = CurrentDb.OpenRecordset(tQueryStr)`。"
+            "十行之后，第 1425 行写的是 `With tRstAssocCodes`，循环又读 "
+            "`!c_inst_code`、`!c_inst_name_code` 等，依据的却是早先绑定到 "
+            "AssocCodes SELECT 的那个 tRstAssocCodes —— 那里没有 `c_inst_*`"
+            "列。症状与 Issue #7 相同，InstitutionCodes 文件永远不会写出。\n\n"
+            "注意：这条路径只在结果集中有 `c_inst_code > 0`（即带"
+            "社会机构编码的入仕记录）时才会触发，并非每个 fixture 都会进入"
+            "这个 With 块。"
+        ),
+        "steps_en": [
+            "Open **LookAtEntry** with a query that produces entries with "
+            "social institution codes (those are uncommon — most entries "
+            "don't trigger this).",
+            "Click **Neo4j**, accept all the SaveAs dialogs.",
+            "When the export reaches the InstitutionCodes file, the same "
+            "`Item not found` popup appears.",
+        ],
+        "steps_zh": [
+            "用一组会产生「带社会机构编码的入仕」的查询条件打开 **LookAtEntry**"
+            "（这种入仕较少见，大多数查询触发不到）。",
+            "点 **Neo4j**，依次确认每个保存对话框。",
+            "走到 InstitutionCodes 文件这一步时，同样的「Item not found」"
+            "对话框弹出来。",
+        ],
+        "fix_en": (
+            "Change `With tRstAssocCodes` on line 1425 to `With "
+            "tRstInstitutions`. Single-character class of fix; the "
+            "underlying recordset variable was simply mis-named."
+        ),
+        "fix_zh": (
+            "把第 1425 行的 `With tRstAssocCodes` 改成 `With tRstInstitutions`。"
+            "属于一字之差的笔误，底层记录集变量只是写错了。"
+        ),
+        "screenshots": [],
+        "severity_en": "P0 — Silent data corruption (export silently produces nothing)",
+        "severity_zh": "P0 — 静默数据缺失（导出无声地什么都没生成）",
+    },
+    # ========== Tier 2: visible runtime crash (popup blocks user) ==========
+    {
+        "id": 4,
+        "tier": "P1_visible_crash",
+        "form": "Form_LookAtPlace.CmdGIS_Click",
+        "title_en": "LookAtPlace.CmdGIS aborts with 'Object required' (references a control that doesn't exist)",
+        "title_zh": "LookAtPlace.CmdGIS 报「Object required」（引用了不存在的控件）",
+        "summary_en": (
+            "Note: this issue is moot in the current dump because there "
+            "is no CmdGIS button on LookAtPlace's design (Issue #15) — "
+            "users physically cannot click it. But the underlying VBA "
+            "problem remains: line 1539 of `Form_LookAtPlace.vb` reads "
+            "`If GISFrame.Value = 1 Then`, and there is no control named "
+            "`GISFrame` on this form (the actual encoding control is "
+            "`CodeFrame`). If the missing button is ever re-added (Issue "
+            "#15) without first fixing this line, every click will throw."
+        ),
+        "summary_zh": (
+            "说明：在当前 .mdb 上这个问题暂时不会被用户触发，因为 LookAtPlace"
+            "的设计视图里根本没有 CmdGIS 按钮（即 Issue #15）——用户无法点击。"
+            "但底层 VBA 问题依然存在：`Form_LookAtPlace.vb` 第 1539 行写的是 "
+            "`If GISFrame.Value = 1 Then`，而该表单上根本没有 `GISFrame` "
+            "控件（真正的编码选择控件叫 `CodeFrame`）。一旦 Issue #15 "
+            "里把缺失的按钮加回去而没先修这一行，每一次点击都会抛错。"
+        ),
+        "steps_en": [
+            "(Hypothetical, after Issue #15 is fixed.) Open **LookAtPlace**.",
+            "Run any query.",
+            "Click the GIS button.",
+            "A `Run-time error 424 — Object required` popup appears, "
+            "the export does nothing.",
+        ],
+        "steps_zh": [
+            "（在 Issue #15 修好之后才能复现）打开 **LookAtPlace**。",
+            "跑任意一次查询。",
+            "点 GIS 按钮。",
+            "弹出 `运行时错误 424 ——必要的对象（Object required）` 对话框，"
+            "导出什么都没做。",
+        ],
+        "fix_en": (
+            "Change `GISFrame.Value` to `CodeFrame.Value` on line 1539 "
+            "of `Form_LookAtPlace.vb`. Same change `CmdNeo4j_Click`, "
+            "`CmdGephi_Click`, and `CmdPajek_Click` on the same form "
+            "already use correctly."
+        ),
+        "fix_zh": (
+            "把 `Form_LookAtPlace.vb` 第 1539 行的 `GISFrame.Value` 改成"
+            " `CodeFrame.Value`。同表单的 `CmdNeo4j_Click`、`CmdGephi_Click`、"
+            "`CmdPajek_Click` 已经写对了，可以参考。"
+        ),
+        "screenshots": [
+            ("bug4_step1_annotated.png", None),
+            ("bug4_step2_annotated.png", None),
+            ("bug4_step3_faux_popup.png", "Re-rendered popup — exact runtime error users would see if the button were present."),
+        ],
+        "severity_en": "P1 — Visible crash, blocks the export",
+        "severity_zh": "P1 — 可见的报错，阻塞导出",
+    },
+    {
+        "id": 5,
+        "tier": "P1_visible_crash",
+        "form": "Form_LookAtStatus.CmdPajek_Click",
+        "title_en": "LookAtStatus.CmdPajek references a missing control AND uses three columns that don't exist",
+        "title_zh": "LookAtStatus.CmdPajek 引用了不存在的控件，且 SQL 用了三个不存在的列",
+        "summary_en": (
+            "Two related defects in the same handler:\n\n"
+            "  (a) Line 2308 reads `If ChkIDs.Value Then`, but Status has "
+            "no control named `ChkIDs` — only `ChkXYRef`, `ChkKML`, and "
+            "`ChkSubUnits`.\n\n"
+            "  (b) Lines 2335–2338 build a SELECT that references "
+            "`ZZ_SCRATCH_STATUS.c_person_id`, `c_status_id`, and "
+            "`c_status_count` — none of which exist in the schema (the "
+            "real columns are `c_personid`, `c_status_code`, no count "
+            "column at all).\n\n"
+            "The whole sub looks copy-pasted from "
+            "`LookAtAssociations.CmdPajek_Click` where these names ARE "
+            "valid; the rename pass missed both spots. Like Issue #4 this "
+            "is also somewhat moot because LookAtStatus has no Pajek "
+            "button (Issue #16); the SQL still fails the moment the sub "
+            "is invoked though, so adding the button without fixing the "
+            "SQL would just expose the failure to users."
+        ),
+        "summary_zh": (
+            "同一个 handler 里有两个相关缺陷：\n\n"
+            "  (a) 第 2308 行写 `If ChkIDs.Value Then`，但 Status 上没有名为"
+            " `ChkIDs` 的控件——只有 `ChkXYRef`、`ChkKML`、`ChkSubUnits`。\n\n"
+            "  (b) 第 2335–2338 行构造的 SELECT 引用 "
+            "`ZZ_SCRATCH_STATUS.c_person_id`、`c_status_id`、`c_status_count`"
+            "——这三列都不在 schema 里（真实列名是 `c_personid`、"
+            "`c_status_code`，count 列根本没有）。\n\n"
+            "整段 sub 看起来是从 `LookAtAssociations.CmdPajek_Click` 整段"
+            "拷过来的，那边列名都对得上；改名时这两处都漏了。和 Issue #4 一样，"
+            "因为 LookAtStatus 当前也没有 Pajek 按钮（Issue #16），用户暂时碰"
+            "不到；但只要按钮加回去而没先修这两处，用户就会立刻看到错误。"
+        ),
+        "steps_en": [
+            "(Hypothetical, after Issue #16 is fixed.) Open **LookAtStatus**.",
+            "Run a query, then click the Pajek button.",
+            "First: an `Object required` popup appears (the ChkIDs reference).",
+            "If that's worked around, the next click hits the SQL: "
+            "a `No such field` error from the SELECT that references three "
+            "non-existent columns.",
+        ],
+        "steps_zh": [
+            "（在 Issue #16 修好之后才能复现）打开 **LookAtStatus**。",
+            "跑一次查询，然后点 Pajek 按钮。",
+            "第一次会弹 `Object required`（ChkIDs 引用所致）。",
+            "如果绕过它，下一次点就会触发 SQL：因为 SELECT 引用了三个不存在的"
+            "列，会报 `No such field` 之类的错误。",
+        ],
+        "fix_en": (
+            "Two fixes:\n"
+            "  (a) Replace `ChkIDs.Value` with either a constant `False` "
+            "(if the optional behaviour isn't needed) or add a real "
+            "ChkIDs control to LookAtStatus's design.\n"
+            "  (b) Rewrite the SELECT to use `ZZ_SCRATCH_STATUS.c_personid` "
+            "and `ZZ_SCRATCH_STATUS.c_status_code`, and either drop the "
+            "count aggregate or compute it some other way (the source "
+            "table doesn't have `c_status_count`).\n\n"
+            "Realistically the whole sub probably needs a thoughtful "
+            "rewrite rather than spot fixes — it was clearly inherited "
+            "from another form without verification."
+        ),
+        "fix_zh": (
+            "两处都要改：\n"
+            "  (a) 把 `ChkIDs.Value` 替换成常量 `False`（如果这个可选行为可以"
+            "去掉），或者在 LookAtStatus 的设计视图里真的加一个 ChkIDs 控件。\n"
+            "  (b) 把 SELECT 改成 `ZZ_SCRATCH_STATUS.c_personid` 和 "
+            "`ZZ_SCRATCH_STATUS.c_status_code`，并去掉对 `c_status_count` 的"
+            "聚合，或用别的方式计算（源表里就没有 c_status_count 列）。\n\n"
+            "建议整段 sub 通盘重写而不是单点修补——它显然是从另一个表单整段"
+            "拷贝过来的，列名没校对过。"
+        ),
+        "screenshots": [],
+        "severity_en": "P1 — Visible crash (cluster of two)",
+        "severity_zh": "P1 — 可见的报错（两个相关缺陷）",
+    },
+    {
+        "id": 6,
+        "tier": "P1_visible_crash",
+        "form": "Form_LookAtGroupData.queryEntry",
+        "title_en": "LookAtGroupData ChkEntry path references a non-existent column ENTRY_DATA.c_parental_status",
+        "title_zh": "LookAtGroupData 的 ChkEntry 路径引用了不存在的列 ENTRY_DATA.c_parental_status",
+        "summary_en": (
+            "`Form_LookAtGroupData.vb` line 2621 has an INSERT INTO whose "
+            "target column list ends with `c_parental_status_code` but "
+            "whose SELECT projection ends with `ENTRY_DATA.c_parental_status` "
+            "(no `_code` suffix). The actual column on `ENTRY_DATA` is "
+            "`c_parental_status_code`; the typo means the SQL crashes with "
+            "'No such field' the moment the user checks **Entry** and "
+            "clicks **Run**.\n\n"
+            "`Form_LookAtEntry.vb:1650` does the same logical query and "
+            "uses the correct name, so this is a single-line drift."
+        ),
+        "summary_zh": (
+            "`Form_LookAtGroupData.vb` 第 2621 行的 INSERT INTO 目标列里写的"
+            "是 `c_parental_status_code`，但 SELECT 投影写的是 "
+            "`ENTRY_DATA.c_parental_status`（少了 `_code` 后缀）。`ENTRY_DATA` "
+            "上真实列名是 `c_parental_status_code`；这个笔误让用户一旦勾上"
+            " **Entry** 子类型再点 **Run**，SQL 就会报「无此字段」。\n\n"
+            "`Form_LookAtEntry.vb:1650` 写的是同一段逻辑查询而且名字是对的，"
+            "可以参考。"
+        ),
+        "steps_en": [
+            "Open **LookAtGroupData** with any non-empty person list.",
+            "Tick the **Entry** checkbox.",
+            "Click **Run**.",
+            "A popup appears reporting that a field doesn't exist (the "
+            "exact wording varies between Office versions).",
+        ],
+        "steps_zh": [
+            "打开 **LookAtGroupData**，给任意一份非空的 person 列表。",
+            "勾上 **Entry** 复选框。",
+            "点 **Run**。",
+            "弹出「字段不存在」之类的对话框（具体措辞取决于 Office 版本）。",
+        ],
+        "fix_en": (
+            "Change `ENTRY_DATA.c_parental_status` to "
+            "`ENTRY_DATA.c_parental_status_code` on line 2621. One-line fix."
+        ),
+        "fix_zh": (
+            "把第 2621 行的 `ENTRY_DATA.c_parental_status` 改成 "
+            "`ENTRY_DATA.c_parental_status_code`。一行修复。"
+        ),
+        "screenshots": [],
+        "severity_en": "P1 — Visible crash on a common path (Entry sub-query)",
+        "severity_zh": "P1 — 常用路径上的可见报错（Entry 子查询）",
+    },
+    {
+        "id": 13,
+        "tier": "P1_visible_crash",
+        "form": "Form_BIOG_MAIN_2_Subform.c_fl_ey_notes_Click",
+        "title_en": "BIOG_MAIN_2 Subform tries to open a picker form (frmPickNIAN_HAO) that doesn't exist",
+        "title_zh": "BIOG_MAIN_2 子表单试图打开一个不存在的 picker 表单 (frmPickNIAN_HAO)",
+        "summary_en": (
+            "When the user clicks the `c_fl_ey_notes` field on a person's "
+            "biographical detail subform, `Sub c_fl_ey_notes_Click` runs "
+            "`DoCmd.OpenForm \"frmPickNIAN_HAO\"`. There is no form named "
+            "`frmPickNIAN_HAO` in the .mdb's CurrentProject.AllForms "
+            "collection. Access raises 'Item not found …' and the field "
+            "click does nothing useful for the user.\n\n"
+            "Likely cause: a picker form was renamed or consolidated in an "
+            "earlier refactor, and this caller wasn't updated."
+        ),
+        "summary_zh": (
+            "用户在某位人物生平详情子表单上点击 `c_fl_ey_notes` 字段时，"
+            "`Sub c_fl_ey_notes_Click` 会调用 `DoCmd.OpenForm "
+            "\"frmPickNIAN_HAO\"`。.mdb 的 CurrentProject.AllForms 集合中"
+            "并没有名为 `frmPickNIAN_HAO` 的表单。Access 报「集合中找不到"
+            "项目」，用户的这一次点击就此无效。\n\n"
+            "可能原因：picker 表单在某次重构中被重命名或合并了，而这个调用"
+            "处没有跟着更新。"
+        ),
+        "steps_en": [
+            "Open any person's biographical detail form.",
+            "On the BIOG_MAIN_2 subform, click the `c_fl_ey_notes` field.",
+            "An `Item not found in this collection.` popup appears.",
+        ],
+        "steps_zh": [
+            "打开任意一位人物的生平详情表单。",
+            "在 BIOG_MAIN_2 子表单上，点击 `c_fl_ey_notes` 字段。",
+            "弹出「集合中找不到项目」对话框。",
+        ],
+        "fix_en": (
+            "Either restore the picker form `frmPickNIAN_HAO`, or update "
+            "the caller in `Form_BIOG_MAIN_2_Subform.c_fl_ey_notes_Click` "
+            "to use whichever picker form replaced it."
+        ),
+        "fix_zh": (
+            "要么把 `frmPickNIAN_HAO` 表单恢复回来，要么在 "
+            "`Form_BIOG_MAIN_2_Subform.c_fl_ey_notes_Click` 里把调用改成"
+            "替代的那个 picker 表单。"
+        ),
+        "screenshots": [],
+        "severity_en": "P1 — Visible crash on a user click",
+        "severity_zh": "P1 — 用户点击时可见的报错",
+    },
+    {
+        "id": 14,
+        "tier": "P1_visible_crash",
+        "form": "Form_KIN_DATA_Subform",
+        "title_en": "KIN_DATA Subform tries to open a picker form (frmPickKINSHIP_CODES) that doesn't exist",
+        "title_zh": "KIN_DATA 子表单试图打开不存在的 picker 表单 (frmPickKINSHIP_CODES)",
+        "summary_en": (
+            "Same shape as Issue #13, on a different sub-form. The kinship-"
+            "code picker logic in KIN_DATA_Subform calls `DoCmd.OpenForm "
+            "\"frmPickKINSHIP_CODES\"` and references "
+            "`Forms!frmPickKINSHIP_CODES!frmKINSHIP_CODES.Form!c_kincode`. "
+            "Neither form exists in the current .mdb."
+        ),
+        "summary_zh": (
+            "症状与 Issue #13 相同，只是在另一个子表单上。KIN_DATA_Subform 中"
+            "选择 kinship 编码的逻辑调用 `DoCmd.OpenForm "
+            "\"frmPickKINSHIP_CODES\"`，并引用 "
+            "`Forms!frmPickKINSHIP_CODES!frmKINSHIP_CODES.Form!c_kincode`。"
+            "这两个表单当前 .mdb 里都没有。"
+        ),
+        "steps_en": [
+            "Open any person's kinship subform.",
+            "Click the field that's bound to the kinship-code picker.",
+            "An `Item not found in this collection.` popup appears.",
+        ],
+        "steps_zh": [
+            "打开任意一位人物的亲属（kinship）子表单。",
+            "点击需要选择 kinship 编码的字段。",
+            "弹出「集合中找不到项目」对话框。",
+        ],
+        "fix_en": (
+            "Same as Issue #13: restore the picker form or update the "
+            "caller to point at its replacement."
+        ),
+        "fix_zh": (
+            "与 Issue #13 相同：把 picker 表单恢复，或把调用方改成指向新的 "
+            "picker 表单。"
+        ),
+        "screenshots": [],
+        "severity_en": "P1 — Visible crash on a user click",
+        "severity_zh": "P1 — 用户点击时可见的报错",
+    },
+    # ========== Tier 3: silent display (data shown wrong/missing) ==========
+    {
+        "id": 10,
+        "tier": "P2_silent_display",
+        "form": "EVENT_ADDR_2 Subform",
+        "title_en": "EVENT_ADDR_2 Subform address columns silently render blank (wrong ControlSource)",
+        "title_zh": "EVENT_ADDR_2 子表单的地址列默默地显示为空（ControlSource 写错了）",
+        "summary_en": (
+            "On the EVENT_ADDR_2 sub-form (events with addresses), the two "
+            "address controls are bound as follows:\n\n"
+            "  • `TxtAddrCHN`.ControlSource = `c_name_chn`\n"
+            "  • `TxtAddrPY`.ControlSource = `c_name`\n\n"
+            "But the form's RecordSource is the saved query "
+            "`View_EventAddrData`, which aliases ADDR_CODES.c_name_chn as "
+            "`c_event_addr_chn` and ADDR_CODES.c_name as `c_event_addr_name`. "
+            "Neither `c_name` nor `c_name_chn` is in the projection, so "
+            "both controls silently render blank for every row."
+        ),
+        "summary_zh": (
+            "在 EVENT_ADDR_2 子表单（带地址的事件）上，两个地址控件的绑定如下：\n\n"
+            "  • `TxtAddrCHN`.ControlSource = `c_name_chn`\n"
+            "  • `TxtAddrPY`.ControlSource = `c_name`\n\n"
+            "但该表单的 RecordSource 是存档查询 `View_EventAddrData`，里面把 "
+            "ADDR_CODES.c_name_chn 起别名成 `c_event_addr_chn`、把 "
+            "ADDR_CODES.c_name 起别名成 `c_event_addr_name`。投影里既没有 "
+            "`c_name` 也没有 `c_name_chn`，所以这两个控件每一行都默默地显示"
+            "为空。"
+        ),
+        "steps_en": [
+            "Open any person's biographical detail form for someone with "
+            "events that have associated addresses.",
+            "Switch to the EVENT_ADDR sub-datasheet.",
+            "The Chinese address column and the Pinyin address column are "
+            "blank, even though the underlying data is populated.",
+        ],
+        "steps_zh": [
+            "打开一位有「带地址事件」记录的人物的生平详情。",
+            "切换到 EVENT_ADDR 子数据表。",
+            "中文地址列和拼音地址列都是空白，尽管底层数据其实有。",
+        ],
+        "fix_en": (
+            "In the form designer, change `TxtAddrCHN`.ControlSource from "
+            "`c_name_chn` to `c_event_addr_chn`, and `TxtAddrPY`."
+            "ControlSource from `c_name` to `c_event_addr_name` (the "
+            "actual aliases in View_EventAddrData)."
+        ),
+        "fix_zh": (
+            "在表单设计视图里，把 `TxtAddrCHN`.ControlSource 由 `c_name_chn` "
+            "改成 `c_event_addr_chn`，把 `TxtAddrPY`.ControlSource 由 "
+            "`c_name` 改成 `c_event_addr_name`（这才是 View_EventAddrData "
+            "里真实的别名）。"
+        ),
+        "screenshots": [
+            ("bug10_subform_annotated.png",
+             "EVENT_ADDR_2 in design view, annotated — TxtAddrCHN's ControlSource (`c_name_chn`) is not in the form's RecordSource projection."),
+        ],
+        "severity_en": "P2 — Silent display (address columns blank)",
+        "severity_zh": "P2 — 静默显示问题（地址列空白）",
+    },
+    {
+        "id": 11,
+        "tier": "P2_silent_display",
+        "form": "EVENTS_DATA_2 Subform",
+        "title_en": "EVENTS_DATA_2 Subform has a control bound to a non-existent column c_event_record_id",
+        "title_zh": "EVENTS_DATA_2 子表单上有一个控件绑定到不存在的列 c_event_record_id",
+        "summary_en": (
+            "The EVENTS_DATA_2 sub-form has a control whose ControlSource "
+            "is `c_event_record_id`. Neither the source table EVENTS_DATA "
+            "nor the form's RecordSource (`View_EventsData`) has a column "
+            "of that name — likely a stale design-time leftover from when "
+            "the schema had an event-record id, or an intended "
+            "`c_event_code` that was typo'd. The control silently shows "
+            "blank for every row."
+        ),
+        "summary_zh": (
+            "EVENTS_DATA_2 子表单上有一个控件，其 ControlSource 写的是 "
+            "`c_event_record_id`。源表 EVENTS_DATA 和表单的 RecordSource "
+            "（`View_EventsData`）都没有这一列——可能是早期 schema 上确实有"
+            "「event record id」字段，后来被去掉了，也可能是想写 "
+            "`c_event_code` 而打成错字。该控件每一行都默默显示空白。"
+        ),
+        "steps_en": [
+            "Open any person's biographical detail form.",
+            "Switch to the EVENTS sub-datasheet.",
+            "The column is blank for every row.",
+        ],
+        "steps_zh": [
+            "打开任意一位人物的生平详情。",
+            "切换到 EVENTS 子数据表。",
+            "对应的列每一行都是空。",
+        ],
+        "fix_en": (
+            "Decide what was intended. If the column is no longer needed, "
+            "remove the control. If it should map to `c_event_code`, fix "
+            "the ControlSource to that name. If the schema needs a real "
+            "event-record-id column, add it to EVENTS_DATA AND project it "
+            "in View_EventsData."
+        ),
+        "fix_zh": (
+            "首先确认本意是什么。如果这一列已经不需要，删掉控件即可；如果原本"
+            "想绑 `c_event_code`，把 ControlSource 改成它；如果确实需要一个"
+            "事件记录 id，那就要在 EVENTS_DATA 上加这一列，并且在 "
+            "View_EventsData 的 SELECT 里 project 出来。"
+        ),
+        "screenshots": [
+            ("bug11_subform_annotated.png",
+             "EVENTS_DATA_2 in design view, annotated."),
+        ],
+        "severity_en": "P2 — Silent display (column blank)",
+        "severity_zh": "P2 — 静默显示问题（一列空白）",
+    },
+    {
+        "id": 12,
+        "tier": "P2_silent_display",
+        "form": "POSTED_TO_OFFICE_DATA_2 Subform",
+        "title_en": "POSTED_TO_OFFICE_DATA_2 Subform appointment-type control bound to wrong column name",
+        "title_zh": "POSTED_TO_OFFICE_DATA_2 子表单的任职类型控件绑到了错的列名",
+        "summary_en": (
+            "The control `c_appt_type_code` on POSTED_TO_OFFICE_DATA_2 "
+            "subform has ControlSource `c_appt_type_code`. The form's "
+            "RecordSource (`View_PostingOfficeData`) projects "
+            "`POSTED_TO_OFFICE_DATA.c_appt_code` (no `_type` infix). The "
+            "control silently shows blank.\n\n"
+            "Looks like a renamed column the form designer didn't follow."
+        ),
+        "summary_zh": (
+            "POSTED_TO_OFFICE_DATA_2 子表单上 `c_appt_type_code` 控件的 "
+            "ControlSource 写的是 `c_appt_type_code`。表单的 RecordSource "
+            "（`View_PostingOfficeData`）投影的是 "
+            "`POSTED_TO_OFFICE_DATA.c_appt_code`（中间没有 `_type`）。"
+            "控件默默地显示空白。\n\n"
+            "看起来是某次列重命名后表单设计没跟上。"
+        ),
+        "steps_en": [
+            "Open any person's biographical detail form for someone with "
+            "office postings.",
+            "Switch to the POSTED_TO_OFFICE sub-datasheet.",
+            "The appointment-type column is blank for every row.",
+        ],
+        "steps_zh": [
+            "打开一位有官职任命记录的人物的生平详情。",
+            "切换到 POSTED_TO_OFFICE 子数据表。",
+            "任职类型列每一行都是空。",
+        ],
+        "fix_en": (
+            "Change the control's ControlSource from `c_appt_type_code` "
+            "to `c_appt_code` (the actual column projected by "
+            "View_PostingOfficeData)."
+        ),
+        "fix_zh": (
+            "把控件的 ControlSource 由 `c_appt_type_code` 改成 `c_appt_code`"
+            "（这才是 View_PostingOfficeData 真正投影出来的列名）。"
+        ),
+        "screenshots": [
+            ("bug12_subform_annotated.png",
+             "POSTED_TO_OFFICE_DATA_2 in design view, annotated."),
+        ],
+        "severity_en": "P2 — Silent display (column blank)",
+        "severity_zh": "P2 — 静默显示问题（一列空白）",
+    },
+    # ========== Tier 4: missing UI (export buttons not on the form) ==========
+    {
+        "id": 15,
+        "tier": "P3_missing_ui",
+        "form": "LookAtPlace",
+        "title_en": "LookAtPlace is missing its CmdGIS button (handler exists but no UI control)",
+        "title_zh": "LookAtPlace 缺少 CmdGIS 按钮（代码里有 handler 但界面上没控件）",
+        "summary_en": (
+            "`Form_LookAtPlace.vb` defines a fully functional "
+            "`CmdGIS_Click` handler — it builds and writes a GIS .tab "
+            "export, identical in shape to the GIS button on Status / "
+            "Texts / Associations / Office / Kinship. But LookAtPlace's "
+            "form design has NO `CmdGIS` button on it. Users on Place "
+            "can use Pajek / Gephi / Neo4j export but cannot use GIS "
+            "export — the handler is there, just unreachable from the UI."
+        ),
+        "summary_zh": (
+            "`Form_LookAtPlace.vb` 里定义了一个完整可用的 `CmdGIS_Click` "
+            "handler——构造并输出 GIS .tab 文件，逻辑和 Status / Texts / "
+            "Associations / Office / Kinship 上的 GIS 按钮一模一样。但 "
+            "LookAtPlace 的设计视图上根本没有 `CmdGIS` 按钮。用户在 Place "
+            "上可以使用 Pajek / Gephi / Neo4j 导出，但用不了 GIS 导出——"
+            "代码在那里，只是界面进不去。"
+        ),
+        "steps_en": [
+            "Open **LookAtPlace**.",
+            "Look at the export-buttons row at the bottom right.",
+            "There's no GIS button. Compare with LookAtStatus / "
+            "LookAtAssociations / LookAtOffice etc., all of which have one.",
+        ],
+        "steps_zh": [
+            "打开 **LookAtPlace**。",
+            "看右下方那一排导出按钮。",
+            "没有 GIS 按钮。可以对比 LookAtStatus / LookAtAssociations / "
+            "LookAtOffice 等，它们都有这个按钮。",
+        ],
+        "fix_en": (
+            "In LookAtPlace's form design, add a CmdGIS button next to "
+            "the existing CmdPajek / CmdGephi buttons, with `OnClick = "
+            "[Event Procedure]` so it invokes the existing CmdGIS_Click "
+            "Sub. (Also fix Issue #4 first, otherwise the button will "
+            "throw 'Object required' on the first click.)"
+        ),
+        "fix_zh": (
+            "在 LookAtPlace 的设计视图里，在已有的 CmdPajek / CmdGephi 旁边"
+            "加一个 CmdGIS 按钮，把 `OnClick` 设为 `[Event Procedure]`，这样"
+            "它就会调用已经写好的 CmdGIS_Click。（同时务必先修 Issue #4，"
+            "否则按钮一点就会报 Object required。）"
+        ),
+        "screenshots": [
+            ("bug15_LookAtPlace_no_CmdGIS_annotated.png",
+             "LookAtPlace as it ships — no GIS button is rendered, even though `Sub CmdGIS_Click()` exists in the module."),
+        ],
+        "severity_en": "P3 — Missing UI (feature unavailable to users)",
+        "severity_zh": "P3 — 缺失界面（用户用不到该功能）",
+    },
+    {
+        "id": 16,
+        "tier": "P3_missing_ui",
+        "form": "LookAtStatus",
+        "title_en": "LookAtStatus is missing its CmdPajek button",
+        "title_zh": "LookAtStatus 缺少 CmdPajek 按钮",
+        "summary_en": (
+            "Same shape as Issue #15. `Sub CmdPajek_Click()` exists in "
+            "`Form_LookAtStatus.vb` (would write a Pajek .net export of "
+            "the status data) but no CmdPajek button is rendered on "
+            "Status's form design.\n\n"
+            "Note: even if the button is added, Issue #5 (the SQL/control "
+            "defects in CmdPajek_Click itself) needs to be fixed first."
+        ),
+        "summary_zh": (
+            "形态与 Issue #15 相同。`Sub CmdPajek_Click()` 在 "
+            "`Form_LookAtStatus.vb` 里有定义（本应输出 Pajek .net 文件），"
+            "但 Status 的设计视图上没有 CmdPajek 按钮。\n\n"
+            "注意：即便把按钮加回去，也得先解决 Issue #5（CmdPajek_Click 本身"
+            "的 SQL/控件缺陷）。"
+        ),
+        "steps_en": [
+            "Open **LookAtStatus**. The export-buttons row has only GIS "
+            "and Neo4j; there's no Pajek button.",
+        ],
+        "steps_zh": [
+            "打开 **LookAtStatus**。导出按钮一栏只有 GIS 和 Neo4j，没有 Pajek。",
+        ],
+        "fix_en": (
+            "Add a CmdPajek button to LookAtStatus's design (after fixing "
+            "Issue #5)."
+        ),
+        "fix_zh": (
+            "在 LookAtStatus 的设计视图里加一个 CmdPajek 按钮（先把 Issue #5 "
+            "修好）。"
+        ),
+        "screenshots": [
+            ("bug16_LookAtStatus_no_CmdPajek_annotated.png", None),
+        ],
+        "severity_en": "P3 — Missing UI",
+        "severity_zh": "P3 — 缺失界面",
+    },
+    {
+        "id": 17,
+        "tier": "P3_missing_ui",
+        "form": "LookAtStatus",
+        "title_en": "LookAtStatus is missing its CmdGephi button",
+        "title_zh": "LookAtStatus 缺少 CmdGephi 按钮",
+        "summary_en": (
+            "`Sub CmdGephi_Click()` exists in `Form_LookAtStatus.vb` but "
+            "no matching button is on the form design."
+        ),
+        "summary_zh": (
+            "`Sub CmdGephi_Click()` 在 `Form_LookAtStatus.vb` 里有定义，"
+            "但表单设计视图里没有相应按钮。"
+        ),
+        "steps_en": [
+            "Open **LookAtStatus**. There is no Gephi export button.",
+        ],
+        "steps_zh": [
+            "打开 **LookAtStatus**。没有 Gephi 导出按钮。",
+        ],
+        "fix_en": (
+            "Add a CmdGephi button to LookAtStatus's design."
+        ),
+        "fix_zh": (
+            "在 LookAtStatus 的设计视图里加一个 CmdGephi 按钮。"
+        ),
+        "screenshots": [
+            ("bug17_LookAtStatus_no_CmdGephi_annotated.png", None),
+        ],
+        "severity_en": "P3 — Missing UI",
+        "severity_zh": "P3 — 缺失界面",
+    },
+    {
+        "id": 18,
+        "tier": "P3_missing_ui",
+        "form": "LookAtStatus",
+        "title_en": "LookAtStatus is missing its CmdUCINet button",
+        "title_zh": "LookAtStatus 缺少 CmdUCINet 按钮",
+        "summary_en": (
+            "`Sub CmdUCINet_Click()` exists in `Form_LookAtStatus.vb` but "
+            "no matching button is on the form design."
+        ),
+        "summary_zh": (
+            "`Sub CmdUCINet_Click()` 在 `Form_LookAtStatus.vb` 里有定义，"
+            "但表单设计视图里没有相应按钮。"
+        ),
+        "steps_en": [
+            "Open **LookAtStatus**. There is no UCINet export button.",
+        ],
+        "steps_zh": [
+            "打开 **LookAtStatus**。没有 UCINet 导出按钮。",
+        ],
+        "fix_en": (
+            "Add a CmdUCINet button to LookAtStatus's design."
+        ),
+        "fix_zh": (
+            "在 LookAtStatus 的设计视图里加一个 CmdUCINet 按钮。"
+        ),
+        "screenshots": [
+            ("bug18_LookAtStatus_no_CmdUCINet_annotated.png", None),
+        ],
+        "severity_en": "P3 — Missing UI",
+        "severity_zh": "P3 — 缺失界面",
+    },
+    {
+        "id": 19,
+        "tier": "P3_missing_ui",
+        "form": "LookAtOffice",
+        "title_en": "LookAtOffice is missing its CmdGUESS button",
+        "title_zh": "LookAtOffice 缺少 CmdGUESS 按钮",
+        "summary_en": (
+            "`Sub CmdGUESS_Click()` exists in `Form_LookAtOffice.vb` but "
+            "no CmdGUESS button is on the form design. Users on Office can "
+            "use GIS / GISPeople / Neo4j export but not GUESS."
+        ),
+        "summary_zh": (
+            "`Sub CmdGUESS_Click()` 在 `Form_LookAtOffice.vb` 里有定义，"
+            "但 Office 的设计视图上没有 CmdGUESS 按钮。Office 上的用户可以"
+            "使用 GIS / GISPeople / Neo4j 导出，但用不了 GUESS。"
+        ),
+        "steps_en": [
+            "Open **LookAtOffice**. There is no GUESS export button.",
+        ],
+        "steps_zh": [
+            "打开 **LookAtOffice**。没有 GUESS 导出按钮。",
+        ],
+        "fix_en": (
+            "Add a CmdGUESS button to LookAtOffice's design."
+        ),
+        "fix_zh": (
+            "在 LookAtOffice 的设计视图里加一个 CmdGUESS 按钮。"
+        ),
+        "screenshots": [
+            ("bug19_LookAtOffice_no_CmdGUESS_annotated.png", None),
+        ],
+        "severity_en": "P3 — Missing UI",
+        "severity_zh": "P3 — 缺失界面",
+    },
+    # ========== Tier 5: setup (one-time fix per machine) ==========
+    {
+        "id": 2,
+        "tier": "P4_setup",
+        "form": "VBE Project References",
+        "title_en": "VBA project references the legacy dao360.dll which isn't on Office 2016+ machines",
+        "title_zh": "VBA 工程引用了过时的 dao360.dll，Office 2016+ 机器上没这个文件",
+        "summary_en": (
+            "The shipped .mdb's VBA project carries a hard reference to "
+            "`C:\\Program Files\\Common Files\\Microsoft Shared\\DAO\\"
+            "dao360.dll`, which was the DAO 3.6 location used by Access "
+            "2003. Modern Office (2016 onward) ships `ACEDAO.DLL` instead "
+            "and does NOT install the legacy DLL. On any clean modern "
+            "machine, the first attempt to open any LookAt form raises "
+            "'Can't find project or library', which is opaque and scary "
+            "to end users.\n\n"
+            "Severity is low because it's a one-time fix per machine, but "
+            "every new install hits it."
+        ),
+        "summary_zh": (
+            ".mdb 中的 VBA 工程硬性引用了 `C:\\Program Files\\Common Files\\"
+            "Microsoft Shared\\DAO\\dao360.dll`，这是 Access 2003 时代 DAO "
+            "3.6 的位置。现代 Office（2016 起）改用 `ACEDAO.DLL`，并不会安"
+            "装旧版 DLL。在任何全新的现代机器上，第一次尝试打开任意 LookAt "
+            "表单都会报「找不到工程或库」（Can't find project or library），"
+            "对终端用户来说既看不懂又吓人。\n\n"
+            "严重等级较低，因为每台机器只需修一次，但每台新装都会撞上。"
+        ),
+        "steps_en": [
+            "Install `CBDB_BJ_User.mdb` on a fresh modern Office machine.",
+            "Open the file. Press Alt+F11 to enter the VBE.",
+            "Tools → References. Notice an entry marked `MISSING: "
+            "dao360.dll`.",
+            "Open any LookAt form. A 'Can't find project or library' "
+            "error appears.",
+        ],
+        "steps_zh": [
+            "在全新的现代 Office 机器上安装 `CBDB_BJ_User.mdb`。",
+            "打开文件，按 Alt+F11 进入 VBE 编辑器。",
+            "工具 → 引用。可以看到一行写着 `MISSING: dao360.dll`。",
+            "打开任意 LookAt 表单。会弹出「Can't find project or library」"
+            "错误。",
+        ],
+        "fix_en": (
+            "Once, on the maintainer's machine, do:\n"
+            "  1. Open the .mdb in Access. Press Alt+F11.\n"
+            "  2. Tools → References. Untick the MISSING dao360.dll entry.\n"
+            "  3. Tick `Microsoft Office 16.0 Access Database Engine "
+            "Object Library` (i.e. ACEDAO.DLL).\n"
+            "  4. Save the .mdb.\n\n"
+            "Then re-distribute the fixed file. Future end users won't "
+            "need to do anything."
+        ),
+        "fix_zh": (
+            "在维护者的机器上做一次：\n"
+            "  1. 用 Access 打开 .mdb，按 Alt+F11。\n"
+            "  2. 工具 → 引用。取消勾选标着 MISSING 的 dao360.dll。\n"
+            "  3. 勾选 `Microsoft Office 16.0 Access Database Engine "
+            "Object Library`（即 ACEDAO.DLL）。\n"
+            "  4. 保存 .mdb。\n\n"
+            "然后重新分发修好的文件。以后的终端用户什么都不用做。"
+        ),
+        "screenshots": [],
+        "severity_en": "P4 — One-time setup hurdle on each new machine",
+        "severity_zh": "P4 — 每台新机器一次性的安装障碍",
+    },
+]
+
+
+# ---------------------------------------------------------------------
+# DOCX building helpers
+# ---------------------------------------------------------------------
+
+def _add_toc(document: Document, lang: str) -> None:
+    """Insert a Word TOC field; Word will offer to update it on open."""
+    para = document.add_paragraph()
+    run = para.add_run()
+    fld_char1 = OxmlElement("w:fldChar")
+    fld_char1.set(qn("w:fldCharType"), "begin")
+    instr = OxmlElement("w:instrText")
+    instr.set(qn("xml:space"), "preserve")
+    instr.text = r'TOC \o "1-2" \h \z \u'
+    fld_char2 = OxmlElement("w:fldChar")
+    fld_char2.set(qn("w:fldCharType"), "separate")
+    msg = OxmlElement("w:t")
+    if lang == "en":
+        msg.text = "Right-click here and choose 'Update Field' to populate."
+    else:
+        msg.text = t("右键点这里，选「更新域」即可生成完整目录。")
+    fld_char3 = OxmlElement("w:fldChar")
+    fld_char3.set(qn("w:fldCharType"), "end")
+    r_el = run._r
+    r_el.append(fld_char1)
+    r_el.append(instr)
+    r_el.append(fld_char2)
+    r_el.append(msg)
+    r_el.append(fld_char3)
+
+
+def _h(document, level, text):
+    p = document.add_heading(text, level=level)
+    return p
+
+
+def _bullets(document, items: list[str]) -> None:
+    for item in items:
+        document.add_paragraph(item, style="List Bullet")
+
+
+def _numbered(document, items: list[str]) -> None:
+    for item in items:
+        document.add_paragraph(item, style="List Number")
+
+
+def _build(lang: str, out_path: Path) -> None:
+    is_en = (lang == "en")
+
+    # Apply Simplified -> Traditional Chinese conversion when emitting
+    # the Chinese variant.  English passes through unchanged.
+    def Z(s: str) -> str:
+        return s if is_en else t(s)
+
+    doc = Document()
+
+    # ---- Cover page ----
+    title = (
+        "CBDB User MDB — Issues Report"
+        if is_en else
+        "CBDB 用户版 .mdb — 问题汇报"
+    )
+    subtitle = (
+        "A respectful summary of issues uncovered during regression testing."
+        if is_en else
+        "测试过程中发现的问题汇总，谨呈维护团队斧正。"
+    )
+    h = doc.add_heading(Z(title), level=0)
+    h.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    p = doc.add_paragraph(Z(subtitle))
+    p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+    intro = (
+        "Dear maintainer,\n\n"
+        "Below is a summary of the issues we uncovered while building "
+        "an automated regression-test suite for the CBDB User MDB. "
+        "We hope this report is useful as you continue your wonderful "
+        "stewardship of this dataset, and we sincerely thank you for "
+        "the immense work that has gone into building it.\n\n"
+        "The issues are ordered by severity (P0 highest). Each entry "
+        "includes a concise description, step-by-step user reproduction, "
+        "screenshots where the issue is visible in the Access UI, and a "
+        "suggested fix. None of these are urgent; they are documented "
+        "so they can be addressed at the maintainer's convenience."
+        if is_en else
+        "尊敬的维护者：\n\n"
+        "下面是我们在为 CBDB 用户版 .mdb 编写自动化回归测试套件过程中，"
+        "陆续整理出来的一些问题清单。我们希望这份报告能在您继续主持这份"
+        "宝贵数据集时有所帮助；同时，对您多年来在这套数据上的辛勤付出，"
+        "我们由衷地表示感谢和敬意。\n\n"
+        "问题按严重程度排序（P0 最高）。每一条都包括：简明描述、用户端"
+        "一步一步的复现步骤、（在界面上能看到时）相关截图，以及一份建议"
+        "的修复方案。这些问题并不紧急，整理在此只是为了方便您在合适的时"
+        "候逐一处理。"
+    )
+    for para in intro.split("\n\n"):
+        doc.add_paragraph(Z(para))
+
+    doc.add_page_break()
+
+    # ---- Table of contents ----
+    _h(doc, 1, Z("Table of Contents" if is_en else "目录"))
+    _add_toc(doc, lang)
+    doc.add_page_break()
+
+    # ---- Severity legend ----
+    _h(doc, 1, Z("Severity legend" if is_en else "严重等级说明"))
+    legend_en = [
+        "P0 — Silent data corruption: data is wrong or missing without an error popup.",
+        "P1 — Visible runtime crash: a popup appears, the operation aborts.",
+        "P2 — Silent display: form fields render blank when they should show data.",
+        "P3 — Missing UI: a feature exists in code but no button invokes it.",
+        "P4 — Setup: one-time hurdle on each new install.",
+    ]
+    legend_zh = [
+        "P0 — 静默数据错误：数据错或缺失，但没有任何报错提示。",
+        "P1 — 可见的运行时报错：弹出错误对话框，操作中断。",
+        "P2 — 静默显示问题：表单字段本应有数据，却显示为空。",
+        "P3 — 缺失界面：代码里实现了某功能，但界面上没有按钮去触发它。",
+        "P4 — 安装设置：每台新机器需要一次性处理。",
+    ]
+    _bullets(doc, [Z(s) for s in (legend_en if is_en else legend_zh)])
+    doc.add_page_break()
+
+    # ---- One section per issue ----
+    by_tier: dict[str, list[dict]] = {}
+    for it in ISSUES:
+        by_tier.setdefault(it["tier"], []).append(it)
+    tier_order = ["P0_silent_data", "P1_visible_crash",
+                  "P2_silent_display", "P3_missing_ui", "P4_setup"]
+    tier_titles_en = {
+        "P0_silent_data": "P0 — Silent data corruption",
+        "P1_visible_crash": "P1 — Visible runtime crash",
+        "P2_silent_display": "P2 — Silent display",
+        "P3_missing_ui": "P3 — Missing UI",
+        "P4_setup": "P4 — Setup",
+    }
+    tier_titles_zh = {
+        "P0_silent_data": "P0 — 静默数据错误",
+        "P1_visible_crash": "P1 — 可见的运行时报错",
+        "P2_silent_display": "P2 — 静默显示问题",
+        "P3_missing_ui": "P3 — 缺失界面",
+        "P4_setup": "P4 — 安装设置",
+    }
+    for tier in tier_order:
+        items = by_tier.get(tier, [])
+        if not items:
+            continue
+        _h(doc, 1, Z(tier_titles_en[tier] if is_en
+                      else tier_titles_zh[tier]))
+        for it in items:
+            title = it["title_en"] if is_en else it["title_zh"]
+            _h(doc, 2, Z(f"Issue #{it['id']} — {title}"))
+            _h(doc, 3, Z("Affected sub" if is_en else "涉及位置"))
+            doc.add_paragraph(Z(it["form"]))
+            _h(doc, 3, Z("Severity" if is_en else "严重等级"))
+            doc.add_paragraph(Z(it["severity_en"] if is_en
+                                  else it["severity_zh"]))
+            _h(doc, 3, Z("Description" if is_en else "问题描述"))
+            for para in (it["summary_en"] if is_en
+                         else it["summary_zh"]).split("\n\n"):
+                doc.add_paragraph(Z(para))
+            _h(doc, 3, Z("Steps to reproduce" if is_en else "复现步骤"))
+            _numbered(doc, [Z(s) for s in
+                            (it["steps_en"] if is_en else it["steps_zh"])])
+            shots = it.get("screenshots") or []
+            if shots:
+                _h(doc, 3, Z("Screenshots" if is_en else "截图"))
+                for fname, caption in shots:
+                    p = SHOT_DIR / fname
+                    if not p.exists():
+                        doc.add_paragraph(Z(
+                            f"[screenshot {fname} not found]"
+                            if is_en else f"[未找到截图 {fname}]"
+                        ))
+                        continue
+                    doc.add_picture(str(p), width=Inches(6.0))
+                    if caption:
+                        cap = doc.add_paragraph(
+                            caption if is_en else Z(caption)
+                        )
+                        cap.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+                        for run in cap.runs:
+                            run.italic = True
+                            run.font.size = Pt(9)
+            _h(doc, 3, Z("Suggested fix" if is_en else "建议修复方案"))
+            for para in (it["fix_en"] if is_en
+                         else it["fix_zh"]).split("\n\n"):
+                doc.add_paragraph(Z(para))
+
+    # ---- Closing ----
+    doc.add_page_break()
+    _h(doc, 1, Z("Closing note" if is_en else "结语"))
+    closing = (
+        "Thank you for taking the time to read this report. None of the "
+        "items above is urgent; we hope having them all in one place "
+        "makes it easy to address them at your own pace.\n\n"
+        "If any of the descriptions or suggested fixes are unclear, we "
+        "would be glad to discuss further. The corresponding regression "
+        "tests in this repository will automatically flip from PASS to "
+        "FAIL the moment any issue is fixed in the source dump — so you "
+        "can use them as a confirmation signal."
+        if is_en else
+        "感谢您抽时间读完这份报告。以上各条都不紧急，我们把它们集中整理"
+        "在一起，只是希望方便您在合适的时候逐一处理。\n\n"
+        "如果对其中任何一条的描述或建议有疑问，欢迎随时一同讨论。本仓库"
+        "里对应的回归测试，会在您修好任意一个问题、并重新导出 dump 之后"
+        "自动从 PASS 翻成 FAIL —— 可以作为修复完成的信号使用。"
+    )
+    for para in closing.split("\n\n"):
+        doc.add_paragraph(Z(para))
+
+    doc.save(out_path)
+    print(f"wrote {out_path}")
+
+
+def main() -> int:
+    _build("en", OUT_EN)
+    _build("zh", OUT_ZH)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
