@@ -213,7 +213,7 @@ Open person 44872 (孫才, Sun Cai). The EVENTS sub-datasheet shows 1 event row(
 
 ![bug10_subform_annotated.png](screenshots/bug10_subform_annotated.png)
 
-_EVENT_ADDR_2 in design view, annotated — TxtAddrCHN's ControlSource (`c_name_chn`) is not in the form's RecordSource projection._
+_Runtime view: CBDB_Browser_2 with c_personid=44872 (孫才) loaded.  EVENT_ADDR sub-tab shows blank Chinese / Pinyin address columns (control `TxtAddrCHN` is bound to `c_name_chn`, which the form's RecordSource — `View_EventAddrData` — doesn't project).  ADDR_CODES has the values — they're just unreachable from this sub-form._
 
 #### Suggested fix
 
@@ -243,7 +243,7 @@ Open person 44872 (孫才, Sun Cai). The EVENTS sub-datasheet shows 1 event row(
 
 ![bug11_subform_annotated.png](screenshots/bug11_subform_annotated.png)
 
-_EVENTS_DATA_2 in design view, annotated._
+_Runtime view: CBDB_Browser_2 with c_personid=44872 (孫才) loaded.  EVENTS_DATA sub-tab has a control bound to `c_event_record_id`, which doesn't exist in either EVENTS_DATA or `View_EventsData` — every row renders blank silently._
 
 #### Suggested fix
 
@@ -275,7 +275,7 @@ Open person 2 (安邡, An Fang). The POSTED-TO-OFFICE sub-datasheet shows 1 post
 
 ![bug12_subform_annotated.png](screenshots/bug12_subform_annotated.png)
 
-_POSTED_TO_OFFICE_DATA_2 in design view, annotated._
+_Runtime view: CBDB_Browser_2 with c_personid=2 (安邡, An Fang) loaded — picked because he has POSTING_DATA (Sun Cai 44872 has none).  Postings sub-tab is open; the appointment-type column is blank on every row — the bound control's ControlSource (`c_appt_type_code`) is missing from `View_PostingOfficeData`'s projection._
 
 #### Suggested fix
 

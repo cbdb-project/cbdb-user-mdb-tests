@@ -150,7 +150,26 @@ def _open_session():
         except PermissionError:
             time.sleep(1); WORK.unlink()
     shutil.copy2(SRC, WORK)
+    # Pre-patch LinkListInit BEFORE Access opens, otherwise
+    # NAVIGATION_PANE.Form_Open (which AutoExec triggers) hangs
+    # forever trying to relink to a non-existent CBDB_<ver>_DATA.mdb
+    # at our working-copy path.  Same workaround as
+    # tests/cbdb_driver/vba_session.py.
+    import pyodbc as _pyodbc
+    _conn = _pyodbc.connect(
+        "DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};"
+        f"DBQ={WORK};", autocommit=True
+    )
+    _conn.cursor().execute(
+        f"UPDATE LinkListInit SET c_path = '"
+        f"{str(WORK).replace(chr(39), chr(39)*2)}'"
+    )
+    _conn.close()
     app = win32com.client.DispatchEx("Access.Application")
+    try:
+        app.AutomationSecurity = 1  # msoAutomationSecurityLow
+    except Exception:
+        pass
     app.Visible = True
     app.OpenCurrentDatabase(str(WORK))
     # Repair DAO ref so forms can open at all (Bug #2 workaround).
@@ -248,41 +267,157 @@ def capture_bug15_19(app):
             print(f"  warn bug{bug} {form}: {e}")
 
 
-def capture_bug11_12_10(app):
-    """Sub-form ControlSource bugs — open the parent form so the
-    sub-form is visible.  These need a person id; use 1 (a Song
-    person known to have data)."""
-    # BIOG_MAIN form for sub-forms; opening it requires picking a
-    # person.  CBDB has frmGetDataVersion etc. as splash.  Skip
-    # actual form opening and instead show the sub-form alone in
-    # design-mode-style.
-    targets = [
-        ("EVENT_ADDR_2 Subform", "TxtAddrCHN", "c_name_chn", 10),
-        ("EVENTS_DATA_2 Subform", "c_event_record_id",
-         "c_event_record_id", 11),
-        ("POSTED_TO_OFFICE_DATA_2 Subform", "c_appt_type_code",
-         "c_appt_type_code", 12),
-    ]
-    for sub, ctl, src, bug in targets:
+def _open_browser_at_personid(app, personid: int) -> None:
+    """Open CBDB_Browser_2 and navigate the embedded BIOG_MAIN_2_Subform's
+    recordset to the given c_personid.  After this returns, the parent
+    form is open and all 10 person-detail sub-sub-forms (EVENTS_DATA_2,
+    POSTING_DATA_2, EVENT_ADDR_2, …) have been refreshed for that
+    person, so capturing the Access window shows what a real CBDB user
+    would see after picking that person from the search.
+
+    Uses Recordset.FindFirst rather than driving the search UI — same
+    end state, fewer moving parts.  Raises if the person isn't in the
+    recordset (BIOG_MAIN_2_Subform's RecordSource is `View_PeopleData`,
+    which projects every row of BIOG_MAIN, so any valid c_personid
+    should resolve).
+    """
+    app.DoCmd.OpenForm("CBDB_Browser_2", 0, "", "", 0, 0)
+    time.sleep(2.0)
+    parent = app.Forms("CBDB_Browser_2")
+    biog_sub = parent.Controls("BIOG_MAIN_2_Subform").Form
+    rs = biog_sub.Recordset
+    rs.FindFirst(f"c_personid = {int(personid)}")
+    if rs.NoMatch:
+        raise RuntimeError(
+            f"c_personid={personid} not found in "
+            f"BIOG_MAIN_2_Subform.Recordset"
+        )
+    # Sub-sub-forms are linked to BIOG_MAIN_2_Subform's current row;
+    # give them a beat to refresh after the FindFirst.
+    time.sleep(2.0)
+
+
+def _switch_biog_tab_to(app, page_name: str) -> None:
+    """Switch BIOG_MAIN_2_Subform's tab control to the named page.
+
+    Page name vs caption (probed live 2026-05-03 against TabCtl14):
+      PageBirthDeathYears, PageAddresses, PageAltNames, PageWritings,
+      PagePosting, PageEntry, PageEvents, PageStatus, PageKinship,
+      PageAssociations, PagePossessions, PageSource, PageBiogInst.
+
+    Uses .Name match (not Caption) — captions can be retranslated by
+    the bilingual UI helpers but Name is stable.
+    """
+    parent = app.Forms("CBDB_Browser_2")
+    biog_sub = parent.Controls("BIOG_MAIN_2_Subform").Form
+    tab_ctl = None
+    for ctl in biog_sub.Controls:
         try:
-            app.DoCmd.OpenForm(sub, 1, "", "", 0, 0)  # acDesign view
-            time.sleep(1.5)
-            s = SHOT_DIR / f"bug{bug}_subform_design.png"
-            _grab_access(s)
-            _annotate(s, SHOT_DIR / f"bug{bug}_subform_annotated.png",
-                      f"{sub} — control {ctl!r}'s ControlSource is "
-                      f"{src!r}, which isn't projected by the form's "
-                      f"saved-query RecordSource.")
+            if int(ctl.ControlType) == 123:  # acTabCtl
+                tab_ctl = ctl
+                break
+        except Exception:
+            continue
+    if tab_ctl is None:
+        print("  warn: no TabCtl found on BIOG_MAIN_2_Subform")
+        return
+    for i in range(tab_ctl.Pages.Count):
+        pg = tab_ctl.Pages(i)
+        if str(pg.Name) == page_name:
             try:
-                app.DoCmd.Close(2, sub, 2)
-            except Exception:
-                pass
-        except Exception as e:
-            print(f"  warn bug{bug} {sub}: {e}")
+                tab_ctl.Value = i
+                time.sleep(1.5)  # let the sub-sub-form refresh
+                return
+            except Exception as e:
+                print(f"  warn: could not activate {page_name}: {e}")
+                return
+    print(f"  warn: no tab page named {page_name!r}")
 
 
-def main() -> int:
+def capture_bug11_12_10(app):
+    """Bugs #10/#11/#12 — sub-form ControlSource refers to a column
+    that isn't in the form's RecordSource projection, so the bound
+    control silently renders blank for every row.
+
+    What the user sees: open a person's biographical detail
+    (CBDB_Browser_2 → BIOG_MAIN_2_Subform), look at the affected
+    sub-tab — the bound columns are blank for every row, even
+    though the underlying lookup tables have the data.
+
+    Demo persons (from `reports/probe_demo_persons.py`):
+      - bugs #10 / #11: c_personid=44872 (孫才, Sun Cai) — has 1
+        EVENTS_DATA row with an associated EVENT_ADDR
+      - bug #12: c_personid=2 (安邡, An Fang) — has POSTING_DATA
+        with an appointment type
+    """
+    targets = [
+        (10, 44872, "PageEvents",
+         "Bug #10 — runtime view, c_personid=44872 (孫才, Sun Cai), "
+         "Events sub-tab.  EVENT_ADDR's Chinese / Pinyin address "
+         "columns render blank for every row (control `TxtAddrCHN` "
+         "bound to `c_name_chn`, which `View_EventAddrData` doesn't "
+         "project — ADDR_CODES has the values, the sub-form just "
+         "can't reach them)."),
+        (11, 44872, "PageEvents",
+         "Bug #11 — runtime view, c_personid=44872 (孫才, Sun Cai), "
+         "Events sub-tab.  A control bound to `c_event_record_id` "
+         "renders blank on every row — the column doesn't exist in "
+         "EVENTS_DATA or in `View_EventsData`."),
+        (12, 2, "PagePosting",
+         "Bug #12 — runtime view, c_personid=2 (安邡, An Fang), "
+         "Postings sub-tab.  Appointment-type column is blank on "
+         "every row (control bound to `c_appt_type_code`, missing "
+         "from `View_PostingOfficeData`'s projection)."),
+    ]
+    last_personid = None
+    for bug, personid, page_name, caption in targets:
+        if personid != last_personid:
+            try:
+                # Close+reopen avoids stale recordset state when
+                # navigating to a different person.
+                if last_personid is not None:
+                    try:
+                        app.DoCmd.Close(2, "CBDB_Browser_2", 2)
+                        time.sleep(0.5)
+                    except Exception:
+                        pass
+                _open_browser_at_personid(app, personid)
+                last_personid = personid
+            except Exception as e:
+                print(f"  warn: could not open browser at "
+                      f"c_personid={personid}: {e}")
+                continue
+        _switch_biog_tab_to(app, page_name)
+        s = SHOT_DIR / f"bug{bug}_subform_runtime.png"
+        _grab_access(s)
+        _annotate(s, SHOT_DIR / f"bug{bug}_subform_annotated.png",
+                  caption)
+
+    try:
+        app.DoCmd.Close(2, "CBDB_Browser_2", 2)
+    except Exception:
+        pass
+
+
+_ALL_CAPTURES = {
+    "bug4": capture_bug4,
+    "bug7": capture_bug7,
+    "bug15_19": capture_bug15_19,
+    "bug10_11_12": capture_bug11_12_10,
+}
+
+
+def main(only: list[str] | None = None) -> int:
+    """Run all (or a subset of) capture routines.
+
+    `only` is a list of keys from `_ALL_CAPTURES` — e.g.
+    `main(["bug10_11_12"])` to recapture just the runtime sub-form
+    shots without re-touching the others (useful when iterating on
+    one bug's screenshot).
+    """
     global _ACCESS_HWND
+    targets = (_ALL_CAPTURES if not only
+               else {k: _ALL_CAPTURES[k] for k in only})
     app = _open_session()
     try:
         _ACCESS_HWND = int(app.hWndAccessApp())
@@ -294,14 +429,9 @@ def main() -> int:
             time.sleep(1.0)
         except Exception:
             pass
-        print("== Bug #4 ==")
-        capture_bug4(app)
-        print("== Bug #7 ==")
-        capture_bug7(app)
-        print("== Bugs #15-#19 ==")
-        capture_bug15_19(app)
-        print("== Bugs #10-#12 ==")
-        capture_bug11_12_10(app)
+        for name, fn in targets.items():
+            print(f"== {name} ==")
+            fn(app)
     finally:
         try:
             app.CloseCurrentDatabase()
@@ -313,4 +443,6 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    import sys as _sys
+    _only = _sys.argv[1:] or None
+    raise SystemExit(main(_only))
