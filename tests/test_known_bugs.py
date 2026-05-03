@@ -2,8 +2,15 @@
 Regression tests for known bugs in CBDB_BJ_User.mdb (current as of 2026-04-30).
 
 Each test here documents a discrete bug and verifies the buggy behaviour.
-When a bug is fixed in the .mdb, the corresponding test will start FAILING —
-that's the signal to flip its assertion to expect the corrected behaviour.
+When the marker stops reproducing, the corresponding test will start
+FAILING — that's the signal to investigate **why** before flipping the
+assertion: the candidates are (a) upstream actually patched the source
+.mdb / VBA, (b) the input fixture or Access driver behaviour changed
+out from under the test, (c) the original bug was misclassified.  Only
+(a) justifies marking the issue as fixed in `reports/generate_report.py`'s
+`ISSUES` dict, and only after inspecting the new VBA / queries dump
+or hearing from the maintainer.  The failure messages below
+deliberately use "no longer reproduces" rather than "FIXED".
 
 Bugs documented:
   1. View_StatusData: c_fy_range_desc / c_fy_range_chn pull from the
@@ -37,7 +44,7 @@ def test_bug_view_statusdata_fy_alias_swap():
     assert "AS YEAR_RANGE_CODES_1 ON STATUS_DATA.c_ly_range" in sql
     # but is incorrectly used for c_fy_range_desc/c_fy_range_chn:
     assert "YEAR_RANGE_CODES_1.c_range AS c_fy_range_desc" in sql, (
-        "Bug appears to be FIXED — first-year range now pulls from the "
+        "Bug marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — first-year range now pulls from the "
         "correct alias. Update this test to assert the corrected SQL."
     )
     assert "YEAR_RANGE_CODES_1.c_range_chn AS c_fy_range_chn" in sql
@@ -61,7 +68,7 @@ def test_bug_view_statusdata_fy_value_equals_ly_value(ro_conn):
     # the same source column in the buggy SQL).
     mismatches = [r for r in rows if r.c_fy_range_desc != r.c_ly_range_desc]
     assert not mismatches, (
-        "Bug appears to be FIXED — found rows where c_fy_range_desc != "
+        "Bug marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — found rows where c_fy_range_desc != "
         "c_ly_range_desc. Update this test to remove the regression "
         f"check. ({len(mismatches)} rows differ)"
     )
@@ -115,7 +122,7 @@ def test_bug4_lookat_place_cmdgis_references_nonexistent_gisframe():
                 / "Form_LookAtPlace.vb")
     body = vba_path.read_bytes().decode("utf-8")
     assert "GISFrame.Value" in body, (
-        "Bug #4 appears to be FIXED — `GISFrame.Value` no longer "
+        "Bug #4 marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — `GISFrame.Value` no longer "
         "appears in Form_LookAtPlace.vb.  Drop the workaround in "
         "tests/cbdb_driver/vba_session.py::_PER_FORM_CMDGIS_PATCHES "
         "and flip this assertion."
@@ -132,11 +139,14 @@ def test_bug5_lookat_status_cmdpajek_references_nonexistent_chkids():
                 / "Form_LookAtStatus.vb")
     body = vba_path.read_bytes().decode("utf-8")
     assert "ChkIDs.Value" in body, (
-        "Bug #5 (ChkIDs side) appears to be FIXED in Form_LookAtStatus."
+        "Bug #5 (ChkIDs side) marker no longer reproduces "
+        "(investigate upstream fix vs. fixture/driver change vs. "
+        "misclassification before flipping) — `ChkIDs.Value` is "
+        "gone from Form_LookAtStatus."
     )
     # The SQL bug is independent — flip when both halves clear.
     assert "ZZ_SCRATCH_STATUS.c_status_count" in body, (
-        "Bug #5 (SQL side) appears to be FIXED — the ZZ_SCRATCH_STATUS"
+        "Bug #5 (SQL side) marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — the ZZ_SCRATCH_STATUS"
         ".c_status_count reference is gone.  The CmdPajek SQL was "
         "copy-pasted from LookAtAssociations and the column names "
         "weren't updated to match Status's schema.  Real fix needs a "
@@ -162,7 +172,7 @@ def test_bug8_lookat_networks_cmdneo4j_select_missing_xy():
         "BIOG_MAIN.c_name_chn AS c_index_addr_chn"
     )
     assert buggy_select in body, (
-        "Bug #8 appears to be FIXED — the LookAtNetworks.CmdNeo4j "
+        "Bug #8 marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — the LookAtNetworks.CmdNeo4j "
         "tRstPlace SELECT no longer matches the buggy 3-col form. "
         "Flip this assertion."
     )
@@ -180,7 +190,7 @@ def test_bug6_groupdata_query_entry_wrong_field():
                 / "Form_LookAtGroupData.vb")
     body = vba_path.read_bytes().decode("utf-8")
     assert "ENTRY_DATA.c_parental_status " in body, (
-        "Bug #6 appears to be FIXED — `ENTRY_DATA.c_parental_status` "
+        "Bug #6 marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — `ENTRY_DATA.c_parental_status` "
         "no longer appears in Form_LookAtGroupData.vb (likely renamed "
         "to `c_parental_status_code`).  Update this test to assert the "
         "corrected form."
@@ -215,7 +225,7 @@ def test_bug7_lookat_place_cmdneo4j_select_missing_dynasty_female():
         "ZZ_SCRATCH_P_TEXT.c_index_year"
     )
     assert buggy_select in body, (
-        "Bug #7 appears to be FIXED — the LookAtPlace.CmdNeo4j SELECT "
+        "Bug #7 marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — the LookAtPlace.CmdNeo4j SELECT "
         "no longer matches the buggy 4-col projection.  Re-run "
         "`analysis/audit_recordset_sql_projection.py` to confirm; if "
         "clean, flip this assertion."
@@ -240,7 +250,7 @@ def test_bug9_lookat_entry_cmdneo4j_with_wrong_var():
     tail = body[set_idx:set_idx + 3000]
     assert ("With tRstAssocCodes" in tail
             and "!c_inst_code" in tail), (
-        "Bug #9 appears to be FIXED — `With tRstAssocCodes` immediately "
+        "Bug #9 marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — `With tRstAssocCodes` immediately "
         "following the tRstInstitutions OpenRecordset is no longer "
         "present (likely renamed to `With tRstInstitutions`).  Flip "
         "this assertion."
@@ -262,11 +272,11 @@ def test_bug10_event_addr_subform_uses_unaliased_columns():
     cs_by_name = {c["name"]: c.get("control_source", "")
                    for c in form.get("controls", [])}
     assert cs_by_name.get("TxtAddrCHN") == "c_name_chn", (
-        "Bug #10 may be FIXED — TxtAddrCHN no longer points at the "
+        "Bug #10 marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — TxtAddrCHN no longer points at the "
         "wrong column (was 'c_name_chn', should be 'c_event_addr_chn')."
     )
     assert cs_by_name.get("TxtAddrPY") == "c_name", (
-        "Bug #10 may be FIXED — TxtAddrPY no longer points at "
+        "Bug #10 marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — TxtAddrPY no longer points at "
         "'c_name'."
     )
 
@@ -283,7 +293,7 @@ def test_bug11_events_data_subform_references_missing_column():
     cs_values = {c.get("control_source", "")
                   for c in form.get("controls", [])}
     assert "c_event_record_id" in cs_values, (
-        "Bug #11 may be FIXED — no control on EVENTS_DATA_2 references "
+        "Bug #11 marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — no control on EVENTS_DATA_2 references "
         "the non-existent `c_event_record_id` column anymore."
     )
     # Also assert it really doesn't exist on EVENTS_DATA.
@@ -293,7 +303,7 @@ def test_bug11_events_data_subform_references_missing_column():
                          if t.get("name") == "EVENTS_DATA"), {})
     cols = {c.get("name") for c in events_data.get("columns", [])}
     assert "c_event_record_id" not in cols, (
-        "Bug #11 may be FIXED — EVENTS_DATA gained the "
+        "Bug #11 marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — EVENTS_DATA gained the "
         "`c_event_record_id` column, so the control now resolves."
     )
 
@@ -310,7 +320,7 @@ def test_bug12_posting_office_subform_wrong_appt_column():
     cs_values = {c.get("control_source", "")
                   for c in form.get("controls", [])}
     assert "c_appt_type_code" in cs_values, (
-        "Bug #12 may be FIXED — no control on POSTED_TO_OFFICE_DATA_2 "
+        "Bug #12 marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — no control on POSTED_TO_OFFICE_DATA_2 "
         "references the non-projected `c_appt_type_code` column."
     )
 
@@ -326,7 +336,7 @@ def test_bug13_biog_main_2_subform_picks_missing_form():
               / "Form_BIOG_MAIN_2_Subform.vb")
              .read_bytes().decode("utf-8"))
     assert 'frmPickNIAN_HAO' in body, (
-        "Bug #13 may be FIXED — `frmPickNIAN_HAO` no longer "
+        "Bug #13 marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — `frmPickNIAN_HAO` no longer "
         "referenced in Form_BIOG_MAIN_2_Subform.  Re-run "
         "`analysis/audit_cross_form_references.py`."
     )
@@ -336,7 +346,7 @@ def test_bug13_biog_main_2_subform_picks_missing_form():
                        / "control_inventory.json").read_text(encoding="utf-8"))
     keys_lc = {k.lower() for k in inv.keys()}
     assert "frmpicknian_hao" not in keys_lc, (
-        "Bug #13 may be FIXED — `frmPickNIAN_HAO` was added to the "
+        "Bug #13 marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — `frmPickNIAN_HAO` was added to the "
         ".mdb.  The cross-form reference now resolves."
     )
 
@@ -349,7 +359,7 @@ def test_bug14_kin_data_subform_picks_missing_form():
               / "Form_KIN_DATA_Subform.vb")
              .read_bytes().decode("utf-8"))
     assert 'frmPickKINSHIP_CODES' in body, (
-        "Bug #14 may be FIXED — `frmPickKINSHIP_CODES` no longer "
+        "Bug #14 marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — `frmPickKINSHIP_CODES` no longer "
         "referenced in Form_KIN_DATA_Subform."
     )
     import json
@@ -357,7 +367,7 @@ def test_bug14_kin_data_subform_picks_missing_form():
                        / "control_inventory.json").read_text(encoding="utf-8"))
     keys_lc = {k.lower() for k in inv.keys()}
     assert "frmpickkinship_codes" not in keys_lc, (
-        "Bug #14 may be FIXED — `frmPickKINSHIP_CODES` form added."
+        "Bug #14 marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — `frmPickKINSHIP_CODES` form added."
     )
 
 
@@ -403,12 +413,12 @@ def test_bugs_15_to_19_orphan_export_handlers():
     for form, ctl, bug_num in cases:
         # Sub still exists in VBA module.
         assert _has_sub(form, f"{ctl}_Click"), (
-            f"Bug #{bug_num} may be FIXED — {form}.{ctl}_Click no "
+            f"Bug #{bug_num} marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — {form}.{ctl}_Click no "
             f"longer exists in the VBA module."
         )
         # Control still missing from form design.
         assert not _has_ctl(form, ctl), (
-            f"Bug #{bug_num} may be FIXED — {form} now has a {ctl} "
+            f"Bug #{bug_num} marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — {form} now has a {ctl} "
             f"button on its design.  Drop the relevant skip in the "
             f"cross-form export test or expand fixture coverage."
         )

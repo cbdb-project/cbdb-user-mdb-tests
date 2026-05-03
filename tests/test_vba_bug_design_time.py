@@ -77,7 +77,7 @@ def test_picker_form_truly_missing_from_mdb(vba: VbaSession,
     names_lc = {all_forms.Item(i).Name.lower()
                  for i in range(all_forms.Count)}
     assert missing_form.lower() not in names_lc, (
-        f"Bug #{bug} appears to be FIXED — `{missing_form}` is now "
+        f"Bug #{bug} marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — `{missing_form}` is now "
         f"in CurrentProject.AllForms.  The cross-form references "
         f"in BIOG_MAIN_2_Subform / KIN_DATA_Subform now resolve."
     )
@@ -134,7 +134,7 @@ def test_subform_control_source_unresolved(vba: VbaSession,
             )
         live_source = (ctl_obj.ControlSource or "").strip()
         assert live_source == bad_source, (
-            f"Bug #{bug} appears to be FIXED — {subform}.{ctl}'s "
+            f"Bug #{bug} marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — {subform}.{ctl}'s "
             f"ControlSource is now {live_source!r}, was {bad_source!r}."
         )
     finally:
@@ -159,7 +159,7 @@ def test_orphan_export_button_truly_missing(vba: VbaSession,
         ctl = f.Controls(btn)
         # If we got here, the button exists — bug fixed.
         pytest.fail(
-            f"Bug #{bug} appears to be FIXED — {form} now has a "
+            f"Bug #{bug} marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — {form} now has a "
             f"{btn} button (Controls(btn) returned {ctl!r}).  "
             f"Update test_known_bugs.test_bugs_15_to_19 to drop "
             f"this case, and consider expanding the cross-form "

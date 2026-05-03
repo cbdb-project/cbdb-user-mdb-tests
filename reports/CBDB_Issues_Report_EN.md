@@ -27,7 +27,7 @@ The issues are ordered by severity (P0 highest). Each entry includes a concise d
   - [Issue #19 — LookAtOffice is missing its CmdGUESS button](#issue-19--lookatoffice-is-missing-its-cmdguess-button)
 - [P4 — Setup](#p4--setup)
   - [Issue #2 — VBA project references the legacy dao360.dll which isn't on Office 2016+ machines](#issue-2--vba-project-references-the-legacy-dao360dll-which-isnt-on-office-2016-machines)
-- [P5 — Resolved / not currently reproducible](#p5--resolved--not-currently-reproducible)
+- [P5 — Dormant / latent / not currently reproducible](#p5--dormant--latent--not-currently-reproducible)
   - [Issue #1 — View_StatusData would display last-year range in the first-year column — DORMANT (no source rows trigger it on this dump)](#issue-1--view_statusdata-would-display-last-year-range-in-the-first-year-column--dormant-no-source-rows-trigger-it-on-this-dump)
   - [Issue #3 — LookAtEntry.CmdQuery backfill UPDATE — historical Bug #3, NOT reproducible on the current dump](#issue-3--lookatentrycmdquery-backfill-update--historical-bug-3-not-reproducible-on-the-current-dump)
   - [Issue #4 — LookAtPlace.CmdGIS would abort with 'Object required' — LATENT, masked by Issue #15 (no CmdGIS button on the form)](#issue-4--lookatplacecmdgis-would-abort-with-object-required--latent-masked-by-issue-15-no-cmdgis-button-on-the-form)
@@ -46,7 +46,7 @@ The issues are ordered by severity (P0 highest). Each entry includes a concise d
 - P2 — Silent display: form fields render blank when they should show data.
 - P3 — Missing UI: a feature exists in code but no button invokes it.
 - P4 — Setup: one-time hurdle on each new install.
-- P5 — Resolved / not currently reproducible: kept as historical record; we re-checked on the current dump and could not trigger the symptom.
+- P5 — Dormant / latent / not currently reproducible: kept as historical record; we re-checked on the current dump and could not trigger the symptom.
 
 ## P0 — Silent data corruption
 
@@ -407,9 +407,9 @@ Once, on the maintainer's machine, do:
 
 Then re-distribute the fixed file. Future end users won't need to do anything.
 
-## P5 — Resolved / not currently reproducible
+## P5 — Dormant / latent / not currently reproducible
 
-_Items in this tier are kept as historical / latent record.  They fall into three categories: (a) DORMANT — verified that current source data doesn't trigger the symptom; (b) RESOLVED — the symptom no longer occurs even though the suspect code is still present (likely fixed by some Office / JET update or a previous iteration); (c) LATENT — the source-code defect is real, but the user can't reach it because another issue (e.g. a missing UI button) blocks the path.  None of these are user-facing today; please consult before treating any of them as urgent._
+_Items in this tier are kept as historical / latent record.  They fall into three categories: (a) DORMANT — verified that current source data doesn't trigger the symptom; (b) NOT CURRENTLY REPRODUCIBLE — the symptom no longer surfaces even though the suspect code is still present (we have NOT confirmed an upstream source-level fix; could be a JET / Office behaviour change, a fixture / driver change on our side, or the original diagnosis was a false positive); (c) LATENT — the source-code defect is real, but the user can't reach it because another issue (e.g. a missing UI button) blocks the path.  None of these are user-facing today; **none have been verified as fixed upstream** — please consult before treating any of them as either urgent or closed._
 
 ### Issue #1 — View_StatusData would display last-year range in the first-year column — DORMANT (no source rows trigger it on this dump)
 
@@ -441,7 +441,7 @@ In `View_StatusData` change `YEAR_RANGE_CODES_1.c_range AS c_fy_range_desc` and 
 
 **Affected sub:** `Form_LookAtEntry.CmdQuery_Click`
 
-**Severity:** P5 — Resolved / not reproducible on current dump
+**Severity:** P5 — Not currently reproducible on this dump (no upstream source-level fix observed)
 
 #### Description
 
@@ -451,7 +451,7 @@ Historical context: an earlier dump of `Form_LookAtEntry.vb` (line 1778-1789, a 
 
 The giant multi-table UPDATE statement is still in the VBA module (the source code wasn't rewritten), so structurally the SQL pattern that was suspect remains.  But its runtime behaviour now produces correct backfills on this dump — likely because of a JET / Office update changing how it schedules complex UPDATE plans, or because the original diagnosis was a false positive.
 
-**Recommendation:** treat as resolved unless someone can produce a fresh repro on a current dump.  Verification script: `analysis/verify_bug3.py`.
+**Recommendation:** treat as not currently reproducible unless someone can produce a fresh repro on a current dump.  Verification script: `analysis/verify_bug3.py`.
 
 #### Steps to reproduce
 
@@ -732,4 +732,4 @@ When we compare BIOG_MAIN's `c_index_year` and `c_index_addr_id` between this Us
 
 Thank you for taking the time to read this report. None of the items above is urgent; we hope having them all in one place makes it easy to address them at your own pace.
 
-If any of the descriptions or suggested fixes are unclear, we would be glad to discuss further. The corresponding regression tests in this repository will automatically flip from PASS to FAIL the moment any issue is fixed in the source dump — so you can use them as a confirmation signal.
+If any of the descriptions or suggested fixes are unclear, we would be glad to discuss further. The corresponding regression tests in this repository will automatically flip from PASS to FAIL the moment any regression marker stops reproducing in the source dump — that is a signal to investigate, not an automatic confirmation that the bug is fixed (the marker could fail because of an upstream fix, a fixture / driver change on our side, or a misclassification we made earlier).

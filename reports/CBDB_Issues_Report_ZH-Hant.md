@@ -27,7 +27,7 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
   - [Issue #19 — LookAtOffice 缺少 CmdGUESS 按鈕](#issue-19--lookatoffice-缺少-cmdguess-按鈕)
 - [P4 — 安裝設定](#p4--安裝設定)
   - [Issue #2 — VBA 工程引用了過時的 dao360.dll，Office 2016+ 機器上沒這個檔案](#issue-2--vba-工程引用了過時的-dao360dlloffice-2016-機器上沒這個檔案)
-- [P5 — 已解決 / 當前無法復現](#p5--已解決--當前無法復現)
+- [P5 — 潛伏 / 不可達 / 當前無法復現](#p5--潛伏--不可達--當前無法復現)
   - [Issue #1 — View_StatusData 會把首年份範圍顯示成末年份範圍 — DORMANT（當前 dump 沒有源資料能觸發）](#issue-1--view_statusdata-會把首年份範圍顯示成末年份範圍--dormant當前-dump-沒有源資料能觸發)
   - [Issue #3 — LookAtEntry.CmdQuery 回填 UPDATE — 歷史 Bug #3，當前 dump 上已無法復現](#issue-3--lookatentrycmdquery-回填-update--歷史-bug-3當前-dump-上已無法復現)
   - [Issue #4 — LookAtPlace.CmdGIS 會報「Object required」 — LATENT，被 Issue #15（表單上沒有 CmdGIS 按鈕）所遮蔽](#issue-4--lookatplacecmdgis-會報object-required--latent被-issue-15表單上沒有-cmdgis-按鈕所遮蔽)
@@ -46,7 +46,7 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
 - P2 — 靜默顯示問題：表單欄位本應有資料，卻顯示為空。
 - P3 — 缺失介面：程式碼裡實現了某功能，但介面上沒有按鈕去觸發它。
 - P4 — 安裝設定：每臺新機器需要一次性處理。
-- P5 — 已解決 / 當前無法復現：保留作為歷史記錄；我們在當前 dump 上重新驗證過，無法再觸發症狀。
+- P5 — 潛伏 / 不可達 / 當前無法復現：保留作為歷史記錄；我們在當前 dump 上重新驗證過，無法再觸發症狀。
 
 ## P0 — 靜默資料錯誤
 
@@ -407,9 +407,9 @@ _LookAtPlace as it ships — no GIS button is rendered, even though `Sub CmdGIS_
 
 然後重新分發修好的檔案。以後的終端使用者什麼都不用做。
 
-## P5 — 已解決 / 當前無法復現
+## P5 — 潛伏 / 不可達 / 當前無法復現
 
-_本層的條目作為歷史 / 潛伏記錄保留。可分為三類：(a) DORMANT 潛伏 — 已驗證當前源資料無法觸發該症狀；(b) RESOLVED 已解決 — 症狀不再出現，雖然可疑程式碼仍在（可能是某次 Office / JET 更新或更早一次修補解決的）；(c) LATENT 被遮蔽 — 原始碼缺陷確實存在，但因為另一個 issue（例如某個 UI 按鈕缺失）擋住了使用路徑，使用者目前碰不到。本層條目當下都不是使用者會遇到的問題；若要當成緊急問題處理，請先諮詢。_
+_本層的條目作為歷史 / 潛伏記錄保留。可分為三類：(a) DORMANT 潛伏 — 已驗證當前源資料無法觸發該症狀；(b) 當前無法復現 — 症狀不再出現，但可疑程式碼仍在（我們**沒有**確認上游有原始碼層面的修復；原因可能是 JET / Office 的行為改變、可能是我們這邊 fixture/driver 改變，也可能原本的診斷就是 false positive）；(c) LATENT 被遮蔽 — 原始碼缺陷確實存在，但因為另一個 issue（例如某個 UI 按鈕缺失）擋住了使用路徑，使用者目前碰不到。本層條目當下都不是使用者會遇到的問題，**也沒有任何一條被確認上游修復**；若要當成緊急或已關閉處理，請先諮詢。_
 
 ### Issue #1 — View_StatusData 會把首年份範圍顯示成末年份範圍 — DORMANT（當前 dump 沒有源資料能觸發）
 
@@ -732,4 +732,4 @@ _**Hypothetical** popup, reconstructed in PIL.  Users currently CAN'T trigger th
 
 感謝您抽時間讀完這份報告。以上各條都不緊急，我們把它們集中整理在一起，只是希望方便您在合適的時候逐一處理。
 
-如果對其中任何一條的描述或建議有疑問，歡迎隨時一同討論。本倉庫裡對應的迴歸測試，會在您修好任意一個問題、並重新匯出 dump 之後自動從 PASS 翻成 FAIL —— 可以作為修復完成的訊號使用。
+如果對其中任何一條的描述或建議有疑問，歡迎隨時一同討論。本倉庫裡對應的迴歸測試，會在任何一個迴歸標記不再復現時自動從 PASS 翻成 FAIL —— 這是「請調查一下」的訊號，而不是「問題已修復」的自動確認（因為標記不再復現也可能是 fixture / driver 變了，或者是我們當初的分類有誤）。

@@ -50,7 +50,7 @@ ISSUES = [
     # ========== Tier 1: silent data corruption ==========
     {
         "id": 1,
-        "tier": "P5_resolved_or_dormant",
+        "tier": "P5_dormant_or_latent",
         "form": "View_StatusData",
         "title_en": "View_StatusData would display last-year range in the first-year column — DORMANT (no source rows trigger it on this dump)",
         "title_zh": "View_StatusData 會把首年份範圍顯示成末年份範圍 — DORMANT（當前 dump 沒有源資料能觸發）",
@@ -120,7 +120,7 @@ ISSUES = [
     },
     {
         "id": 3,
-        "tier": "P5_resolved_or_dormant",
+        "tier": "P5_dormant_or_latent",
         "form": "Form_LookAtEntry.CmdQuery_Click",
         "title_en": "LookAtEntry.CmdQuery backfill UPDATE — historical Bug #3, NOT reproducible on the current dump",
         "title_zh": "LookAtEntry.CmdQuery 回填 UPDATE — 歷史 Bug #3，當前 dump 上已無法復現",
@@ -144,7 +144,8 @@ ISSUES = [
             "likely because of a JET / Office update changing how it "
             "schedules complex UPDATE plans, or because the original "
             "diagnosis was a false positive.\n\n"
-            "**Recommendation:** treat as resolved unless someone can "
+            "**Recommendation:** treat as not currently reproducible "
+            "unless someone can "
             "produce a fresh repro on a current dump.  Verification "
             "script: `analysis/verify_bug3.py`."
         ),
@@ -194,7 +195,7 @@ ISSUES = [
             "與 Status / Texts / Associations 已使用的寫法一致。"
         ),
         "screenshots": [],
-        "severity_en": "P5 — Resolved / not reproducible on current dump",
+        "severity_en": "P5 — Not currently reproducible on this dump (no upstream source-level fix observed)",
         "severity_zh": "P5 — 已解決 / 當前 dump 上無法復現",
     },
     {
@@ -417,7 +418,7 @@ ISSUES = [
     # ========== Tier 2: visible runtime crash (popup blocks user) ==========
     {
         "id": 4,
-        "tier": "P5_resolved_or_dormant",
+        "tier": "P5_dormant_or_latent",
         "form": "Form_LookAtPlace.CmdGIS_Click",
         "title_en": "LookAtPlace.CmdGIS would abort with 'Object required' — LATENT, masked by Issue #15 (no CmdGIS button on the form)",
         "title_zh": "LookAtPlace.CmdGIS 會報「Object required」 — LATENT，被 Issue #15（表單上沒有 CmdGIS 按鈕）所遮蔽",
@@ -485,7 +486,7 @@ ISSUES = [
     },
     {
         "id": 5,
-        "tier": "P5_resolved_or_dormant",
+        "tier": "P5_dormant_or_latent",
         "form": "Form_LookAtStatus.CmdPajek_Click",
         "title_en": "LookAtStatus.CmdPajek references a missing control AND uses three columns that don't exist",
         "title_zh": "LookAtStatus.CmdPajek 引用了不存在的控件，且 SQL 用了三个不存在的列",
@@ -715,7 +716,7 @@ ISSUES = [
     },
     {
         "id": 14,
-        "tier": "P5_resolved_or_dormant",
+        "tier": "P5_dormant_or_latent",
         "form": "Form_KIN_DATA_Subform",
         "title_en": "KIN_DATA Subform's CmdPickKinRel calls a missing picker (frmPickKINSHIP_CODES) — but the host sub-form is currently an orphan (LATENT)",
         "title_zh": "KIN_DATA 子表單的 CmdPickKinRel 呼叫不存在的 picker（frmPickKINSHIP_CODES）——但目前該子表單在主表中無入口（LATENT）",
@@ -921,7 +922,7 @@ ISSUES = [
     },
     {
         "id": 11,
-        "tier": "P5_resolved_or_dormant",
+        "tier": "P5_dormant_or_latent",
         "form": "EVENTS_DATA_2 Subform",
         "title_en": "EVENTS_DATA_2's c_event_record_id control bound to a non-existent column — but the control is hidden (LATENT)",
         "title_zh": "EVENTS_DATA_2 上 c_event_record_id 控件綁到不存在的欄位——但該控件本身是隱藏的（LATENT）",
@@ -1010,7 +1011,7 @@ ISSUES = [
     },
     {
         "id": 12,
-        "tier": "P5_resolved_or_dormant",
+        "tier": "P5_dormant_or_latent",
         "form": "POSTED_TO_OFFICE_DATA_2 Subform",
         "title_en": "POSTED_TO_OFFICE_DATA_2's c_appt_type_code control bound to a non-projected column — but the control is hidden AND the user-facing appointment-type controls work (LATENT)",
         "title_zh": "POSTED_TO_OFFICE_DATA_2 上 c_appt_type_code 控件綁到沒投影的欄位——但該控件是隱藏的，且用戶實際看的任職類型欄位是正常的（LATENT）",
@@ -1773,7 +1774,7 @@ def _build(lang: str, out_path: Path) -> None:
         "P2 — Silent display: form fields render blank when they should show data.",
         "P3 — Missing UI: a feature exists in code but no button invokes it.",
         "P4 — Setup: one-time hurdle on each new install.",
-        "P5 — Resolved / not currently reproducible: kept as historical "
+        "P5 — Dormant / latent / not currently reproducible: kept as historical "
         "record; we re-checked on the current dump and could not "
         "trigger the symptom.",
     ]
@@ -1783,7 +1784,7 @@ def _build(lang: str, out_path: Path) -> None:
         "P2 — 静默显示问题：表单字段本应有数据，却显示为空。",
         "P3 — 缺失界面：代码里实现了某功能，但界面上没有按钮去触发它。",
         "P4 — 安装设置：每台新机器需要一次性处理。",
-        "P5 — 已解决 / 当前无法复现：保留作为历史记录；我们在当前 dump "
+        "P5 — 潛伏 / 不可達 / 當前無法復現：保留作为历史记录；我们在当前 dump "
         "上重新验证过，无法再触发症状。",
     ]
     _bullets(doc, [Z(s) for s in (legend_en if is_en else legend_zh)])
@@ -1795,15 +1796,15 @@ def _build(lang: str, out_path: Path) -> None:
         by_tier.setdefault(it["tier"], []).append(it)
     tier_order = ["P0_silent_data", "P1_visible_crash",
                   "P2_silent_display", "P3_missing_ui", "P4_setup",
-                  "P5_resolved_or_dormant"]
+                  "P5_dormant_or_latent"]
     tier_titles_en = {
         "P0_silent_data": "P0 — Silent data corruption",
         "P1_visible_crash": "P1 — Visible runtime crash",
         "P2_silent_display": "P2 — Silent display",
         "P3_missing_ui": "P3 — Missing UI",
         "P4_setup": "P4 — Setup",
-        "P5_resolved_or_dormant":
-            "P5 — Resolved / not currently reproducible",
+        "P5_dormant_or_latent":
+            "P5 — Dormant / latent / not currently reproducible",
     }
     tier_titles_zh = {
         "P0_silent_data": "P0 — 静默数据错误",
@@ -1811,7 +1812,7 @@ def _build(lang: str, out_path: Path) -> None:
         "P2_silent_display": "P2 — 静默显示问题",
         "P3_missing_ui": "P3 — 缺失界面",
         "P4_setup": "P4 — 安装设置",
-        "P5_resolved_or_dormant": "P5 — 已解决 / 当前无法复现",
+        "P5_dormant_or_latent": "P5 — 潛伏 / 不可達 / 當前無法復現",
     }
     demo_persons = _load_demo_persons()
     bug_status = _load_bug_test_status()
@@ -1822,28 +1823,36 @@ def _build(lang: str, out_path: Path) -> None:
             continue
         _h(doc, 1, Z(tier_titles_en[tier] if is_en
                       else tier_titles_zh[tier]))
-        if tier == "P5_resolved_or_dormant":
+        if tier == "P5_dormant_or_latent":
             preface = (
                 "Items in this tier are kept as historical / latent "
                 "record.  They fall into three categories: (a) DORMANT "
                 "— current source data doesn't trigger the symptom; "
-                "(b) RESOLVED — the symptom no longer occurs even "
-                "though the suspect code is still present (likely "
-                "fixed by some Office / JET update or a previous "
-                "iteration); (c) LATENT — the source-code defect is "
+                "(b) NOT CURRENTLY REPRODUCIBLE — the symptom no "
+                "longer surfaces even though the suspect code is "
+                "still present (we have NOT confirmed an upstream "
+                "source-level fix; the cause could be a JET / Office "
+                "behaviour change, a fixture / driver change on our "
+                "side, or the original diagnosis was a false "
+                "positive); (c) LATENT — the source-code defect is "
                 "real, but the user can't reach it because another "
                 "issue (e.g. a missing UI button) blocks the path. "
-                "None of these are user-facing today; please consult "
-                "before treating any of them as urgent."
+                "None of these are user-facing today; **none have "
+                "been verified as fixed upstream** — please consult "
+                "before treating any of them as either urgent or "
+                "closed."
                 if is_en else
                 "本層的條目作為歷史 / 潛伏記錄保留。可分為三類："
                 "(a) DORMANT 潛伏 —— 已驗證當前源資料無法觸發該症狀；"
-                "(b) RESOLVED 已解決 —— 症狀不再出現，雖然可疑程式碼"
-                "仍在（可能是某次 Office / JET 更新或更早一次修補解決"
-                "的）；(c) LATENT 被屏蔽 —— 源碼缺陷確實存在，但因為"
+                "(b) 當前無法復現 —— 症狀不再出現，但可疑程式碼仍在"
+                "（我們**沒有**確認上游有源碼層面的修復；原因可能是 "
+                "JET / Office 的行為改變、可能是我們這邊 fixture/driver "
+                "改變，也可能原本的診斷就是 false positive）；"
+                "(c) LATENT 被屏蔽 —— 源碼缺陷確實存在，但因為"
                 "另一個 issue（例如某個 UI 按鈕缺失）擋住了使用路徑，"
                 "使用者目前碰不到。本層條目當下都不是使用者會遇到的"
-                "問題；若要當成緊急問題處理，請先諮詢。"
+                "問題，**也沒有任何一條被確認上游修復**；若要當成緊急"
+                "或已關閉處理，請先諮詢。"
             )
             p = doc.add_paragraph(Z(preface))
             for run in p.runs:
@@ -1872,9 +1881,13 @@ def _build(lang: str, out_path: Path) -> None:
                         "⚠ Automated test status: the regression marker "
                         "for this issue currently FAILS (run on "
                         f"{status.get('when', 'unknown date')}), which "
-                        "usually means the underlying defect has been "
-                        "FIXED in the source dump.  Please verify in "
-                        "person before considering this issue closed; "
+                        "means the marker no longer reproduces.  This MAY "
+                        "indicate the underlying defect was fixed "
+                        "upstream, but it could equally mean that the "
+                        "input fixture or Access driver changed out "
+                        "from under the test, or that the original "
+                        "classification was wrong.  Please investigate "
+                        "in person before considering this issue closed; "
                         "this report has NOT been edited to drop the "
                         "issue.  Tests consulted:\n"
                         + "\n".join(
@@ -1884,8 +1897,10 @@ def _build(lang: str, out_path: Path) -> None:
                         if is_en else
                         "⚠ 自動測試狀態：本 issue 對應的回歸標記目前 "
                         f"FAIL（執行時間：{status.get('when', '未知')}），"
-                        "通常意味著底層缺陷已在 source dump 中被修復。"
-                        "請務必親自確認，再將此 issue 視為關閉；本報告"
+                        "代表標記目前無法復現。這**可能**表示上游已在源碼層"
+                        "面修復，但同樣可能是輸入 fixture 或 Access "
+                        "driver 在不知不覺中改變、或原本的分類就是錯的。"
+                        "請務必親自調查清楚，再將此 issue 視為關閉；本報告"
                         "並未自動刪除任何 issue。對照的測試：\n"
                         + "\n".join(
                             f"  • {t.rsplit('::', 1)[-1]}"
@@ -1900,7 +1915,10 @@ def _build(lang: str, out_path: Path) -> None:
                         "ℹ Automated test status: this issue's "
                         "regression markers report MIXED outcomes "
                         f"(run {status.get('when', 'unknown date')}). "
-                        "Likely the issue is partially fixed; please "
+                        "Likely the issue's markers partially stopped "
+                        "reproducing (could be a partial upstream fix, a "
+                        "partial fixture/driver change, or a partial "
+                        "misclassification).  Please "
                         "review the per-test breakdown:\n"
                         + "\n".join(
                             f"  • {t.rsplit('::', 1)[-1]}: {o}"
@@ -1909,7 +1927,9 @@ def _build(lang: str, out_path: Path) -> None:
                         if is_en else
                         "ℹ 自動測試狀態：本 issue 對應的回歸標記呈現"
                         f"混合結果（執行時間：{status.get('when', '未知')}）。"
-                        "可能是部分修復，請查看分項：\n"
+                        "可能是部分標記不再復現（可能是部分上游修復、"
+                        "部分 fixture/driver 變化、或部分分類錯誤）。"
+                        "請查看分項：\n"
                         + "\n".join(
                             f"  • {t.rsplit('::', 1)[-1]}: {o}"
                             for t, o in status["tests"]
@@ -2017,14 +2037,19 @@ def _build(lang: str, out_path: Path) -> None:
         "If any of the descriptions or suggested fixes are unclear, we "
         "would be glad to discuss further. The corresponding regression "
         "tests in this repository will automatically flip from PASS to "
-        "FAIL the moment any issue is fixed in the source dump — so you "
-        "can use them as a confirmation signal."
+        "FAIL the moment any regression marker stops reproducing in "
+        "the source dump — that is a signal to investigate, not an "
+        "automatic confirmation that the bug is fixed (the marker "
+        "could fail because of an upstream fix, a fixture / driver "
+        "change on our side, or a misclassification we made earlier)."
         if is_en else
         "感谢您抽时间读完这份报告。以上各条都不紧急，我们把它们集中整理"
         "在一起，只是希望方便您在合适的时候逐一处理。\n\n"
         "如果对其中任何一条的描述或建议有疑问，欢迎随时一同讨论。本仓库"
-        "里对应的回归测试，会在您修好任意一个问题、并重新导出 dump 之后"
-        "自动从 PASS 翻成 FAIL —— 可以作为修复完成的信号使用。"
+        "里对应的回归测试，会在任何一个回归标记不再复现时自动从 PASS "
+        "翻成 FAIL —— 这是「请调查一下」的讯号，而不是「问题已修复」的"
+        "自动确认（因为标记不再复现也可能是 fixture / driver 变了，"
+        "或者是我们当初的分类有误）。"
     )
     for para in closing.split("\n\n"):
         doc.add_paragraph(Z(para))
@@ -2094,8 +2119,8 @@ def _build_md(lang: str, out_path: Path) -> None:
         "P2_silent_display": "P2 — Silent display",
         "P3_missing_ui": "P3 — Missing UI",
         "P4_setup": "P4 — Setup",
-        "P5_resolved_or_dormant":
-            "P5 — Resolved / not currently reproducible",
+        "P5_dormant_or_latent":
+            "P5 — Dormant / latent / not currently reproducible",
     }
     tier_titles_zh = {
         "P0_silent_data": "P0 — 静默数据错误",
@@ -2103,11 +2128,11 @@ def _build_md(lang: str, out_path: Path) -> None:
         "P2_silent_display": "P2 — 静默显示问题",
         "P3_missing_ui": "P3 — 缺失界面",
         "P4_setup": "P4 — 安装设置",
-        "P5_resolved_or_dormant": "P5 — 已解决 / 当前无法复现",
+        "P5_dormant_or_latent": "P5 — 潛伏 / 不可達 / 當前無法復現",
     }
     tier_order = ["P0_silent_data", "P1_visible_crash",
                   "P2_silent_display", "P3_missing_ui", "P4_setup",
-                  "P5_resolved_or_dormant"]
+                  "P5_dormant_or_latent"]
 
     by_tier: dict[str, list[dict]] = {}
     for it in ISSUES:
@@ -2182,7 +2207,7 @@ def _build_md(lang: str, out_path: Path) -> None:
         "P2 — Silent display: form fields render blank when they should show data.",
         "P3 — Missing UI: a feature exists in code but no button invokes it.",
         "P4 — Setup: one-time hurdle on each new install.",
-        "P5 — Resolved / not currently reproducible: kept as historical "
+        "P5 — Dormant / latent / not currently reproducible: kept as historical "
         "record; we re-checked on the current dump and could not "
         "trigger the symptom.",
     ]
@@ -2192,7 +2217,7 @@ def _build_md(lang: str, out_path: Path) -> None:
         "P2 — 静默显示问题：表单字段本应有数据，却显示为空。",
         "P3 — 缺失界面：代码里实现了某功能，但界面上没有按钮去触发它。",
         "P4 — 安装设置：每台新机器需要一次性处理。",
-        "P5 — 已解决 / 当前无法复现：保留作为历史记录；我们在当前 dump "
+        "P5 — 潛伏 / 不可達 / 當前無法復現：保留作为历史记录；我们在当前 dump "
         "上重新验证过，无法再触发症状。",
     ]
     for s in (legend_en if is_en else legend_zh):
@@ -2211,28 +2236,35 @@ def _build_md(lang: str, out_path: Path) -> None:
                       else tier_titles_zh[tier])
         lines.append(f"## {Z(tier_title)}")
         lines.append("")
-        if tier == "P5_resolved_or_dormant":
+        if tier == "P5_dormant_or_latent":
             lines.append(Z(
                 "_Items in this tier are kept as historical / latent "
                 "record.  They fall into three categories: (a) DORMANT — "
                 "verified that current source data doesn't trigger the "
-                "symptom; (b) RESOLVED — the symptom no longer occurs "
-                "even though the suspect code is still present (likely "
-                "fixed by some Office / JET update or a previous "
-                "iteration); (c) LATENT — the source-code defect is "
-                "real, but the user can't reach it because another "
-                "issue (e.g. a missing UI button) blocks the path.  "
-                "None of these are user-facing today; please consult "
-                "before treating any of them as urgent._"
+                "symptom; (b) NOT CURRENTLY REPRODUCIBLE — the symptom "
+                "no longer surfaces even though the suspect code is "
+                "still present (we have NOT confirmed an upstream "
+                "source-level fix; could be a JET / Office behaviour "
+                "change, a fixture / driver change on our side, or the "
+                "original diagnosis was a false positive); (c) LATENT — "
+                "the source-code defect is real, but the user can't "
+                "reach it because another issue (e.g. a missing UI "
+                "button) blocks the path.  None of these are "
+                "user-facing today; **none have been verified as fixed "
+                "upstream** — please consult before treating any of "
+                "them as either urgent or closed._"
                 if is_en else
                 "_本層的條目作為歷史 / 潛伏記錄保留。可分為三類："
                 "(a) DORMANT 潛伏 — 已驗證當前源資料無法觸發該症狀；"
-                "(b) RESOLVED 已解決 — 症狀不再出現，雖然可疑程式碼仍"
-                "在（可能是某次 Office / JET 更新或更早一次修補解決的）；"
+                "(b) 當前無法復現 — 症狀不再出現，但可疑程式碼仍在"
+                "（我們**沒有**確認上游有源碼層面的修復；原因可能是 "
+                "JET / Office 的行為改變、可能是我們這邊 fixture/driver "
+                "改變，也可能原本的診斷就是 false positive）；"
                 "(c) LATENT 被屏蔽 — 源碼缺陷確實存在，但因為另一個 "
                 "issue（例如某個 UI 按鈕缺失）擋住了使用路徑，使用者"
-                "目前碰不到。本層條目當下都不是使用者會遇到的問題；"
-                "若要當成緊急問題處理，請先諮詢。_"
+                "目前碰不到。本層條目當下都不是使用者會遇到的問題，"
+                "**也沒有任何一條被確認上游修復**；若要當成緊急或"
+                "已關閉處理，請先諮詢。_"
             ))
             lines.append("")
         for it in items:
@@ -2255,7 +2287,9 @@ def _build_md(lang: str, out_path: Path) -> None:
                         "regression marker currently FAILS** "
                         f"(run on {status.get('when', 'unknown date')}). "
                         "That usually means the underlying defect has "
-                        "been **FIXED** in the source dump.  Please "
+                        "longer reproduces, which MAY mean upstream fixed "
+                        "it but could equally be a fixture / driver "
+                        "regression or a misclassification.  Please "
                         "verify in person before considering this issue "
                         "closed; this report has NOT been edited to drop "
                         "the issue.  Tests consulted: "
@@ -2448,14 +2482,19 @@ def _build_md(lang: str, out_path: Path) -> None:
         "If any of the descriptions or suggested fixes are unclear, we "
         "would be glad to discuss further. The corresponding regression "
         "tests in this repository will automatically flip from PASS to "
-        "FAIL the moment any issue is fixed in the source dump — so you "
-        "can use them as a confirmation signal."
+        "FAIL the moment any regression marker stops reproducing in "
+        "the source dump — that is a signal to investigate, not an "
+        "automatic confirmation that the bug is fixed (the marker "
+        "could fail because of an upstream fix, a fixture / driver "
+        "change on our side, or a misclassification we made earlier)."
         if is_en else
         "感谢您抽时间读完这份报告。以上各条都不紧急，我们把它们集中整理"
         "在一起，只是希望方便您在合适的时候逐一处理。\n\n"
         "如果对其中任何一条的描述或建议有疑问，欢迎随时一同讨论。本仓库"
-        "里对应的回归测试，会在您修好任意一个问题、并重新导出 dump 之后"
-        "自动从 PASS 翻成 FAIL —— 可以作为修复完成的信号使用。"
+        "里对应的回归测试，会在任何一个回归标记不再复现时自动从 PASS "
+        "翻成 FAIL —— 这是「请调查一下」的讯号，而不是「问题已修复」的"
+        "自动确认（因为标记不再复现也可能是 fixture / driver 变了，"
+        "或者是我们当初的分类有误）。"
     )
     for para in closing.split("\n\n"):
         lines.append(Z(para))
