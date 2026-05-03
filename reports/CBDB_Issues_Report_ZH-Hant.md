@@ -626,6 +626,22 @@ PR K2 進一步的 triage (`analysis/triage_index_year_drift_groups.py` → `rep
 - `unclassified` × 18 → 18 筆已命名，17 筆標為 `blocked_by_missing_frmBaseMaintenance_vba`（需要 Access 端執行順序才能判斷）。
 - `php_did_not_compute` × 19 → 按 Access tcode 分 6 組；最大的是 `access_tcode='05'` × 7（jinshi 進士類的 `candidate_php_entry_code_mapping_gap`）。
 
+### c_index_addr_id 差異 —— 逐筆分類
+
+在 **488** 筆 c_index_addr 差異中（PR G 的 478 `index_addr_only_diff` + 10 `index_both_diff`），逐筆把兩邊的 BIOG_ADDR_DATA 代入「rank-priority + MAX(c_sequence)」演演算法重算，與實際儲存值對照分類：
+
+| 分桶 | 筆數 |
+|---|---:|
+| `mdb_stale_index_addr` | 412 |
+| `mdb_value_php_null` | 47 |
+| `same_candidates_diff_winner` | 10 |
+| `both_stale_recompute_mismatch` | 10 |
+| `both_sides_match_recomputed` | 6 |
+| `sqlite_stale_index_addr` | 2 |
+| `mdb_null_php_value` | 1 |
+
+以上沒有任何一筆被視為已確認的 bug。412 筆 `mdb_stale_index_addr` 屬於維護週期差異（User MDB 在下次釋出前需要重跑 frmBaseMaintenance）。10 筆 `same_candidates_diff_winner` 是唯一的候選演演算法差異。逐筆輸出見 `reports/index_addr_drift_classification.json`。
+
 ### 僅 c_index_year 不一致的樣例
 
 **`c_personid = 3501` — 李孝稱 (Li Xiaocheng)**
