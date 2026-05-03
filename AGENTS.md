@@ -483,10 +483,33 @@ rule-by-rule comparison of Access BM IY queries against PHP
 `analysis/index_year_rule_comparison.md` /
 `.json`: 8 candidate `logic_diff`s flagged (most notably a sign
 flip in entry-based rules, +N vs -N), 4 missing-on-one-side, 15
-needing manual review.  None confirmed as bugs.  Re-run the
-classifier and the rule comparator after every cbdb-online-main-
-server SQLite refresh, or after any change to the User MDB
-index-recompute path.
+needing manual review.  None confirmed as bugs.
+
+PR K1 took those rule-level findings and ran them against the 69
+year-only diffs (59 `index_year_only_diff` + 10 `index_both_diff`)
+from PR G — see `analysis/classify_index_year_drift_by_rule.py`
+and `reports/index_year_drift_rule_classification.json`.  Headline:
+
+  - 19 `php_did_not_compute`         (Access has a value, PHP wrote 0/null)
+  -  7 `access_did_not_compute`      (PHP has a value, Access wrote 0/null)
+  -  5 `iteration_order_diff`        (Phase-C propagation differs;
+                                       e.g. PHP tcode '11' vs Access '1112')
+  - 14 `consistent_within_rule`      (multiple rows share the same
+                                       (php_tcode, access_tcode, diff)
+                                       triple — single rule-level
+                                       cause to investigate)
+  -  1 `php_returned_sentinel`       (PHP value ≥ 9999, looks like
+                                       overflow / garbage)
+  -  5 `candidate_algorithm_divergence` (rule shape matches PR I's
+                                          flagged divergence but
+                                          numbers don't reconstruct
+                                          exactly)
+  - 18 `unclassified`
+
+Total 69, ~74 % bucketed into named patterns (still none labelled
+as confirmed bugs; the buckets are evidence categories for the
+maintainer).  Re-run after every fresh SQLite snapshot or any
+change to the index-recompute path on either side.
 
 ## Test inventory snapshot (run this to get current state)
 

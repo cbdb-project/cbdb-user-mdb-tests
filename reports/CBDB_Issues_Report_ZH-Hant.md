@@ -604,6 +604,22 @@ _**Hypothetical** popup, reconstructed in PIL.  Users currently CAN'T trigger th
 
 淨差異：**563** / 657,245（0.086 %）。其中 **16** 筆能明確歸因於 birthyear / deathyear 的源資料漂移；剩下 **547** 筆需要逐筆追查（可能是 PHP↔VBA 演演算法差異，也可能是本分類器沒有比較的 evidence 表（BIOG_ADDR_DATA / ENTRY_DATA / NIAN_HAO 等）裡的漂移）。完整輸出見 `reports/index_drift_classification.json`，演算法來源指標見 `analysis/index_drift_algorithm_notes.md`。
 
+### 年份差異 —— 逐筆 rule 分類
+
+在 **69** 筆「只有 c_index_year 不一致」的行中，逐筆比對 PR I (`analysis/index_year_rule_comparison.md`) 標記的規則級差異。保守分類如下：
+
+| 分桶 | 筆數 |
+|---|---:|
+| `php_returned_sentinel` (PHP 寫了 sentinel／溢位值) | 1 |
+| `php_did_not_compute` (PHP 沒算出值（覆蓋率缺口）) | 19 |
+| `access_did_not_compute` (Access 沒算出值（覆蓋率缺口）) | 7 |
+| `iteration_order_diff` (Phase-C 迭代次數不同) | 5 |
+| `consistent_within_rule` (多列共享同一 (php_tcode, access_tcode, diff)) | 14 |
+| `candidate_algorithm_divergence` (形狀符合 PR I 標記但無法精確重建) | 5 |
+| `unclassified` (尚未對上任何模式) | 18 |
+
+以上沒有任何一筆被視為已確認的 bug。逐筆輸出見 `reports/index_year_drift_rule_classification.json`。
+
 ### 僅 c_index_year 不一致的樣例
 
 **`c_personid = 3501` — 李孝稱 (Li Xiaocheng)**
