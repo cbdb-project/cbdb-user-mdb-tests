@@ -1,0 +1,134 @@
+{
+  "openform_timeout_sec": 90,
+  "compile_timeout_sec": 60,
+  "per_variant_timeout_sec": 240,
+  "ac_cmd_compile_and_save_all_modules": 126,
+  "variants": [
+    {
+      "variant": "V1_baseline_no_compile",
+      "label": "full inject, no compile (PR AT V1 reproduction)",
+      "compile_method": "no_compile",
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session"
+        },
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 5.23,
+          "marker": "session_opened"
+        },
+        {
+          "t": 5.23,
+          "marker": "starting_OpenForm"
+        },
+        {
+          "t": 95.25,
+          "marker": "OpenForm_finished=False"
+        }
+      ],
+      "outcome": "hung_at_OpenForm",
+      "elapsed_sec": 97.56,
+      "exception": null,
+      "post_open_state": {}
+    },
+    {
+      "variant": "V2_RunCommand_126",
+      "label": "full inject + acCmdCompileAndSaveAllModules",
+      "compile_method": "RunCommand_126",
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session"
+        },
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 5.01,
+          "marker": "session_opened"
+        },
+        {
+          "t": 5.01,
+          "marker": "compile_start_RunCommand_126"
+        },
+        {
+          "t": 5.34,
+          "marker": "compile_returned_in_0.34s"
+        },
+        {
+          "t": 5.34,
+          "marker": "starting_OpenForm"
+        },
+        {
+          "t": 95.36,
+          "marker": "OpenForm_finished=False"
+        }
+      ],
+      "outcome": "hung_at_OpenForm",
+      "elapsed_sec": 97.76,
+      "exception": null,
+      "post_open_state": {},
+      "compile": {
+        "method": "RunCommand_126",
+        "elapsed_sec": 0.34,
+        "outcome": "compile_returned",
+        "exception": null
+      }
+    },
+    {
+      "variant": "V3_VBE_touch",
+      "label": "full inject + VBE.VBComponents touch (fallback)",
+      "compile_method": "VBE_touch_components",
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session"
+        },
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 5.02,
+          "marker": "session_opened"
+        },
+        {
+          "t": 5.18,
+          "marker": "vbe_touch_done_69_comps_in_0.16s"
+        },
+        {
+          "t": 5.18,
+          "marker": "starting_OpenForm"
+        },
+        {
+          "t": 95.18,
+          "marker": "OpenForm_finished=False"
+        }
+      ],
+      "outcome": "hung_at_OpenForm",
+      "elapsed_sec": 97.46,
+      "exception": null,
+      "post_open_state": {},
+      "compile": {
+        "method": "VBE_dummy_write",
+        "elapsed_sec": 0.16,
+        "outcome": "vbe_touch_complete",
+        "exception": null,
+        "proj_mode_before": 2,
+        "n_components_touched": 69
+      }
+    }
+  ],
+  "summary_by_outcome": {
+    "V1_baseline_no_compile": "hung_at_OpenForm",
+    "V2_RunCommand_126": "hung_at_OpenForm",
+    "V3_VBE_touch": "hung_at_OpenForm"
+  },
+  "headline_verdict": "no_compile_method_helped",
+  "verdict_note": "Neither RunCommand nor VBE-touch unblocked Networks.  The dirty-project-compile theory may need refinement; next mitigation candidate is to open LookAtNetworks BEFORE the sibling injections run (open-first ordering)."
+}
