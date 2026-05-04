@@ -1,0 +1,474 @@
+{
+  "openform_timeout_sec": 90,
+  "per_variant_timeout_sec": 180,
+  "n_variants": 12,
+  "variants": [
+    {
+      "variant": "V1_baseline_inject_all",
+      "label": "production default — inject all 10 (PR AT V1)",
+      "skip_inject_autodetect_forms": null,
+      "n_skipped": 0,
+      "n_injected": 10,
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session"
+        },
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 5.49,
+          "marker": "session_opened"
+        },
+        {
+          "t": 5.49,
+          "marker": "starting_OpenForm"
+        },
+        {
+          "t": 95.5,
+          "marker": "OpenForm_finished=False"
+        }
+      ],
+      "outcome": "hung_at_OpenForm",
+      "elapsed_sec": 97.82,
+      "exception": null,
+      "post_open_state": {}
+    },
+    {
+      "variant": "V2_skip_all",
+      "label": "skip all forms — control (PR AT V2)",
+      "skip_inject_autodetect_forms": [
+        "Form_LookAtAssociationPairs",
+        "Form_LookAtAssociations",
+        "Form_LookAtEntry",
+        "Form_LookAtGroupData",
+        "Form_LookAtKinship",
+        "Form_LookAtNetworks",
+        "Form_LookAtOffice",
+        "Form_LookAtPlace",
+        "Form_LookAtStatus",
+        "Form_LookAtTexts"
+      ],
+      "n_skipped": 10,
+      "n_injected": 0,
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session"
+        },
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 1.31,
+          "marker": "session_opened"
+        },
+        {
+          "t": 1.31,
+          "marker": "starting_OpenForm"
+        },
+        {
+          "t": 3.67,
+          "marker": "OpenForm_finished=True"
+        },
+        {
+          "t": 3.73,
+          "marker": "form_closed"
+        }
+      ],
+      "outcome": "OpenForm_returned",
+      "elapsed_sec": 6.02,
+      "exception": null,
+      "post_open_state": {
+        "forms_count": 2,
+        "loaded": true,
+        "visible": true
+      }
+    },
+    {
+      "variant": "V3_skip_Form_LookAtEntry",
+      "label": "skip ONLY Form_LookAtEntry; Networks + 8 other siblings injected",
+      "skip_inject_autodetect_forms": [
+        "Form_LookAtEntry"
+      ],
+      "n_skipped": 1,
+      "n_injected": 9,
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session"
+        },
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 4.85,
+          "marker": "session_opened"
+        },
+        {
+          "t": 4.85,
+          "marker": "starting_OpenForm"
+        },
+        {
+          "t": 94.86,
+          "marker": "OpenForm_finished=False"
+        }
+      ],
+      "outcome": "hung_at_OpenForm",
+      "elapsed_sec": 97.16,
+      "exception": null,
+      "post_open_state": {}
+    },
+    {
+      "variant": "V4_skip_Form_LookAtOffice",
+      "label": "skip ONLY Form_LookAtOffice; Networks + 8 other siblings injected",
+      "skip_inject_autodetect_forms": [
+        "Form_LookAtOffice"
+      ],
+      "n_skipped": 1,
+      "n_injected": 9,
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session"
+        },
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 4.68,
+          "marker": "session_opened"
+        },
+        {
+          "t": 4.68,
+          "marker": "starting_OpenForm"
+        },
+        {
+          "t": 94.7,
+          "marker": "OpenForm_finished=False"
+        }
+      ],
+      "outcome": "hung_at_OpenForm",
+      "elapsed_sec": 97.03,
+      "exception": null,
+      "post_open_state": {}
+    },
+    {
+      "variant": "V5_skip_Form_LookAtStatus",
+      "label": "skip ONLY Form_LookAtStatus; Networks + 8 other siblings injected",
+      "skip_inject_autodetect_forms": [
+        "Form_LookAtStatus"
+      ],
+      "n_skipped": 1,
+      "n_injected": 9,
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session"
+        },
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 4.81,
+          "marker": "session_opened"
+        },
+        {
+          "t": 4.81,
+          "marker": "starting_OpenForm"
+        },
+        {
+          "t": 94.81,
+          "marker": "OpenForm_finished=False"
+        }
+      ],
+      "outcome": "hung_at_OpenForm",
+      "elapsed_sec": 97.11,
+      "exception": null,
+      "post_open_state": {}
+    },
+    {
+      "variant": "V6_skip_Form_LookAtTexts",
+      "label": "skip ONLY Form_LookAtTexts; Networks + 8 other siblings injected",
+      "skip_inject_autodetect_forms": [
+        "Form_LookAtTexts"
+      ],
+      "n_skipped": 1,
+      "n_injected": 9,
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session"
+        },
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 4.88,
+          "marker": "session_opened"
+        },
+        {
+          "t": 4.88,
+          "marker": "starting_OpenForm"
+        },
+        {
+          "t": 94.89,
+          "marker": "OpenForm_finished=False"
+        }
+      ],
+      "outcome": "hung_at_OpenForm",
+      "elapsed_sec": 97.21,
+      "exception": null,
+      "post_open_state": {}
+    },
+    {
+      "variant": "V7_skip_Form_LookAtAssociations",
+      "label": "skip ONLY Form_LookAtAssociations; Networks + 8 other siblings injected",
+      "skip_inject_autodetect_forms": [
+        "Form_LookAtAssociations"
+      ],
+      "n_skipped": 1,
+      "n_injected": 9,
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session"
+        },
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 4.71,
+          "marker": "session_opened"
+        },
+        {
+          "t": 4.71,
+          "marker": "starting_OpenForm"
+        },
+        {
+          "t": 94.71,
+          "marker": "OpenForm_finished=False"
+        }
+      ],
+      "outcome": "hung_at_OpenForm",
+      "elapsed_sec": 97.02,
+      "exception": null,
+      "post_open_state": {}
+    },
+    {
+      "variant": "V8_skip_Form_LookAtPlace",
+      "label": "skip ONLY Form_LookAtPlace; Networks + 8 other siblings injected",
+      "skip_inject_autodetect_forms": [
+        "Form_LookAtPlace"
+      ],
+      "n_skipped": 1,
+      "n_injected": 9,
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session"
+        },
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 4.81,
+          "marker": "session_opened"
+        },
+        {
+          "t": 4.81,
+          "marker": "starting_OpenForm"
+        },
+        {
+          "t": 94.82,
+          "marker": "OpenForm_finished=False"
+        }
+      ],
+      "outcome": "hung_at_OpenForm",
+      "elapsed_sec": 97.13,
+      "exception": null,
+      "post_open_state": {}
+    },
+    {
+      "variant": "V9_skip_Form_LookAtKinship",
+      "label": "skip ONLY Form_LookAtKinship; Networks + 8 other siblings injected",
+      "skip_inject_autodetect_forms": [
+        "Form_LookAtKinship"
+      ],
+      "n_skipped": 1,
+      "n_injected": 9,
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session"
+        },
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 4.65,
+          "marker": "session_opened"
+        },
+        {
+          "t": 4.65,
+          "marker": "starting_OpenForm"
+        },
+        {
+          "t": 94.65,
+          "marker": "OpenForm_finished=False"
+        }
+      ],
+      "outcome": "hung_at_OpenForm",
+      "elapsed_sec": 97.02,
+      "exception": null,
+      "post_open_state": {}
+    },
+    {
+      "variant": "V10_skip_Form_LookAtAssociationPairs",
+      "label": "skip ONLY Form_LookAtAssociationPairs; Networks + 8 other siblings injected",
+      "skip_inject_autodetect_forms": [
+        "Form_LookAtAssociationPairs"
+      ],
+      "n_skipped": 1,
+      "n_injected": 9,
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session"
+        },
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 4.7,
+          "marker": "session_opened"
+        },
+        {
+          "t": 4.7,
+          "marker": "starting_OpenForm"
+        },
+        {
+          "t": 94.7,
+          "marker": "OpenForm_finished=False"
+        }
+      ],
+      "outcome": "hung_at_OpenForm",
+      "elapsed_sec": 96.98,
+      "exception": null,
+      "post_open_state": {}
+    },
+    {
+      "variant": "V11_skip_Form_LookAtGroupData",
+      "label": "skip ONLY Form_LookAtGroupData; Networks + 8 other siblings injected",
+      "skip_inject_autodetect_forms": [
+        "Form_LookAtGroupData"
+      ],
+      "n_skipped": 1,
+      "n_injected": 9,
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session"
+        },
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 4.41,
+          "marker": "session_opened"
+        },
+        {
+          "t": 4.41,
+          "marker": "starting_OpenForm"
+        },
+        {
+          "t": 94.42,
+          "marker": "OpenForm_finished=False"
+        }
+      ],
+      "outcome": "hung_at_OpenForm",
+      "elapsed_sec": 96.73,
+      "exception": null,
+      "post_open_state": {}
+    },
+    {
+      "variant": "V12_inject_only_Networks",
+      "label": "skip all 9 siblings; ONLY Form_LookAtNetworks injected",
+      "skip_inject_autodetect_forms": [
+        "Form_LookAtAssociationPairs",
+        "Form_LookAtAssociations",
+        "Form_LookAtEntry",
+        "Form_LookAtGroupData",
+        "Form_LookAtKinship",
+        "Form_LookAtOffice",
+        "Form_LookAtPlace",
+        "Form_LookAtStatus",
+        "Form_LookAtTexts"
+      ],
+      "n_skipped": 9,
+      "n_injected": 1,
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session"
+        },
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 2.12,
+          "marker": "session_opened"
+        },
+        {
+          "t": 2.12,
+          "marker": "starting_OpenForm"
+        },
+        {
+          "t": 4.52,
+          "marker": "OpenForm_finished=True"
+        },
+        {
+          "t": 4.57,
+          "marker": "form_closed"
+        }
+      ],
+      "outcome": "OpenForm_returned",
+      "elapsed_sec": 6.91,
+      "exception": null,
+      "post_open_state": {
+        "forms_count": 2,
+        "loaded": true,
+        "visible": true
+      }
+    }
+  ],
+  "summary_by_outcome": {
+    "V1_baseline_inject_all": "hung_at_OpenForm",
+    "V2_skip_all": "OpenForm_returned",
+    "V3_skip_Form_LookAtEntry": "hung_at_OpenForm",
+    "V4_skip_Form_LookAtOffice": "hung_at_OpenForm",
+    "V5_skip_Form_LookAtStatus": "hung_at_OpenForm",
+    "V6_skip_Form_LookAtTexts": "hung_at_OpenForm",
+    "V7_skip_Form_LookAtAssociations": "hung_at_OpenForm",
+    "V8_skip_Form_LookAtPlace": "hung_at_OpenForm",
+    "V9_skip_Form_LookAtKinship": "hung_at_OpenForm",
+    "V10_skip_Form_LookAtAssociationPairs": "hung_at_OpenForm",
+    "V11_skip_Form_LookAtGroupData": "hung_at_OpenForm",
+    "V12_inject_only_Networks": "OpenForm_returned"
+  },
+  "headline_verdict": "any_sibling_module_touch_is_enough",
+  "verdict_note": "Inject-only-Networks succeeds (V12); inject-Networks-plus-any-one-sibling all hung (V3-V11).  The trigger is cumulative: ANY sibling LookAt module modification is enough to make Networks Form_Open hang.  Project-wide dirty-compile is the most likely mechanism."
+}
