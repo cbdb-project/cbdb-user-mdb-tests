@@ -354,6 +354,23 @@ _NEO4J_SHAPES: dict[str, tuple[str, list[str], list[str]]] = {
                            ["PersonTextRoleCode",
                             "PersonTextRoleDesc"],
                            ["PersonTextRoleCode"]),
+    # Added 2026-05-04 (hygiene follow-up to PR cover/lookatoffice-
+    # cmdneo4j-peopleoffice) to cover LookAtOffice's OfficeCode-
+    # codes shape so the LookAtOffice CmdNeo4j chain goes from
+    # 5/6 strictly classified to 6/6.  Header literal at
+    # Form_LookAtOffice.vb:1326 (non-ASCII branch, the default):
+    #   "OfficeCode,OfficeTrans,OfficePinyin,OfficeHZ"
+    # Live-verified against the office_80944_unfiltered fixture:
+    # 1 row (the office matching the picker), all 4 cols populated.
+    # The ASCII branch (line 1324) emits 3 cols (OfficeCode,
+    # OfficeTrans, OfficePinyin); not currently exercised by any
+    # cross-form test fixture, so requiring all 4 cols is fine
+    # today — would need a separate ASCII-mode fixture before
+    # tightening could regress.
+    "OfficeCode": ("OfficeCodes",
+                   ["OfficeCode", "OfficeTrans", "OfficePinyin",
+                    "OfficeHZ"],
+                   ["OfficeCode"]),
 }
 
 # Two-column-prefix disambiguation for shapes whose first column
@@ -530,7 +547,11 @@ def _assert_neo4j_export_depth(form_name: str,
                 # TextCodes is keyed on `TextID` (integer), but
                 # CBDB occasionally writes 0 / blank for unmapped
                 # texts; treat as code-table for the bad-id check.
-                "TextCodes"):
+                "TextCodes",
+                # OfficeCodes — same code-table family; office
+                # code can legitimately be 0 / blank for unmapped
+                # offices.
+                "OfficeCodes"):
             # Code-table shapes can legitimately start with 0.
             raise AssertionError(
                 f"[{form_name}] {f.name} has rows whose first cell "
