@@ -147,6 +147,40 @@ conn.cursor().execute(
 )
 ```
 
+### 3.5. LookAtNetworks Form_Open deadlocks under default `_inject_autodetect`
+because ANY sibling `Form_LookAt*` module modification dirties the
+VBA project, and Networks's Form_Open then hits a project-wide
+auto-compile interaction with its `Forms!LookAtNetworks!<sub>.Form
+.Recordset` self-reference during Open.  Bisected by PR AR–AX:
+
+  - `Form_Open` is fine by itself (~2 s under bare DispatchEx).
+  - `_inject_autodetect` IS the trigger of the OpenForm hang.
+  - Skipping ONLY Networks's own injection still hangs (PR AT V3).
+  - Skipping ANY single sibling form's injection still hangs (PR AU).
+  - Compile-after-inject mitigation FAILED (PR AV).
+  - Warm-open + close + reopen still hangs (PR AW W2/W4).
+  - The two viable paths: keep form loaded across injection (PR AW W3,
+    fragile ergonomics) OR use minimal injection — skip all 9 sibling
+    `Form_LookAt*` autodetect entries via the PR AT
+    `skip_inject_autodetect_forms` kwarg (PR AU V12 / AX-verified).
+
+For Networks-specific tests use:
+
+```python
+SKIP_SIBLINGS = {
+    "Form_LookAtEntry", "Form_LookAtOffice", "Form_LookAtStatus",
+    "Form_LookAtTexts", "Form_LookAtAssociations",
+    "Form_LookAtPlace", "Form_LookAtKinship",
+    "Form_LookAtAssociationPairs", "Form_LookAtGroupData",
+}
+sess = VbaSession(SRC, WORK, skip_inject_autodetect_forms=SKIP_SIBLINGS)
+```
+
+Live example: `tests/test_vba_networks_small_fixture.py` (PR AY).
+The general matrix Networks case stays skipped — fixing it requires
+either re-architecting the matrix harness to use minimal-injection
+per-form, or a deeper Access-side workaround.
+
 ### 4. `Application.Run "Form_X.SubName"` does NOT work for form-module
 subs on this Office install.
 

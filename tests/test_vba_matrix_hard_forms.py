@@ -38,10 +38,12 @@ WORK = Path(__file__).resolve().parent.parent / "analysis" / "_matrix_hard_test_
 
 
 _HARD_FIXTURES: list[CrossFixture] = [
-    # LookAtNetworks deliberately omitted: its Form_Open hangs in this
-    # driver (same root family as the matrix Networks skip + the picker
-    # smoke skip + the cross-form export skips).  Until that's resolved,
-    # smaller fixtures don't help — the form never reaches CmdRun.
+    # LookAtNetworks deliberately omitted from THIS file: full-injection
+    # VbaSession opens the form into a project-wide auto-compile
+    # deadlock (PR AR-AX bisected the cause).  Real CmdRun smoke
+    # coverage now lives in tests/test_vba_networks_small_fixture.py,
+    # which uses the PR AT `skip_inject_autodetect_forms` kwarg to
+    # suppress sibling-form injection (PR AU V12 / AX-verified).
     CrossFixture(
         name="groupdata_person_1_small",
         spec=LOOKATGROUPDATA,
