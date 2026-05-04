@@ -184,7 +184,7 @@ _Step 2 — the popup users see when the With block on line 1425 reads `!c_inst_
 
 #### 復現步驟
 
-1. 開啟 **LookAtStatus**。在 status picker 裡挑 status code **40**（進士），不要設年份過濾——測試 fixture 裡 `FrameFilterYears = 1`。
+1. 開啟 **LookAtStatus**。在 status picker 裡挑 status code **40**（[為官者：文] / civil office），不要設年份過濾——測試 fixture 裡 `FrameFilterYears = 1`。
 2. 點 **Run Query**。結果網格里大約填進 17 000 行。
 3. 點 **GIS**，把編碼選成 UTF-8（`GISFrame = 1`）。把匯出的 `.tab` 檔存下來。
 4. 在任意支援 tab 的工具（Excel / 帶欄位標尺的文字編輯器）裡開啟這個檔。第 **11476** 行附近（對應人物阮孚，`c_addr_id = 702559` / 尉氏）有一行包含 10 個 tab 欄位、卻對著 9 欄的表頭。AddrChn 是空的、X 欄裡塞了文字，真正的 X / Y 值都往右挪了一欄。

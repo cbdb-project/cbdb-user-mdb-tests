@@ -532,7 +532,7 @@ ISSUES = [
         ),
         "steps_en": [
             "Open **LookAtStatus**. Pick the status picker and "
-            "choose status code **40** (Provincial Graduate / 进士) "
+            "choose status code **40** (civil office / [為官者：文]) "
             "without setting any year filter — `FrameFilterYears = 1` "
             "in the test fixture.",
             "Click **Run Query**. ~17 000 rows populate the result "
@@ -549,8 +549,8 @@ ISSUES = [
         ],
         "steps_zh": [
             "打开 **LookAtStatus**。在 status picker 里挑 status "
-            "code **40**（进士），不要设年份过滤——测试 fixture 里 "
-            "`FrameFilterYears = 1`。",
+            "code **40**（[為官者：文] / civil office），不要设年份"
+            "过滤——测试 fixture 里 `FrameFilterYears = 1`。",
             "点 **Run Query**。结果网格里大约填进 17 000 行。",
             "点 **GIS**，把编码选成 UTF-8（`GISFrame = 1`）。把"
             "导出的 `.tab` 档存下来。",

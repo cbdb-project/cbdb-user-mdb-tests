@@ -46,3 +46,69 @@ def test_markdown_toc_anchors_match_github_slug_shape():
         "it-on-this-dump)"
     )
     assert issue1_toc in text, "Issue #1 TOC anchor drifted"
+
+
+def _issue_block(text: str, issue_num: int) -> str:
+    """Return the substring of `text` between `### Issue #N — ...`
+    and the next `### Issue #` heading (or EOF).  Used to scope
+    regression assertions to a single issue block."""
+    start_marker = f"### Issue #{issue_num} —"
+    start = text.find(start_marker)
+    assert start != -1, f"Issue #{issue_num} heading not found in report"
+    next_start = text.find("### Issue #", start + len(start_marker))
+    return text[start: next_start if next_start != -1 else len(text)]
+
+
+def test_issue_20_status_code_40_uses_civil_office_label():
+    """Issue #20 is about a LookAtStatus / `c_status_code = 40`
+    fixture.  STATUS_CODES.c_status_code = 40 is `civil office /
+    [為官者：文]`.  The Provincial-Graduate / 进士 wording that
+    earlier drafts of the steps used was a copy-paste error from
+    Issue #9 (which IS about jinshi / `c_entry_code = 36`).  This
+    test pins the corrected wording so the mistake doesn't recur.
+
+    Scoped to the Issue #20 block only — Issue #9's correct
+    `c_entry_code = 36 / jinshi / 進士` mentions must not be
+    affected.
+    """
+    for path in (
+        REPO / "reports/CBDB_Issues_Report_EN.md",
+        REPO / "reports/CBDB_Issues_Report_ZH-Hant.md",
+    ):
+        text = path.read_text(encoding="utf-8")
+        block = _issue_block(text, 20)
+
+        # Forbidden incorrect wordings (the EN and ZH variants of
+        # the original copy-paste error from Issue #9).
+        assert "status code **40** (Provincial Graduate / 进士)" \
+            not in block, (
+                f"{path.name}: Issue #20 still contains the stale "
+                f"'status code **40** (Provincial Graduate / 进士)' "
+                f"wording — that's Issue #9's jinshi label, not "
+                f"status 40 (which is civil office)."
+            )
+        assert "status code **40**（进士）" not in block, (
+            f"{path.name}: Issue #20 still contains the stale "
+            f"'status code **40**（进士）' wording — see comment "
+            f"above."
+        )
+        # Also block the s2twp-traditionalised form, since the ZH
+        # report goes through OpenCC.
+        assert "status code **40**（進士）" not in block, (
+            f"{path.name}: Issue #20 still contains the stale "
+            f"'status code **40**（進士）' wording (s2twp form)."
+        )
+
+        # Required correct labels — the exact phrasing comes from
+        # STATUS_CODES.c_status_desc / c_status_desc_chn for
+        # c_status_code = 40.
+        assert "civil office" in block, (
+            f"{path.name}: Issue #20 must mention 'civil office' "
+            f"(STATUS_CODES.c_status_desc for status_code=40); "
+            f"the corrected steps wording is required."
+        )
+        assert "[為官者：文]" in block, (
+            f"{path.name}: Issue #20 must mention '[為官者：文]' "
+            f"(STATUS_CODES.c_status_desc_chn for status_code=40); "
+            f"the corrected steps wording is required."
+        )

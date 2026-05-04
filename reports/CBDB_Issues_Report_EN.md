@@ -184,7 +184,7 @@ Evidence — full byte-level trace in `analysis/gis_status_embedded_delim_root_c
 
 #### Steps to reproduce
 
-1. Open **LookAtStatus**. Pick the status picker and choose status code **40** (Provincial Graduate / 进士) without setting any year filter — `FrameFilterYears = 1` in the test fixture.
+1. Open **LookAtStatus**. Pick the status picker and choose status code **40** (civil office / [為官者：文]) without setting any year filter — `FrameFilterYears = 1` in the test fixture.
 2. Click **Run Query**. ~17 000 rows populate the result grid.
 3. Click **GIS** with the encoding selector set to UTF-8 (`GISFrame = 1`). Save the resulting `.tab` file.
 4. Open the file in any tab-aware tool (Excel / a text editor with column rulers). Around row **11476** (corresponding to person Ruan Fu / 阮孚, `c_addr_id = 702559` / Wei Shi 尉氏) one row has 10 tab cells against the 9-column header. AddrChn is blank, X column contains text, the real X / Y values have all shifted one column to the right.
