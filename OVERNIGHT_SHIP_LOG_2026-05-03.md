@@ -221,3 +221,30 @@ What went less well:
 
 No regressions introduced.  All branches deleted; only `main`
 remains tracking `origin/main`.
+
+## Addendum (PR AL + AM, after the original ship log)
+
+| Branch | SHA | Description |
+| --- | --- | --- |
+| `feat/pr-al-doc-health-audit` | `03c3a0d` | doc health audit — flags 21 stale phrasing refs + zero broken links across all .md docs |
+| `feat/pr-am-ship-log-addendum` | (this commit) | this addendum |
+
+PR AL produced an actionable worklist for morning:
+
+  - **16** "Form_Open hangs" occurrences across docs/tests
+    that PR AA invalidated.  Some live in test skip reasons
+    and should remain as warnings until PR AB-style fixture
+    work lands.
+  - **4** `candidate_same_rule_tie_break_or_aggregation_diff`
+    occurrences that PR AI + AJ invalidated.  Will be edited
+    out alongside the bucket rename.
+  - **1** stray `blocked_by_missing_frmBaseMaintenance_vba`
+    that PR X's rename pass missed.  One-line edit when
+    convenient.
+  - **0** broken local file links.
+
+See `analysis/doc_health_audit.md` for the per-doc rollup.
+
+Final main HEAD after autopilot: see `git log --oneline 4ac2f8f..HEAD`.
+All branches deleted; only `main` tracks `origin/main`.
+
