@@ -169,41 +169,55 @@ K2 sub-groups by Access tcode (largest first):
   reference against PHP's `IndexYearRebuildService` Phase-C
   loop body.
 
-### A5. `consistent_within_rule` × 14
+### A5. `consistent_within_rule` × 14 — **REVERSED by PR AI + AJ**
 
-K2 sub-groups by `(php_tcode, access_tcode, diff)` signature:
+K2 sub-groups by `(php_tcode, access_tcode, diff)` signature,
+with the per-row probe verdict from PR AI / AJ:
 
-| Signature | Count | Likely cause |
+| Signature | Count | Probe verdict |
 | --- | ---: | --- |
-| `('11','11', 1)` | 5 | Same rule (child = father.c_birthyear + 30); both sides picked different father rows (NULL handling / different MIN candidate). |
-| `('19','19', -20)` | 3 | Same rule (older brother MAX + 2); diff = -20 suggests the two sides picked siblings whose c_birthyear differs by 20. |
-| `('13','13', -20)` | 2 | Same rule (father = MIN(child) - 30); same -20 cluster — staging-step row pick. |
-| `('15','15', -20)` | 2 | Same rule (mother = MIN(child) - 27); same -20 cluster. |
-| `('11','11', -20)` | 2 | Same rule (child + 30); same -20 cluster. |
+| `('11','11', 1)` | 5 | PR AJ — 4 KIN_DATA evidence-pid drift + 1 BIOG_MAIN birthyear drift |
+| `('19','19', -20)` | 3 | PR AI — BIOG_MAIN.c_birthyear drift, winner-pid birthyear differs by exactly the index_year diff |
+| `('13','13', -20)` | 2 | PR AI — same |
+| `('15','15', -20)` | 2 | PR AI — same |
+| `('11','11', -20)` | 2 | PR AI — same |
 
-- **Likely cause.** Per PR N these rules are matched (or
-  matched_minor_diff with the staging-vs-subquery distinction).
-  The divergence is therefore **tie-break / aggregation
-  detail** — when multiple evidence rows share the same
-  priority (e.g. multiple children with the same min birthyear
-  candidate), PHP and runtime Access can pick different ones
-  depending on storage order, NULL handling, and the
-  staging-step vs subquery aggregate path.  The recurring `-20`
-  across rules 11 / 13 / 15 / 19 is a **standout pattern**
-  that points at a single staging-step row pick reproducing
-  consistently.
-- **Algorithm evidence.** PR N pairs each rule as
-  matched_minor_diff (the staging-vs-subquery aggregate
-  equivalence on the happy path).
-- **Row evidence.** 14 rows across 5 signature groups.
-- **Confidence.** **Medium** — the tie-break framing is
-  consistent but the specific candidate row each side picked
-  has not been per-row dumped yet.
-- **Next action.** Pull each affected person's KIN_DATA +
-  child / sibling birthyears on both sides; identify the
-  candidate set; confirm whether the `-20` shift comes from
-  one consistent row choice.  Same kind of deep-dive PR S did
-  for `same_candidates_diff_winner` on the address side.
+- **Likely cause.** **Upstream source-data drift between
+  User MDB and SQLite snapshot for the EVIDENCE persons that
+  the rule reads from — NOT algorithm divergence.**  PR AI's
+  per-row probe of the -20 sub-cluster (9 rows) and PR AJ's
+  per-row probe of the +1 sub-cluster (5 rows) confirmed all
+  14 / 14 rows fit one of two upstream-data shapes:
+  **BIOG_MAIN.c_birthyear differs between sides for the
+  evidence person** (8 rows) or **KIN_DATA evidence-pid set
+  differs between sides** (6 rows).  Concrete example:
+  c_personid=228114 (王淑抃), father 王圖 (123710); User MDB
+  BIOG_MAIN.c_birthyear(123710)=1557 vs SQLite 1577; Access
+  fires 1557+30=1587, PHP fires 1577+30=1607, diff=−20
+  explained 100% by upstream birthyear drift on the same
+  evidence person.
+- **Algorithm evidence.** PR N pairs each rule as matched
+  (or matched_minor_diff on staging-vs-subquery aggregate);
+  the rule body is identical and runs correctly on both
+  sides.  PR AI / AJ probe scripts walked every row and
+  inferred the rule output from the evidence on each side.
+- **Row evidence.** Per-personid breakdown in
+  `reports/index_year_diff_minus_20_cluster_probe.json` (PR
+  AI) and `reports/index_year_diff_plus_1_cluster_probe.json`
+  (PR AJ).  All 14 rows accounted for; 0 unexplained.
+- **Confidence.** **Supported by focused probe (PR AI + AJ).**
+  Same general class as PR Z's tcode='05' candidate_php_entry_
+  code_mapping_gap.  Not a CBDB User MDB algorithm bug.
+- **Next action.** Forward the affected personids + their
+  evidence-row mismatches to the cbdb-online-main-server /
+  SQLite-snapshot-build team as upstream data-drift
+  candidates.  Out-of-scope for this repo.
+
+(Historical note: prior to PR AI/AJ this bucket was labelled
+`candidate_same_rule_tie_break_or_aggregation_diff` at
+confidence "medium" with the working hypothesis that a
+single staging-step row pick reproduced consistently.  Both
+parts of that hypothesis are now invalidated.)
 
 ### A6. `candidate_algorithm_divergence` × 5
 

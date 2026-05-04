@@ -78,17 +78,17 @@
         "bucket": "consistent_within_rule",
         "count": 14,
         "k2_subgroups": [
-          {"signature": "('11','11', 1)", "count": 5, "candidate_label": "candidate_same_rule_tie_break_or_aggregation_diff"},
-          {"signature": "('19','19', -20)", "count": 3, "candidate_label": "candidate_same_rule_tie_break_or_aggregation_diff"},
-          {"signature": "('13','13', -20)", "count": 2, "candidate_label": "candidate_same_rule_tie_break_or_aggregation_diff"},
-          {"signature": "('15','15', -20)", "count": 2, "candidate_label": "candidate_same_rule_tie_break_or_aggregation_diff"},
-          {"signature": "('11','11', -20)", "count": 2, "candidate_label": "candidate_same_rule_tie_break_or_aggregation_diff"}
+          {"signature": "('11','11', 1)", "count": 5, "candidate_label": "source_data_drift_kin_data_or_biog_main_birthyear_between_sides", "pr_aj_verdict": "supported_by_focused_probe (4 KIN_DATA drift + 1 BIOG_MAIN drift)"},
+          {"signature": "('19','19', -20)", "count": 3, "candidate_label": "source_data_drift_biog_main_birthyear_between_sides", "pr_ai_verdict": "supported_by_focused_probe"},
+          {"signature": "('13','13', -20)", "count": 2, "candidate_label": "source_data_drift_biog_main_birthyear_between_sides", "pr_ai_verdict": "supported_by_focused_probe"},
+          {"signature": "('15','15', -20)", "count": 2, "candidate_label": "source_data_drift_biog_main_birthyear_between_sides", "pr_ai_verdict": "supported_by_focused_probe"},
+          {"signature": "('11','11', -20)", "count": 2, "candidate_label": "source_data_drift_biog_main_birthyear_between_sides", "pr_ai_verdict": "supported_by_focused_probe"}
         ],
-        "likely_cause": "Per PR N these rules are matched (or matched_minor_diff with the staging-vs-subquery distinction); divergence is tie-break / aggregation detail when multiple evidence rows share the same priority.  Standout pattern: recurring diff = -20 across rules 11/13/15/19 suggests a single staging-step row pick reproducing consistently.",
-        "supporting_algorithm_evidence": "PR N pairs each rule as matched_minor_diff (staging-vs-subquery aggregate equivalence on the happy path).",
-        "supporting_row_evidence": "14 rows across 5 signature groups in K2.",
-        "confidence": "medium",
-        "next_action": "Pull each affected person's KIN_DATA + child/sibling birthyears on both sides; identify candidate set; confirm whether the -20 shift comes from one consistent row choice.  Same kind of deep-dive PR S did for same_candidates_diff_winner on the address side."
+        "likely_cause": "Upstream source-data drift between User MDB and SQLite snapshot for the EVIDENCE persons that the rule reads from — NOT algorithm divergence.  Per PR AI's per-row probe (-20 sub-cluster, 9 rows): 7/9 are BIOG_MAIN.c_birthyear differing by exactly the index_year diff for the same evidence person; 2/9 are KIN_DATA evidence-pid set differing.  Per PR AJ (+1 sub-cluster, 5 rows): 4/5 are KIN_DATA evidence-pid drift, 1/5 is BIOG_MAIN birthyear drift.  All 14 / 14 rows are PHP-side / SQLite-snapshot upstream data drift; same general class as PR Z's tcode='05' candidate_php_entry_code_mapping_gap.  The Access vs PHP rule body is identical and runs correctly on both sides.",
+        "supporting_algorithm_evidence": "PR N pairs each of rules 11/13/15/19 as matched (or matched_minor_diff on staging-vs-subquery aggregate).  PR AI (analysis/probe_index_year_diff_minus_20_cluster.py) and PR AJ (analysis/probe_index_year_diff_plus_1_cluster.py) walked all 14 rows individually and confirmed the upstream-data-drift mechanism.",
+        "supporting_row_evidence": "Concrete example (PR AI): c_personid=228114 (王淑抃), father=王圖 (123710); User MDB BIOG_MAIN.c_birthyear(123710)=1557, SQLite=1577; Access fires 1557+30=1587, PHP fires 1577+30=1607, diff=-20 explained 100% by upstream birthyear drift.  Per-personid breakdown in reports/index_year_diff_minus_20_cluster_probe.json + reports/index_year_diff_plus_1_cluster_probe.json.",
+        "confidence": "supported_by_focused_probe (PR AI + AJ)",
+        "next_action": "PHP-side / SQLite-snapshot data quality issue, not a CBDB User MDB algorithm bug.  Forward findings to cbdb-online-main-server / SQLite-snapshot-build team as upstream data-drift candidates.  Out-of-scope for this repo."
       },
       {
         "bucket": "candidate_algorithm_divergence",

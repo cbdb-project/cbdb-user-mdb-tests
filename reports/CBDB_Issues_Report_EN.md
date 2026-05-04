@@ -656,7 +656,7 @@ None of these are confirmed bugs.  Full per-row output is in `reports/index_year
 
 Deeper triage (PR K2, `analysis/triage_index_year_drift_groups.py` → `reports/index_year_drift_rule_groups.json`) named the leftover buckets:
 
-- `consistent_within_rule` × 14 → 5 signature groups, all `candidate_same_rule_tie_break_or_aggregation_diff`.  Recurring diff=-20 across Rules 11/13/15/19 is the standout pattern.
+- `consistent_within_rule` × 14 → 5 signature groups.  PR AI + AJ probes reversed the prior tie-break hypothesis: all 14 rows are `source_data_drift_biog_main_or_kin_data_between_sides` (8 BIOG_MAIN birthyear drift + 6 KIN_DATA evidence-pid drift).  Upstream PHP-side / SQLite-snapshot data issue, not a CBDB algorithm divergence.
 - `unclassified` × 18 → 18 named, 17 flagged `blocked_by_runtime_priority_triage_pending` (PR M dumped frmBaseMaintenance, so the source is in repo; resolving each row still needs a per-row walk of the runtime priority/iteration order).
 - `php_did_not_compute` × 19 → 6 groups by Access tcode; biggest is `access_tcode='05'` × 7 (`candidate_php_entry_code_mapping_gap` for jinshi).
 
@@ -692,7 +692,7 @@ Per-bucket cause / supporting evidence / confidence / next action lives in `anal
 | `php_did_not_compute` | 19 | tcode='05' × 7: supported_by_focused_probe (PR Z).  tcode='11' × 5: medium.  Phase-C tcodes (14/20/2304): medium.  tcode='07' × 1: medium (vestigial-vs-intentional unresolved). |
 | `access_did_not_compute` | 7 | medium |
 | `iteration_order_diff` | 5 | medium |
-| `consistent_within_rule` | 14 | medium |
+| `consistent_within_rule` | 14 | supported_by_focused_probe (PR AI + AJ) |
 | `candidate_algorithm_divergence` | 5 | low-medium |
 | `blocked_by_runtime_priority_triage_pending` | 17 | low (per-row causes); high (category label) |
 

@@ -656,7 +656,7 @@ _**Hypothetical** popup, reconstructed in PIL.  Users currently CAN'T trigger th
 
 PR K2 進一步的 triage (`analysis/triage_index_year_drift_groups.py` → `reports/index_year_drift_rule_groups.json`) 把剩下的桶命名清楚：
 
-- `consistent_within_rule` × 14 → 5 個 signature 分組，全部標為 `candidate_same_rule_tie_break_or_aggregation_diff`。最顯眼的是 Rule 11/13/15/19 反覆出現的 diff=-20。
+- `consistent_within_rule` × 14 → 5 個 signature 分組。PR AI + AJ 的逐筆探測推翻了原本的 tie-break 假說：14 筆全是 `source_data_drift_biog_main_or_kin_data_between_sides`（8 筆 BIOG_MAIN birthyear 漂移 + 6 筆 KIN_DATA evidence-pid 漂移）。屬於 PHP-side / SQLite snapshot 的上游資料漂移，並非 CBDB 演演算法差異。
 - `unclassified` × 18 → 18 筆已命名，17 筆標為 `blocked_by_runtime_priority_triage_pending`（PR M 已 dump frmBaseMaintenance，原始碼已在 repo；要逐筆判斷哪邊正確仍需走一遍 runtime 的 priority／iteration 順序）。
 - `php_did_not_compute` × 19 → 按 Access tcode 分 6 組；最大的是 `access_tcode='05'` × 7（jinshi 進士類的 `candidate_php_entry_code_mapping_gap`）。
 
@@ -690,7 +690,7 @@ PR M（`analysis/dump_data_mdb_vba.py`）從 DATA mdb 抽出了 `frmBaseMaintena
 | `php_did_not_compute` | 19 | tcode='05' × 7: supported_by_focused_probe (PR Z).  tcode='11' × 5: medium.  Phase-C tcodes (14/20/2304): medium.  tcode='07' × 1: medium (vestigial-vs-intentional unresolved). |
 | `access_did_not_compute` | 7 | medium |
 | `iteration_order_diff` | 5 | medium |
-| `consistent_within_rule` | 14 | medium |
+| `consistent_within_rule` | 14 | supported_by_focused_probe (PR AI + AJ) |
 | `candidate_algorithm_divergence` | 5 | low-medium |
 | `blocked_by_runtime_priority_triage_pending` | 17 | low (per-row causes); high (category label) |
 

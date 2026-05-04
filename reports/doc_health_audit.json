@@ -1,10 +1,10 @@
 {
   "summary": {
     "n_docs_scanned": 24,
-    "n_findings": 8,
+    "n_findings": 6,
     "by_kind": {
       "stale_claim_pre_PR_AA": 3,
-      "candidate_label_overtaken_by_PR_AI_AJ": 4,
+      "candidate_label_overtaken_by_PR_AI_AJ": 2,
       "stale_label_pre_PR_X": 1
     }
   },
@@ -19,7 +19,7 @@
     },
     {
       "doc": "AGENTS.md",
-      "line": 531,
+      "line": 530,
       "kind": "candidate_label_overtaken_by_PR_AI_AJ",
       "matched_text": "candidate_same_rule_tie_break_or_aggregation_diff",
       "line_excerpt": "`candidate_same_rule_tie_break_or_aggregation_diff` (both",
@@ -56,22 +56,6 @@
       "matched_text": "Form_Open hangs",
       "line_excerpt": "behaviors.py:270` from `\"LookAtNetworks Form_Open hangs\"`",
       "note": "PR AA showed Form_Open does NOT hang; the actual blocker is CmdRun (Zhu Xi 2471 assocs)"
-    },
-    {
-      "doc": "reports\\CBDB_Issues_Report_EN.md",
-      "line": 659,
-      "kind": "candidate_label_overtaken_by_PR_AI_AJ",
-      "matched_text": "candidate_same_rule_tie_break_or_aggregation_diff",
-      "line_excerpt": "- `consistent_within_rule` × 14 → 5 signature groups, all `candidate_same_rule_tie_break_or_aggregation_diff`.  Recurring diff=-20 across Rules 11/13/15/19 is the standout pattern.",
-      "note": "PR AI + AJ showed all 14 rows are upstream BIOG_MAIN / KIN_DATA drift, NOT tie-break.  Bucket label rename queued for morning."
-    },
-    {
-      "doc": "reports\\CBDB_Issues_Report_ZH-Hant.md",
-      "line": 659,
-      "kind": "candidate_label_overtaken_by_PR_AI_AJ",
-      "matched_text": "candidate_same_rule_tie_break_or_aggregation_diff",
-      "line_excerpt": "- `consistent_within_rule` × 14 → 5 個 signature 分組，全部標為 `candidate_same_rule_tie_break_or_aggregation_diff`。最顯眼的是 Rule 11/13/15/19 反覆出現的 diff=-20。",
-      "note": "PR AI + AJ showed all 14 rows are upstream BIOG_MAIN / KIN_DATA drift, NOT tie-break.  Bucket label rename queued for morning."
     }
   ]
 }

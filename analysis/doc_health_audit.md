@@ -5,11 +5,11 @@ Static scan of all `.md` docs in the repo for known-stale phrasing patterns and 
 ## Headline
 
 - Docs scanned: 24
-- Findings: **8**
+- Findings: **6**
 
 - By kind:
-  - `candidate_label_overtaken_by_PR_AI_AJ`: 4
   - `stale_claim_pre_PR_AA`: 3
+  - `candidate_label_overtaken_by_PR_AI_AJ`: 2
   - `stale_label_pre_PR_X`: 1
 
 ## `AGENTS.md` × 2
@@ -18,7 +18,7 @@ Static scan of all `.md` docs in the repo for known-stale phrasing patterns and 
   - match: `Form_Open hangs`
   - excerpt: ### 3. NAVIGATION_PANE.Form_Open hangs forever if `LinkListInit.c_path`
   - note: PR AA showed Form_Open does NOT hang; the actual blocker is CmdRun (Zhu Xi 2471 assocs)
-- line 531 (`candidate_label_overtaken_by_PR_AI_AJ`)
+- line 530 (`candidate_label_overtaken_by_PR_AI_AJ`)
   - match: `candidate_same_rule_tie_break_or_aggregation_diff`
   - excerpt: `candidate_same_rule_tie_break_or_aggregation_diff` (both
   - note: PR AI + AJ showed all 14 rows are upstream BIOG_MAIN / KIN_DATA drift, NOT tie-break.  Bucket label rename queued for morning.
@@ -44,17 +44,3 @@ Static scan of all `.md` docs in the repo for known-stale phrasing patterns and 
   - match: `Form_Open hangs`
   - excerpt: behaviors.py:270` from `"LookAtNetworks Form_Open hangs"`
   - note: PR AA showed Form_Open does NOT hang; the actual blocker is CmdRun (Zhu Xi 2471 assocs)
-
-## `reports\CBDB_Issues_Report_EN.md` × 1
-
-- line 659 (`candidate_label_overtaken_by_PR_AI_AJ`)
-  - match: `candidate_same_rule_tie_break_or_aggregation_diff`
-  - excerpt: - `consistent_within_rule` × 14 → 5 signature groups, all `candidate_same_rule_tie_break_or_aggregation_diff`.  Recurring diff=-20 across Rules 11/13/15/19 is the standout pattern.
-  - note: PR AI + AJ showed all 14 rows are upstream BIOG_MAIN / KIN_DATA drift, NOT tie-break.  Bucket label rename queued for morning.
-
-## `reports\CBDB_Issues_Report_ZH-Hant.md` × 1
-
-- line 659 (`candidate_label_overtaken_by_PR_AI_AJ`)
-  - match: `candidate_same_rule_tie_break_or_aggregation_diff`
-  - excerpt: - `consistent_within_rule` × 14 → 5 個 signature 分組，全部標為 `candidate_same_rule_tie_break_or_aggregation_diff`。最顯眼的是 Rule 11/13/15/19 反覆出現的 diff=-20。
-  - note: PR AI + AJ showed all 14 rows are upstream BIOG_MAIN / KIN_DATA drift, NOT tie-break.  Bucket label rename queued for morning.

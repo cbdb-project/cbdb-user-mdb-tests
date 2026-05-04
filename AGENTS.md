@@ -526,12 +526,20 @@ PR K2 (`analysis/triage_index_year_drift_groups.py` →
 `reports/index_year_drift_rule_groups.json`) does a second triage
 pass on what K1 left under-named:
 
-  - **consistent_within_rule** (14 rows): 5 (php_tcode,
-    access_tcode, diff) signature groups, all named
+  - **consistent_within_rule** (14 rows): originally named
     `candidate_same_rule_tie_break_or_aggregation_diff` (both
-    sides chose the same rule but produced different values; tie-
-    break or aggregation diff suspected).  A recurring **diff =
-    -20 across Rules 11 / 13 / 15 / 19** stands out.
+    sides chose the same rule but produced different values).
+    PR AI + AJ's per-row probes reversed that hypothesis: all
+    14 rows are **upstream source-data drift between User MDB
+    and SQLite snapshot for the EVIDENCE persons that the rule
+    reads from** — 8 are BIOG_MAIN.c_birthyear differing for
+    the same evidence person; 6 are KIN_DATA evidence-pid set
+    differing.  Renamed in `reports/index_drift_cause_summary
+    .json` to `source_data_drift_biog_main_or_kin_data_
+    between_sides`; confidence promoted from `medium` to
+    `supported_by_focused_probe (PR AI + AJ)`.  Same general
+    class as PR Z's tcode='05' upstream-data-gap finding;
+    NOT a CBDB algorithm bug.
   - **unclassified** (18 rows): all 18 named after triage; 17
     flagged `blocked_by_runtime_priority_triage_pending`
     (different rules picked on each side; PR M dumped
