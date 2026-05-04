@@ -146,9 +146,11 @@ ISSUES = [
         ),
         "steps_en": [
             "Open **LookAtPlace**.  Pick the address picker, choose a "
-            "well-attested address — for example **c_addr_id = 7213** "
-            "(Kaifeng 開封) — so the resulting query has plenty of "
-            "people to feed the People-CSV loop.  Click **Run Query**.",
+            "well-attested address — for example **c_addr_id = 100658** "
+            "(Kaifeng 開封; this is also the addr_id used by "
+            "`tests/test_vba_inline.py`'s kaifeng-yin fixture) — so the "
+            "resulting query has plenty of people to feed the People-CSV "
+            "loop.  Click **Run Query**.",
             "Once the query finishes, click the **Neo4j** export button.",
             "Pick a save location at the first SaveAs prompt (the "
             "'People file' prompt).",
@@ -159,8 +161,10 @@ ISSUES = [
         ],
         "steps_zh": [
             "打開 **LookAtPlace**。透過地址 picker 選一個資料量足夠的"
-            "地址——例如 **c_addr_id = 7213（開封）**——這樣查詢結果有"
-            "足夠人物餵給 People-CSV 迴圈。點 **Run Query**。",
+            "地址——例如 **c_addr_id = 100658（開封）**（這也是 "
+            "`tests/test_vba_inline.py` 的 kaifeng-yin fixture 用的 "
+            "addr_id）——這樣查詢結果有足夠人物餵給 People-CSV 迴圈。"
+            "點 **Run Query**。",
             "等查詢跑完，點 **Neo4j** 匯出按鈕。",
             "在第一個另存對話框（「People 檔」對話框）裡選好儲存路徑。",
             "幾乎立刻彈出 `執行時錯誤 3265 ——集合中找不到項目` 對話框。",

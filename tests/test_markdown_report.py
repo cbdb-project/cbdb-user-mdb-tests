@@ -1,9 +1,14 @@
 from __future__ import annotations
 
+import json
+import subprocess
+import sys
 from pathlib import Path
 
 
 REPO = Path(__file__).resolve().parent.parent
+AUDIT_SCRIPT = REPO / "analysis" / "audit_report_code_labels.py"
+AUDIT_JSON = REPO / "reports" / "report_code_label_audit.json"
 
 
 def test_markdown_toc_anchors_match_github_slug_shape():
@@ -112,3 +117,65 @@ def test_issue_20_status_code_40_uses_civil_office_label():
             f"(STATUS_CODES.c_status_desc_chn for status_code=40); "
             f"the corrected steps wording is required."
         )
+
+
+def test_report_code_labels_audit_clean():
+    """Run `analysis/audit_report_code_labels.py` and assert it
+    finds no mismatches between the report's hardcoded code
+    labels and the MDB dictionary tables.
+
+    Born from the Issue #20 status-code-40 wording mistake (it
+    originally said `Provincial Graduate / 进士`, which is
+    Issue #9's jinshi label, not the actual STATUS_CODES desc
+    for status_code=40 which is `civil office / [為官者：文]`).
+    The auditor's curated manifest covers every (table,
+    code_value) the report currently hardcodes.
+
+    Skipped if the user MDB isn't present (matches the
+    behaviour of other MDB-touching tests in this file's
+    sibling files).
+    """
+    import pytest
+    user_mdb = REPO / "data" / "CBDB_BJ_User.mdb"
+    if not user_mdb.exists():
+        pytest.skip(f"{user_mdb} not present")
+
+    # Re-run the auditor so the test reflects the live state of
+    # the report + MDB, not a stale cached JSON.
+    r = subprocess.run(
+        [sys.executable, str(AUDIT_SCRIPT)],
+        capture_output=True, text=True, timeout=60,
+    )
+    # Auditor exits non-zero on any mismatch; the JSON is still
+    # written either way.
+    assert AUDIT_JSON.exists(), (
+        f"audit script did not write {AUDIT_JSON}; stderr:\n"
+        f"{r.stderr[-500:]}"
+    )
+
+    audit = json.loads(AUDIT_JSON.read_text(encoding="utf-8"))
+    s = audit["summary"]
+    mismatches = audit["mismatches"]
+
+    assert mismatches == [], (
+        f"report code-label audit found {len(mismatches)} "
+        f"mismatch(es).  Each mismatch is a place where the "
+        f"report's hardcoded label disagrees with the MDB "
+        f"dictionary table.  Fix either the report wording or "
+        f"the manifest in analysis/audit_report_code_labels.py "
+        f"(if the data changed).  Detail:\n"
+        + "\n".join(
+            f"  - issue #{m['issue_id']} {m['table']}."
+            f"{m['code_col']}={m['code_value']} [{m['lang']}]: "
+            f"missing={m.get('missing_expected_labels')} "
+            f"forbidden={m.get('found_forbidden_labels')} "
+            f"mdb_desc_present={m.get('mdb_desc_present_in_block')}"
+            for m in mismatches
+        )
+    )
+    # All language checks must have passed (manifest entries × 2).
+    assert s["n_per_lang_checks_passed"] == s["n_per_lang_checks_total"], (
+        f"audit summary disagrees with mismatches: "
+        f"{s['n_per_lang_checks_passed']} / "
+        f"{s['n_per_lang_checks_total']} per-lang checks passed"
+    )

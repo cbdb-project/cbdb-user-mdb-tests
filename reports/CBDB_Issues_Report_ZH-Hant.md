@@ -62,7 +62,7 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
 
 #### 復現步驟
 
-1. 開啟 **LookAtPlace**。透過地址 picker 選一個資料量足夠的地址——例如 **c_addr_id = 7213（開封）**——這樣查詢結果有足夠人物餵給 People-CSV 迴圈。點 **Run Query**。
+1. 開啟 **LookAtPlace**。透過地址 picker 選一個資料量足夠的地址——例如 **c_addr_id = 100658（開封）**（這也是 `tests/test_vba_inline.py` 的 kaifeng-yin fixture 用的 addr_id）——這樣查詢結果有足夠人物餵給 People-CSV 迴圈。點 **Run Query**。
 2. 等查詢跑完，點 **Neo4j** 匯出按鈕。
 3. 在第一個另存對話方塊（「People 檔」對話方塊）裡選好儲存路徑。
 4. 幾乎立刻彈出 `執行時錯誤 3265 ——集合中找不到專案` 對話方塊。

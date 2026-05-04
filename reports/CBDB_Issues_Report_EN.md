@@ -62,7 +62,7 @@ The People-CSV section of `LookAtPlace.CmdNeo4j_Click` (line ~322 onward) builds
 
 #### Steps to reproduce
 
-1. Open **LookAtPlace**.  Pick the address picker, choose a well-attested address — for example **c_addr_id = 7213** (Kaifeng 開封) — so the resulting query has plenty of people to feed the People-CSV loop.  Click **Run Query**.
+1. Open **LookAtPlace**.  Pick the address picker, choose a well-attested address — for example **c_addr_id = 100658** (Kaifeng 開封; this is also the addr_id used by `tests/test_vba_inline.py`'s kaifeng-yin fixture) — so the resulting query has plenty of people to feed the People-CSV loop.  Click **Run Query**.
 2. Once the query finishes, click the **Neo4j** export button.
 3. Pick a save location at the first SaveAs prompt (the 'People file' prompt).
 4. A `Run-time error 3265 — Item not found in this collection` popup appears almost immediately.
