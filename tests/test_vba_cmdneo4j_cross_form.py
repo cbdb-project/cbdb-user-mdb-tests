@@ -333,6 +333,27 @@ _NEO4J_SHAPES: dict[str, tuple[str, list[str], list[str]]] = {
                         ["personPlaceCode", "personPlaceTrans",
                          "personPlaceHZ"],
                         ["personPlaceCode"]),
+    # Added 2026-05-04 (follow-up) to cover LookAtTexts's
+    # mixed-case Neo4j output.  Probe results saved to
+    # analysis/_lookattexts_neo4j_headers.json.
+    "PlaceID": ("Places-capital",
+                ["PlaceID", "PlacePY", "PlaceHZ", "PlaceX",
+                 "PlaceY"],
+                ["PlaceID"]),
+    "TextID": ("TextCodes",
+               ["TextID", "TextPY", "TextHZ",
+                "TextCategoryCode"],
+               ["TextID"]),
+    "PersonTextRoleCode": ("PersonTextRoleCodes",
+                           # Note: actual CBDB header has
+                           # `PersonTextRoleDesc` repeated as
+                           # cols[1] AND cols[2] — looks like a
+                           # CBDB-side dup-column bug in the
+                           # header writer.  We don't enforce the
+                           # dup; just require the key column.
+                           ["PersonTextRoleCode",
+                            "PersonTextRoleDesc"],
+                           ["PersonTextRoleCode"]),
 }
 
 # Two-column-prefix disambiguation for shapes whose first column
@@ -357,6 +378,31 @@ _NEO4J_SHAPES_BY_TWO_COLS: dict[
                             ["NameID", "PlaceID",
                              "PersonPlaceCode"],
                             ["NameID"]),
+    # Added 2026-05-04 (follow-up) to cover LookAtTexts's
+    # mixed-case Neo4j output.  Three NameID-prefixed shapes
+    # exist in the wild; without two-column disambiguation they
+    # all collapse onto the legacy `NameID -> PeopleEntry`
+    # fall-through and the depth check fails on the People
+    # ('NameID,NameHZ,...') and PeopleText ('NameID,TextID,...')
+    # files.
+    ("NameID", "NameHZ"): ("People-capital",
+                           ["NameID", "NameHZ", "NamePY",
+                            "IndexYear", "Dynasty", "Sex"],
+                           ["NameID"]),
+    ("NameID", "TextID"): ("PeopleText",
+                           ["NameID", "TextID"],  # row width
+                                                  # loose-check
+                           ["NameID"]),
+    # Make the legacy single-column fall-through explicit too,
+    # so the disambiguation is uniform: when col0 is `NameID`
+    # the classifier ALWAYS consults the 2-col table first, and
+    # `(NameID, EntryCode)` here matches the same shape that the
+    # single-column lookup would have returned.  Keeps existing
+    # forms (Office, Kinship) on the same answer regardless of
+    # whether their PeopleEntry header has 2+ cols.
+    ("NameID", "EntryCode"): ("PeopleEntry",
+                              ["NameID", "EntryCode"],
+                              ["NameID"]),
 }
 
 
@@ -459,7 +505,15 @@ def _assert_neo4j_export_depth(form_name: str,
                 # PersonPlaceCodes is a code-table whose first
                 # column (`personPlaceCode`) can legitimately be
                 # 0 / blank for unmapped place categories.
-                "PersonPlaceCodes"):
+                "PersonPlaceCodes",
+                # PersonTextRoleCodes — same code-table family;
+                # role code can legitimately be 0 / blank for
+                # unmapped role values.
+                "PersonTextRoleCodes",
+                # TextCodes is keyed on `TextID` (integer), but
+                # CBDB occasionally writes 0 / blank for unmapped
+                # texts; treat as code-table for the bad-id check.
+                "TextCodes"):
             # Code-table shapes can legitimately start with 0.
             raise AssertionError(
                 f"[{form_name}] {f.name} has rows whose first cell "

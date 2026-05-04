@@ -35,6 +35,10 @@ Status taxonomy (one per cell):
   - `real_vba_covered` ─ test exists and passes
   - `real_vba_skipped` ─ test exists but is `pytest.mark.skip`'d
                          (with reason)
+  - `real_vba_failing` ─ test exists, runs (does NOT skip), and
+                         fails on the current dump (e.g. depth-
+                         check classifier gap for an unfamiliar
+                         file-shape family)
   - `unit_or_static_only` ─ covered by static analysis (e.g.
                             `tests/test_known_bugs.py` source-grep)
                             but no real CmdQuery → CmdX chain
@@ -165,7 +169,28 @@ EXPORT_TEST_MANIFEST: list[dict] = [
     {"form": "LookAtOffice", "button": "CmdNeo4j",
      "test_module": "tests/test_vba_cmdneo4j_cross_form.py",
      "test_node": "test_cmd_neo4j_produces_files[LookAtOffice]",
-     "status": "covered", "notes": "min_files=4 + per-shape depth"},
+     "status": "real_vba_failing",
+     "skip_reason":
+         "Pre-existing failure on baseline (verified 2026-05-04 by "
+         "stashing the classifier-extension PR's edits and re-running): "
+         "the depth-check classifier (PR Q, commit 720f6f8) doesn't "
+         "know LookAtOffice's PeopleOffice shape "
+         "(`NameID,OfficeCode,OfficeAddrID,SocialInstID,...`).  The "
+         "single-column lookup `NameID -> PeopleEntry` requires "
+         "`EntryCode`, which Office's f6 doesn't have, so the missing-"
+         "cols assertion fires on f6.  Same family as the LookAtTexts "
+         "pre-existing failure (PeopleText / People-capital / "
+         "Places-capital / TextCodes / PersonTextRoleCodes shapes) "
+         "fixed in fix/cmdneo4j-classifier-lookattexts; that PR was "
+         "scoped to Texts only.  Recommended follow-up: extend "
+         "`_NEO4J_SHAPES_BY_TWO_COLS` with `(NameID, OfficeCode) -> "
+         "PeopleOffice` and add a single-column entry for whatever "
+         "Office's other shapes need.",
+     "notes": "min_files=4 + per-shape depth.  Inventory previously "
+              "(2026-05-04 PR 89d9a63) marked this `covered` based on "
+              "an assumption from the test file's _SPECS list — actual "
+              "behaviour was never verified end-to-end with --include-"
+              "vba.  Status corrected here."},
     {"form": "LookAtPlace", "button": "CmdNeo4j",
      "test_module": "tests/test_vba_cmdneo4j_cross_form.py",
      "test_node": "test_cmd_neo4j_produces_files[LookAtPlace]",
@@ -423,6 +448,16 @@ def _classify_cell(form: str, button: str,
             "test_entries": manifest_for_cell,
             "static_test_notes": static_notes,
         }
+    if any(m["status"] == "real_vba_failing" for m in manifest_for_cell):
+        return {
+            "status": "real_vba_failing",
+            "explanation":
+                "Real-VBA test exists, runs (does NOT skip), and "
+                "fails on the current dump.  See `skip_reason` on "
+                "each manifest entry for the failure mode.",
+            "test_entries": manifest_for_cell,
+            "static_test_notes": static_notes,
+        }
     return {
         "status": "real_vba_skipped",
         "explanation":
@@ -562,6 +597,7 @@ _STATUS_GLYPH = {
     "real_vba_covered_via_handler_dispatch":     "✓*",
     "real_vba_skipped":                          "skip",
     "real_vba_skipped_via_handler_dispatch":     "skip*",
+    "real_vba_failing":                          "FAIL",
     "not_applicable":                            "—",
     "missing_ui_button":                         "no-btn",
     "orphan_button_no_handler":                  "orphan",
@@ -610,6 +646,11 @@ def _render_md(d: dict) -> str:
         "| `skip*` | `real_vba_skipped_via_handler_dispatch` | "
         "Same as `skip`, but for a handler-dispatched cell whose "
         "UI button is missing. |\n"
+        "| `FAIL` | `real_vba_failing` | "
+        "Real-VBA test exists, runs (does NOT skip), and fails on "
+        "the current dump.  See per-cell skip_reason in JSON for "
+        "the failure mode (typically a depth-check classifier gap "
+        "for an unfamiliar file-shape family). |\n"
         "| `GAP` | `gap` | "
         "Both handler + button present, no real-VBA test, no "
         "static-only test either — true uncovered slice. |\n"

@@ -1,6 +1,6 @@
 # Export coverage inventory (LookAt form × export button)
 
-**Generated:** 2026-05-04T13:45:33+00:00
+**Generated:** 2026-05-04T14:05:44+00:00
 **Generator:** `analysis/inventory_export_coverage.py`
 **Companion JSON:** `reports/export_coverage_inventory.json`
 
@@ -14,6 +14,7 @@ Read-only inventory.  No MDB.  No Access COM.  Reads the VBA dump (`analysis/dum
 | `✓*` | `real_vba_covered_via_handler_dispatch` | Test passes via `Form_Timer` handler dispatch — handler exists, UI button is missing (P3 family).  Test exercises handler logic; missing button stays documented as a P3 issue. |
 | `skip` | `real_vba_skipped` | Real-VBA test exists but is `pytest.mark.skip`'d (see per-cell skip_reason in JSON). |
 | `skip*` | `real_vba_skipped_via_handler_dispatch` | Same as `skip`, but for a handler-dispatched cell whose UI button is missing. |
+| `FAIL` | `real_vba_failing` | Real-VBA test exists, runs (does NOT skip), and fails on the current dump.  See per-cell skip_reason in JSON for the failure mode (typically a depth-check classifier gap for an unfamiliar file-shape family). |
 | `GAP` | `gap` | Both handler + button present, no real-VBA test, no static-only test either — true uncovered slice. |
 | `static` | `unit_or_static_only` | Only static / source-level tests cover this cell (`tests/test_known_bugs.py` family); no real CmdQuery → CmdX chain. |
 | `no-btn` | `missing_ui_button` | Handler exists in source but no control on the form (P3 missing-UI family — Issues #15-19). |
@@ -28,12 +29,13 @@ Read-only inventory.  No MDB.  No Access COM.  Reads the VBA dump (`analysis/dum
 
 - **Cells total:** 80 (10 forms × 8 buttons)
 - `not_applicable` (—): **40**
-- `real_vba_covered` (✓): **16**
+- `real_vba_covered` (✓): **15**
 - `gap` (GAP): **13**
 - `real_vba_skipped` (skip): **5**
 - `real_vba_covered_via_handler_dispatch` (✓*): **3**
 - `real_vba_skipped_via_handler_dispatch` (skip*): **2**
 - `missing_ui_button` (no-btn): **1**
+- `real_vba_failing` (FAIL): **1**
 
 ## Coverage matrix
 
@@ -42,7 +44,7 @@ Read-only inventory.  No MDB.  No Access COM.  Reads the VBA dump (`analysis/dum
 | **LookAtEntry** | ✓ | ✓ | — | — | — | — | — | — |
 | **LookAtTexts** | ✓ | ✓ | — | — | — | — | — | — |
 | **LookAtAssociations** | ✓ | skip | ✓ | ✓ | — | — | GAP | — |
-| **LookAtOffice** | ✓ | ✓ | — | — | ✓* | — | — | ✓ |
+| **LookAtOffice** | ✓ | FAIL | — | — | ✓* | — | — | ✓ |
 | **LookAtPlace** | ✓* | skip | ✓ | ✓ | — | — | GAP | — |
 | **LookAtKinship** | ✓ | ✓ | ✓* | — | ✓ | — | GAP | — |
 | **LookAtStatus** | ✓ | skip | skip* | skip* | — | — | no-btn | — |
@@ -125,12 +127,12 @@ Cells with status `not_applicable` are omitted to keep the noise down.
 - Why: Real-VBA test exists and passes for this cell.
 - Test: `tests/test_vba_cmdgis_other_forms.py::test_cmd_gis_produces_file` — **covered**; notes: structural
 
-### LookAtOffice × CmdNeo4j — `real_vba_covered`
+### LookAtOffice × CmdNeo4j — `real_vba_failing`
 
 - Handler in source: yes
 - Button on form: yes
-- Why: Real-VBA test exists and passes for this cell.
-- Test: `tests/test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtOffice]` — **covered**; notes: min_files=4 + per-shape depth
+- Why: Real-VBA test exists, runs (does NOT skip), and fails on the current dump.  See `skip_reason` on each manifest entry for the failure mode.
+- Test: `tests/test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtOffice]` — **real_vba_failing**; skip_reason: Pre-existing failure on baseline (verified 2026-05-04 by stashing the classifier-extension PR's edits and re-running): the depth-check classifier (PR Q, commit 720f6f8) doesn't know LookAtOffice's PeopleOffice shape (`NameID,OfficeCode,OfficeAddrID,SocialInstID,...`).  The single-column lookup `NameID -> PeopleEntry` requires `EntryCode`, which Office's f6 doesn't have, so the missing-cols assertion fires on f6.  Same family as the LookAtTexts pre-existing failure (PeopleText / People-capital / Places-capital / TextCodes / PersonTextRoleCodes shapes) fixed in fix/cmdneo4j-classifier-lookattexts; that PR was scoped to Texts only.  Recommended follow-up: extend `_NEO4J_SHAPES_BY_TWO_COLS` with `(NameID, OfficeCode) -> PeopleOffice` and add a single-column entry for whatever Office's other shapes need.; notes: min_files=4 + per-shape depth.  Inventory previously (2026-05-04 PR 89d9a63) marked this `covered` based on an assumption from the test file's _SPECS list — actual behaviour was never verified end-to-end with --include-vba.  Status corrected here.
 
 ### LookAtOffice × CmdGUESS — `real_vba_covered_via_handler_dispatch`
 
