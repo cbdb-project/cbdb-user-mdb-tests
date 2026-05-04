@@ -1,0 +1,257 @@
+{
+  "skip_inject_autodetect_forms": [
+    "Form_LookAtAssociationPairs",
+    "Form_LookAtAssociations",
+    "Form_LookAtEntry",
+    "Form_LookAtGroupData",
+    "Form_LookAtKinship",
+    "Form_LookAtOffice",
+    "Form_LookAtPlace",
+    "Form_LookAtStatus",
+    "Form_LookAtTexts"
+  ],
+  "min_control_state": {
+    "TxtNodeDist": 1,
+    "TxtMaxLoop": 0,
+    "ChkKin": -1,
+    "ChkNonKin": 0,
+    "ChkMale": -1,
+    "ChkFemale": -1
+  },
+  "per_candidate_timeout_sec": 240,
+  "cmdrun_timer_timeout_sec": 120,
+  "results": [
+    {
+      "candidate": {
+        "c_personid": 30270,
+        "name_chn": "曹植",
+        "name_py": "Cao Zhi",
+        "assocs": 10,
+        "kin": 1,
+        "est_1hop": 10
+      },
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session_minimal_inject"
+        },
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 2.49,
+          "marker": "session_opened_only_Networks_injected"
+        },
+        {
+          "t": 3.64,
+          "marker": "form_opened"
+        },
+        {
+          "t": 3.86,
+          "marker": "picker_seeded"
+        },
+        {
+          "t": 4.0,
+          "marker": "controls_set"
+        },
+        {
+          "t": 5.53,
+          "marker": "cmdrun_returned_1_rows_via_timer"
+        },
+        {
+          "t": 5.53,
+          "marker": "row_counts_captured"
+        },
+        {
+          "t": 5.53,
+          "marker": "debug_captured"
+        }
+      ],
+      "outcome": "succeeded_with_output",
+      "elapsed_sec": 7.86,
+      "exception": null,
+      "row_counts": {
+        "ZZ_SOCIAL_NETWORK_via_click_via_timer": 1,
+        "ZZ_SOCIAL_NETWORK": 1,
+        "ZZ_SCRATCH_PEOPLE": 2,
+        "ZZ_SOCIAL_NETWORK_AGGREGATE": 1
+      },
+      "debug_transcript": [
+        {
+          "id": 1,
+          "msg": "LookAtNetworks:ENTER"
+        },
+        {
+          "id": 2,
+          "msg": "LookAtNetworks:DONE"
+        }
+      ],
+      "controls_set": {
+        "TxtNodeDist": 1,
+        "TxtMaxLoop": 0,
+        "ChkKin": -1,
+        "ChkNonKin": 0,
+        "ChkMale": -1,
+        "ChkFemale": -1
+      }
+    },
+    {
+      "candidate": {
+        "c_personid": 4,
+        "name_chn": "查道",
+        "name_py": "Zha Dao",
+        "assocs": 5,
+        "kin": 9,
+        "est_1hop": 99
+      },
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session_minimal_inject"
+        },
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 2.16,
+          "marker": "session_opened_only_Networks_injected"
+        },
+        {
+          "t": 3.32,
+          "marker": "form_opened"
+        },
+        {
+          "t": 3.32,
+          "marker": "picker_seeded"
+        },
+        {
+          "t": 3.46,
+          "marker": "controls_set"
+        },
+        {
+          "t": 5.49,
+          "marker": "cmdrun_returned_14_rows_via_timer"
+        },
+        {
+          "t": 5.49,
+          "marker": "row_counts_captured"
+        },
+        {
+          "t": 5.49,
+          "marker": "debug_captured"
+        }
+      ],
+      "outcome": "succeeded_with_output",
+      "elapsed_sec": 7.79,
+      "exception": null,
+      "row_counts": {
+        "ZZ_SOCIAL_NETWORK_via_click_via_timer": 14,
+        "ZZ_SOCIAL_NETWORK": 14,
+        "ZZ_SCRATCH_PEOPLE": 10,
+        "ZZ_SOCIAL_NETWORK_AGGREGATE": 14
+      },
+      "debug_transcript": [
+        {
+          "id": 1,
+          "msg": "LookAtNetworks:ENTER"
+        },
+        {
+          "id": 2,
+          "msg": "LookAtNetworks:DONE"
+        }
+      ],
+      "controls_set": {
+        "TxtNodeDist": 1,
+        "TxtMaxLoop": 0,
+        "ChkKin": -1,
+        "ChkNonKin": 0,
+        "ChkMale": -1,
+        "ChkFemale": -1
+      }
+    },
+    {
+      "candidate": {
+        "c_personid": 3135,
+        "name_chn": "張君平",
+        "name_py": "Zhang Junping",
+        "assocs": 5,
+        "kin": 2,
+        "est_1hop": 31
+      },
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session_minimal_inject"
+        },
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 2.12,
+          "marker": "session_opened_only_Networks_injected"
+        },
+        {
+          "t": 5.01,
+          "marker": "form_opened"
+        },
+        {
+          "t": 5.02,
+          "marker": "picker_seeded"
+        },
+        {
+          "t": 5.15,
+          "marker": "controls_set"
+        },
+        {
+          "t": 5.68,
+          "marker": "cmdrun_returned_2_rows_via_timer"
+        },
+        {
+          "t": 5.68,
+          "marker": "row_counts_captured"
+        },
+        {
+          "t": 5.68,
+          "marker": "debug_captured"
+        }
+      ],
+      "outcome": "succeeded_with_output",
+      "elapsed_sec": 7.97,
+      "exception": null,
+      "row_counts": {
+        "ZZ_SOCIAL_NETWORK_via_click_via_timer": 2,
+        "ZZ_SOCIAL_NETWORK": 2,
+        "ZZ_SCRATCH_PEOPLE": 3,
+        "ZZ_SOCIAL_NETWORK_AGGREGATE": 2
+      },
+      "debug_transcript": [
+        {
+          "id": 1,
+          "msg": "LookAtNetworks:ENTER"
+        },
+        {
+          "id": 2,
+          "msg": "LookAtNetworks:DONE"
+        }
+      ],
+      "controls_set": {
+        "TxtNodeDist": 1,
+        "TxtMaxLoop": 0,
+        "ChkKin": -1,
+        "ChkNonKin": 0,
+        "ChkMale": -1,
+        "ChkFemale": -1
+      }
+    }
+  ],
+  "summary_by_outcome": {
+    "30270": "succeeded_with_output",
+    "4": "succeeded_with_output",
+    "3135": "succeeded_with_output"
+  },
+  "headline_verdict": "SUCCESS_at_least_one_anchor_completed",
+  "verdict_note": "3 of 3 anchors completed CmdRun with non-empty bounded output under 120 s.  Recommend PR AY to add a small-fixture LookAtNetworks test using one of these anchors + the minimal-injection helper."
+}
