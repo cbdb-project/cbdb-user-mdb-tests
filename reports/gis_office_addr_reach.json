@@ -1,0 +1,105 @@
+{
+  "summary": {
+    "n_office_codes_dirty_rows": 5,
+    "n_office_codes_dirty_reachable_via_postings": 0,
+    "kin_recursive_reach": {
+      "seed_personid": 29619,
+      "max_hops": 4,
+      "n_persons_per_hop": {
+        "0": 1,
+        "1": 3,
+        "2": 3,
+        "3": 2,
+        "4": 4
+      },
+      "n_unique_pickers_reaching_seed": 12
+    },
+    "office_chn_writers": [
+      {
+        "form": "LookAtOffice",
+        "command": "CmdNeo4j_Click",
+        "file": "OfficeCodes.csv",
+        "vba_line": 1360,
+        "writes": "Trim(!c_office_chn) appended with TAB sep, no escaping.  If c_office_chn carries BOM or TAB, JET-mangled or raw, column alignment breaks (same mechanism as Issue #20 ADDR side)."
+      },
+      {
+        "form": "LookAtOffice",
+        "command": "CmdNeo4j_Click",
+        "file": "OfficeCodes.csv (variant in same sub at line 2676)",
+        "vba_line": 2676,
+        "writes": "tStr + tC + !c_office_chn appended; same risk."
+      },
+      {
+        "form": "LookAtOffice",
+        "command": "CmdGIS_Click",
+        "file": "network_gis_<encoding>.tab",
+        "vba_line": 168,
+        "writes": "Reads ZZ_SCRATCH_P_OFFICE which JOINs to ADDR_CODES (PersonAddr / OfficeAddr); does NOT write c_office_chn directly.  OFFICE_CODES BOM rows do NOT leak via this path."
+      }
+    ],
+    "headline": "Five OFFICE_CODES rows carry BOM in c_office_chn (PR AE).  All five are reachable via LookAtOffice.CmdNeo4j_Click → OfficeCodes.csv, which writes c_office_chn TAB-separated without escaping (Form_LookAtOffice.vb:1360 + :2676).  Same bug class as Issue #20.  LookAtOffice.CmdGIS_Click does NOT expose them (it joins ADDR_CODES, not OFFICE_CODES, for AddrName/AddrChn).  Kinship recursive reach from Ruan Fu (29619) over 4 hops covers 12 pickers."
+  },
+  "office_codes_dirty": [
+    {
+      "c_office_id": 202976,
+      "c_office_chn_repr": "'\\ufeff某京\\ufeff鹽鐵使'",
+      "c_office_pinyin": "mou jing  yan tie shi",
+      "utf16le_hex_first_8": "ff fe d0 67 ac 4e ff fe",
+      "n_persons_posted_to": 0
+    },
+    {
+      "c_office_id": 202977,
+      "c_office_chn_repr": "'\\ufeff某京戶部使事'",
+      "c_office_pinyin": "mou jing hu bu shi shi",
+      "utf16le_hex_first_8": "ff fe d0 67 ac 4e 36 62",
+      "n_persons_posted_to": 0
+    },
+    {
+      "c_office_id": 202978,
+      "c_office_chn_repr": "'\\ufeff某京度支副使'",
+      "c_office_pinyin": "mou jing du zhi fu shi",
+      "utf16le_hex_first_8": "ff fe d0 67 ac 4e a6 5e",
+      "n_persons_posted_to": 0
+    },
+    {
+      "c_office_id": 202979,
+      "c_office_chn_repr": "'\\ufeff某京三司使事'",
+      "c_office_pinyin": "mou jing san si shi shi",
+      "utf16le_hex_first_8": "ff fe d0 67 ac 4e 09 4e",
+      "n_persons_posted_to": 0
+    },
+    {
+      "c_office_id": 202980,
+      "c_office_chn_repr": "'\\ufeff某京轉運判官'",
+      "c_office_pinyin": "mou jing zhuan yun pan guan",
+      "utf16le_hex_first_8": "ff fe d0 67 ac 4e 49 8f",
+      "n_persons_posted_to": 0
+    }
+  ],
+  "kin_by_hop_sample": {
+    "0": [
+      29619
+    ],
+    "1": [
+      29617,
+      29618,
+      29621
+    ],
+    "2": [
+      29616,
+      29620,
+      29624
+    ],
+    "3": [
+      29613,
+      29625
+    ],
+    "4": [
+      29612,
+      29615,
+      29623,
+      29626
+    ]
+  },
+  "is_confirmed_bug": false
+}
