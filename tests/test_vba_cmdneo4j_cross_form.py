@@ -403,6 +403,23 @@ _NEO4J_SHAPES_BY_TWO_COLS: dict[
     ("NameID", "EntryCode"): ("PeopleEntry",
                               ["NameID", "EntryCode"],
                               ["NameID"]),
+    # Added 2026-05-04 to cover LookAtOffice's PeopleOffice shape.
+    # Header literal at Form_LookAtOffice.vb:947:
+    #   "NameID,OfficeCode,OfficeAddrID,SocialInstID,
+    #    PostingFirstYear,PostingLastYear,PostingDynasty"
+    # Without this 2-col entry the file falls through to the
+    # legacy `NameID -> PeopleEntry` single-col lookup, which
+    # requires `EntryCode` -> assertion fires.  Verified
+    # pre-existing failure on baseline (PR fix/cmdneo4j-
+    # classifier-lookattexts surfaced it; PR docs/inventory-
+    # real-vba-failing-semantics pinned it as `real_vba_failing`).
+    ("NameID", "OfficeCode"): ("PeopleOffice",
+                               ["NameID", "OfficeCode",
+                                "OfficeAddrID", "SocialInstID",
+                                "PostingFirstYear",
+                                "PostingLastYear",
+                                "PostingDynasty"],
+                               ["NameID"]),
 }
 
 

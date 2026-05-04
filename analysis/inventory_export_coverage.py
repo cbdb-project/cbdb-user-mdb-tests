@@ -169,28 +169,35 @@ EXPORT_TEST_MANIFEST: list[dict] = [
     {"form": "LookAtOffice", "button": "CmdNeo4j",
      "test_module": "tests/test_vba_cmdneo4j_cross_form.py",
      "test_node": "test_cmd_neo4j_produces_files[LookAtOffice]",
-     "status": "real_vba_failing",
-     "skip_reason":
-         "Pre-existing failure on baseline (verified 2026-05-04 by "
-         "stashing the classifier-extension PR's edits and re-running): "
-         "the depth-check classifier (PR Q, commit 720f6f8) doesn't "
-         "know LookAtOffice's PeopleOffice shape "
-         "(`NameID,OfficeCode,OfficeAddrID,SocialInstID,...`).  The "
-         "single-column lookup `NameID -> PeopleEntry` requires "
-         "`EntryCode`, which Office's f6 doesn't have, so the missing-"
-         "cols assertion fires on f6.  Same family as the LookAtTexts "
-         "pre-existing failure (PeopleText / People-capital / "
-         "Places-capital / TextCodes / PersonTextRoleCodes shapes) "
-         "fixed in fix/cmdneo4j-classifier-lookattexts; that PR was "
-         "scoped to Texts only.  Recommended follow-up: extend "
-         "`_NEO4J_SHAPES_BY_TWO_COLS` with `(NameID, OfficeCode) -> "
-         "PeopleOffice` and add a single-column entry for whatever "
-         "Office's other shapes need.",
-     "notes": "min_files=4 + per-shape depth.  Inventory previously "
-              "(2026-05-04 PR 89d9a63) marked this `covered` based on "
-              "an assumption from the test file's _SPECS list — actual "
-              "behaviour was never verified end-to-end with --include-"
-              "vba.  Status corrected here."},
+     "status": "covered",
+     "notes":
+         "min_files=4 + per-shape depth.  Promoted from "
+         "`real_vba_failing` 2026-05-04 in PR cover/lookatoffice-"
+         "cmdneo4j-peopleoffice: added `(NameID, OfficeCode) -> "
+         "PeopleOffice` 2-col entry to `_NEO4J_SHAPES_BY_TWO_COLS` "
+         "with required cols `[NameID, OfficeCode, OfficeAddrID, "
+         "SocialInstID, PostingFirstYear, PostingLastYear, "
+         "PostingDynasty]`.  Header literal verified at "
+         "`Form_LookAtOffice.vb:947`.  Live-verified end-to-end "
+         "with --include-vba: 6 files produced (People, "
+         "PeopleOffice, Places, PeoplePlaces, PersonPlaceCodes, "
+         "OfficeCode-codes-via-loose-check), 5/6 classified "
+         "strictly via the depth check; the 6th (`OfficeCode_"
+         "*.csv`, header `OfficeCode,OfficeTrans,OfficePinyin"
+         "[,OfficeHZ]` per `Form_LookAtOffice.vb:1324-1326`) "
+         "passes via the loose-check fallback because the "
+         "classifier doesn't have a single-column entry for "
+         "`OfficeCode` yet — non-failing today; tightening it is a "
+         "future hygiene follow-up if needed.  InstitutionCodes "
+         "block (line 1399) is gated like LookAtEntry's and is "
+         "absent on this dump (no `c_inst_code > 0` rows in the "
+         "office-relevant scratch table).  Inventory previously "
+         "(PR 89d9a63) had marked this `covered` based on an "
+         "assumption from the test file's _SPECS list; PR fix/"
+         "cmdneo4j-classifier-lookattexts surfaced the actual "
+         "classifier-side failure and correctly downgraded to "
+         "`real_vba_failing`; this PR fixes the classifier and "
+         "honestly re-promotes after live verification."},
     {"form": "LookAtPlace", "button": "CmdNeo4j",
      "test_module": "tests/test_vba_cmdneo4j_cross_form.py",
      "test_node": "test_cmd_neo4j_produces_files[LookAtPlace]",

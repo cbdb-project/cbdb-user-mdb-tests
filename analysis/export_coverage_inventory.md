@@ -1,6 +1,6 @@
 # Export coverage inventory (LookAt form × export button)
 
-**Generated:** 2026-05-04T14:17:38+00:00
+**Generated:** 2026-05-04T14:53:24+00:00
 **Generator:** `analysis/inventory_export_coverage.py`
 **Companion JSON:** `reports/export_coverage_inventory.json`
 
@@ -48,13 +48,12 @@ If a `FAIL` cell ever wants to graduate to `real_vba_covered`, the path is to (a
 
 - **Cells total:** 80 (10 forms × 8 buttons)
 - `not_applicable` (—): **40**
-- `real_vba_covered` (✓): **15**
+- `real_vba_covered` (✓): **16**
 - `gap` (GAP): **13**
 - `real_vba_skipped` (skip): **5**
 - `real_vba_covered_via_handler_dispatch` (✓*): **3**
 - `real_vba_skipped_via_handler_dispatch` (skip*): **2**
 - `missing_ui_button` (no-btn): **1**
-- `real_vba_failing` (FAIL): **1**
 
 ## Coverage matrix
 
@@ -63,7 +62,7 @@ If a `FAIL` cell ever wants to graduate to `real_vba_covered`, the path is to (a
 | **LookAtEntry** | ✓ | ✓ | — | — | — | — | — | — |
 | **LookAtTexts** | ✓ | ✓ | — | — | — | — | — | — |
 | **LookAtAssociations** | ✓ | skip | ✓ | ✓ | — | — | GAP | — |
-| **LookAtOffice** | ✓ | FAIL | — | — | ✓* | — | — | ✓ |
+| **LookAtOffice** | ✓ | ✓ | — | — | ✓* | — | — | ✓ |
 | **LookAtPlace** | ✓* | skip | ✓ | ✓ | — | — | GAP | — |
 | **LookAtKinship** | ✓ | ✓ | ✓* | — | ✓ | — | GAP | — |
 | **LookAtStatus** | ✓ | skip | skip* | skip* | — | — | no-btn | — |
@@ -146,12 +145,12 @@ Cells with status `not_applicable` are omitted to keep the noise down.
 - Why: Real-VBA test exists and passes for this cell.
 - Test: `tests/test_vba_cmdgis_other_forms.py::test_cmd_gis_produces_file` — **covered**; notes: structural
 
-### LookAtOffice × CmdNeo4j — `real_vba_failing`
+### LookAtOffice × CmdNeo4j — `real_vba_covered`
 
 - Handler in source: yes
 - Button on form: yes
-- Why: Real-VBA test exists, runs (does NOT skip), and fails on the current dump.  See `skip_reason` on each manifest entry for the failure mode.
-- Test: `tests/test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtOffice]` — **real_vba_failing**; skip_reason: Pre-existing failure on baseline (verified 2026-05-04 by stashing the classifier-extension PR's edits and re-running): the depth-check classifier (PR Q, commit 720f6f8) doesn't know LookAtOffice's PeopleOffice shape (`NameID,OfficeCode,OfficeAddrID,SocialInstID,...`).  The single-column lookup `NameID -> PeopleEntry` requires `EntryCode`, which Office's f6 doesn't have, so the missing-cols assertion fires on f6.  Same family as the LookAtTexts pre-existing failure (PeopleText / People-capital / Places-capital / TextCodes / PersonTextRoleCodes shapes) fixed in fix/cmdneo4j-classifier-lookattexts; that PR was scoped to Texts only.  Recommended follow-up: extend `_NEO4J_SHAPES_BY_TWO_COLS` with `(NameID, OfficeCode) -> PeopleOffice` and add a single-column entry for whatever Office's other shapes need.; notes: min_files=4 + per-shape depth.  Inventory previously (2026-05-04 PR 89d9a63) marked this `covered` based on an assumption from the test file's _SPECS list — actual behaviour was never verified end-to-end with --include-vba.  Status corrected here.
+- Why: Real-VBA test exists and passes for this cell.
+- Test: `tests/test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtOffice]` — **covered**; notes: min_files=4 + per-shape depth.  Promoted from `real_vba_failing` 2026-05-04 in PR cover/lookatoffice-cmdneo4j-peopleoffice: added `(NameID, OfficeCode) -> PeopleOffice` 2-col entry to `_NEO4J_SHAPES_BY_TWO_COLS` with required cols `[NameID, OfficeCode, OfficeAddrID, SocialInstID, PostingFirstYear, PostingLastYear, PostingDynasty]`.  Header literal verified at `Form_LookAtOffice.vb:947`.  Live-verified end-to-end with --include-vba: 6 files produced (People, PeopleOffice, Places, PeoplePlaces, PersonPlaceCodes, OfficeCode-codes-via-loose-check), 5/6 classified strictly via the depth check; the 6th (`OfficeCode_*.csv`, header `OfficeCode,OfficeTrans,OfficePinyin[,OfficeHZ]` per `Form_LookAtOffice.vb:1324-1326`) passes via the loose-check fallback because the classifier doesn't have a single-column entry for `OfficeCode` yet — non-failing today; tightening it is a future hygiene follow-up if needed.  InstitutionCodes block (line 1399) is gated like LookAtEntry's and is absent on this dump (no `c_inst_code > 0` rows in the office-relevant scratch table).  Inventory previously (PR 89d9a63) had marked this `covered` based on an assumption from the test file's _SPECS list; PR fix/cmdneo4j-classifier-lookattexts surfaced the actual classifier-side failure and correctly downgraded to `real_vba_failing`; this PR fixes the classifier and honestly re-promotes after live verification.
 
 ### LookAtOffice × CmdGUESS — `real_vba_covered_via_handler_dispatch`
 
