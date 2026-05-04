@@ -1,0 +1,95 @@
+{
+  "openform_timeout_sec": 90,
+  "per_variation_timeout_sec": 180,
+  "variations": [
+    {
+      "variant": "D0_acFormPropertySettings",
+      "data_mode": 0,
+      "label": "VbaSession default (PR AR's hang)",
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 5.25,
+          "marker": "session_opened"
+        },
+        {
+          "t": 5.25,
+          "marker": "starting_OpenForm"
+        },
+        {
+          "t": 95.26,
+          "marker": "OpenForm_finished=False"
+        }
+      ],
+      "outcome": "hung_at_OpenForm",
+      "elapsed_sec": 97.59,
+      "exception": null,
+      "post_open_state": {},
+      "debug_transcript": []
+    },
+    {
+      "variant": "D1_acFormAdd",
+      "data_mode": 1,
+      "label": "acFormAdd",
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 5.05,
+          "marker": "session_opened"
+        },
+        {
+          "t": 5.05,
+          "marker": "starting_OpenForm"
+        },
+        {
+          "t": 95.07,
+          "marker": "OpenForm_finished=False"
+        }
+      ],
+      "outcome": "hung_at_OpenForm",
+      "elapsed_sec": 97.37,
+      "exception": null,
+      "post_open_state": {},
+      "debug_transcript": []
+    },
+    {
+      "variant": "D2_acFormEdit",
+      "data_mode": 2,
+      "label": "PR AA's stripped-probe success",
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 5.07,
+          "marker": "session_opened"
+        },
+        {
+          "t": 5.07,
+          "marker": "starting_OpenForm"
+        },
+        {
+          "t": 95.07,
+          "marker": "OpenForm_finished=False"
+        }
+      ],
+      "outcome": "hung_at_OpenForm",
+      "elapsed_sec": 97.38,
+      "exception": null,
+      "post_open_state": {},
+      "debug_transcript": []
+    }
+  ],
+  "summary_by_outcome": {
+    "D0_acFormPropertySettings": "hung_at_OpenForm",
+    "D1_acFormAdd": "hung_at_OpenForm",
+    "D2_acFormEdit": "hung_at_OpenForm"
+  }
+}
