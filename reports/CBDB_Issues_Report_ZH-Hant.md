@@ -123,13 +123,34 @@ _Reconstructed-in-PIL popup showing the JET 'Item not found in this collection' 
 
 `Form_LookAtEntry.vb` 第 1415 行開啟 institutions 記錄集：`Set tRstInstitutions = CurrentDb.OpenRecordset(tQueryStr)`。十行之後，第 1425 行寫的是 `With tRstAssocCodes`，迴圈又讀 `!c_inst_code`、`!c_inst_name_code` 等，依據的卻是早先繫結到 AssocCodes SELECT 的那個 tRstAssocCodes —— 那裡沒有 `c_inst_*`列。症狀與 Issue #7 相同，InstitutionCodes 檔案永遠不會寫出。
 
-注意：這條路徑只在結果集中有 `c_inst_code > 0`（即帶社會機構編碼的入仕記錄）時才會觸發，並非每個 fixture 都會進入這個 With 塊。
+**具體復現** （已對當前 `CBDB_BJ_User.mdb` 驗證）：
+
+在 LookAtEntry 的 picker 選 `c_entry_code = 36`（科舉: 進士（籠統））或 `c_entry_code = 101`（薦舉/保任）。這兩個 entry code 都會產生包含 `c_assoc_code > 0` 之 entry 的查詢結果，使 `tRstAssocCodes` 不為空——具體 personid 見下方 Concrete reproduction 段。點 **Neo4j**，一路確認到 InstitutionCodes 對話方塊；第 1425 行的 `With tRstAssocCodes` 區塊呼叫 `.MoveFirst` 後讀 `!c_inst_code` → DAO 3265（「集合中找不到專案」）彈窗。
+
+**c_inst_code 資料現況補充**：當前 MDB 263 454 筆 ENTRY_DATA 中，`c_inst_code > 0` 的列數為 0；換句話說即使修好這個 bug，InstitutionCodes 檔本來也會是空的。但 bug 本身**在每次走到 InstitutionCodes 分支的 CmdNeo4j 執行時都會觸發**——錯誤的 recordset 變數名與 tRstInstitutions 是否有 row 無關。
 
 #### 復現步驟
 
-1. 用一組會產生「帶社會機構編碼的入仕」的查詢條件開啟 **LookAtEntry**（這種入仕較少見，大多數查詢觸發不到）。
-2. 點 **Neo4j**，依次確認每個儲存對話方塊。
-3. 走到 InstitutionCodes 檔案這一步時，同樣的「Item not found」對話方塊彈出來。
+1. 開啟 **LookAtEntry**。在 entry-code picker 裡選 `c_entry_code = 36`（科舉: 進士），這個 code 的查詢結果會包含若干 `c_assoc_code > 0` 的 entry，使 `tRstAssocCodes` 不為空。點 **Run Query**。
+2. 點 **Neo4j** 匯出按鈕。
+3. 前面 6 個 SaveAs 對話方塊（People / PeopleEntry / Place / EntryCodes / KinCodes / AssocCodes）都能正常存檔。
+4. 走到 InstitutionCodes 對話方塊時選好儲存位置。第 1425 行的 `With tRstAssocCodes` 區塊先對 AssocCodes 那條 recordset 呼叫 `.MoveFirst`，接著嘗試讀 `!c_inst_code`（這欄根本不在 AssocCodes 的 SELECT 投影裡）。
+5. 立即彈出 DAO 3265「集合中找不到專案」對話方塊。按確定後，InstitutionCodes 檔內容為空、未寫入。
+
+#### 具體復現
+
+驗證過的範例—— 以下 personid 在當前 MDB 真實存在，且對所列 `c_entry_code` 都有 `c_assoc_code > 0`，會把 `tRstAssocCodes` 填滿：
+
+  - `c_entry_code = 36`（科舉: 進士）:
+      - `c_personid = 32227`  （白居易 / Bai Juyi）  —         c_assoc_code = 559
+      - `c_personid = 93384`  （張文伏 / Zhang Wenfu）  —         c_assoc_code = 186
+
+  - `c_entry_code = 101`（薦舉/保任），共 6 筆，包含：
+      - `c_personid = 3404`   （胡瑗 / Hu Yuan）
+      - `c_personid = 4022`   （吳師仁 / Wu Shiren）
+      - `c_personid = 108665` （湯楷 / Tang Kai）
+
+兩個 entry_code 任一個都能復現此 bug。不需要 fixture-side 造資料——這些是當前 dump 裡真實存在的 CBDB 紀錄。
 
 #### 截圖
 

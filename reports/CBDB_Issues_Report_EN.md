@@ -123,13 +123,34 @@ Extend each SELECT to project every field the loop reads. For tRstPlace: add `AD
 
 Line 1415 of `Form_LookAtEntry.vb` opens the institutions recordset as `tRstInstitutions = CurrentDb.OpenRecordset(tQueryStr)`. Ten lines later, line 1425 says `With tRstAssocCodes` and the loop reads `!c_inst_code`, `!c_inst_name_code`, etc. against THAT recordset — which was bound much earlier to the AssocCodes SELECT and doesn't have `c_inst_*` columns. Same `Item not found` symptom; InstitutionCodes file is never written.
 
-Note: triggering this path requires entries with `c_inst_code > 0` (i.e. social-institution-bearing entries). Not every fixture reaches this With block.
+**Concrete reproduction** (verified against current `CBDB_BJ_User.mdb`):
+
+Pick `c_entry_code = 36` (jinshi, examination: general) or `c_entry_code = 101` (recommendation / 薦舉) in the LookAtEntry picker.  Both produce a non-empty `tRstAssocCodes` recordset because their result rows include entries with `c_assoc_code > 0` — see Concrete reproduction below.  Click **Neo4j**, accept SaveAs through the InstitutionCodes prompt; the `With tRstAssocCodes` block at line 1425 calls `.MoveFirst` then reads `!c_inst_code` → DAO 3265 (`Item not found in this collection`).
+
+**Note on c_inst_code data**: the current MDB has 0 of 263 454 ENTRY_DATA rows with `c_inst_code > 0`, so the InstitutionCodes file would have been empty by design even with the bug fixed.  The bug nevertheless **fires on every CmdNeo4j run** that reaches the InstitutionCodes branch — the misnamed recordset reference doesn't depend on whether tRstInstitutions has rows.
 
 #### Steps to reproduce
 
-1. Open **LookAtEntry** with a query that produces entries with social institution codes (those are uncommon — most entries don't trigger this).
-2. Click **Neo4j**, accept all the SaveAs dialogs.
-3. When the export reaches the InstitutionCodes file, the same `Item not found` popup appears.
+1. Open **LookAtEntry**.  Use the entry-code picker to select `c_entry_code = 36` (科舉: 進士 / examination jinshi) — this produces a result set that includes entries with `c_assoc_code > 0`, populating `tRstAssocCodes`.  Click **Run Query**.
+2. Click **Neo4j** export button.
+3. Click through every SaveAs dialog (People, PeopleEntry, Place, EntryCodes, KinCodes, AssocCodes), all of which succeed.
+4. When the SaveAs prompt for InstitutionCodes appears, pick a save location.  The `With tRstAssocCodes` block at line 1425 fires `.MoveFirst` on the AssocCodes recordset, then tries to read `!c_inst_code` (a column the AssocCodes SELECT never projected).
+5. DAO 3265 (`Item not found in this collection`) popup appears immediately.  Click OK; the InstitutionCodes file is empty / not finalised.
+
+#### Concrete reproduction
+
+Worked examples — these specific personids exist in the current MDB and have `c_assoc_code > 0` for the listed `c_entry_code` (so they populate `tRstAssocCodes`):
+
+  - `c_entry_code = 36` (jinshi / 科舉: 進士):
+      - `c_personid = 32227`  (白居易 / Bai Juyi)  —         c_assoc_code = 559
+      - `c_personid = 93384`  (張文伏 / Zhang Wenfu)  —         c_assoc_code = 186
+
+  - `c_entry_code = 101` (薦舉 / recommendation), 6 hits     including:
+      - `c_personid = 3404`   (胡瑗 / Hu Yuan)
+      - `c_personid = 4022`   (吳師仁 / Wu Shiren)
+      - `c_personid = 108665` (湯楷 / Tang Kai)
+
+Either entry_code reproduces the bug.  No fixture-side data setup needed — these are real CBDB records on the current dump.
 
 #### Screenshots
 

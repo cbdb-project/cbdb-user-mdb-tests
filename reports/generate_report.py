@@ -277,9 +277,25 @@ ISSUES = [
             "was bound much earlier to the AssocCodes SELECT and doesn't "
             "have `c_inst_*` columns. Same `Item not found` symptom; "
             "InstitutionCodes file is never written.\n\n"
-            "Note: triggering this path requires entries with "
-            "`c_inst_code > 0` (i.e. social-institution-bearing entries). "
-            "Not every fixture reaches this With block."
+            "**Concrete reproduction** (verified against current "
+            "`CBDB_BJ_User.mdb`):\n\n"
+            "Pick `c_entry_code = 36` (jinshi, examination: general) "
+            "or `c_entry_code = 101` (recommendation / 薦舉) in the "
+            "LookAtEntry picker.  Both produce a non-empty "
+            "`tRstAssocCodes` recordset because their result rows "
+            "include entries with `c_assoc_code > 0` — see Concrete "
+            "reproduction below.  Click **Neo4j**, accept SaveAs through "
+            "the InstitutionCodes prompt; the `With tRstAssocCodes` "
+            "block at line 1425 calls `.MoveFirst` then reads "
+            "`!c_inst_code` → DAO 3265 (`Item not found in this "
+            "collection`).\n\n"
+            "**Note on c_inst_code data**: the current MDB has 0 of "
+            "263 454 ENTRY_DATA rows with `c_inst_code > 0`, so the "
+            "InstitutionCodes file would have been empty by design "
+            "even with the bug fixed.  The bug nevertheless **fires "
+            "on every CmdNeo4j run** that reaches the InstitutionCodes "
+            "branch — the misnamed recordset reference doesn't depend "
+            "on whether tRstInstitutions has rows."
         ),
         "summary_zh": (
             "`Form_LookAtEntry.vb` 第 1415 行打开 institutions 记录集："
@@ -288,25 +304,89 @@ ISSUES = [
             "`!c_inst_code`、`!c_inst_name_code` 等，依据的却是早先绑定到 "
             "AssocCodes SELECT 的那个 tRstAssocCodes —— 那里没有 `c_inst_*`"
             "列。症状与 Issue #7 相同，InstitutionCodes 文件永远不会写出。\n\n"
-            "注意：这条路径只在结果集中有 `c_inst_code > 0`（即带"
-            "社会机构编码的入仕记录）时才会触发，并非每个 fixture 都会进入"
-            "这个 With 块。"
+            "**具体复现** （已对當前 `CBDB_BJ_User.mdb` 驗證）：\n\n"
+            "在 LookAtEntry 的 picker 選 `c_entry_code = 36`（科舉: 進士"
+            "（籠統））或 `c_entry_code = 101`（薦舉/保任）。這兩個 entry "
+            "code 都會產生包含 `c_assoc_code > 0` 之 entry 的查詢結果，"
+            "使 `tRstAssocCodes` 不為空——具體 personid 見下方 Concrete "
+            "reproduction 段。點 **Neo4j**，一路確認到 InstitutionCodes "
+            "對話框；第 1425 行的 `With tRstAssocCodes` 區塊呼叫 "
+            "`.MoveFirst` 後讀 `!c_inst_code` → DAO 3265（「集合中找不到"
+            "項目」）彈窗。\n\n"
+            "**c_inst_code 資料現況補充**：當前 MDB 263 454 筆 ENTRY_DATA "
+            "中，`c_inst_code > 0` 的列數為 0；換句話說即使修好這個 bug，"
+            "InstitutionCodes 檔本來也會是空的。但 bug 本身**在每次走到 "
+            "InstitutionCodes 分支的 CmdNeo4j 執行時都會觸發**——錯誤的 "
+            "recordset 變數名與 tRstInstitutions 是否有 row 無關。"
         ),
         "steps_en": [
-            "Open **LookAtEntry** with a query that produces entries with "
-            "social institution codes (those are uncommon — most entries "
-            "don't trigger this).",
-            "Click **Neo4j**, accept all the SaveAs dialogs.",
-            "When the export reaches the InstitutionCodes file, the same "
-            "`Item not found` popup appears.",
+            "Open **LookAtEntry**.  Use the entry-code picker to select "
+            "`c_entry_code = 36` (科舉: 進士 / examination jinshi) — "
+            "this produces a result set that includes entries with "
+            "`c_assoc_code > 0`, populating `tRstAssocCodes`.  "
+            "Click **Run Query**.",
+            "Click **Neo4j** export button.",
+            "Click through every SaveAs dialog (People, PeopleEntry, "
+            "Place, EntryCodes, KinCodes, AssocCodes), all of which "
+            "succeed.",
+            "When the SaveAs prompt for InstitutionCodes appears, pick a "
+            "save location.  The `With tRstAssocCodes` block at line "
+            "1425 fires `.MoveFirst` on the AssocCodes recordset, then "
+            "tries to read `!c_inst_code` (a column the AssocCodes "
+            "SELECT never projected).",
+            "DAO 3265 (`Item not found in this collection`) popup "
+            "appears immediately.  Click OK; the InstitutionCodes file "
+            "is empty / not finalised.",
         ],
         "steps_zh": [
-            "用一组会产生「带社会机构编码的入仕」的查询条件打开 **LookAtEntry**"
-            "（这种入仕较少见，大多数查询触发不到）。",
-            "点 **Neo4j**，依次确认每个保存对话框。",
-            "走到 InstitutionCodes 文件这一步时，同样的「Item not found」"
-            "对话框弹出来。",
+            "打開 **LookAtEntry**。在 entry-code picker 裡選 "
+            "`c_entry_code = 36`（科舉: 進士），這個 code 的查詢結果會"
+            "包含若干 `c_assoc_code > 0` 的 entry，使 `tRstAssocCodes` "
+            "不為空。點 **Run Query**。",
+            "點 **Neo4j** 匯出按鈕。",
+            "前面 6 個 SaveAs 對話框（People / PeopleEntry / Place / "
+            "EntryCodes / KinCodes / AssocCodes）都能正常存檔。",
+            "走到 InstitutionCodes 對話框時選好儲存位置。第 1425 行的 "
+            "`With tRstAssocCodes` 區塊先對 AssocCodes 那條 recordset "
+            "呼叫 `.MoveFirst`，接著嘗試讀 `!c_inst_code`（這欄根本"
+            "不在 AssocCodes 的 SELECT 投影裡）。",
+            "立即彈出 DAO 3265「集合中找不到項目」對話框。按確定後，"
+            "InstitutionCodes 檔內容為空、未寫入。",
         ],
+        "concrete_reproduction_en": (
+            "Worked examples — these specific personids exist in the "
+            "current MDB and have `c_assoc_code > 0` for the listed "
+            "`c_entry_code` (so they populate `tRstAssocCodes`):\n\n"
+            "  - `c_entry_code = 36` (jinshi / 科舉: 進士):\n"
+            "      - `c_personid = 32227`  (白居易 / Bai Juyi)  — "
+            "        c_assoc_code = 559\n"
+            "      - `c_personid = 93384`  (張文伏 / Zhang Wenfu)  — "
+            "        c_assoc_code = 186\n\n"
+            "  - `c_entry_code = 101` (薦舉 / recommendation), 6 hits "
+            "    including:\n"
+            "      - `c_personid = 3404`   (胡瑗 / Hu Yuan)\n"
+            "      - `c_personid = 4022`   (吳師仁 / Wu Shiren)\n"
+            "      - `c_personid = 108665` (湯楷 / Tang Kai)\n\n"
+            "Either entry_code reproduces the bug.  No fixture-side "
+            "data setup needed — these are real CBDB records on the "
+            "current dump."
+        ),
+        "concrete_reproduction_zh": (
+            "驗證過的範例—— 以下 personid 在當前 MDB 真實存在，且對所列 "
+            "`c_entry_code` 都有 `c_assoc_code > 0`，會把 "
+            "`tRstAssocCodes` 填滿：\n\n"
+            "  - `c_entry_code = 36`（科舉: 進士）:\n"
+            "      - `c_personid = 32227`  （白居易 / Bai Juyi）  — "
+            "        c_assoc_code = 559\n"
+            "      - `c_personid = 93384`  （張文伏 / Zhang Wenfu）  — "
+            "        c_assoc_code = 186\n\n"
+            "  - `c_entry_code = 101`（薦舉/保任），共 6 筆，包含：\n"
+            "      - `c_personid = 3404`   （胡瑗 / Hu Yuan）\n"
+            "      - `c_personid = 4022`   （吳師仁 / Wu Shiren）\n"
+            "      - `c_personid = 108665` （湯楷 / Tang Kai）\n\n"
+            "兩個 entry_code 任一個都能復現此 bug。不需要 fixture-side "
+            "造資料——這些是當前 dump 裡真實存在的 CBDB 紀錄。"
+        ),
         "fix_en": (
             "Change `With tRstAssocCodes` on line 1425 to `With "
             "tRstInstitutions`. Single-character class of fix; the "
@@ -2687,6 +2767,18 @@ def _build(lang: str, out_path: Path) -> None:
                     ).italic = True
             _numbered(doc, [Z(s) for s in
                             (it["steps_en"] if is_en else it["steps_zh"])])
+            # Optional concrete-reproduction block — see Issue #9
+            # for the canonical use (specific personids that
+            # trigger the bug on the current dump).
+            cr_key = ("concrete_reproduction_en" if is_en
+                      else "concrete_reproduction_zh")
+            cr_text = it.get(cr_key)
+            if cr_text:
+                _h(doc, 3, Z("Concrete reproduction"
+                              if is_en else "具體復現"))
+                for chunk in str(cr_text).split("\n\n"):
+                    if chunk.strip():
+                        doc.add_paragraph(Z(chunk))
             shots = it.get("screenshots") or []
             if shots:
                 _h(doc, 3, Z("Screenshots" if is_en else "截图"))
@@ -3068,6 +3160,15 @@ def _build_md(lang: str, out_path: Path) -> None:
             ):
                 lines.append(f"{i}. {Z(step)}")
             lines.append("")
+            # Optional concrete-reproduction block — see Issue #9.
+            cr_key = ("concrete_reproduction_en" if is_en
+                      else "concrete_reproduction_zh")
+            cr_text = it.get(cr_key)
+            if cr_text:
+                lines.append(f"#### {Z('Concrete reproduction' if is_en else '具體復現')}")
+                lines.append("")
+                lines.append(Z(str(cr_text)))
+                lines.append("")
             shots = it.get("screenshots") or []
             if shots:
                 lines.append(f"#### {Z('Screenshots' if is_en else '截图')}")
