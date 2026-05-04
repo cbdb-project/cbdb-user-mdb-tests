@@ -1,0 +1,303 @@
+{
+  "summary": {
+    "n_rows": 10,
+    "tiebreak_rule_summary": {
+      "MIN_addr_id": {
+        "would_make_user_and_sqlite_pick_same_row": 10,
+        "of_total_rows": 10
+      },
+      "MAX_addr_id": {
+        "would_make_user_and_sqlite_pick_same_row": 10,
+        "of_total_rows": 10
+      }
+    },
+    "interpretation": "Under both MIN(c_addr_id) and MAX(c_addr_id) the candidate set is symmetric across User and SQLite (they see the same BIOG_ADDR_DATA rows in PR S's deep dive), so any deterministic tie-break would make both sides converge.  The choice between MIN vs MAX is a maintainer style call, not a correctness call."
+  },
+  "rows": [
+    {
+      "personid": 149797,
+      "name_chn": "朱通",
+      "name_py": "Zhu Tong",
+      "winning_addr_type": 1,
+      "max_c_sequence": 1,
+      "n_candidates_tied": 3,
+      "tied_candidate_addr_ids": [
+        400539,
+        14692,
+        15791
+      ],
+      "user_stored_addr_id": 15791,
+      "sqlite_stored_addr_id": 400539,
+      "user_recompute_addr_id": 400539,
+      "sqlite_recompute_addr_id": 14692,
+      "tiebreak_rule_picks": {
+        "MIN_addr_id": {
+          "user_pick": 14692,
+          "sqlite_pick": 14692,
+          "agree": true
+        },
+        "MAX_addr_id": {
+          "user_pick": 400539,
+          "sqlite_pick": 400539,
+          "agree": true
+        }
+      }
+    },
+    {
+      "personid": 151289,
+      "name_chn": "元環",
+      "name_py": "Yuan Huan",
+      "winning_addr_type": 1,
+      "max_c_sequence": 1,
+      "n_candidates_tied": 2,
+      "tied_candidate_addr_ids": [
+        16737,
+        14692
+      ],
+      "user_stored_addr_id": 14692,
+      "sqlite_stored_addr_id": 16737,
+      "user_recompute_addr_id": 16737,
+      "sqlite_recompute_addr_id": 14692,
+      "tiebreak_rule_picks": {
+        "MIN_addr_id": {
+          "user_pick": 14692,
+          "sqlite_pick": 14692,
+          "agree": true
+        },
+        "MAX_addr_id": {
+          "user_pick": 16737,
+          "sqlite_pick": 16737,
+          "agree": true
+        }
+      }
+    },
+    {
+      "personid": 153923,
+      "name_chn": "陳仁恭",
+      "name_py": "Chen Rengong",
+      "winning_addr_type": 1,
+      "max_c_sequence": 1,
+      "n_candidates_tied": 2,
+      "tied_candidate_addr_ids": [
+        15910,
+        14755
+      ],
+      "user_stored_addr_id": 14755,
+      "sqlite_stored_addr_id": 15910,
+      "user_recompute_addr_id": 15910,
+      "sqlite_recompute_addr_id": 14755,
+      "tiebreak_rule_picks": {
+        "MIN_addr_id": {
+          "user_pick": 14755,
+          "sqlite_pick": 14755,
+          "agree": true
+        },
+        "MAX_addr_id": {
+          "user_pick": 15910,
+          "sqlite_pick": 15910,
+          "agree": true
+        }
+      }
+    },
+    {
+      "personid": 154902,
+      "name_chn": "崔元周",
+      "name_py": "Cui Yuanzhou",
+      "winning_addr_type": 1,
+      "max_c_sequence": 1,
+      "n_candidates_tied": 3,
+      "tied_candidate_addr_ids": [
+        15285,
+        14750,
+        14932
+      ],
+      "user_stored_addr_id": 14932,
+      "sqlite_stored_addr_id": 15285,
+      "user_recompute_addr_id": 15285,
+      "sqlite_recompute_addr_id": 14750,
+      "tiebreak_rule_picks": {
+        "MIN_addr_id": {
+          "user_pick": 14750,
+          "sqlite_pick": 14750,
+          "agree": true
+        },
+        "MAX_addr_id": {
+          "user_pick": 15285,
+          "sqlite_pick": 15285,
+          "agree": true
+        }
+      }
+    },
+    {
+      "personid": 155767,
+      "name_chn": "李曾",
+      "name_py": "Li Ceng",
+      "winning_addr_type": 1,
+      "max_c_sequence": 1,
+      "n_candidates_tied": 2,
+      "tied_candidate_addr_ids": [
+        400467,
+        15691
+      ],
+      "user_stored_addr_id": 15691,
+      "sqlite_stored_addr_id": 400467,
+      "user_recompute_addr_id": 400467,
+      "sqlite_recompute_addr_id": 15691,
+      "tiebreak_rule_picks": {
+        "MIN_addr_id": {
+          "user_pick": 15691,
+          "sqlite_pick": 15691,
+          "agree": true
+        },
+        "MAX_addr_id": {
+          "user_pick": 400467,
+          "sqlite_pick": 400467,
+          "agree": true
+        }
+      }
+    },
+    {
+      "personid": 156434,
+      "name_chn": "崔玕",
+      "name_py": "Cui Gan",
+      "winning_addr_type": 1,
+      "max_c_sequence": 1,
+      "n_candidates_tied": 2,
+      "tied_candidate_addr_ids": [
+        400398,
+        14965
+      ],
+      "user_stored_addr_id": 14965,
+      "sqlite_stored_addr_id": 400398,
+      "user_recompute_addr_id": 400398,
+      "sqlite_recompute_addr_id": 14965,
+      "tiebreak_rule_picks": {
+        "MIN_addr_id": {
+          "user_pick": 14965,
+          "sqlite_pick": 14965,
+          "agree": true
+        },
+        "MAX_addr_id": {
+          "user_pick": 400398,
+          "sqlite_pick": 400398,
+          "agree": true
+        }
+      }
+    },
+    {
+      "personid": 157177,
+      "name_chn": "乘道卿",
+      "name_py": "Cheng Daoqing",
+      "winning_addr_type": 1,
+      "max_c_sequence": 1,
+      "n_candidates_tied": 3,
+      "tied_candidate_addr_ids": [
+        15768,
+        400402,
+        14692
+      ],
+      "user_stored_addr_id": 14692,
+      "sqlite_stored_addr_id": 400402,
+      "user_recompute_addr_id": 15768,
+      "sqlite_recompute_addr_id": 14692,
+      "tiebreak_rule_picks": {
+        "MIN_addr_id": {
+          "user_pick": 14692,
+          "sqlite_pick": 14692,
+          "agree": true
+        },
+        "MAX_addr_id": {
+          "user_pick": 400402,
+          "sqlite_pick": 400402,
+          "agree": true
+        }
+      }
+    },
+    {
+      "personid": 160450,
+      "name_chn": "鄭守廣",
+      "name_py": "Zheng Shouguang",
+      "winning_addr_type": 1,
+      "max_c_sequence": 1,
+      "n_candidates_tied": 2,
+      "tied_candidate_addr_ids": [
+        15970,
+        14692
+      ],
+      "user_stored_addr_id": 14692,
+      "sqlite_stored_addr_id": 15970,
+      "user_recompute_addr_id": 15970,
+      "sqlite_recompute_addr_id": 14692,
+      "tiebreak_rule_picks": {
+        "MIN_addr_id": {
+          "user_pick": 14692,
+          "sqlite_pick": 14692,
+          "agree": true
+        },
+        "MAX_addr_id": {
+          "user_pick": 15970,
+          "sqlite_pick": 15970,
+          "agree": true
+        }
+      }
+    },
+    {
+      "personid": 174879,
+      "name_chn": "李琳",
+      "name_py": "Li Lin",
+      "winning_addr_type": 1,
+      "max_c_sequence": 1,
+      "n_candidates_tied": 2,
+      "tied_candidate_addr_ids": [
+        14507,
+        14492
+      ],
+      "user_stored_addr_id": 14492,
+      "sqlite_stored_addr_id": 14507,
+      "user_recompute_addr_id": 14507,
+      "sqlite_recompute_addr_id": 14492,
+      "tiebreak_rule_picks": {
+        "MIN_addr_id": {
+          "user_pick": 14492,
+          "sqlite_pick": 14492,
+          "agree": true
+        },
+        "MAX_addr_id": {
+          "user_pick": 14507,
+          "sqlite_pick": 14507,
+          "agree": true
+        }
+      }
+    },
+    {
+      "personid": 177165,
+      "name_chn": "崔子侃",
+      "name_py": "Cui Zikan",
+      "winning_addr_type": 1,
+      "max_c_sequence": 1,
+      "n_candidates_tied": 4,
+      "tied_candidate_addr_ids": [
+        15237,
+        14693,
+        14764,
+        15003
+      ],
+      "user_stored_addr_id": 15003,
+      "sqlite_stored_addr_id": 15237,
+      "user_recompute_addr_id": 15237,
+      "sqlite_recompute_addr_id": 14693,
+      "tiebreak_rule_picks": {
+        "MIN_addr_id": {
+          "user_pick": 14693,
+          "sqlite_pick": 14693,
+          "agree": true
+        },
+        "MAX_addr_id": {
+          "user_pick": 15237,
+          "sqlite_pick": 15237,
+          "agree": true
+        }
+      }
+    }
+  ]
+}
