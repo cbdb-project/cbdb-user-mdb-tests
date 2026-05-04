@@ -1,0 +1,369 @@
+# Export coverage inventory (LookAt form × export button)
+
+**Generated:** 2026-05-04T13:26:10+00:00
+**Generator:** `analysis/inventory_export_coverage.py`
+**Companion JSON:** `reports/export_coverage_inventory.json`
+
+Read-only inventory.  No MDB.  No Access COM.  Reads the VBA dump (`analysis/dump/vba/`), the control inventory (`analysis/dump/control_inventory.json`), and a curated test-coverage manifest declared in this script.  The manifest is cross-validated against the VBA dump on every run; drift surfaces under § Manifest drift.
+
+## Legend
+
+| Glyph | Status | Meaning |
+|---|---|---|
+| `✓` | `real_vba_covered` | Real-VBA test exists and passes for this (form, button). Both handler and UI button present. |
+| `✓*` | `real_vba_covered_via_handler_dispatch` | Test passes via `Form_Timer` handler dispatch — handler exists, UI button is missing (P3 family).  Test exercises handler logic; missing button stays documented as a P3 issue. |
+| `skip` | `real_vba_skipped` | Real-VBA test exists but is `pytest.mark.skip`'d (see per-cell skip_reason in JSON). |
+| `skip*` | `real_vba_skipped_via_handler_dispatch` | Same as `skip`, but for a handler-dispatched cell whose UI button is missing. |
+| `GAP` | `gap` | Both handler + button present, no real-VBA test, no static-only test either — true uncovered slice. |
+| `static` | `unit_or_static_only` | Only static / source-level tests cover this cell (`tests/test_known_bugs.py` family); no real CmdQuery → CmdX chain. |
+| `no-btn` | `missing_ui_button` | Handler exists in source but no control on the form (P3 missing-UI family — Issues #15-19). |
+| `orphan` | `orphan_button_no_handler` | Button exists on the form but no `Sub <Cmd>_Click` in the dumped VBA — clicking would be a no-op. |
+| `—` | `not_applicable` | Neither handler nor button — this form just doesn't host this export. |
+
+**CmdKML caveat:** CmdKML is included in the matrix per the investigation brief, but the codebase has neither a `CmdKML` button nor a `CmdKML_Click` handler on any LookAt form.  KML output is implemented as a `ChkKML` checkbox option that other exports honour (e.g. LookAtOffice has `ChkPeopleKML` / `ChkOfficeKML`).  Every CmdKML cell therefore renders `—` (not_applicable); future KML coverage would be checkbox-driven, not a separate button slice.
+
+**CmdUCInet → CmdUCINet:** the brief used `CmdUCInet` (lower-case `i`); the actual control + handler is `CmdUCINet` (capital `N`).  The matrix uses the real casing.
+
+## Summary
+
+- **Cells total:** 80 (10 forms × 8 buttons)
+- `not_applicable` (—): **40**
+- `real_vba_covered` (✓): **15**
+- `gap` (GAP): **13**
+- `real_vba_skipped` (skip): **6**
+- `real_vba_covered_via_handler_dispatch` (✓*): **3**
+- `real_vba_skipped_via_handler_dispatch` (skip*): **2**
+- `missing_ui_button` (no-btn): **1**
+
+## Coverage matrix
+
+| Form | CmdGIS | CmdNeo4j | CmdPajek | CmdGephi | CmdGUESS | CmdKML | CmdUCINet | CmdGISPeople |
+|---|---|---|---|---|---|---|---|---|
+| **LookAtEntry** | ✓ | skip | — | — | — | — | — | — |
+| **LookAtTexts** | ✓ | ✓ | — | — | — | — | — | — |
+| **LookAtAssociations** | ✓ | skip | ✓ | ✓ | — | — | GAP | — |
+| **LookAtOffice** | ✓ | ✓ | — | — | ✓* | — | — | ✓ |
+| **LookAtPlace** | ✓* | skip | ✓ | ✓ | — | — | GAP | — |
+| **LookAtKinship** | ✓ | ✓ | ✓* | — | ✓ | — | GAP | — |
+| **LookAtStatus** | ✓ | skip | skip* | skip* | — | — | no-btn | — |
+| **LookAtAssociationPairs** | GAP | GAP | GAP | GAP | — | — | GAP | — |
+| **LookAtNetworks** | GAP | skip | GAP | — | skip | — | GAP | — |
+| **LookAtGroupData** | GAP | GAP | — | — | — | — | — | — |
+
+## Per-cell detail (non-trivial cells)
+
+Cells with status `not_applicable` are omitted to keep the noise down.
+
+### LookAtEntry × CmdGIS — `real_vba_covered`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Real-VBA test exists and passes for this cell.
+- Test: `tests/test_vba_export.py::test_lookatentry_cmd_gis` — **covered**; notes: byte-level golden compare; the original CmdGIS test
+
+### LookAtEntry × CmdNeo4j — `real_vba_skipped`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Real-VBA test exists but is currently skipped.  See skip_reason on each manifest entry.
+- Test: `tests/test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtEntry]` — **skipped**; skip_reason: no matrix fixture for LookAtEntry (_all_fixtures()) — Entry's matrix entry was never wired; notes: Issue #9 reclassification re-verification used a single-fixture probe instead (analysis/investigate_issue9_neo4j_institutioncodes.py); not promoted to a pytest yet.
+- Static-only note: tests/test_known_bugs.py::test_bug9_lookat_entry_cmdneo4j_with_wrong_var — pins source typo + LATENT-gate (Issue #9)
+- Static-only note: tests/test_vba_bug_behaviors.py::test_bug9_lookat_entry_cmdneo4j_with_institutions_fixture — runtime: chain finishes cleanly without ERR for non-inst fixture
+
+### LookAtTexts × CmdGIS — `real_vba_covered`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Real-VBA test exists and passes for this cell.
+- Test: `tests/test_vba_cmdgis_other_forms.py::test_cmd_gis_produces_file` — **covered**; notes: structural
+
+### LookAtTexts × CmdNeo4j — `real_vba_covered`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Real-VBA test exists and passes for this cell.
+- Test: `tests/test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtTexts]` — **covered**; notes: min_files=4 + per-shape depth
+
+### LookAtAssociations × CmdGIS — `real_vba_covered`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Real-VBA test exists and passes for this cell.
+- Test: `tests/test_vba_cmdgis_other_forms.py::test_cmd_gis_produces_file` — **covered**; notes: structural
+
+### LookAtAssociations × CmdNeo4j — `real_vba_skipped`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Real-VBA test exists but is currently skipped.  See skip_reason on each manifest entry.
+- Test: `tests/test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtAssociations]` — **skipped**; skip_reason: produces 0 files in directory mode — needs investigation alongside Place
+
+### LookAtAssociations × CmdPajek — `real_vba_covered`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Real-VBA test exists and passes for this cell.
+- Test: `tests/test_vba_pajek_gephi_cross_form.py::test_export_produces_file[LookAtAssociations-CmdPajek]` — **covered**; notes: shape: .net / *vertices header
+
+### LookAtAssociations × CmdGephi — `real_vba_covered`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Real-VBA test exists and passes for this cell.
+- Test: `tests/test_vba_pajek_gephi_cross_form.py::test_export_produces_file[LookAtAssociations-CmdGephi]` — **covered**; notes: shape: .gdf / nodedef header
+
+### LookAtAssociations × CmdUCINet — `gap`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.
+
+### LookAtOffice × CmdGIS — `real_vba_covered`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Real-VBA test exists and passes for this cell.
+- Test: `tests/test_vba_cmdgis_other_forms.py::test_cmd_gis_produces_file` — **covered**; notes: structural
+
+### LookAtOffice × CmdNeo4j — `real_vba_covered`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Real-VBA test exists and passes for this cell.
+- Test: `tests/test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtOffice]` — **covered**; notes: min_files=4 + per-shape depth
+
+### LookAtOffice × CmdGUESS — `real_vba_covered_via_handler_dispatch`
+
+- Handler in source: yes
+- Button on form: no
+- Why: Handler exists in source but the form has no control with this name (P3 missing-UI family).  The cross-form test exercises the handler via Form_Timer dispatch (no UI click needed), so handler logic IS covered; the missing UI button is documented separately as a P3 issue.
+- Test: `tests/test_vba_cmdguess_cross_form.py::test_cmd_guess_produces_file[LookAtOffice]` — **covered**; notes: .gdf shape
+- Static-only note: (plus Issue #19: P3 missing UI button)
+
+### LookAtOffice × CmdGISPeople — `real_vba_covered`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Real-VBA test exists and passes for this cell.
+- Test: `tests/test_vba_cmdgispeople_office.py::test_cmd_gis_people` — **covered**; notes: only host; people-side GIS export distinct from office-side CmdGIS
+
+### LookAtPlace × CmdGIS — `real_vba_covered_via_handler_dispatch`
+
+- Handler in source: yes
+- Button on form: no
+- Why: Handler exists in source but the form has no control with this name (P3 missing-UI family).  The cross-form test exercises the handler via Form_Timer dispatch (no UI click needed), so handler logic IS covered; the missing UI button is documented separately as a P3 issue.
+- Test: `tests/test_vba_cmdgis_other_forms.py::test_cmd_gis_produces_file` — **covered**; notes: structural; passes only thanks to driver-side _PER_FORM_CMDGIS_PATCHES rewrite of GISFrame -> CodeFrame (Issue #4 latent typo workaround)
+- Static-only note: (plus Issue #15: P3 missing UI button — covered by tests/test_known_bugs.py::test_bugs_15_to_19_orphan_export_handlers)
+
+### LookAtPlace × CmdNeo4j — `real_vba_skipped`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Real-VBA test exists but is currently skipped.  See skip_reason on each manifest entry.
+- Test: `tests/test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtPlace]` — **skipped**; skip_reason: fires 'Item not found in this collection' mid-body — Issue #7 (real CBDB bug)
+- Static-only note: tests/test_known_bugs.py::test_bug7_lookat_place_cmdneo4j_select_missing_dynasty_female — pins source SELECT (Issue #7)
+
+### LookAtPlace × CmdPajek — `real_vba_covered`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Real-VBA test exists and passes for this cell.
+- Test: `tests/test_vba_pajek_gephi_cross_form.py::test_export_produces_file[LookAtPlace-CmdPajek]` — **covered**; notes: shape: .net / *vertices header
+
+### LookAtPlace × CmdGephi — `real_vba_covered`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Real-VBA test exists and passes for this cell.
+- Test: `tests/test_vba_pajek_gephi_cross_form.py::test_export_produces_file[LookAtPlace-CmdGephi]` — **covered**; notes: shape: .gdf / nodedef header
+
+### LookAtPlace × CmdUCINet — `gap`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.
+
+### LookAtKinship × CmdGIS — `real_vba_covered`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Real-VBA test exists and passes for this cell.
+- Test: `tests/test_vba_cmdgis_other_forms.py::test_cmd_gis_produces_file` — **covered**; notes: structural; subform requery via _SUBFORMS_TO_REQUERY
+
+### LookAtKinship × CmdNeo4j — `real_vba_covered`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Real-VBA test exists and passes for this cell.
+- Test: `tests/test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtKinship]` — **covered**; notes: min_files=4 + per-shape depth
+
+### LookAtKinship × CmdPajek — `real_vba_covered_via_handler_dispatch`
+
+- Handler in source: yes
+- Button on form: no
+- Why: Handler exists in source but the form has no control with this name (P3 missing-UI family).  The cross-form test exercises the handler via Form_Timer dispatch (no UI click needed), so handler logic IS covered; the missing UI button is documented separately as a P3 issue.
+- Test: `tests/test_vba_pajek_gephi_cross_form.py::test_export_produces_file[LookAtKinship-CmdPajek]` — **covered**; notes: shape: .net / *vertices header
+
+### LookAtKinship × CmdGUESS — `real_vba_covered`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Real-VBA test exists and passes for this cell.
+- Test: `tests/test_vba_cmdguess_cross_form.py::test_cmd_guess_produces_file[LookAtKinship]` — **covered**; notes: .gdf shape
+
+### LookAtKinship × CmdUCINet — `gap`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.
+
+### LookAtStatus × CmdGIS — `real_vba_covered`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Real-VBA test exists and passes for this cell.
+- Test: `tests/test_vba_cmdgis_other_forms.py::test_cmd_gis_produces_file` — **covered**; notes: structural assertion (header + non-empty cols)
+
+### LookAtStatus × CmdNeo4j — `real_vba_skipped`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Real-VBA test exists but is currently skipped.  See skip_reason on each manifest entry.
+- Test: `tests/test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtStatus]` — **skipped**; skip_reason: chain post-cleanup invalidates subform recordset rebind; downstream CmdNeo4j reads RecordCount=0 (same family as Pajek/Gephi Status skip)
+
+### LookAtStatus × CmdPajek — `real_vba_skipped_via_handler_dispatch`
+
+- Handler in source: yes
+- Button on form: no
+- Why: Handler exists in source but the form has no control with this name (P3 missing-UI family).  The cross-form test exercises the handler via Form_Timer dispatch (no UI click needed), so handler logic IS covered; the missing UI button is documented separately as a P3 issue.
+- Test: `tests/test_vba_pajek_gephi_cross_form.py::test_export_produces_file[LookAtStatus-CmdPajek]` — **skipped**; skip_reason: chain to CmdPajek/CmdGephi reads RecordCount=0 after subform rebind cleanup; same as Status Neo4j skip
+- Static-only note: (plus Issue #16: P3 missing UI button)
+
+### LookAtStatus × CmdGephi — `real_vba_skipped_via_handler_dispatch`
+
+- Handler in source: yes
+- Button on form: no
+- Why: Handler exists in source but the form has no control with this name (P3 missing-UI family).  The cross-form test exercises the handler via Form_Timer dispatch (no UI click needed), so handler logic IS covered; the missing UI button is documented separately as a P3 issue.
+- Test: `tests/test_vba_pajek_gephi_cross_form.py::test_export_produces_file[LookAtStatus-CmdGephi]` — **skipped**; skip_reason: same chain-cleanup family as Status CmdPajek
+- Static-only note: (plus Issue #17: P3 missing UI button)
+
+### LookAtStatus × CmdUCINet — `missing_ui_button`
+
+- Handler in source: yes
+- Button on form: no
+- Why: Handler exists in source but the form has no control with this name (P3 missing-UI family — Issues #15-19 documented).  No real-VBA test exercises this handler.
+- Static-only note: (plus Issue #18: P3 missing UI button)
+
+### LookAtAssociationPairs × CmdGIS — `gap`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.
+
+### LookAtAssociationPairs × CmdNeo4j — `gap`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.
+
+### LookAtAssociationPairs × CmdPajek — `gap`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.
+
+### LookAtAssociationPairs × CmdGephi — `gap`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.
+
+### LookAtAssociationPairs × CmdUCINet — `gap`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.
+
+### LookAtNetworks × CmdGIS — `gap`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.
+
+### LookAtNetworks × CmdNeo4j — `real_vba_skipped`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Real-VBA test exists but is currently skipped.  See skip_reason on each manifest entry.
+- Test: `tests/test_vba_cmdneo4j_cross_form.py::(implicit — LookAtNetworks is in _FORMS_WITH_CMDGUESS-style skip family; no explicit Spec entry in _SPECS)` — **skipped**; skip_reason: matrix CmdRun skipped (high-degree anchor expansion) + default full injection Form_Open deadlock (AGENTS landmine #3.5; minimal injection works for Form_Open per tests/test_vba_networks_small_fixture.py)
+- Static-only note: tests/test_known_bugs.py::test_bug8_lookat_networks_cmdneo4j_select_missing_xy — pins source SELECT (Issue #8)
+
+### LookAtNetworks × CmdPajek — `gap`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.
+
+### LookAtNetworks × CmdGUESS — `real_vba_skipped`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Real-VBA test exists but is currently skipped.  See skip_reason on each manifest entry.
+- Test: `tests/test_vba_cmdguess_cross_form.py::test_cmd_guess_produces_file[LookAtNetworks]` — **skipped**; skip_reason: CmdRun times out on high-degree anchors (AGENTS landmine #3.5)
+
+### LookAtNetworks × CmdUCINet — `gap`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.
+
+### LookAtGroupData × CmdGIS — `gap`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.
+
+### LookAtGroupData × CmdNeo4j — `gap`
+
+- Handler in source: yes
+- Button on form: yes
+- Why: Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.
+
+## Manifest drift
+
+**Clean — manifest entries all match the VBA dump and control inventory.**
+
+## Recommended next real-VBA slice
+
+*Suggestion only — this PR ships inventory and does NOT implement.  Review the cell's manifest entry + static notes before committing to a slice.*
+
+### Tier 1 — low-hanging skipped tests (mechanical fix)
+
+These cells have a real-VBA test that is currently skipped for a *mechanical* reason (typically: "no matrix fixture").  Promoting one to passing is the smallest, lowest-risk way to close a coverage cell — no driver changes, no new infrastructure, no Networks / Status / AssociationPairs blockers.
+
+- **LookAtEntry × CmdNeo4j** (`tests/test_vba_cmdneo4j_cross_form.py`)
+  - skip_reason: no matrix fixture for LookAtEntry (_all_fixtures()) — Entry's matrix entry was never wired
+  - fix class: wire matrix fixture in tests/test_vba_matrix_all_forms.py::_all_fixtures
+  - existing evidence: Issue #9 reclassification re-verification used a single-fixture probe instead (analysis/investigate_issue9_neo4j_institutioncodes.py); not promoted to a pytest yet.
+
+**Concrete recommendation** (do NOT implement in this inventory PR): wire a LookAtEntry matrix fixture in `tests/test_vba_matrix_all_forms.py::_all_fixtures` so `test_cmd_neo4j_produces_files[LookAtEntry]` in `tests/test_vba_cmdneo4j_cross_form.py` flips from skip to a real assertion.  Notes from the manifest: Issue #9 reclassification re-verification used a single-fixture probe instead (analysis/investigate_issue9_neo4j_institutioncodes.py); not promoted to a pytest yet.
+
+### Tier 2 — pure `gap` cells (button + handler exist, no test of any kind)
+
+Cells ranked by family priority (lower = lower-risk, smaller blast radius).  Note: many gap cells in this list (Networks family, AssociationPairs family, GroupData family, the entirely-untested CmdUCINet family) sit behind known blockers and are NOT good candidates for a small first slice — Tier 1 is preferred.
+
+| # | Form | Button | Family priority | Known family blocker |
+|---:|---|---|---:|---|
+| 1 | LookAtAssociationPairs | CmdGIS | 1 | matrix CmdQuery times out — no CrossFixture promoted to a passing assertion |
+| 2 | LookAtGroupData | CmdGIS | 1 | matrix CmdQuery has issues; depends on a CrossFixture that doesn't exist for GroupData |
+| 3 | LookAtNetworks | CmdGIS | 1 | Form_Open hang / CmdRun timeout (AGENTS landmine #3.5) |
+| 4 | LookAtAssociationPairs | CmdGephi | 3 | matrix CmdQuery times out — no CrossFixture promoted to a passing assertion |
+| 5 | LookAtAssociationPairs | CmdPajek | 3 | matrix CmdQuery times out — no CrossFixture promoted to a passing assertion |
+| 6 | LookAtNetworks | CmdPajek | 3 | Form_Open hang / CmdRun timeout (AGENTS landmine #3.5) |
+| 7 | LookAtAssociationPairs | CmdNeo4j | 5 | matrix CmdQuery times out — no CrossFixture promoted to a passing assertion |
+| 8 | LookAtGroupData | CmdNeo4j | 5 | matrix CmdQuery has issues; depends on a CrossFixture that doesn't exist for GroupData |
+| 9 | LookAtAssociationPairs | CmdUCINet | 6 | matrix CmdQuery times out — no CrossFixture promoted to a passing assertion |
+| 10 | LookAtAssociations | CmdUCINet | 6 | entirely untested handler family — no existing test infrastructure to extend |
+| 11 | LookAtKinship | CmdUCINet | 6 | entirely untested handler family — no existing test infrastructure to extend |
+| 12 | LookAtNetworks | CmdUCINet | 6 | Form_Open hang / CmdRun timeout (AGENTS landmine #3.5) |
+| 13 | LookAtPlace | CmdUCINet | 6 | entirely untested handler family — no existing test infrastructure to extend |
