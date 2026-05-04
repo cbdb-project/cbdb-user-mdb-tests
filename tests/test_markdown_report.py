@@ -9,6 +9,10 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 AUDIT_SCRIPT = REPO / "analysis" / "audit_report_code_labels.py"
 AUDIT_JSON = REPO / "reports" / "report_code_label_audit.json"
+SCREENSHOT_AUDIT_SCRIPT = (
+    REPO / "analysis" / "audit_report_screenshot_consistency.py")
+SCREENSHOT_AUDIT_JSON = (
+    REPO / "reports" / "report_screenshot_audit.json")
 
 
 def test_markdown_toc_anchors_match_github_slug_shape():
@@ -179,3 +183,56 @@ def test_report_code_labels_audit_clean():
         f"{s['n_per_lang_checks_passed']} / "
         f"{s['n_per_lang_checks_total']} per-lang checks passed"
     )
+
+
+def test_report_screenshot_consistency_audit_clean():
+    """Run `analysis/audit_report_screenshot_consistency.py` and
+    assert it finds no mismatches between screenshot captions and
+    each issue's tier / declared latency state.
+
+    Born from the Issue #9 reclassification (P0 -> P5 latent on
+    2026-05-04): the prior P0 narrative shipped with a faux 3265
+    popup screenshot whose caption asserted present-tense user
+    impact, while the issue had no realistic UI repro on the
+    current dump.  This auditor's two text-only rules catch that
+    self-contradiction class directly from
+    `reports/generate_report.py::ISSUES`.
+
+    Conservative scope:
+      - Rule A: P5 only — filename trigger keyword (popup /
+        runtime / form_open / annotated) requires caption hedge
+        keyword (Hypothetical / latent / cannot trigger / 潛伏 / …).
+      - Rule B: all issues — caption active-trigger phrase + issue
+        latent marker = self-contradiction.
+      - P3 missing-UI runtime captures and P0/P1/P2 faux popups
+        are exempt from Rule A by design.
+
+    Always runs (no MDB / no Access COM dependency).
+    """
+    r = subprocess.run(
+        [sys.executable, str(SCREENSHOT_AUDIT_SCRIPT)],
+        capture_output=True, text=True, timeout=30,
+    )
+    assert SCREENSHOT_AUDIT_JSON.exists(), (
+        f"audit script did not write {SCREENSHOT_AUDIT_JSON}; "
+        f"stderr:\n{r.stderr[-500:]}"
+    )
+    audit = json.loads(SCREENSHOT_AUDIT_JSON.read_text(encoding="utf-8"))
+    s = audit["summary"]
+    mismatches = audit["mismatches"]
+
+    assert mismatches == [], (
+        f"report screenshot audit found {len(mismatches)} "
+        f"mismatch(es).  Each mismatch is a screenshot whose "
+        f"caption disagrees with its issue's tier or declared "
+        f"latency state.  Either re-caption the screenshot, "
+        f"remove it, or update the issue's wording in "
+        f"reports/generate_report.py.  Detail:\n"
+        + "\n".join(
+            f"  - rule {m['rule']} #{m['issue_id']} ({m['tier']}) "
+            f"file={m['filename']!r} excerpt={m['caption_excerpt'][:120]!r}"
+            for m in mismatches
+        )
+    )
+    assert s["n_rule_a_violations"] == 0
+    assert s["n_rule_b_violations"] == 0
