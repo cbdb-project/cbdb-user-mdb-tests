@@ -592,6 +592,79 @@ def _build() -> dict:
     }
 
 
+def _validate_invariants(d: dict) -> None:
+    """Assert deterministic invariants on the built inventory.  Raises
+    `AssertionError` if any invariant is violated; the script exits
+    non-zero (after writing the JSON / MD) so the regression is
+    visible in CI output.
+
+    Invariants:
+
+      I1. `real_vba_failing` cells are NEVER counted as covered.
+          (`by_status['real_vba_covered']` excludes them; the matrix
+          cell's status string is `real_vba_failing`, not `_covered`.)
+
+      I2. `real_vba_failing` cells NEVER appear in
+          `low_hanging_skips` — a failing test is not a "skip with a
+          mechanical fix", it's a test that runs and fails.
+
+      I3. Every `real_vba_failing` cell's manifest entries MUST carry
+          either a `skip_reason` (re-used as the failure-mode
+          description, since the `_failing` status overloads the
+          field) OR a substantive `notes` field of >= 20 characters
+          — so reviewers always have machinery-readable context for
+          the failure, not just the bare status string.
+    """
+    failing_cells: list[tuple[str, str, dict]] = []
+    for f in d["forms"]:
+        for b in d["buttons"]:
+            cell = d["matrix"][f][b]
+            if cell["status"] == "real_vba_failing":
+                failing_cells.append((f, b, cell))
+
+    # I1: failing cells are not in the covered count.
+    n_covered = d["summary"]["by_status"].get("real_vba_covered", 0)
+    n_failing = d["summary"]["by_status"].get("real_vba_failing", 0)
+    assert n_failing == len(failing_cells), (
+        "Invariant I1 violated: by_status['real_vba_failing'] "
+        f"({n_failing}) does not match the number of cells with "
+        f"status == 'real_vba_failing' in the matrix "
+        f"({len(failing_cells)})."
+    )
+
+    # I2: failing cells never in low_hanging_skips.
+    failing_keys = {(f, b) for f, b, _ in failing_cells}
+    bad_low_hang = [
+        h for h in d["low_hanging_skips"]
+        if (h["form"], h["button"]) in failing_keys
+    ]
+    assert not bad_low_hang, (
+        "Invariant I2 violated: low_hanging_skips contains failing "
+        f"cells (these are NOT mechanical-fix skips): "
+        f"{[(h['form'], h['button']) for h in bad_low_hang]}.  "
+        "low_hanging_skips is gated on status == 'real_vba_skipped' "
+        "by construction; if you see this, the gate has regressed."
+    )
+
+    # I3: every failing cell has a substantive failure description.
+    bad_desc = []
+    for f, b, cell in failing_cells:
+        for m in cell.get("test_entries") or []:
+            sr = (m.get("skip_reason") or "").strip()
+            notes = (m.get("notes") or "").strip()
+            if not sr and len(notes) < 20:
+                bad_desc.append({
+                    "form": f, "button": b,
+                    "test_module": m.get("test_module"),
+                })
+    assert not bad_desc, (
+        "Invariant I3 violated: real_vba_failing cells must carry "
+        "either a `skip_reason` (re-used as failure-mode "
+        "description) or substantive `notes` (>= 20 chars).  "
+        f"Bare cells: {bad_desc}"
+    )
+
+
 _STATUS_GLYPH = {
     "real_vba_covered":                          "✓",
     "real_vba_covered_via_handler_dispatch":     "✓*",
@@ -648,9 +721,12 @@ def _render_md(d: dict) -> str:
         "UI button is missing. |\n"
         "| `FAIL` | `real_vba_failing` | "
         "Real-VBA test exists, runs (does NOT skip), and fails on "
-        "the current dump.  See per-cell skip_reason in JSON for "
+        "the current dump.  See per-cell `skip_reason` in JSON for "
         "the failure mode (typically a depth-check classifier gap "
-        "for an unfamiliar file-shape family). |\n"
+        "for an unfamiliar file-shape family).  **NOT counted as "
+        "covered.**  Distinct from `skip` (no `pytest.mark.skip`) "
+        "and from `GAP` (test does exist).  See § Status semantics "
+        "below. |\n"
         "| `GAP` | `gap` | "
         "Both handler + button present, no real-VBA test, no "
         "static-only test either — true uncovered slice. |\n"
@@ -685,6 +761,68 @@ def _render_md(d: dict) -> str:
         "(lower-case `i`); the actual control + handler is "
         "`CmdUCINet` (capital `N`).  The matrix uses the real "
         "casing.")
+    lines.append("")
+
+    # Status semantics — pin the meaning of FAIL vs skip vs GAP.
+    lines.append("## Status semantics")
+    lines.append("")
+    lines.append(
+        "Four statuses describe \"there is or is not real-VBA test "
+        "coverage for this cell\".  They are NOT interchangeable; "
+        "in particular `real_vba_failing` is its own bucket, never "
+        "rolled into `real_vba_covered`.")
+    lines.append("")
+    lines.append(
+        "| Status | Test exists? | Test skipped? | Test passes? | "
+        "Counted as covered? | Eligible as Tier-1 (low-hanging) "
+        "candidate? |")
+    lines.append(
+        "|---|:---:|:---:|:---:|:---:|:---:|")
+    lines.append(
+        "| `real_vba_covered` (✓ / ✓*) | yes | no | **yes** | "
+        "**yes** | n/a (already covered) |")
+    lines.append(
+        "| `real_vba_skipped` (skip / skip*) | yes | **yes** "
+        "(`pytest.mark.skip`) | n/a — not run | no | "
+        "**yes**, but only when `skip_reason` matches a "
+        "mechanical-fix pattern (currently: \"no matrix fixture\") |")
+    lines.append(
+        "| `real_vba_failing` (FAIL) | yes | no | **no** | **no** "
+        "| **no** — failing tests are not skips with a mechanical "
+        "fix; they're tests that run and fail.  Each failing cell "
+        "must carry a `skip_reason` (re-used as failure-mode "
+        "description) or substantive `notes` (>= 20 chars) so the "
+        "failure mode is machinery-readable. |")
+    lines.append(
+        "| `gap` (GAP) | **no** | n/a | n/a | no | yes (always — "
+        "ranked by family priority in Tier 2) |")
+    lines.append("")
+    lines.append(
+        "Three deterministic invariants are checked at script-exit "
+        "time and printed to stderr (with non-zero exit code) if "
+        "violated:")
+    lines.append("")
+    lines.append(
+        "  - **I1** — `real_vba_failing` cells are never counted as "
+        "covered (`by_status` rolls them up as their own bucket).")
+    lines.append(
+        "  - **I2** — `real_vba_failing` cells never appear in "
+        "`low_hanging_skips` (which is gated on status == "
+        "`real_vba_skipped` by construction; this invariant pins "
+        "that gate).")
+    lines.append(
+        "  - **I3** — every `real_vba_failing` cell's manifest "
+        "entries carry either a `skip_reason` (re-used as failure-"
+        "mode description) or substantive `notes` (>= 20 chars).")
+    lines.append("")
+    lines.append(
+        "If a `FAIL` cell ever wants to graduate to `real_vba_"
+        "covered`, the path is to (a) fix the underlying failure "
+        "mode (typically: extend the depth-check classifier in "
+        "`tests/test_vba_cmdneo4j_cross_form.py` for a new "
+        "file-shape family) and (b) flip the manifest entry's "
+        "`status` from `real_vba_failing` to `covered`.  The flip "
+        "must come AFTER the test actually passes, not before.")
     lines.append("")
 
     # Summary roll-up.
@@ -885,6 +1023,17 @@ def main() -> int:
           f"{len(d['recommended_next_slices'])}")
     print(f"  wrote {OUT_JSON}")
     print(f"  wrote {OUT_MD}")
+
+    # Run deterministic invariants AFTER writing so a reviewer can
+    # always inspect the JSON / MD even if guards fire.  Print the
+    # AssertionError message and exit non-zero so the regression is
+    # visible in CI without aborting the artifact write.
+    try:
+        _validate_invariants(d)
+    except AssertionError as e:
+        print(f"\n[INVARIANT VIOLATION] {e}", file=sys.stderr)
+        return 2
+
     # Inventory is informational; never non-zero exit on coverage
     # alone (gaps are expected — that's the point).  Only manifest
     # drift indicates the inventory itself is stale.

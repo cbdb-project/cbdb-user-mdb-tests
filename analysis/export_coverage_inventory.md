@@ -1,6 +1,6 @@
 # Export coverage inventory (LookAt form × export button)
 
-**Generated:** 2026-05-04T14:05:44+00:00
+**Generated:** 2026-05-04T14:17:38+00:00
 **Generator:** `analysis/inventory_export_coverage.py`
 **Companion JSON:** `reports/export_coverage_inventory.json`
 
@@ -14,7 +14,7 @@ Read-only inventory.  No MDB.  No Access COM.  Reads the VBA dump (`analysis/dum
 | `✓*` | `real_vba_covered_via_handler_dispatch` | Test passes via `Form_Timer` handler dispatch — handler exists, UI button is missing (P3 family).  Test exercises handler logic; missing button stays documented as a P3 issue. |
 | `skip` | `real_vba_skipped` | Real-VBA test exists but is `pytest.mark.skip`'d (see per-cell skip_reason in JSON). |
 | `skip*` | `real_vba_skipped_via_handler_dispatch` | Same as `skip`, but for a handler-dispatched cell whose UI button is missing. |
-| `FAIL` | `real_vba_failing` | Real-VBA test exists, runs (does NOT skip), and fails on the current dump.  See per-cell skip_reason in JSON for the failure mode (typically a depth-check classifier gap for an unfamiliar file-shape family). |
+| `FAIL` | `real_vba_failing` | Real-VBA test exists, runs (does NOT skip), and fails on the current dump.  See per-cell `skip_reason` in JSON for the failure mode (typically a depth-check classifier gap for an unfamiliar file-shape family).  **NOT counted as covered.**  Distinct from `skip` (no `pytest.mark.skip`) and from `GAP` (test does exist).  See § Status semantics below. |
 | `GAP` | `gap` | Both handler + button present, no real-VBA test, no static-only test either — true uncovered slice. |
 | `static` | `unit_or_static_only` | Only static / source-level tests cover this cell (`tests/test_known_bugs.py` family); no real CmdQuery → CmdX chain. |
 | `no-btn` | `missing_ui_button` | Handler exists in source but no control on the form (P3 missing-UI family — Issues #15-19). |
@@ -24,6 +24,25 @@ Read-only inventory.  No MDB.  No Access COM.  Reads the VBA dump (`analysis/dum
 **CmdKML caveat:** CmdKML is included in the matrix per the investigation brief, but the codebase has neither a `CmdKML` button nor a `CmdKML_Click` handler on any LookAt form.  KML output is implemented as a `ChkKML` checkbox option that other exports honour (e.g. LookAtOffice has `ChkPeopleKML` / `ChkOfficeKML`).  Every CmdKML cell therefore renders `—` (not_applicable); future KML coverage would be checkbox-driven, not a separate button slice.
 
 **CmdUCInet → CmdUCINet:** the brief used `CmdUCInet` (lower-case `i`); the actual control + handler is `CmdUCINet` (capital `N`).  The matrix uses the real casing.
+
+## Status semantics
+
+Four statuses describe "there is or is not real-VBA test coverage for this cell".  They are NOT interchangeable; in particular `real_vba_failing` is its own bucket, never rolled into `real_vba_covered`.
+
+| Status | Test exists? | Test skipped? | Test passes? | Counted as covered? | Eligible as Tier-1 (low-hanging) candidate? |
+|---|:---:|:---:|:---:|:---:|:---:|
+| `real_vba_covered` (✓ / ✓*) | yes | no | **yes** | **yes** | n/a (already covered) |
+| `real_vba_skipped` (skip / skip*) | yes | **yes** (`pytest.mark.skip`) | n/a — not run | no | **yes**, but only when `skip_reason` matches a mechanical-fix pattern (currently: "no matrix fixture") |
+| `real_vba_failing` (FAIL) | yes | no | **no** | **no** | **no** — failing tests are not skips with a mechanical fix; they're tests that run and fail.  Each failing cell must carry a `skip_reason` (re-used as failure-mode description) or substantive `notes` (>= 20 chars) so the failure mode is machinery-readable. |
+| `gap` (GAP) | **no** | n/a | n/a | no | yes (always — ranked by family priority in Tier 2) |
+
+Three deterministic invariants are checked at script-exit time and printed to stderr (with non-zero exit code) if violated:
+
+  - **I1** — `real_vba_failing` cells are never counted as covered (`by_status` rolls them up as their own bucket).
+  - **I2** — `real_vba_failing` cells never appear in `low_hanging_skips` (which is gated on status == `real_vba_skipped` by construction; this invariant pins that gate).
+  - **I3** — every `real_vba_failing` cell's manifest entries carry either a `skip_reason` (re-used as failure-mode description) or substantive `notes` (>= 20 chars).
+
+If a `FAIL` cell ever wants to graduate to `real_vba_covered`, the path is to (a) fix the underlying failure mode (typically: extend the depth-check classifier in `tests/test_vba_cmdneo4j_cross_form.py` for a new file-shape family) and (b) flip the manifest entry's `status` from `real_vba_failing` to `covered`.  The flip must come AFTER the test actually passes, not before.
 
 ## Summary
 
