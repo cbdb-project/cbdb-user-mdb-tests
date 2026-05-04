@@ -48,8 +48,9 @@ def _guess_fixtures() -> list[CrossFixture]:
 def _skip_marks(fx: CrossFixture):
     if fx.spec.name == "LookAtNetworks":
         return pytest.mark.skip(
-            reason="LookAtNetworks Form_Open hangs in this driver "
-                   "(same root family as matrix Networks skip)."
+            reason="LookAtNetworks CmdRun times out on high-degree "
+                   "anchors (PR AA: Form_Open is fine; matrix "
+                   "Networks blocker is CmdRun expansion)."
         )
     return ()
 

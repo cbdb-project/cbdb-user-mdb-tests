@@ -52,21 +52,34 @@ DOC_FILES = (
     + sorted(ROOT.glob("reports/*.md"))
     + sorted(ROOT.glob("tests/*.md"))
 )
+# Exclude self-scanning of the audit's own outputs.
+SELF_OUTPUTS = {
+    ROOT / "analysis" / "doc_health_audit.md",
+    ROOT / "analysis" / "hard_form_skip_inventory.md",
+}
+DOC_FILES = [p for p in DOC_FILES if p not in SELF_OUTPUTS]
 
 
 def scan_stale(path: Path) -> list[dict]:
     text = path.read_text(encoding="utf-8", errors="replace")
     findings = []
+    lines = text.splitlines()
     for pat, note, kind in STALE_PATTERNS:
         for m in pat.finditer(text):
             line_no = text.count("\n", 0, m.start()) + 1
-            line_text = text.splitlines()[line_no - 1] \
-                if line_no - 1 < len(text.splitlines()) else ""
-            # Skip if the line clearly notes the supersession.
-            if any(s in line_text.lower() for s in
+            line_text = lines[line_no - 1] \
+                if line_no - 1 < len(lines) else ""
+            # Look at the matched line PLUS one line above and one
+            # below — supersession framing often spans lines (e.g.
+            # "PR X renamed it from\n`<old_label>` (factually stale)").
+            ctx = " ".join(
+                lines[max(0, line_no - 2): min(len(lines), line_no + 1)]
+            ).lower()
+            if any(s in ctx for s in
                    ("invalidated", "stale", "renamed", "supersed",
                     "historical", "no longer", "no-longer",
-                    "old label", "older")):
+                    "old label", "older", "pr aa:", "pr ai", "pr aj",
+                    "pr x renamed", "renamed from", "factually stale")):
                 continue
             findings.append({
                 "doc": str(path.relative_to(ROOT)),

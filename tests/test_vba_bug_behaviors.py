@@ -261,14 +261,18 @@ def test_bug7_lookat_place_cmdneo4j_fires_item_not_found(vba: VbaSession):
     )
 
 
-def test_bug8_lookat_networks_skipped_form_open_hangs():
-    """Bug #8 deep verification needs LookAtNetworks Form_Open to
-    succeed, which currently hangs in this driver (driver-level issue,
-    not a CBDB bug).  The static marker in test_known_bugs covers the
-    code-side; this placeholder documents why we don't have runtime
-    coverage."""
-    pytest.skip("LookAtNetworks Form_Open hangs in this driver — "
-                "Bug #8 covered statically by test_known_bugs.py.")
+def test_bug8_lookat_networks_skipped_cmdrun_timeout():
+    """Bug #8 deep verification needs LookAtNetworks CmdRun to
+    complete, which currently times out on high-degree anchors
+    (Zhu Xi 2471 assocs).  PR AA's probe showed Form_Open itself
+    opens cleanly in ~2 s — the blocker is CmdRun network
+    expansion, not Form_Open.  The static marker in
+    test_known_bugs covers the code-side; this placeholder
+    documents why we don't have runtime coverage until a smaller
+    fixture is blessed."""
+    pytest.skip("LookAtNetworks CmdRun times out on high-degree "
+                "anchors (PR AA: Form_Open is fine).  Bug #8 "
+                "covered statically by test_known_bugs.py.")
 
 
 def test_bug9_lookat_entry_cmdneo4j_with_institutions_fixture(vba: VbaSession):

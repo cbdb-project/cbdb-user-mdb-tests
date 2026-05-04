@@ -11,8 +11,7 @@
       "unclassified": 9,
       "intentional_placeholder": 2,
       "fixture_empty": 11,
-      "lookatnetworks_form_open_hang_legacy_label": 4,
-      "cmdrun_timeout": 1
+      "cmdrun_timeout": 5
     },
     "by_form": {
       "null": 23,
@@ -137,13 +136,13 @@
     },
     {
       "test_file": "tests\\test_vba_bug_behaviors.py",
-      "line": 270,
+      "line": 273,
       "kind": "call_skip",
-      "raw_text": "pytest.skip(\"LookAtNetworks Form_Open hangs in this driver — \"",
-      "reason": "LookAtNetworks Form_Open hangs in this driver —",
+      "raw_text": "pytest.skip(\"LookAtNetworks CmdRun times out on high-degree \"",
+      "reason": "LookAtNetworks CmdRun times out on high-degree",
       "form": "LookAtNetworks",
-      "blocker_class": "lookatnetworks_form_open_hang_legacy_label",
-      "likely_next_action": "Stale label — PR AA showed Form_Open does NOT hang.  Replace skip reason with cmdrun_timeout once a smaller fixture lets CmdRun complete (PR AB scope was subsumed by AA — see analysis/lookatnetworks_form_open_hang.md)."
+      "blocker_class": "cmdrun_timeout",
+      "likely_next_action": "Smaller fixture: anchor person with 5–20 assocs instead of Zhu Xi (2471).  Then attempt unskip."
     },
     {
       "test_file": "tests\\test_vba_cmdgispeople_office.py",
@@ -160,10 +159,10 @@
       "line": 50,
       "kind": "factory_skip",
       "raw_text": "return pytest.mark.skip(",
-      "reason": "LookAtNetworks Form_Open hangs in this driver",
+      "reason": "LookAtNetworks CmdRun times out on high-degree",
       "form": "LookAtNetworks",
-      "blocker_class": "lookatnetworks_form_open_hang_legacy_label",
-      "likely_next_action": "Stale label — PR AA showed Form_Open does NOT hang.  Replace skip reason with cmdrun_timeout once a smaller fixture lets CmdRun complete (PR AB scope was subsumed by AA — see analysis/lookatnetworks_form_open_hang.md)."
+      "blocker_class": "cmdrun_timeout",
+      "likely_next_action": "Smaller fixture: anchor person with 5–20 assocs instead of Zhu Xi (2471).  Then attempt unskip."
     },
     {
       "test_file": "tests\\test_vba_cmdneo4j_cross_form.py",
@@ -217,13 +216,13 @@
     },
     {
       "test_file": "tests\\test_vba_import_lists.py",
-      "line": 134,
+      "line": 135,
       "kind": "factory_skip",
       "raw_text": "return pytest.mark.skip(",
-      "reason": "LookAtNetworks Form_Open hangs in this driver",
+      "reason": "LookAtNetworks CmdRun times out on high-degree",
       "form": "LookAtNetworks",
-      "blocker_class": "lookatnetworks_form_open_hang_legacy_label",
-      "likely_next_action": "Stale label — PR AA showed Form_Open does NOT hang.  Replace skip reason with cmdrun_timeout once a smaller fixture lets CmdRun complete (PR AB scope was subsumed by AA — see analysis/lookatnetworks_form_open_hang.md)."
+      "blocker_class": "cmdrun_timeout",
+      "likely_next_action": "Smaller fixture: anchor person with 5–20 assocs instead of Zhu Xi (2471).  Then attempt unskip."
     },
     {
       "test_file": "tests\\test_vba_integrity.py",
@@ -350,14 +349,14 @@
       "line": 224,
       "kind": "factory_skip",
       "raw_text": "return pytest.mark.skip(",
-      "reason": "LookAtNetworks Form_Open hangs in this driver",
+      "reason": "LookAtNetworks CmdRun times out on high-degree",
       "form": "LookAtNetworks",
-      "blocker_class": "lookatnetworks_form_open_hang_legacy_label",
-      "likely_next_action": "Stale label — PR AA showed Form_Open does NOT hang.  Replace skip reason with cmdrun_timeout once a smaller fixture lets CmdRun complete (PR AB scope was subsumed by AA — see analysis/lookatnetworks_form_open_hang.md)."
+      "blocker_class": "cmdrun_timeout",
+      "likely_next_action": "Smaller fixture: anchor person with 5–20 assocs instead of Zhu Xi (2471).  Then attempt unskip."
     },
     {
       "test_file": "tests\\test_vba_storeid_recallid.py",
-      "line": 293,
+      "line": 294,
       "kind": "call_skip",
       "raw_text": "pytest.skip(\"test_inputs.json missing — run discover_test_inputs.py\")",
       "reason": "test_inputs.json missing — run discover_test_inputs.py",

@@ -222,9 +222,10 @@ def _recallid_marks(spec: FormSpec):
     GroupData all open cleanly."""
     if spec.name == "LookAtNetworks":
         return pytest.mark.skip(
-            reason="LookAtNetworks Form_Open hangs in this driver "
-                   "(subform recordset binding) — same root family as "
-                   "matrix CmdRun timeout.  See reports/CBDB_Issues_Report_EN.md."
+            reason="LookAtNetworks CmdRun times out on high-degree "
+                   "anchors — same root family as matrix Networks "
+                   "CmdRun timeout (PR AA: Form_Open opens fine).  "
+                   "See reports/CBDB_Issues_Report_EN.md."
         )
     return ()
 

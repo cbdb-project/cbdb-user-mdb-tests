@@ -127,13 +127,15 @@ def _wait_for_count(vba: VbaSession, table: str, col: str, target: int,
 
 
 def _skip_marks(spec: ImportSpec):
-    """LookAtNetworks Form_Open hangs in this driver (subform recordset
-    binding) — same root family as the matrix Networks skip; the recall
-    test for it is also skipped."""
+    """LookAtNetworks CmdRun times out on high-degree anchors —
+    same root family as the matrix Networks skip; the recall test
+    for it is also skipped.  PR AA showed Form_Open itself is
+    fine; the blocker is CmdRun network expansion."""
     if spec.form == "LookAtNetworks":
         return pytest.mark.skip(
-            reason="LookAtNetworks Form_Open hangs in this driver "
-                   "— same family as matrix Networks skip"
+            reason="LookAtNetworks CmdRun times out on high-degree "
+                   "anchors (PR AA: Form_Open is fine) — same "
+                   "family as matrix Networks skip"
         )
     return ()
 
