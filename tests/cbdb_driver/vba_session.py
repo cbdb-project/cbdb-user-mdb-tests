@@ -65,7 +65,14 @@ def _pid_for_access_app(app) -> int | None:
 class VbaSession:
     """One Access process, one open form, one pyodbc connection."""
 
-    def __init__(self, src_mdb: Path, work_mdb: Path):
+    def __init__(self, src_mdb: Path, work_mdb: Path,
+                 *,
+                 skip_inject_autodetect_forms: "set[str] | None" = None):
+        """`skip_inject_autodetect_forms` is a probe-only opt-out:
+        a set of `Form_<name>` keys whose autodetect injection
+        should be skipped during `_inject_autodetect()`.  Pass an
+        empty set to skip ALL forms.  Default `None` preserves
+        production behaviour (inject every form in `_AUTODETECT`)."""
         self.src = Path(src_mdb).resolve()
         self.work = Path(work_mdb).resolve()
         self.app = None
@@ -73,6 +80,10 @@ class VbaSession:
         self._pwa = None
         self._form_open: str | None = None
         self._pid: int | None = None
+        # Probe-only.  Production tests must not pass this.
+        self._skip_inject_autodetect_forms: "set[str] | None" = (
+            skip_inject_autodetect_forms
+        )
 
     # ---------- lifecycle ----------
     def open(self) -> "VbaSession":
@@ -374,7 +385,15 @@ class VbaSession:
         Form_Timer to fire twice."""
         proj = self.app.VBE.VBProjects(1)
         marker = "AUTO-DETECT PICKER STATE v8"
+        skip = self._skip_inject_autodetect_forms
         for module_name, body_lines in self._AUTODETECT.items():
+            # Probe-only opt-out.  None (default) → inject every
+            # form.  Empty set → skip all.  Otherwise skip only
+            # the listed Form_<name> keys.
+            if skip is not None and (
+                len(skip) == 0 or module_name in skip
+            ):
+                continue
             try:
                 comp = proj.VBComponents(module_name)
             except Exception:
