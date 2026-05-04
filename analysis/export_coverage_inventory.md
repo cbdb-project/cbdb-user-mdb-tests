@@ -1,6 +1,6 @@
 # Export coverage inventory (LookAt form × export button)
 
-**Generated:** 2026-05-04T13:26:10+00:00
+**Generated:** 2026-05-04T13:45:33+00:00
 **Generator:** `analysis/inventory_export_coverage.py`
 **Companion JSON:** `reports/export_coverage_inventory.json`
 
@@ -28,9 +28,9 @@ Read-only inventory.  No MDB.  No Access COM.  Reads the VBA dump (`analysis/dum
 
 - **Cells total:** 80 (10 forms × 8 buttons)
 - `not_applicable` (—): **40**
-- `real_vba_covered` (✓): **15**
+- `real_vba_covered` (✓): **16**
 - `gap` (GAP): **13**
-- `real_vba_skipped` (skip): **6**
+- `real_vba_skipped` (skip): **5**
 - `real_vba_covered_via_handler_dispatch` (✓*): **3**
 - `real_vba_skipped_via_handler_dispatch` (skip*): **2**
 - `missing_ui_button` (no-btn): **1**
@@ -39,7 +39,7 @@ Read-only inventory.  No MDB.  No Access COM.  Reads the VBA dump (`analysis/dum
 
 | Form | CmdGIS | CmdNeo4j | CmdPajek | CmdGephi | CmdGUESS | CmdKML | CmdUCINet | CmdGISPeople |
 |---|---|---|---|---|---|---|---|---|
-| **LookAtEntry** | ✓ | skip | — | — | — | — | — | — |
+| **LookAtEntry** | ✓ | ✓ | — | — | — | — | — | — |
 | **LookAtTexts** | ✓ | ✓ | — | — | — | — | — | — |
 | **LookAtAssociations** | ✓ | skip | ✓ | ✓ | — | — | GAP | — |
 | **LookAtOffice** | ✓ | ✓ | — | — | ✓* | — | — | ✓ |
@@ -61,12 +61,12 @@ Cells with status `not_applicable` are omitted to keep the noise down.
 - Why: Real-VBA test exists and passes for this cell.
 - Test: `tests/test_vba_export.py::test_lookatentry_cmd_gis` — **covered**; notes: byte-level golden compare; the original CmdGIS test
 
-### LookAtEntry × CmdNeo4j — `real_vba_skipped`
+### LookAtEntry × CmdNeo4j — `real_vba_covered`
 
 - Handler in source: yes
 - Button on form: yes
-- Why: Real-VBA test exists but is currently skipped.  See skip_reason on each manifest entry.
-- Test: `tests/test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtEntry]` — **skipped**; skip_reason: no matrix fixture for LookAtEntry (_all_fixtures()) — Entry's matrix entry was never wired; notes: Issue #9 reclassification re-verification used a single-fixture probe instead (analysis/investigate_issue9_neo4j_institutioncodes.py); not promoted to a pytest yet.
+- Why: Real-VBA test exists and passes for this cell.
+- Test: `tests/test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtEntry]` — **covered**; notes: min_files=7 + per-shape depth + LookAtEntry-specific structural assertion that the file set is exactly {People, PeopleEntry, Places, PeoplePlaces, PersonPlaceCodes, EntryCodes, AssocCodes} AND no InstitutionCodes file (Issue #9 LATENT-gate pin: `ENTRY_DATA.c_inst_code > 0 = 0` on this dump).  Promoted from skip 2026-05-04 after the Issue #9 reverification probe verified the chain end-to-end with c_entry_code=101.
 - Static-only note: tests/test_known_bugs.py::test_bug9_lookat_entry_cmdneo4j_with_wrong_var — pins source typo + LATENT-gate (Issue #9)
 - Static-only note: tests/test_vba_bug_behaviors.py::test_bug9_lookat_entry_cmdneo4j_with_institutions_fixture — runtime: chain finishes cleanly without ERR for non-inst fixture
 
@@ -339,14 +339,7 @@ Cells with status `not_applicable` are omitted to keep the noise down.
 
 ### Tier 1 — low-hanging skipped tests (mechanical fix)
 
-These cells have a real-VBA test that is currently skipped for a *mechanical* reason (typically: "no matrix fixture").  Promoting one to passing is the smallest, lowest-risk way to close a coverage cell — no driver changes, no new infrastructure, no Networks / Status / AssociationPairs blockers.
-
-- **LookAtEntry × CmdNeo4j** (`tests/test_vba_cmdneo4j_cross_form.py`)
-  - skip_reason: no matrix fixture for LookAtEntry (_all_fixtures()) — Entry's matrix entry was never wired
-  - fix class: wire matrix fixture in tests/test_vba_matrix_all_forms.py::_all_fixtures
-  - existing evidence: Issue #9 reclassification re-verification used a single-fixture probe instead (analysis/investigate_issue9_neo4j_institutioncodes.py); not promoted to a pytest yet.
-
-**Concrete recommendation** (do NOT implement in this inventory PR): wire a LookAtEntry matrix fixture in `tests/test_vba_matrix_all_forms.py::_all_fixtures` so `test_cmd_neo4j_produces_files[LookAtEntry]` in `tests/test_vba_cmdneo4j_cross_form.py` flips from skip to a real assertion.  Notes from the manifest: Issue #9 reclassification re-verification used a single-fixture probe instead (analysis/investigate_issue9_neo4j_institutioncodes.py); not promoted to a pytest yet.
+*(No skipped tests with a mechanical fix class.  All current skips are blocked on harder issues — chain cleanup family, matrix CmdRun timeout family, Form_Open deadlock family.)*
 
 ### Tier 2 — pure `gap` cells (button + handler exist, no test of any kind)
 

@@ -52,7 +52,15 @@ class Spec:
 
 
 _SPECS: tuple[Spec, ...] = (
-    Spec("LookAtEntry",        min_files=4),
+    # LookAtEntry has been measured end-to-end against the
+    # `c_entry_code = 101` matrix fixture (Issue #9 reverification
+    # 2026-05-04): produces exactly 7 files (People, PeopleEntry,
+    # Places, PeoplePlaces, PersonPlaceCodes, EntryCodes,
+    # AssocCodes).  No InstitutionCodes file because
+    # `ENTRY_DATA.c_inst_code > 0 = 0` on the current dump gates
+    # the optional InstitutionCodes block out — see the per-fixture
+    # InstitutionCodes-absent assertion in the test body.
+    Spec("LookAtEntry",        min_files=7),
     Spec("LookAtTexts",        min_files=4),
     Spec("LookAtAssociations", min_files=4),
     Spec("LookAtOffice",       min_files=4),
@@ -173,15 +181,127 @@ def test_cmd_neo4j_produces_files(vba: VbaSession, spec: Spec, tmp_path):
     # id-column non-empty rate.
     _assert_neo4j_export_depth(fspec.name, files)
 
+    # ---- Per-form structural assertions ------------------------
+    if fspec.name == "LookAtEntry":
+        _assert_lookatentry_neo4j_shape(fspec.name, files)
+
+
+def _assert_lookatentry_neo4j_shape(form_name: str,
+                                     files: list[Path]) -> None:
+    """LookAtEntry × CmdNeo4j on the current dump produces exactly
+    7 files with these shapes (verified end-to-end by the Issue #9
+    reverification probe at
+    `analysis/investigate_issue9_neo4j_institutioncodes.py`):
+
+      People             — header starts `nameID,nameHZ,…`
+      PeopleEntry        — header starts `NameID,EntryCode,…`
+      Places             — header starts `placeID,placePY,…`
+      PeoplePlaces       — header starts `nameID,placeID,…`
+      PersonPlaceCodes   — header starts `personPlaceCode,…`
+      EntryCodes         — header starts `EntryCode,EntryDesc,…`
+      AssocCodes         — header starts `AssocCode,…`
+
+    Conspicuously ABSENT: `InstitutionCodes` (header would start
+    `InstitutionCode,…`).  This is NOT a bug on the current dump:
+    `Form_LookAtEntry.vb:1389` gates the InstitutionCodes block
+    on `If tRecDeleted > 0 Then` where `tRecDeleted` is the row
+    count of an `INSERT INTO ZZ_SCRATCH_P_TEXT … WHERE
+    ZZ_SCRATCH_ENTRY.c_inst_code > 0`.  CmdQuery copies
+    `ENTRY_DATA.c_inst_code` verbatim into ZZ_SCRATCH_ENTRY
+    (lines 1645-1652), and `ENTRY_DATA.c_inst_code > 0 = 0` for
+    all 263,454 rows on this dump → the gate is false → the
+    optional InstitutionCodes block is silently skipped.  This is
+    the same per-block "skip when source count is 0" pattern the
+    surrounding blocks use (e.g. AssocCodes is also skipped for a
+    fixture with `c_assoc_code = 0`).
+
+    Issue #9 (the line-1425 `With tRstAssocCodes` typo intended
+    to be `With tRstInstitutions`) remains a real source-level
+    bug, but on the current dump it sits behind this gate and is
+    unreachable — see Issue #9 in
+    `reports/CBDB_Issues_Report_EN.md` (P5 latent).
+
+    If a future MDB drop introduces any `c_inst_code > 0` row in
+    ENTRY_DATA, the gate opens, this assertion fails (because an
+    8th file appears with `InstitutionCode` first column), AND
+    the `With tRstAssocCodes` typo fires DAO 3021 — at which
+    point Issue #9 needs re-promotion to P1 and this assertion
+    needs updating to either (a) require InstitutionCodes
+    present + non-empty after the typo is fixed, or (b) document
+    the new failure mode."""
+    headers_first_col = []
+    inst_files = []
+    for f in files:
+        raw = f.read_bytes()
+        text = raw.decode("utf-8", errors="replace").lstrip("﻿")
+        first_line = text.split("\n", 1)[0].strip()
+        first_col = first_line.split(",", 1)[0]
+        headers_first_col.append(first_col)
+        if first_col == "InstitutionCode":
+            inst_files.append(f.name)
+
+    expected_first_cols = {
+        "nameID",          # People AND PeoplePlaces (disambiguated
+                           # downstream by 2-col classifier)
+        "NameID",          # PeopleEntry
+        "placeID",         # Places
+        "personPlaceCode", # PersonPlaceCodes
+        "EntryCode",       # EntryCodes
+        "AssocCode",       # AssocCodes
+    }
+    seen = set(headers_first_col)
+    missing = expected_first_cols - seen
+    assert not missing, (
+        f"[{form_name}] CmdNeo4j missing expected file shapes "
+        f"(by header first-column): missing={sorted(missing)}; "
+        f"saw={sorted(seen)}.  Headers per file: "
+        f"{list(zip([f.name for f in files], headers_first_col))}"
+    )
+
+    # InstitutionCodes file MUST be absent — see docstring for why
+    # this is the desired behaviour on the current dump (Issue #9
+    # latent gate).  If this assertion ever fails, see Issue #9
+    # re-promotion plan.
+    assert not inst_files, (
+        f"[{form_name}] CmdNeo4j unexpectedly produced an "
+        f"InstitutionCodes-shape file ({inst_files}).  This "
+        f"means `ENTRY_DATA.c_inst_code > 0` is no longer 0 on "
+        f"the current dump and Issue #9's LATENT-gate has "
+        f"flipped — the source-level typo at "
+        f"Form_LookAtEntry.vb:1425 is now reachable.  Re-promote "
+        f"Issue #9 from P5 latent to P1 in "
+        f"reports/generate_report.py and update this test to "
+        f"either (a) assert InstitutionCodes present + non-empty "
+        f"after the typo is fixed, or (b) document the new "
+        f"failure mode.  See "
+        f"analysis/issue9_neo4j_institutioncodes_reverification.md."
+    )
+
+    # We expect exactly 6 distinct first-column shapes (the two
+    # `nameID` files differ by their second column — disambiguated
+    # by `_NEO4J_SHAPES_BY_TWO_COLS`).
+    assert len(seen) == len(expected_first_cols), (
+        f"[{form_name}] expected {len(expected_first_cols)} "
+        f"distinct file-shape first-columns "
+        f"({sorted(expected_first_cols)}); saw {len(seen)} "
+        f"({sorted(seen)})."
+    )
+
 
 # ----------------------------------------------------------------------
 # PR Q: per-shape Neo4j export depth manifest
 # ----------------------------------------------------------------------
 
 # Recognised file shapes (from existing committed goldens at
-# tests/golden/exports/real_lookatentry_neo4j_*.csv).  Mapping:
+# tests/golden/exports/real_lookatentry_neo4j_*.csv plus the
+# Issue #9 reverification probe).  Mapping:
 #   header_first_column → (shape_label, required_columns,
 #                           key_id_columns_must_be_non_empty)
+#
+# Two `nameID` shapes share the same first column — People (the
+# top-level person dump, 6 cols) and PeoplePlaces (a 3-col
+# person↔place edge dump that LookAtEntry produces).  Disambiguate
+# via second-column lookup before falling back to first-column.
 #
 # CmdNeo4j writes UTF-8 with BOM; we strip the BOM before splitting.
 _NEO4J_SHAPES: dict[str, tuple[str, list[str], list[str]]] = {
@@ -204,16 +324,55 @@ _NEO4J_SHAPES: dict[str, tuple[str, list[str], list[str]]] = {
     "InstCode": ("InstCodes",
                  ["InstCode"],
                  ["InstCode"]),
+    # Added 2026-05-04 to cover LookAtEntry's CmdNeo4j output:
+    "placeID": ("Places",
+                ["placeID", "placePY", "placeHZ", "placeX",
+                 "placeY"],
+                ["placeID"]),
+    "personPlaceCode": ("PersonPlaceCodes",
+                        ["personPlaceCode", "personPlaceTrans",
+                         "personPlaceHZ"],
+                        ["personPlaceCode"]),
+}
+
+# Two-column-prefix disambiguation for shapes whose first column
+# alone is ambiguous.  Checked BEFORE the first-column lookup.
+#
+# Two casings of the People-Place-edge shape exist in the wild —
+# LookAtEntry uses lower-case (`nameID,placeID,personPlaceCode`),
+# LookAtTexts uses mixed-case (`NameID,PlaceID,PersonPlaceCode`).
+# Without this two-column disambiguator the LookAtTexts variant
+# gets mis-classified as `PeopleEntry` (which expects
+# `NameID,EntryCode,...`) and the depth check fails.  Verified
+# pre-existing failure on `main` for `test_cmd_neo4j_produces_
+# files[LookAtTexts]` when run with `--include-vba` — fixed here
+# alongside the LookAtEntry promotion.
+_NEO4J_SHAPES_BY_TWO_COLS: dict[
+        tuple[str, str], tuple[str, list[str], list[str]]] = {
+    ("nameID", "placeID"): ("PeoplePlaces",
+                            ["nameID", "placeID",
+                             "personPlaceCode"],
+                            ["nameID"]),
+    ("NameID", "PlaceID"): ("PeoplePlaces",
+                            ["NameID", "PlaceID",
+                             "PersonPlaceCode"],
+                            ["NameID"]),
 }
 
 
 def _classify_neo4j_csv(header_cols: list[str]
                         ) -> tuple[str, list[str], list[str]] | None:
     """Try to identify what shape a Neo4j CSV is from its header's
-    first column.  Returns None if we don't recognise it (loose-check
-    fallback)."""
+    columns.  Two-column prefix wins over single-column to handle
+    the `nameID` ambiguity (People shape vs PeoplePlaces shape both
+    start with `nameID`).  Returns None if we don't recognise it
+    (loose-check fallback)."""
     if not header_cols:
         return None
+    if len(header_cols) >= 2:
+        two = (header_cols[0], header_cols[1])
+        if two in _NEO4J_SHAPES_BY_TWO_COLS:
+            return _NEO4J_SHAPES_BY_TWO_COLS[two]
     return _NEO4J_SHAPES.get(header_cols[0])
 
 
@@ -296,7 +455,11 @@ def _assert_neo4j_export_depth(form_name: str,
 
         if bad_id and shape and shape_label not in (
                 "EntryCode-codes", "KinshipCodes",
-                "AssocCodes", "InstCodes"):
+                "AssocCodes", "InstCodes",
+                # PersonPlaceCodes is a code-table whose first
+                # column (`personPlaceCode`) can legitimately be
+                # 0 / blank for unmapped place categories.
+                "PersonPlaceCodes"):
             # Code-table shapes can legitimately start with 0.
             raise AssertionError(
                 f"[{form_name}] {f.name} has rows whose first cell "

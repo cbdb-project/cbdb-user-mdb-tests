@@ -26,6 +26,7 @@ from cbdb_driver.form_specs import (
     FormSpec, LOOKATSTATUS, LOOKATTEXTS, LOOKATASSOCIATIONS,
     LOOKATOFFICE, LOOKATPLACE, LOOKATASSOCIATIONPAIRS,
     LOOKATKINSHIP, LOOKATNETWORKS, LOOKATGROUPDATA,
+    LOOKATENTRY,
 )
 
 
@@ -271,12 +272,51 @@ def _make_assoc_pairs_fixtures(inputs: dict) -> list[CrossFixture]:
     return out
 
 
+def _make_entry_fixtures(inputs: dict) -> list[CrossFixture]:
+    """LookAtEntry matrix fixture.
+
+    Hard-pin `c_entry_code = 101` (recommendation / 薦舉/保任 /
+    `ENTRY_CODES.c_entry_desc = 'recommendation'`) instead of
+    pulling the most-populous code from `top_entry_codes`: 101 is
+    small (878 ENTRY_DATA rows on the current dump) and was
+    already verified end-to-end by the Issue #9 reverification
+    script
+    `analysis/investigate_issue9_neo4j_institutioncodes.py` —
+    CmdQuery + CmdNeo4j chain finishes cleanly with no popup,
+    `InstitutionCodes_*.csv` correctly absent because
+    `ENTRY_DATA.c_inst_code > 0 = 0` on this dump.
+
+    The most-populous code (`c_entry_code = 36`, jinshi, ~92,500
+    rows) reliably crashes Access COM with RPC unavailable mid-
+    CmdNeo4j chain — too heavy for one COM session — so we keep
+    the small fixture that's known to work end-to-end."""
+    out: list[CrossFixture] = []
+    code = 101
+    desc_chn = "recommendation / 薦舉"
+    out.append(CrossFixture(
+        name=f"entry_{code}_unfiltered",
+        spec=LOOKATENTRY,
+        picker_ids=[code],
+        # FrameYears = 1 → Entry-Years mode with no
+        # TxtFromYear/TxtToYear set → no year filter applied.
+        # Same recipe used by the investigation script.
+        controls={"FrameYears": 1},
+        expected_min_rows=10,
+        source_sql=(
+            f"SELECT DISTINCT c_personid FROM ENTRY_DATA "
+            f"WHERE c_entry_code = {code}"
+        ),
+    ))
+    return out
+
+
 def _all_fixtures() -> list[CrossFixture]:
     inputs = _load_inputs()
     if inputs is None:
         return []
     return (
-        _make_status_fixtures(inputs)
+        _make_entry_fixtures(inputs)
+        + _make_status_fixtures(inputs)
         + _make_texts_fixtures(inputs)
         + _make_assoc_fixtures(inputs)
         + _make_office_fixtures(inputs)

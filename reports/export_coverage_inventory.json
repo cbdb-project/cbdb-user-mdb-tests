@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_utc": "2026-05-04T13:26:10+00:00",
+  "generated_utc": "2026-05-04T13:45:33+00:00",
   "forms": [
     "LookAtEntry",
     "LookAtTexts",
@@ -43,17 +43,16 @@
         "button_present": true
       },
       "CmdNeo4j": {
-        "status": "real_vba_skipped",
-        "explanation": "Real-VBA test exists but is currently skipped.  See skip_reason on each manifest entry.",
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
         "test_entries": [
           {
             "form": "LookAtEntry",
             "button": "CmdNeo4j",
             "test_module": "tests/test_vba_cmdneo4j_cross_form.py",
             "test_node": "test_cmd_neo4j_produces_files[LookAtEntry]",
-            "status": "skipped",
-            "skip_reason": "no matrix fixture for LookAtEntry (_all_fixtures()) — Entry's matrix entry was never wired",
-            "notes": "Issue #9 reclassification re-verification used a single-fixture probe instead (analysis/investigate_issue9_neo4j_institutioncodes.py); not promoted to a pytest yet."
+            "status": "covered",
+            "notes": "min_files=7 + per-shape depth + LookAtEntry-specific structural assertion that the file set is exactly {People, PeopleEntry, Places, PeoplePlaces, PersonPlaceCodes, EntryCodes, AssocCodes} AND no InstitutionCodes file (Issue #9 LATENT-gate pin: `ENTRY_DATA.c_inst_code > 0 = 0` on this dump).  Promoted from skip 2026-05-04 after the Issue #9 reverification probe verified the chain end-to-end with c_entry_code=101."
           }
         ],
         "static_test_notes": [
@@ -888,9 +887,9 @@
     "n_buttons": 8,
     "n_cells": 80,
     "by_status": {
-      "real_vba_covered": 15,
-      "real_vba_skipped": 6,
+      "real_vba_covered": 16,
       "not_applicable": 40,
+      "real_vba_skipped": 5,
       "gap": 13,
       "real_vba_covered_via_handler_dispatch": 3,
       "real_vba_skipped_via_handler_dispatch": 2,
@@ -898,17 +897,7 @@
     }
   },
   "manifest_drift_findings": [],
-  "low_hanging_skips": [
-    {
-      "form": "LookAtEntry",
-      "button": "CmdNeo4j",
-      "test_module": "tests/test_vba_cmdneo4j_cross_form.py",
-      "test_node": "test_cmd_neo4j_produces_files[LookAtEntry]",
-      "skip_reason": "no matrix fixture for LookAtEntry (_all_fixtures()) — Entry's matrix entry was never wired",
-      "notes": "Issue #9 reclassification re-verification used a single-fixture probe instead (analysis/investigate_issue9_neo4j_institutioncodes.py); not promoted to a pytest yet.",
-      "fix_class": "wire matrix fixture in tests/test_vba_matrix_all_forms.py::_all_fixtures"
-    }
-  ],
+  "low_hanging_skips": [],
   "recommended_next_slices": [
     {
       "form": "LookAtAssociationPairs",

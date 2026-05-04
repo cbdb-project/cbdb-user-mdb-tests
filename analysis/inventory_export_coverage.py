@@ -142,14 +142,16 @@ EXPORT_TEST_MANIFEST: list[dict] = [
     {"form": "LookAtEntry", "button": "CmdNeo4j",
      "test_module": "tests/test_vba_cmdneo4j_cross_form.py",
      "test_node": "test_cmd_neo4j_produces_files[LookAtEntry]",
-     "status": "skipped",
-     "skip_reason": "no matrix fixture for LookAtEntry "
-                    "(_all_fixtures()) — Entry's matrix entry was "
-                    "never wired",
-     "notes": "Issue #9 reclassification re-verification used a "
-              "single-fixture probe instead "
-              "(analysis/investigate_issue9_neo4j_institutioncodes"
-              ".py); not promoted to a pytest yet."},
+     "status": "covered",
+     "notes": "min_files=7 + per-shape depth + LookAtEntry-"
+              "specific structural assertion that the file set is "
+              "exactly {People, PeopleEntry, Places, PeoplePlaces, "
+              "PersonPlaceCodes, EntryCodes, AssocCodes} AND no "
+              "InstitutionCodes file (Issue #9 LATENT-gate pin: "
+              "`ENTRY_DATA.c_inst_code > 0 = 0` on this dump).  "
+              "Promoted from skip 2026-05-04 after the Issue #9 "
+              "reverification probe verified the chain end-to-end "
+              "with c_entry_code=101."},
     {"form": "LookAtTexts", "button": "CmdNeo4j",
      "test_module": "tests/test_vba_cmdneo4j_cross_form.py",
      "test_node": "test_cmd_neo4j_produces_files[LookAtTexts]",
