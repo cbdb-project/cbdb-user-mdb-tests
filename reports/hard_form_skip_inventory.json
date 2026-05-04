@@ -1,0 +1,369 @@
+{
+  "summary": {
+    "total_findings": 33,
+    "by_kind": {
+      "call_skip": 22,
+      "decorator_skip": 2,
+      "factory_skip": 9
+    },
+    "by_blocker_class": {
+      "fixture_not_available": 6,
+      "unclassified": 9,
+      "intentional_placeholder": 2,
+      "fixture_empty": 11,
+      "lookatnetworks_form_open_hang_legacy_label": 4,
+      "cmdrun_timeout": 1
+    },
+    "by_form": {
+      "null": 23,
+      "LookAtNetworks": 5,
+      "LookAtOffice": 1,
+      "LookAtStatus": 3,
+      "LookAtAssociations": 1
+    },
+    "by_test_file_top10": {
+      "tests\\test_vba_integrity.py": 7,
+      "tests\\test_vba_cmdneo4j_cross_form.py": 4,
+      "tests\\test_schema.py": 2,
+      "tests\\test_vba_bug_behaviors.py": 2,
+      "tests\\test_vba_pajek_gephi_cross_form.py": 2,
+      "tests\\test_vba_storeid_recallid.py": 2,
+      "tests\\test_addr_codes_embedded_delim.py": 1,
+      "tests\\test_index_year_xcheck.py": 1,
+      "tests\\test_infra_smoke.py": 1,
+      "tests\\test_known_bugs.py": 1
+    }
+  },
+  "findings": [
+    {
+      "test_file": "tests\\test_addr_codes_embedded_delim.py",
+      "line": 56,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(f\"{USER_MDB} not present\")",
+      "reason": "{USER_MDB} not present",
+      "form": null,
+      "blocker_class": "fixture_not_available",
+      "likely_next_action": "Provide a fixture (data file / picker code) to enable."
+    },
+    {
+      "test_file": "tests\\test_index_year_xcheck.py",
+      "line": 60,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(",
+      "reason": "No HF SQLite snapshot found under {HF_SQLITE_DIR}.\\n",
+      "form": null,
+      "blocker_class": "unclassified",
+      "likely_next_action": "Read the test for context; no automated next-action heuristic."
+    },
+    {
+      "test_file": "tests\\test_infra_smoke.py",
+      "line": 41,
+      "kind": "decorator_skip",
+      "raw_text": "@pytest.mark.skip(",
+      "reason": "pywinauto+COM end-to-end works in standalone probe but not",
+      "form": null,
+      "blocker_class": "unclassified",
+      "likely_next_action": "Read the test for context; no automated next-action heuristic."
+    },
+    {
+      "test_file": "tests\\test_known_bugs.py",
+      "line": 66,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(\"no STATUS_DATA rows with range descriptions\")",
+      "reason": "no STATUS_DATA rows with range descriptions",
+      "form": null,
+      "blocker_class": "unclassified",
+      "likely_next_action": "Read the test for context; no automated next-action heuristic."
+    },
+    {
+      "test_file": "tests\\test_other_forms_skeletons.py",
+      "line": 44,
+      "kind": "decorator_skip",
+      "raw_text": "@pytest.mark.skip(reason=\"TODO: implement replay modules for these forms\")",
+      "reason": "TODO: implement replay modules for these forms",
+      "form": null,
+      "blocker_class": "intentional_placeholder",
+      "likely_next_action": "Future-PR placeholder; no action."
+    },
+    {
+      "test_file": "tests\\test_other_lookat_forms.py",
+      "line": 95,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(\"no rows for category 1 — try another in regen step\")",
+      "reason": "no rows for category 1 — try another in regen step",
+      "form": null,
+      "blocker_class": "fixture_empty",
+      "likely_next_action": "Fixture-data drift — re-run discover_test_inputs.py or pick a different anchor for the affected test."
+    },
+    {
+      "test_file": "tests\\test_saved_views.py",
+      "line": 29,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(f\"{QUERIES_JSON} missing; run analysis/dump_metadata.py\")",
+      "reason": "{QUERIES_JSON} missing; run analysis/dump_metadata.py",
+      "form": null,
+      "blocker_class": "fixture_not_available",
+      "likely_next_action": "Provide a fixture (data file / picker code) to enable."
+    },
+    {
+      "test_file": "tests\\test_schema.py",
+      "line": 71,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(f\"{TABLES_JSON} missing; run analysis/dump_metadata.py\")",
+      "reason": "{TABLES_JSON} missing; run analysis/dump_metadata.py",
+      "form": null,
+      "blocker_class": "fixture_not_available",
+      "likely_next_action": "Provide a fixture (data file / picker code) to enable."
+    },
+    {
+      "test_file": "tests\\test_schema.py",
+      "line": 84,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(f\"{table} not present (covered by required-tables test)\")",
+      "reason": "{table} not present (covered by required-tables test)",
+      "form": null,
+      "blocker_class": "fixture_not_available",
+      "likely_next_action": "Provide a fixture (data file / picker code) to enable."
+    },
+    {
+      "test_file": "tests\\test_vba_bug_behaviors.py",
+      "line": 73,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(f\"no matrix fixture for {form}\")",
+      "reason": "no matrix fixture for {form}",
+      "form": null,
+      "blocker_class": "fixture_empty",
+      "likely_next_action": "Fixture-data drift — re-run discover_test_inputs.py or pick a different anchor for the affected test."
+    },
+    {
+      "test_file": "tests\\test_vba_bug_behaviors.py",
+      "line": 270,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(\"LookAtNetworks Form_Open hangs in this driver — \"",
+      "reason": "LookAtNetworks Form_Open hangs in this driver —",
+      "form": "LookAtNetworks",
+      "blocker_class": "lookatnetworks_form_open_hang_legacy_label",
+      "likely_next_action": "Stale label — PR AA showed Form_Open does NOT hang.  Replace skip reason with cmdrun_timeout once a smaller fixture lets CmdRun complete (PR AB scope was subsumed by AA — see analysis/lookatnetworks_form_open_hang.md)."
+    },
+    {
+      "test_file": "tests\\test_vba_cmdgispeople_office.py",
+      "line": 36,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(\"no LookAtOffice fixture available\")",
+      "reason": "no LookAtOffice fixture available",
+      "form": "LookAtOffice",
+      "blocker_class": "unclassified",
+      "likely_next_action": "Read the test for context; no automated next-action heuristic."
+    },
+    {
+      "test_file": "tests\\test_vba_cmdguess_cross_form.py",
+      "line": 50,
+      "kind": "factory_skip",
+      "raw_text": "return pytest.mark.skip(",
+      "reason": "LookAtNetworks Form_Open hangs in this driver",
+      "form": "LookAtNetworks",
+      "blocker_class": "lookatnetworks_form_open_hang_legacy_label",
+      "likely_next_action": "Stale label — PR AA showed Form_Open does NOT hang.  Replace skip reason with cmdrun_timeout once a smaller fixture lets CmdRun complete (PR AB scope was subsumed by AA — see analysis/lookatnetworks_form_open_hang.md)."
+    },
+    {
+      "test_file": "tests\\test_vba_cmdneo4j_cross_form.py",
+      "line": 71,
+      "kind": "factory_skip",
+      "raw_text": "return pytest.mark.skip(",
+      "reason": "LookAtStatus chain post-cleanup invalidates the",
+      "form": "LookAtStatus",
+      "blocker_class": "unclassified",
+      "likely_next_action": "Read the test for context; no automated next-action heuristic."
+    },
+    {
+      "test_file": "tests\\test_vba_cmdneo4j_cross_form.py",
+      "line": 77,
+      "kind": "factory_skip",
+      "raw_text": "return pytest.mark.skip(",
+      "reason": "LookAtPlace.CmdNeo4j fires `Item not found in this",
+      "form": "LookAtStatus",
+      "blocker_class": "unclassified",
+      "likely_next_action": "Read the test for context; no automated next-action heuristic."
+    },
+    {
+      "test_file": "tests\\test_vba_cmdneo4j_cross_form.py",
+      "line": 85,
+      "kind": "factory_skip",
+      "raw_text": "return pytest.mark.skip(",
+      "reason": "LookAtAssociations.CmdNeo4j produces 0 files in",
+      "form": "LookAtAssociations",
+      "blocker_class": "unclassified",
+      "likely_next_action": "Read the test for context; no automated next-action heuristic."
+    },
+    {
+      "test_file": "tests\\test_vba_cmdneo4j_cross_form.py",
+      "line": 120,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(f\"no matrix fixture for {spec.form}\")",
+      "reason": "no matrix fixture for {spec.form}",
+      "form": null,
+      "blocker_class": "fixture_empty",
+      "likely_next_action": "Fixture-data drift — re-run discover_test_inputs.py or pick a different anchor for the affected test."
+    },
+    {
+      "test_file": "tests\\test_vba_export.py",
+      "line": 113,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(f\"blessed golden: {golden}\")",
+      "reason": "blessed golden: {golden}",
+      "form": null,
+      "blocker_class": "intentional_placeholder",
+      "likely_next_action": "Future-PR placeholder; no action."
+    },
+    {
+      "test_file": "tests\\test_vba_import_lists.py",
+      "line": 134,
+      "kind": "factory_skip",
+      "raw_text": "return pytest.mark.skip(",
+      "reason": "LookAtNetworks Form_Open hangs in this driver",
+      "form": "LookAtNetworks",
+      "blocker_class": "lookatnetworks_form_open_hang_legacy_label",
+      "likely_next_action": "Stale label — PR AA showed Form_Open does NOT hang.  Replace skip reason with cmdrun_timeout once a smaller fixture lets CmdRun complete (PR AB scope was subsumed by AA — see analysis/lookatnetworks_form_open_hang.md)."
+    },
+    {
+      "test_file": "tests\\test_vba_integrity.py",
+      "line": 177,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(\"no rows\")",
+      "reason": "no rows",
+      "form": null,
+      "blocker_class": "fixture_empty",
+      "likely_next_action": "Fixture-data drift — re-run discover_test_inputs.py or pick a different anchor for the affected test."
+    },
+    {
+      "test_file": "tests\\test_vba_integrity.py",
+      "line": 214,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(\"no rows\")",
+      "reason": "no rows",
+      "form": null,
+      "blocker_class": "fixture_empty",
+      "likely_next_action": "Fixture-data drift — re-run discover_test_inputs.py or pick a different anchor for the affected test."
+    },
+    {
+      "test_file": "tests\\test_vba_integrity.py",
+      "line": 247,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(\"no rows with addr\")",
+      "reason": "no rows with addr",
+      "form": null,
+      "blocker_class": "fixture_empty",
+      "likely_next_action": "Fixture-data drift — re-run discover_test_inputs.py or pick a different anchor for the affected test."
+    },
+    {
+      "test_file": "tests\\test_vba_integrity.py",
+      "line": 279,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(\"no addrs in result\")",
+      "reason": "no addrs in result",
+      "form": null,
+      "blocker_class": "fixture_empty",
+      "likely_next_action": "Fixture-data drift — re-run discover_test_inputs.py or pick a different anchor for the affected test."
+    },
+    {
+      "test_file": "tests\\test_vba_integrity.py",
+      "line": 296,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(\"no codes\")",
+      "reason": "no codes",
+      "form": null,
+      "blocker_class": "fixture_empty",
+      "likely_next_action": "Fixture-data drift — re-run discover_test_inputs.py or pick a different anchor for the affected test."
+    },
+    {
+      "test_file": "tests\\test_vba_integrity.py",
+      "line": 383,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(\"no rows\")",
+      "reason": "no rows",
+      "form": null,
+      "blocker_class": "fixture_empty",
+      "likely_next_action": "Fixture-data drift — re-run discover_test_inputs.py or pick a different anchor for the affected test."
+    },
+    {
+      "test_file": "tests\\test_vba_integrity.py",
+      "line": 388,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(\"no personids\")",
+      "reason": "no personids",
+      "form": null,
+      "blocker_class": "fixture_empty",
+      "likely_next_action": "Fixture-data drift — re-run discover_test_inputs.py or pick a different anchor for the affected test."
+    },
+    {
+      "test_file": "tests\\test_vba_matrix.py",
+      "line": 73,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(f\"missing {INPUTS} — run discover_test_inputs.py first\")",
+      "reason": "missing {INPUTS} — run discover_test_inputs.py first",
+      "form": null,
+      "blocker_class": "fixture_not_available",
+      "likely_next_action": "Provide a fixture (data file / picker code) to enable."
+    },
+    {
+      "test_file": "tests\\test_vba_matrix_all_forms.py",
+      "line": 312,
+      "kind": "factory_skip",
+      "raw_text": "return pytest.mark.skip(",
+      "reason": "{fx.spec.name} CmdQuery/CmdRun times out — needs",
+      "form": "LookAtNetworks",
+      "blocker_class": "cmdrun_timeout",
+      "likely_next_action": "Smaller fixture: anchor person with 5–20 assocs instead of Zhu Xi (2471).  Then attempt unskip."
+    },
+    {
+      "test_file": "tests\\test_vba_pajek_gephi_cross_form.py",
+      "line": 79,
+      "kind": "factory_skip",
+      "raw_text": "return pytest.mark.skip(",
+      "reason": "LookAtStatus chain to CmdPajek/CmdGephi reads",
+      "form": "LookAtStatus",
+      "blocker_class": "unclassified",
+      "likely_next_action": "Read the test for context; no automated next-action heuristic."
+    },
+    {
+      "test_file": "tests\\test_vba_pajek_gephi_cross_form.py",
+      "line": 127,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(f\"no matrix fixture for {case.form}\")",
+      "reason": "no matrix fixture for {case.form}",
+      "form": null,
+      "blocker_class": "fixture_empty",
+      "likely_next_action": "Fixture-data drift — re-run discover_test_inputs.py or pick a different anchor for the affected test."
+    },
+    {
+      "test_file": "tests\\test_vba_pickers_smoke.py",
+      "line": 66,
+      "kind": "factory_skip",
+      "raw_text": "return pytest.mark.skip(",
+      "reason": "{name} has 0 callers in any VBA / macro — orphan",
+      "form": null,
+      "blocker_class": "unclassified",
+      "likely_next_action": "Read the test for context; no automated next-action heuristic."
+    },
+    {
+      "test_file": "tests\\test_vba_storeid_recallid.py",
+      "line": 224,
+      "kind": "factory_skip",
+      "raw_text": "return pytest.mark.skip(",
+      "reason": "LookAtNetworks Form_Open hangs in this driver",
+      "form": "LookAtNetworks",
+      "blocker_class": "lookatnetworks_form_open_hang_legacy_label",
+      "likely_next_action": "Stale label — PR AA showed Form_Open does NOT hang.  Replace skip reason with cmdrun_timeout once a smaller fixture lets CmdRun complete (PR AB scope was subsumed by AA — see analysis/lookatnetworks_form_open_hang.md)."
+    },
+    {
+      "test_file": "tests\\test_vba_storeid_recallid.py",
+      "line": 293,
+      "kind": "call_skip",
+      "raw_text": "pytest.skip(\"test_inputs.json missing — run discover_test_inputs.py\")",
+      "reason": "test_inputs.json missing — run discover_test_inputs.py",
+      "form": null,
+      "blocker_class": "fixture_not_available",
+      "likely_next_action": "Provide a fixture (data file / picker code) to enable."
+    }
+  ]
+}
