@@ -303,7 +303,15 @@ class VbaSession:
             "    ' (no picker globals — input is ZZ_SCRATCH_IMPORT_PEOPLE table)",
         ],
         "Form_LookAtNetworks": [
-            "    ' (no picker globals — input is ZZ_SCRATCH_IMPORT_PEOPLE table)",
+            "    ' Auto-detect picker state from ZZ_SCRATCH_IMPORT_PEOPLE",
+            "    ' (matches what CmdSelectPerson / CmdImportPeople would",
+            "    ' set when a real user populates the picker via the UI).",
+            "    Dim tdPplCount As Long, tdAddrCount As Long",
+            "    tdPplCount = 0 : tdAddrCount = 0",
+            "    tdPplCount = DCount(\"*\", \"ZZ_SCRATCH_IMPORT_PEOPLE\")",
+            "    tdAddrCount = DCount(\"*\", \"ZZ_SCRATCH_ADDR\")",
+            "    gUsePersonID = (tdPplCount > 0)",
+            "    gUseADDRID = (tdAddrCount > 0)",
         ],
         "Form_LookAtGroupData": [
             "    ' (no picker globals — input is ZZ_SCRATCH_IMPORT_PEOPLE table)",

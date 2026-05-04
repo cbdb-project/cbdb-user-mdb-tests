@@ -1,0 +1,107 @@
+{
+  "candidates_probed": 3,
+  "outcomes_summary": {
+    "30270": "exception",
+    "4": "exception",
+    "3135": "exception"
+  },
+  "per_candidate_timeout_sec": 240,
+  "cmdrun_timer_timeout_sec": 120,
+  "min_control_state": {
+    "TxtNodeDist": 1,
+    "TxtMaxLoop": 0,
+    "ChkKin": -1,
+    "ChkNonKin": 0,
+    "ChkMale": -1,
+    "ChkFemale": -1
+  },
+  "results": [
+    {
+      "candidate": {
+        "c_personid": 30270,
+        "name_chn": "曹植",
+        "name_py": "Cao Zhi",
+        "assocs": 10,
+        "kin": 1,
+        "est_1hop": 10
+      },
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 5.41,
+          "marker": "session_opened"
+        },
+        {
+          "t": 240.01,
+          "marker": "hard_timeout_at_240s"
+        }
+      ],
+      "outcome": "exception",
+      "elapsed_sec": 242.55,
+      "exception": "com_error(-2147023170, 'The remote procedure call failed.', None, None)\nTraceback (most recent call last):\n  File \"C:\\Users\\how612\\Documents\\GitHub\\cbdb-user-mdb-tests\\analysis\\probe_lookatnetworks_cmdrun.py\", line 125, in _worker\n    sess.open_form(\"LookAtNetworks\")\n  File \"C:\\Users\\how612\\Documents\\GitHub\\cbdb-user-mdb-tests\\tests\\cbdb_driver\\vba_session.py\", line 628, in open_form\n    self.app.DoCmd.OpenForm(name, 0, \"\", \"\", 0, 0)\n  File \"<COMObject <unknown>>\", line 3, in OpenForm\npywintypes.com_error: (-2147023170, 'The remote procedure call failed.', None, None)\n",
+      "row_counts": {},
+      "debug_transcript": []
+    },
+    {
+      "candidate": {
+        "c_personid": 4,
+        "name_chn": "查道",
+        "name_py": "Zha Dao",
+        "assocs": 5,
+        "kin": 9,
+        "est_1hop": 99
+      },
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 5.05,
+          "marker": "session_opened"
+        },
+        {
+          "t": 240.0,
+          "marker": "hard_timeout_at_240s"
+        }
+      ],
+      "outcome": "exception",
+      "elapsed_sec": 242.58,
+      "exception": "com_error(-2147023170, 'The remote procedure call failed.', None, None)\nTraceback (most recent call last):\n  File \"C:\\Users\\how612\\Documents\\GitHub\\cbdb-user-mdb-tests\\analysis\\probe_lookatnetworks_cmdrun.py\", line 125, in _worker\n    sess.open_form(\"LookAtNetworks\")\n  File \"C:\\Users\\how612\\Documents\\GitHub\\cbdb-user-mdb-tests\\tests\\cbdb_driver\\vba_session.py\", line 628, in open_form\n    self.app.DoCmd.OpenForm(name, 0, \"\", \"\", 0, 0)\n  File \"<COMObject <unknown>>\", line 3, in OpenForm\npywintypes.com_error: (-2147023170, 'The remote procedure call failed.', None, None)\n",
+      "row_counts": {},
+      "debug_transcript": []
+    },
+    {
+      "candidate": {
+        "c_personid": 3135,
+        "name_chn": "張君平",
+        "name_py": "Zhang Junping",
+        "assocs": 5,
+        "kin": 2,
+        "est_1hop": 31
+      },
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "opening_session"
+        },
+        {
+          "t": 5.04,
+          "marker": "session_opened"
+        },
+        {
+          "t": 240.01,
+          "marker": "hard_timeout_at_240s"
+        }
+      ],
+      "outcome": "exception",
+      "elapsed_sec": 242.57,
+      "exception": "com_error(-2147023170, 'The remote procedure call failed.', None, None)\nTraceback (most recent call last):\n  File \"C:\\Users\\how612\\Documents\\GitHub\\cbdb-user-mdb-tests\\analysis\\probe_lookatnetworks_cmdrun.py\", line 125, in _worker\n    sess.open_form(\"LookAtNetworks\")\n  File \"C:\\Users\\how612\\Documents\\GitHub\\cbdb-user-mdb-tests\\tests\\cbdb_driver\\vba_session.py\", line 628, in open_form\n    self.app.DoCmd.OpenForm(name, 0, \"\", \"\", 0, 0)\n  File \"<COMObject <unknown>>\", line 3, in OpenForm\npywintypes.com_error: (-2147023170, 'The remote procedure call failed.', None, None)\n",
+      "row_counts": {},
+      "debug_transcript": []
+    }
+  ]
+}
