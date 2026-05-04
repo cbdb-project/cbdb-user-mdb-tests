@@ -11,8 +11,13 @@ Same structural-assertion approach as `test_vba_cmdgis_other_forms.py`:
   the `.gdf` `nodedef>` keyword
 
 Skip:
-- LookAtNetworks — Form_Open hangs in this driver (same family as
-  the matrix Networks skip + the picker test skip).
+- LookAtNetworks — under default full injection Form_Open hits
+  the project-wide auto-compile deadlock documented in PR AR-AX
+  (AGENTS landmine #3.5).  Same family as the matrix Networks
+  skip + picker test skip.  Form_Open itself is fine via the
+  minimal-injection path used by
+  `tests/test_vba_networks_small_fixture.py`; CmdGUESS coverage
+  via this default-injection chain stays out of scope here.
 """
 from __future__ import annotations
 

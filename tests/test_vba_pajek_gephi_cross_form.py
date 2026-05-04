@@ -11,8 +11,11 @@ Per `analysis/dump/vba/Form_*.vb`:
   CmdGephi hosts:   AssociationPairs, Associations, Place, Status
 
 Skip rationale:
-  - Networks: Form_Open hangs in this driver
-    (matrix Networks skip + picker test skip same family).
+  - Networks: under default full injection Form_Open hits the
+    project-wide auto-compile deadlock (PR AR-AX, AGENTS landmine
+    #3.5).  Same family as matrix Networks + picker test skips.
+    Form_Open verified fine via minimal injection in
+    tests/test_vba_networks_small_fixture.py.
   - AssociationPairs: matrix CmdQuery / CmdRun itself doesn't
     complete (item 7 still open); without a working query the
     CmdQuery → CmdPajek chain has nothing to feed.

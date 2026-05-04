@@ -14,9 +14,15 @@ toggle would silently break the bilingual flow that end users depend
 on.  We just verify the timer-fired Click completes without ERR.
 
 Skips:
-- LookAtNetworks: Form_Open hangs in this driver.
+- LookAtNetworks: under default full injection, Form_Open hits
+  the project-wide auto-compile deadlock documented in PR AR-AX
+  (see AGENTS.md landmine #3.5).  Real Networks Form_Open is
+  fine via the minimal-injection path used by
+  `tests/test_vba_networks_small_fixture.py`; this test still
+  skips because it shares VbaSession default setup with the
+  matrix.
 - LookAtAssociationPairs / LookAtGroupData: matrix CmdQuery skipped
-  family — Form_Open path interaction with this driver is the same.
+  family — same VbaSession setup interaction.
 """
 from __future__ import annotations
 

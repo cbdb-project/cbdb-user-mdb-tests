@@ -15,7 +15,10 @@ catches "Sub doesn't run", "early bail before any write", "regex
 mismatch breaks one block".
 
 Skips:
-- LookAtNetworks: matrix CmdQuery/CmdRun skipped + Form_Open hangs.
+- LookAtNetworks: matrix CmdQuery/CmdRun skipped + under default
+  full injection Form_Open hits the project-wide auto-compile
+  deadlock (PR AR-AX, AGENTS landmine #3.5).  Form_Open is fine
+  via minimal injection — see tests/test_vba_networks_small_fixture.py.
 - LookAtStatus: chain interaction with CmdQuery cleanup-rebind
   (same root family as Pajek/Gephi Status skip).
 - LookAtAssociationPairs / LookAtGroupData: matrix CmdQuery skipped.

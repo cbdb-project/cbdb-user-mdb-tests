@@ -41,8 +41,11 @@ WORK = ROOT / "analysis" / "_bilingual_test_copy.mdb"
 
 # Every form that has the standard CmdFanti / CmdJianti pair.
 # LookAtNetworks uses different button names (`CmdFantiDisplay`,
-# `CmdJiantiDisplay`) and its Form_Open hangs in this driver — handled
-# below as a skip.
+# `CmdJiantiDisplay`) AND under default full injection its
+# Form_Open hits the project-wide auto-compile deadlock (PR AR-AX,
+# AGENTS landmine #3.5) — handled below as a skip.  Real Networks
+# Form_Open is verified fine via minimal injection in
+# tests/test_vba_networks_small_fixture.py.
 _FORMS_WITH_LANG_TOGGLE = (
     "LookAtEntry",
     "LookAtStatus",
