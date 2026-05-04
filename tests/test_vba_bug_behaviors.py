@@ -279,21 +279,23 @@ def test_bug9_lookat_entry_cmdneo4j_with_institutions_fixture(vba: VbaSession):
     """Bug #9: LookAtEntry.CmdNeo4j has `With tRstAssocCodes` where
     `With tRstInstitutions` was intended.
 
-    The buggy block sits inside `If tRecDeleted > 0 Then` at line
-    1390, where tRecDeleted is the count of rows inserted into
-    ZZ_SCRATCH_P_TEXT with `WHERE c_inst_code > 0` — i.e. only entries
-    with a social-institution code reach the With block.
+    Reclassified 2026-05-04 to P5 latent.  The buggy block sits
+    inside `If tRecDeleted > 0 Then` at Form_LookAtEntry.vb:1389,
+    where tRecDeleted is the count of rows inserted into
+    ZZ_SCRATCH_P_TEXT with `WHERE c_inst_code > 0` — i.e. only
+    entries with a social-institution code reach the With block.
+    On the current dump 0 of 263,454 ENTRY_DATA rows have
+    c_inst_code > 0, so the buggy block is unreachable from any
+    LookAtEntry fixture (full re-verification:
+    analysis/issue9_neo4j_institutioncodes_reverification.md).
 
-    For a typical fixture (entry_code=36 jinshi general), c_inst_code
-    is almost always 0, so tRecDeleted=0 and the buggy block is
-    skipped.  This test verifies that property — when no institution-
-    style entries exist, CmdNeo4j completes without error AND without
-    reaching the bug.
-
-    To genuinely trigger Bug #9, a fixture would need ENTRY_DATA rows
-    with c_inst_code > 0 (rare).  Static `test_known_bugs.test_bug9`
-    covers the code-side; a future deeper test could pre-populate
-    ZZ_SCRATCH_ENTRY directly to force the With-block reach."""
+    This behavioural test pins that property — for a normal user
+    fixture (entry_code=36 jinshi), CmdNeo4j completes without
+    error AND without reaching the buggy With block.  If a future
+    MDB drop introduces ENTRY_DATA rows with c_inst_code > 0,
+    test_known_bugs.test_bug9 will fail at the LATENT-gate
+    assertion and force re-promotion to P1; this test would still
+    pass for fixtures that don't pull in inst-bearing entries."""
     spec = LOOKATENTRY
     fx = CrossFixture(
         name="bug9_entry",

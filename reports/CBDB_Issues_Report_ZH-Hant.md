@@ -13,7 +13,6 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
 - [P0 — 靜默資料錯誤](#p0--靜默資料錯誤)
   - [Issue #7 — LookAtPlace.CmdNeo4j 在寫入第一條 people-CSV 時靜默失敗](#issue-7--lookatplacecmdneo4j-在寫入第一條-people-csv-時靜默失敗)
   - [Issue #8 — LookAtNetworks.CmdNeo4j 的 people/place CSV 在第一條上靜默失敗](#issue-8--lookatnetworkscmdneo4j-的-peopleplace-csv-在第一條上靜默失敗)
-  - [Issue #9 — LookAtEntry.CmdNeo4j 的機構 (Institutions) 部分用錯了記錄集變數](#issue-9--lookatentrycmdneo4j-的機構-institutions-部分用錯了記錄集變數)
   - [Issue #20 — 地址名中的 BOM 會在 GIS 匯出中變成 tab，造成欄位錯位](#issue-20--地址名中的-bom-會在-gis-匯出中變成-tab造成欄位錯位)
 - [P1 — 可見的執行時報錯](#p1--可見的執行時報錯)
   - [Issue #6 — LookAtGroupData 的 ChkEntry 路徑引用了不存在的列 ENTRY_DATA.c_parental_status](#issue-6--lookatgroupdata-的-chkentry-路徑引用了不存在的列-entry_datac_parental_status)
@@ -30,6 +29,7 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
   - [Issue #2 — VBA 工程引用了過時的 dao360.dll，Office 2016+ 機器上沒這個檔案](#issue-2--vba-工程引用了過時的-dao360dlloffice-2016-機器上沒這個檔案)
 - [P5 — 潛伏 / 不可達 / 當前無法復現](#p5--潛伏--不可達--當前無法復現)
   - [Issue #1 — View_StatusData 會把首年份範圍顯示成末年份範圍 — DORMANT（當前 dump 沒有源資料能觸發）](#issue-1--view_statusdata-會把首年份範圍顯示成末年份範圍--dormant當前-dump-沒有源資料能觸發)
+  - [Issue #9 — LookAtEntry.CmdNeo4j 的機構 (Institutions) 部分用錯了記錄集變數 — LATENT（被資料 gate 跳過、不可達；當前 dump 中沒有 c_inst_code > 0 的 ENTRY_DATA 行）](#issue-9--lookatentrycmdneo4j-的機構-institutions-部分用錯了記錄集變數--latent被資料-gate-跳過不可達當前-dump-中沒有-c_inst_code--0-的-entry_data-行)
   - [Issue #4 — LookAtPlace.CmdGIS 會報「Object required」 — LATENT，被 Issue #15（表單上沒有 CmdGIS 按鈕）所遮蔽](#issue-4--lookatplacecmdgis-會報object-required--latent被-issue-15表單上沒有-cmdgis-按鈕所遮蔽)
   - [Issue #5 — LookAtStatus.CmdPajek 引用了不存在的控制元件，且 SQL 用了三個不存在的列](#issue-5--lookatstatuscmdpajek-引用了不存在的控制元件且-sql-用了三個不存在的列)
   - [Issue #14 — KIN_DATA 子表單的 CmdPickKinRel 呼叫不存在的 picker（frmPickKINSHIP_CODES）——但目前該子表單在主表中無入口（LATENT）](#issue-14--kin_data-子表單的-cmdpickkinrel-呼叫不存在的-pickerfrmpickkinship_codes但目前該子表單在主表中無入口latent)
@@ -112,59 +112,6 @@ _Reconstructed-in-PIL popup showing the JET 'Item not found in this collection' 
 #### 建議修復方案
 
 把兩條 SELECT 都擴充套件，加入迴圈裡讀到的欄位。對 tRstPlace 加上 `ADDR_CODES.x_coord`、`ADDR_CODES.y_coord`。對 tRstPeoplePlace 加上 `c_person_id` 和 `c_index_addr_id`。
-
-### Issue #9 — LookAtEntry.CmdNeo4j 的機構 (Institutions) 部分用錯了記錄集變數
-
-**涉及位置:** `Form_LookAtEntry.CmdNeo4j_Click`
-
-**嚴重等級:** P0 — 靜默資料缺失（匯出無聲地什麼都沒生成）
-
-#### 問題描述
-
-`Form_LookAtEntry.vb` 第 1415 行開啟 institutions 記錄集：`Set tRstInstitutions = CurrentDb.OpenRecordset(tQueryStr)`。十行之後，第 1425 行寫的是 `With tRstAssocCodes`，迴圈又讀 `!c_inst_code`、`!c_inst_name_code` 等，依據的卻是早先繫結到 AssocCodes SELECT 的那個 tRstAssocCodes —— 那裡沒有 `c_inst_*`列。症狀與 Issue #7 相同，InstitutionCodes 檔案永遠不會寫出。
-
-**具體復現** （已對當前 `CBDB_BJ_User.mdb` 驗證）：
-
-在 LookAtEntry 的 picker 選 `c_entry_code = 36`（科舉: 進士（籠統））或 `c_entry_code = 101`（薦舉/保任）。這兩個 entry code 都會產生包含 `c_assoc_code > 0` 之 entry 的查詢結果，使 `tRstAssocCodes` 不為空——具體 personid 見下方 Concrete reproduction 段。點 **Neo4j**，一路確認到 InstitutionCodes 對話方塊；第 1425 行的 `With tRstAssocCodes` 區塊呼叫 `.MoveFirst` 後讀 `!c_inst_code` → DAO 3265（「集合中找不到專案」）彈窗。
-
-**c_inst_code 資料現況補充**：當前 MDB 263 454 筆 ENTRY_DATA 中，`c_inst_code > 0` 的列數為 0；換句話說即使修好這個 bug，InstitutionCodes 檔本來也會是空的。但 bug 本身**在每次走到 InstitutionCodes 分支的 CmdNeo4j 執行時都會觸發**——錯誤的 recordset 變數名與 tRstInstitutions 是否有 row 無關。
-
-#### 復現步驟
-
-1. 開啟 **LookAtEntry**。在 entry-code picker 裡選 `c_entry_code = 36`（科舉: 進士），這個 code 的查詢結果會包含若干 `c_assoc_code > 0` 的 entry，使 `tRstAssocCodes` 不為空。點 **Run Query**。
-2. 點 **Neo4j** 匯出按鈕。
-3. 前面 6 個 SaveAs 對話方塊（People / PeopleEntry / Place / EntryCodes / KinCodes / AssocCodes）都能正常存檔。
-4. 走到 InstitutionCodes 對話方塊時選好儲存位置。第 1425 行的 `With tRstAssocCodes` 區塊先對 AssocCodes 那條 recordset 呼叫 `.MoveFirst`，接著嘗試讀 `!c_inst_code`（這欄根本不在 AssocCodes 的 SELECT 投影裡）。
-5. 立即彈出 DAO 3265「集合中找不到專案」對話方塊。按確定後，InstitutionCodes 檔內容為空、未寫入。
-
-#### 具體復現
-
-驗證過的範例—— 以下 personid 在當前 MDB 真實存在，且對所列 `c_entry_code` 都有 `c_assoc_code > 0`，會把 `tRstAssocCodes` 填滿：
-
-  - `c_entry_code = 36`（科舉: 進士）:
-      - `c_personid = 32227`  （白居易 / Bai Juyi）  —         c_assoc_code = 559
-      - `c_personid = 93384`  （張文伏 / Zhang Wenfu）  —         c_assoc_code = 186
-
-  - `c_entry_code = 101`（薦舉/保任），共 6 筆，包含：
-      - `c_personid = 3404`   （胡瑗 / Hu Yuan）
-      - `c_personid = 4022`   （吳師仁 / Wu Shiren）
-      - `c_personid = 108665` （湯楷 / Tang Kai）
-
-兩個 entry_code 任一個都能復現此 bug。不需要 fixture-side 造資料——這些是當前 dump 裡真實存在的 CBDB 紀錄。
-
-#### 截圖
-
-![bug9_form_annotated.png](screenshots/bug9_form_annotated.png)
-
-_Step 1 — open LookAtEntry, run any query, click **Neo4j**.  (Note: this code path only fires for queries whose result includes entries with `c_inst_code > 0` — see the summary's REAL_BUT_GATED note.)_
-
-![bug9_faux_popup.png](screenshots/bug9_faux_popup.png)
-
-_Step 2 — the popup users see when the With block on line 1425 reads `!c_inst_code` against the wrong-named recordset.  Reconstructed in PIL because the real popup would block the COM test driver; the error code (DAO 3265) and message text are JET's standard response to a recordset field that doesn't exist._
-
-#### 建議修復方案
-
-把第 1425 行的 `With tRstAssocCodes` 改成 `With tRstInstitutions`。屬於一字之差的筆誤，底層記錄集變數只是寫錯了。
 
 ### Issue #20 — 地址名中的 BOM 會在 GIS 匯出中變成 tab，造成欄位錯位
 
@@ -490,6 +437,45 @@ _本層的條目作為歷史 / 潛伏記錄保留。可分為三類：(a) DORMAN
 #### 建議修復方案
 
 在 `View_StatusData` 中，把 `YEAR_RANGE_CODES_1.c_range AS c_fy_range_desc` 和 `YEAR_RANGE_CODES_1.c_range_chn AS c_fy_range_chn` 改成不帶別名的 `YEAR_RANGE_CODES.*`（FROM 子句已經按 `c_fy_range` JOIN 了它）。
+
+### Issue #9 — LookAtEntry.CmdNeo4j 的機構 (Institutions) 部分用錯了記錄集變數 — LATENT（被資料 gate 跳過、不可達；當前 dump 中沒有 c_inst_code > 0 的 ENTRY_DATA 行）
+
+**涉及位置:** `Form_LookAtEntry.CmdNeo4j_Click`
+
+**嚴重等級:** P5 — Source-level latent typo（在當前 dump 被 gate 跳過、不可達；若未來任一 ENTRY_DATA 列出現 c_inst_code > 0，會回歸為 P1）
+
+#### 問題描述
+
+**Source-level typo，目前在此 dump 上不可達。**
+
+`Form_LookAtEntry.vb` 第 1415 行用 `Set tRstInstitutions = CurrentDb.OpenRecordset(tQueryStr)` 開啟 institutions 記錄集。十行之後，第 1425 行卻寫成 `With tRstAssocCodes`，接下來迴圈讀 `!c_inst_code`、`!c_inst_name_code` 等欄位 ── 這個 recordset 早在 AssocCodes 區塊的第 1373 行就已經 `Close` 掉了。一旦真的執行到，`.MoveFirst` 那行就會丟出 DAO 3021（「No current record」）。這個錯名 reference 確實是 source-level bug。
+
+但在當前 dump，整個 SaveAs 對話方塊與有 bug 的 `With` 區塊都包在第 1389 行的 gate `If tRecDeleted > 0 Then` 裡；`tRecDeleted` 是緊鄰的 `INSERT INTO ZZ_SCRATCH_P_TEXT … WHERE ZZ_SCRATCH_ENTRY.c_inst_code > 0` 寫入列數。CmdQuery 把 `ENTRY_DATA.c_inst_code` 原樣複製到 `ZZ_SCRATCH_ENTRY.c_inst_code`（第 1645-1652 行），而 **當前 MDB 263,454 筆 ENTRY_DATA 中，`c_inst_code > 0` 的列數為 0**（`c_inst_name_code > 0` 也為 0）。因此任何 LookAtEntry 條件下 `tRecDeleted` 都會是 0、gate 永遠為假、SaveAs 對話方塊不會出現、`With tRstAssocCodes` 永遠不會被執行，CmdNeo4j 會順利走完並顯示「Finished saving to Neo4j」── 只是因為沒有 institution rows，所以靜默地省略 `InstitutionCodes_*.csv`。
+
+**缺 `InstitutionCodes_*.csv` 本身在當前 dump 不是使用者可見錯誤**。當該分割槽資料表計數為 0 時跳過該 optional 檔，與鄰近區塊的 gating 行為完全一致（fixture 若 `c_assoc_code = 0`，AssocCodes 區塊同樣會被靜默跳過 ── 詳見 re-verification artifacts 的對照行為）。只有當未來某次 MDB 更新引入任一 `c_inst_code > 0` 的 ENTRY_DATA 列，這個 latent typo 才會變成使用者可見錯誤。
+
+**Re-verification 證據：** SQL pre-image 與對 `c_entry_code = 36`（科舉：進士）、`c_entry_code = 101`（薦舉/保任）的真實 Access COM 探查均確認：無 popup、chain 順利完成、產出檔案中沒有 `InstitutionCode` 形狀的檔。細節請見 `analysis/issue9_neo4j_institutioncodes_reverification.md` 與 `reports/issue9_neo4j_institutioncodes_reverification.json`。
+
+#### 復現步驟
+
+1. **當前 dump 此 bug 無法從 UI 觸發** ── Form_LookAtEntry.vb:1389 的 `If tRecDeleted > 0 Then` gate 對任何 LookAtEntry 條件都為假（263,454 筆 ENTRY_DATA 中 `c_inst_code > 0` 為 0）。請改用 source-level 靜態驗證：
+2. 開啟 `analysis/dump/vba/Form_LookAtEntry.vb`，讀第 1415-1425 行。第 1415 行寫 `Set tRstInstitutions = CurrentDb.OpenRecordset(tQueryStr)`，第 1425 行寫 `With tRstAssocCodes`（原意應為 `With tRstInstitutions`）。`tRstAssocCodes` 早在 AssocCodes 區塊的第 1373 行就已經 `Close` 掉，因此 `.MoveFirst` 一旦執行即丟 DAO 3021。
+3. （可選，SQL）在當前 dump 確認 gate 條件：`SELECT COUNT(*) FROM ENTRY_DATA WHERE c_inst_code > 0` 結果為 0（`c_inst_name_code > 0` 同樣為 0）。正是這點讓有 bug 的區塊變成不可達。
+4. （可選，runtime 證據）在 LookAtEntry 選 `c_entry_code = 36`（科舉：進士）或 `c_entry_code = 101`（薦舉/保任）→ Run Query → Neo4j。chain 會順利完成並顯示「Finished saving to Neo4j」；無 popup，輸出資料夾中沒有 `InstitutionCodes_*.csv`。這在今天不是使用者可見錯誤 ── 它是 gate 確實起作用的證據。
+5. Source-level typo 會在未來某次 MDB 更新引入任一 `c_inst_code > 0` 的 ENTRY_DATA 列時變成使用者可見錯誤。屆時 gate 開啟，`With tRstAssocCodes` 那行對已 `Close` 的 recordset 執行，`.MoveFirst` 立即丟出 DAO 3021（「No current record」）。
+
+#### 具體復現
+
+下列兩個 `c_entry_code` 值是 re-verification 用的investigation 證據 ── 它們會走完 CmdQuery + CmdNeo4j，用來示範 InstitutionCodes branch 在當前 dump 被 gate 跳過。**這兩個 fixture 不是 popup 復現**，兩者都會顯示「Finished saving to Neo4j」、無錯誤、無 `InstitutionCodes_*.csv`：
+
+  - `c_entry_code = 36`（科舉：進士）── ENTRY_DATA 92,514 筆，`c_inst_code > 0` 為 0
+  - `c_entry_code = 101`（薦舉/保任）── ENTRY_DATA 878 筆，`c_inst_code > 0` 為 0
+
+用 `python analysis/investigate_issue9_neo4j_institutioncodes.py` 重跑 SQL evidence；加 `--com` 會額外跑真實 Access COM。
+
+#### 建議修復方案
+
+把第 1425 行的 `With tRstAssocCodes` 改成 `With tRstInstitutions`。屬於一字之差的筆誤，底層記錄集變數只是寫錯了。雖然目前不可達，順手修掉成本極低，也能避免未來資料一旦變動就回歸成 user-visible bug。
 
 ### Issue #4 — LookAtPlace.CmdGIS 會報「Object required」 — LATENT，被 Issue #15（表單上沒有 CmdGIS 按鈕）所遮蔽
 

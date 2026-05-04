@@ -18,9 +18,20 @@ banner) are flagged for follow-up.
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 import pyodbc
+
+# Several note strings carry → / ≠ unicode arrows.  On Windows
+# cp1252 the default sys.stdout chokes on them when the script is
+# run from PowerShell without PYTHONIOENCODING.  Reconfigure once
+# at import so a plain `python analysis/reverify_all_issues.py`
+# always works.
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
 
 ROOT = Path(__file__).resolve().parent.parent
 USER_MDB = ROOT / "data" / "CBDB_BJ_User.mdb"
@@ -173,10 +184,40 @@ def main() -> int:
                      "behavioral repro blocked by driver Form_Open hang"))
 
     # ---- Bug #9: Entry.CmdNeo4j — gated by institution rows --------
-    findings.append((9, "REAL_BUT_GATED",
-                     "`With tRstAssocCodes` typo confirmed in source; "
-                     "behavioural trigger requires entries with "
-                     "c_inst_code > 0"))
+    # Re-verified 2026-05-04: source-level typo on
+    # Form_LookAtEntry.vb:1425 still present, but the entire SaveAs +
+    # buggy `With` block sits inside `If tRecDeleted > 0 Then` at
+    # line 1389, where tRecDeleted = row count of an `INSERT ... WHERE
+    # ZZ_SCRATCH_ENTRY.c_inst_code > 0`.  CmdQuery copies
+    # ENTRY_DATA.c_inst_code verbatim into ZZ_SCRATCH_ENTRY, so we
+    # can ask the question with a simple SQL pre-image.
+    body9 = (ROOT / "analysis/dump/vba/Form_LookAtEntry.vb"
+             ).read_bytes().decode("utf-8")
+    typo_present = "With tRstAssocCodes" in body9
+    cur.execute("SELECT COUNT(*) FROM ENTRY_DATA "
+                "WHERE c_inst_code > 0")
+    n_inst = int(cur.fetchone()[0])
+    cur.execute("SELECT COUNT(*) FROM ENTRY_DATA "
+                "WHERE c_inst_name_code > 0")
+    n_inst_name = int(cur.fetchone()[0])
+    if not typo_present:
+        findings.append((9, "REVIEW",
+                         "`With tRstAssocCodes` typo no longer in "
+                         "Form_LookAtEntry.vb — flip this branch."))
+    elif n_inst == 0 and n_inst_name == 0:
+        findings.append((9, "LATENT",
+                         f"`With tRstAssocCodes` typo confirmed at "
+                         f"line 1425, but gated unreachable: "
+                         f"ENTRY_DATA c_inst_code>0={n_inst}, "
+                         f"c_inst_name_code>0={n_inst_name}.  Will "
+                         f"re-promote to P1 the moment any future "
+                         f"MDB drop introduces inst rows."))
+    else:
+        findings.append((9, "REAL",
+                         f"`With tRstAssocCodes` typo confirmed AND "
+                         f"gate is open: ENTRY_DATA c_inst_code>0="
+                         f"{n_inst}, c_inst_name_code>0={n_inst_name}."
+                         f"  Re-promote to P1."))
 
     # ---- Bug #10: EVENT_ADDR_2 TxtAddrCHN/TxtAddrPY -----------------
     # Verify ControlSource columns are NOT in View_EventAddrData

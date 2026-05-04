@@ -261,12 +261,12 @@ produce fresh ones).
 
 | Tier | Count | Meaning |
 |------|------:|---------|
-| P0 — Silent data corruption | 4 | wrong data shown, no user warning |
+| P0 — Silent data corruption | 3 | wrong data shown, no user warning |
 | P1 — Visible runtime crash  | 2 | error popup on a normal user click |
 | P2 — Silent display         | 1 | user-visible bound control renders blank where data exists |
 | P3 — Missing UI             | 5 | event handler exists in code but no button on the form |
 | P4 — Setup                  | 1 | one-time install fix (dao360.dll on Office 2016+) |
-| P5 — Dormant / latent / not currently reproducible | 6 | defect real but doesn't fire on the current dump or has no UI trigger today; **none have been verified as upstream-fixed** (#1 dormant; #4, #5, #11, #12, #14 latent) |
+| P5 — Dormant / latent / not currently reproducible | 7 | defect real but doesn't fire on the current dump or has no UI trigger today; **none have been verified as upstream-fixed** (#1 dormant; #4, #5, #9, #11, #12, #14 latent) |
 
 > **Re-verifications.** Issues that earlier snapshots graded 🔴/🟡
 > were re-checked end-to-end in three passes:
@@ -280,6 +280,14 @@ produce fresh ones).
 >   fix to point at, so per the marker-failure-≠-fix policy it was
 >   treated as a testing-infrastructure / fixture / driver artifact
 >   rather than a CBDB-maintainer bug
+> - 2026-05-04 — **#9 demoted to P5 latent** (source-level typo at
+>   `Form_LookAtEntry.vb:1425` is real, but the buggy `With` block
+>   sits inside `If tRecDeleted > 0 Then` at line 1389, which is
+>   gated by `ZZ_SCRATCH_ENTRY.c_inst_code > 0`; the current dump
+>   has 0 of 263,454 ENTRY_DATA rows with that, so the branch is
+>   unreachable for any LookAtEntry fixture and produces no popup
+>   — verified end-to-end via SQL pre-image + real Access COM in
+>   [`analysis/issue9_neo4j_institutioncodes_reverification.md`](./analysis/issue9_neo4j_institutioncodes_reverification.md))
 >
 > The classifier lives in [`analysis/reverify_all_issues.py`](./analysis/reverify_all_issues.py)
 > and is cross-checked against `generate_report.py` so the report
@@ -433,7 +441,7 @@ python -m pytest tests/test_vba_export.py -v -W ignore --include-vba
 - ✅ 7/10 LookAt 表單已納入真 VBA matrix（12 fixtures，110 秒跑完）
 - ✅ 1 個真實匯出位元組對比（`LookAtEntry.CmdGIS`）
 - ✅ 12 維度資料完整性檢查
-- ✅ 已確認 19 個 issue（詳見 [`reports/CBDB_Issues_Report_ZH-Hant.md`](./reports/CBDB_Issues_Report_ZH-Hant.md)；P0 ×4 / P1 ×2 / P2 ×1 / P3 ×5 / P4 ×1 / P5 dormant·latent ×6。原 Bug #3 於 2026-05-03 從報告中移除——重新驗證 0 NULL backfill 且無上游源碼修復證據，視為早期 false positive。新增 Issue #20（GIS 匯出嵌入 tab／BOM 造成欄位錯位），證據 + probe 腳本見 `analysis/gis_status_embedded_delim_root_cause.md` / `analysis/probe_status_gis_embedded_delim.py` / `analysis/probe_status_gis_export_bytes.py` / `tests/test_addr_codes_embedded_delim.py`）
+- ✅ 已確認 19 個 issue（詳見 [`reports/CBDB_Issues_Report_ZH-Hant.md`](./reports/CBDB_Issues_Report_ZH-Hant.md)；P0 ×3 / P1 ×2 / P2 ×1 / P3 ×5 / P4 ×1 / P5 dormant·latent ×7。原 Bug #3 於 2026-05-03 從報告中移除——重新驗證 0 NULL backfill 且無上游源碼修復證據，視為早期 false positive。Issue #9 於 2026-05-04 從 P0 降為 P5 latent——`Form_LookAtEntry.vb:1425` 的 source-level typo 雖然真實存在，但被第 1389 行的 `If tRecDeleted > 0 Then` gate 擋下；當前 dump 263,454 筆 ENTRY_DATA 中 `c_inst_code > 0` 為 0,所以任何 LookAtEntry fixture 都進不到那個分支、不會 popup（端到端 SQL + Access COM 證據見 `analysis/issue9_neo4j_institutioncodes_reverification.md`）。新增 Issue #20（GIS 匯出嵌入 tab／BOM 造成欄位錯位），證據 + probe 腳本見 `analysis/gis_status_embedded_delim_root_cause.md` / `analysis/probe_status_gis_embedded_delim.py` / `analysis/probe_status_gis_export_bytes.py` / `tests/test_addr_codes_embedded_delim.py`）
 - 🟡 剩 1 個表單（LookAtNetworks）因 Form_Open hang 暫跳過；其餘 2 個（LookAtAssociationPairs / LookAtGroupData）已用 tiny fixture 覆蓋（`test_vba_matrix_hard_forms.py`）— roadmap 第 7 項
 - 🟡 其他匯出按鈕大多已部分涵蓋：CmdGIS（6 個 form, `test_vba_cmdgis_other_forms.py`）、CmdGUESS（Kinship+Office, `test_vba_cmdguess_cross_form.py`）、CmdPajek/Gephi（`test_vba_pajek_gephi_cross_form.py`，5 過 / 2 Status skip）、CmdGISPeople（Office）、CmdNeo4j（3 過 / 4 skip — 還順手挖出 Bug #7/#8/#9）。CmdKML 與 CmdUCInet 仍只在 LookAtNetworks 那 3 個跳過的 form 上未測（依賴 roadmap 第 7 項解凍）— roadmap 第 8 項
 - ✅ pytest 啟動時自動偵測 `test_inputs.json` 是否過時並重跑 `discover_test_inputs.py`（`pytest --no-discover-inputs` 可關閉）— roadmap 第 9 項

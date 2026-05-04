@@ -479,40 +479,13 @@ def capture_bug8(_app):
                 "VBA static inspection.)")
 
 
-def capture_bug9(app):
-    """Bug #9 (P0 silent data): LookAtEntry.CmdNeo4j Institutions
-    block opens recordset `tRstInstitutions` then 10 lines later
-    reads `tRstAssocCodes` (typo) — `!c_inst_code` etc. raise on
-    a recordset that was bound to the assoc-codes SELECT.
-
-    User-reachable: open LookAtEntry, run a query, click Neo4j.
-    Faux popup over a real LookAtEntry runtime view.
-    """
-    try:
-        app.DoCmd.OpenForm("LookAtEntry", 0, "", "", 0, 0)
-        time.sleep(1.5)
-    except Exception as e:
-        print(f"  warn bug9: could not open LookAtEntry: {e}")
-        return
-    s = SHOT_DIR / "bug9_form_open.png"
-    _grab_access(s)
-    _annotate(s, SHOT_DIR / "bug9_form_annotated.png",
-              "Bug #9 — open LookAtEntry, run any query, click "
-              "**Neo4j**.")
-    _faux_popup(s, SHOT_DIR / "bug9_faux_popup.png",
-                "Microsoft Visual Basic",
-                "Run-time error '3265':\n\n"
-                "Item not found in this collection.\n\n"
-                "(Form_LookAtEntry.vb:1425 — `With tRstAssocCodes`\n"
-                "but the loop reads !c_inst_code / !c_inst_name_code\n"
-                "etc.  The recordset variable was a typo from\n"
-                "`tRstInstitutions` (bound correctly 10 lines earlier).\n"
-                "Reconstructed from VBA static inspection; real popup\n"
-                "would block the COM test driver.)")
-    try:
-        app.DoCmd.Close(2, "LookAtEntry", 2)
-    except Exception:
-        pass
+# Bug #9 capture removed 2026-05-04: re-verification proved the
+# InstitutionCodes branch is gated unreachable on the current dump
+# (0 of 263,454 ENTRY_DATA rows have c_inst_code > 0), so the faux
+# 3265 popup misrepresented the user-visible behaviour.  Bug #9 is
+# now classified as a latent source-level typo (P5); its report
+# entry no longer carries screenshots — see
+# analysis/issue9_neo4j_institutioncodes_reverification.md.
 
 
 def capture_bug13(app):
@@ -558,7 +531,7 @@ _ALL_CAPTURES = {
     "bug6": capture_bug6,
     "bug7": capture_bug7,
     "bug8": capture_bug8,
-    "bug9": capture_bug9,
+    # bug9 capture removed — see comment block above capture_bug13.
     "bug13": capture_bug13,
     "bug15_19": capture_bug15_19,
     "bug10_11_12": capture_bug11_12_10,

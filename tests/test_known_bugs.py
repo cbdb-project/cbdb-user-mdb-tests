@@ -209,8 +209,24 @@ def test_bug7_lookat_place_cmdneo4j_select_missing_dynasty_female():
 
 def test_bug9_lookat_entry_cmdneo4j_with_wrong_var():
     """Bug #9 — Form_LookAtEntry.CmdNeo4j has `With tRstAssocCodes`
-    where `With tRstInstitutions` was intended (the `!c_inst_*` reads
-    that follow only make sense against the institutions recordset).
+    where `With tRstInstitutions` was intended.
+
+    Reclassified 2026-05-04 from P0 to P5 latent: the typo on line
+    1425 is real, but the entire SaveAs prompt + buggy `With` block
+    sit inside the gate `If tRecDeleted > 0 Then` at line 1389.
+    `tRecDeleted` is the row count of an
+    `INSERT INTO ZZ_SCRATCH_P_TEXT … WHERE
+    ZZ_SCRATCH_ENTRY.c_inst_code > 0`, and on the current dump
+    0 of 263,454 ENTRY_DATA rows have c_inst_code > 0 — so the
+    branch is unreachable from any LookAtEntry fixture.
+
+    This test is therefore a SOURCE-level marker only: it pins
+    that the typo is still in the dumped VBA AND that the gating
+    condition still holds (so the issue stays correctly classified
+    as latent).  If the gate condition flips (some future MDB drop
+    introduces a c_inst_code > 0 row), the LATENT-gate assertion
+    below will fail and force the maintainer to re-promote Issue #9
+    back to P1.
     """
     vba_path = (REPO / "analysis" / "dump" / "vba"
                 / "Form_LookAtEntry.vb")
@@ -225,10 +241,41 @@ def test_bug9_lookat_entry_cmdneo4j_with_wrong_var():
     tail = body[set_idx:set_idx + 3000]
     assert ("With tRstAssocCodes" in tail
             and "!c_inst_code" in tail), (
-        "Bug #9 marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — `With tRstAssocCodes` immediately "
-        "following the tRstInstitutions OpenRecordset is no longer "
-        "present (likely renamed to `With tRstInstitutions`).  Flip "
-        "this assertion."
+        "Bug #9 source-level marker no longer reproduces "
+        "(investigate upstream fix vs. fixture/driver change vs. "
+        "misclassification before flipping) — `With tRstAssocCodes` "
+        "immediately following the tRstInstitutions OpenRecordset is "
+        "no longer present (likely renamed to `With "
+        "tRstInstitutions`).  Flip this assertion AND remove the "
+        "Issue #9 entry from generate_report.py."
+    )
+
+    # Also pin the gate: ENTRY_DATA.c_inst_code must still be 0
+    # on the current dump for Issue #9 to remain LATENT.  If this
+    # fails, the maintainer must re-promote Issue #9 to P1 and
+    # restore behavioural / popup coverage.
+    user_mdb = REPO / "data" / "CBDB_BJ_User.mdb"
+    if not user_mdb.exists():
+        pytest.skip(f"{user_mdb} not present — gate-check skipped")
+    import pyodbc
+    conn = pyodbc.connect(
+        "DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};"
+        f"DBQ={user_mdb};", autocommit=True, readonly=True)
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM ENTRY_DATA "
+                "WHERE c_inst_code > 0")
+    n_inst = int(cur.fetchone()[0])
+    cur.execute("SELECT COUNT(*) FROM ENTRY_DATA "
+                "WHERE c_inst_name_code > 0")
+    n_inst_name = int(cur.fetchone()[0])
+    assert n_inst == 0 and n_inst_name == 0, (
+        f"Bug #9 LATENT-gate flipped: ENTRY_DATA rows with "
+        f"c_inst_code > 0 = {n_inst}, c_inst_name_code > 0 = "
+        f"{n_inst_name}.  The InstitutionCodes branch is no longer "
+        f"unreachable.  Re-promote Issue #9 to P1 in "
+        f"reports/generate_report.py and restore behavioural / "
+        f"popup coverage; the source-level typo at line 1425 is "
+        f"now user-visible."
     )
 
 

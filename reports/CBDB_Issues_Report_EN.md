@@ -13,7 +13,6 @@ The issues are ordered by severity (P0 highest). Each entry includes a concise d
 - [P0 — Silent data corruption](#p0--silent-data-corruption)
   - [Issue #7 — LookAtPlace.CmdNeo4j people-CSV silently fails on the first record](#issue-7--lookatplacecmdneo4j-people-csv-silently-fails-on-the-first-record)
   - [Issue #8 — LookAtNetworks.CmdNeo4j people/place CSVs silently fail on the first record](#issue-8--lookatnetworkscmdneo4j-peopleplace-csvs-silently-fail-on-the-first-record)
-  - [Issue #9 — LookAtEntry.CmdNeo4j Institutions block uses the wrong recordset variable](#issue-9--lookatentrycmdneo4j-institutions-block-uses-the-wrong-recordset-variable)
   - [Issue #20 — BOM-prefixed address names can become embedded tabs and misalign GIS exports](#issue-20--bom-prefixed-address-names-can-become-embedded-tabs-and-misalign-gis-exports)
 - [P1 — Visible runtime crash](#p1--visible-runtime-crash)
   - [Issue #6 — LookAtGroupData ChkEntry path references a non-existent column ENTRY_DATA.c_parental_status](#issue-6--lookatgroupdata-chkentry-path-references-a-non-existent-column-entry_datac_parental_status)
@@ -30,6 +29,7 @@ The issues are ordered by severity (P0 highest). Each entry includes a concise d
   - [Issue #2 — VBA project references the legacy dao360.dll which isn't on Office 2016+ machines](#issue-2--vba-project-references-the-legacy-dao360dll-which-isnt-on-office-2016-machines)
 - [P5 — Dormant / latent / not currently reproducible](#p5--dormant--latent--not-currently-reproducible)
   - [Issue #1 — View_StatusData would display last-year range in the first-year column — DORMANT (no source rows trigger it on this dump)](#issue-1--view_statusdata-would-display-last-year-range-in-the-first-year-column--dormant-no-source-rows-trigger-it-on-this-dump)
+  - [Issue #9 — LookAtEntry.CmdNeo4j Institutions block uses the wrong recordset variable — LATENT (gated unreachable on this dump; no ENTRY_DATA row has c_inst_code > 0)](#issue-9--lookatentrycmdneo4j-institutions-block-uses-the-wrong-recordset-variable--latent-gated-unreachable-on-this-dump-no-entry_data-row-has-c_inst_code--0)
   - [Issue #4 — LookAtPlace.CmdGIS would abort with 'Object required' — LATENT, masked by Issue #15 (no CmdGIS button on the form)](#issue-4--lookatplacecmdgis-would-abort-with-object-required--latent-masked-by-issue-15-no-cmdgis-button-on-the-form)
   - [Issue #5 — LookAtStatus.CmdPajek references a missing control AND uses three columns that don't exist](#issue-5--lookatstatuscmdpajek-references-a-missing-control-and-uses-three-columns-that-dont-exist)
   - [Issue #14 — KIN_DATA Subform's CmdPickKinRel calls a missing picker (frmPickKINSHIP_CODES) — but the host sub-form is currently an orphan (LATENT)](#issue-14--kin_data-subforms-cmdpickkinrel-calls-a-missing-picker-frmpickkinship_codes--but-the-host-sub-form-is-currently-an-orphan-latent)
@@ -112,59 +112,6 @@ _Reconstructed-in-PIL popup showing the JET 'Item not found in this collection' 
 #### Suggested fix
 
 Extend each SELECT to project every field the loop reads. For tRstPlace: add `ADDR_CODES.x_coord`, `ADDR_CODES.y_coord`. For tRstPeoplePlace: add the missing `c_person_id` / `c_index_addr_id` columns from the joined tables.
-
-### Issue #9 — LookAtEntry.CmdNeo4j Institutions block uses the wrong recordset variable
-
-**Affected sub:** `Form_LookAtEntry.CmdNeo4j_Click`
-
-**Severity:** P0 — Silent data corruption (export silently produces nothing)
-
-#### Description
-
-Line 1415 of `Form_LookAtEntry.vb` opens the institutions recordset as `tRstInstitutions = CurrentDb.OpenRecordset(tQueryStr)`. Ten lines later, line 1425 says `With tRstAssocCodes` and the loop reads `!c_inst_code`, `!c_inst_name_code`, etc. against THAT recordset — which was bound much earlier to the AssocCodes SELECT and doesn't have `c_inst_*` columns. Same `Item not found` symptom; InstitutionCodes file is never written.
-
-**Concrete reproduction** (verified against current `CBDB_BJ_User.mdb`):
-
-Pick `c_entry_code = 36` (jinshi, examination: general) or `c_entry_code = 101` (recommendation / 薦舉) in the LookAtEntry picker.  Both produce a non-empty `tRstAssocCodes` recordset because their result rows include entries with `c_assoc_code > 0` — see Concrete reproduction below.  Click **Neo4j**, accept SaveAs through the InstitutionCodes prompt; the `With tRstAssocCodes` block at line 1425 calls `.MoveFirst` then reads `!c_inst_code` → DAO 3265 (`Item not found in this collection`).
-
-**Note on c_inst_code data**: the current MDB has 0 of 263 454 ENTRY_DATA rows with `c_inst_code > 0`, so the InstitutionCodes file would have been empty by design even with the bug fixed.  The bug nevertheless **fires on every CmdNeo4j run** that reaches the InstitutionCodes branch — the misnamed recordset reference doesn't depend on whether tRstInstitutions has rows.
-
-#### Steps to reproduce
-
-1. Open **LookAtEntry**.  Use the entry-code picker to select `c_entry_code = 36` (科舉: 進士 / examination jinshi) — this produces a result set that includes entries with `c_assoc_code > 0`, populating `tRstAssocCodes`.  Click **Run Query**.
-2. Click **Neo4j** export button.
-3. Click through every SaveAs dialog (People, PeopleEntry, Place, EntryCodes, KinCodes, AssocCodes), all of which succeed.
-4. When the SaveAs prompt for InstitutionCodes appears, pick a save location.  The `With tRstAssocCodes` block at line 1425 fires `.MoveFirst` on the AssocCodes recordset, then tries to read `!c_inst_code` (a column the AssocCodes SELECT never projected).
-5. DAO 3265 (`Item not found in this collection`) popup appears immediately.  Click OK; the InstitutionCodes file is empty / not finalised.
-
-#### Concrete reproduction
-
-Worked examples — these specific personids exist in the current MDB and have `c_assoc_code > 0` for the listed `c_entry_code` (so they populate `tRstAssocCodes`):
-
-  - `c_entry_code = 36` (jinshi / 科舉: 進士):
-      - `c_personid = 32227`  (白居易 / Bai Juyi)  —         c_assoc_code = 559
-      - `c_personid = 93384`  (張文伏 / Zhang Wenfu)  —         c_assoc_code = 186
-
-  - `c_entry_code = 101` (薦舉 / recommendation), 6 hits     including:
-      - `c_personid = 3404`   (胡瑗 / Hu Yuan)
-      - `c_personid = 4022`   (吳師仁 / Wu Shiren)
-      - `c_personid = 108665` (湯楷 / Tang Kai)
-
-Either entry_code reproduces the bug.  No fixture-side data setup needed — these are real CBDB records on the current dump.
-
-#### Screenshots
-
-![bug9_form_annotated.png](screenshots/bug9_form_annotated.png)
-
-_Step 1 — open LookAtEntry, run any query, click **Neo4j**.  (Note: this code path only fires for queries whose result includes entries with `c_inst_code > 0` — see the summary's REAL_BUT_GATED note.)_
-
-![bug9_faux_popup.png](screenshots/bug9_faux_popup.png)
-
-_Step 2 — the popup users see when the With block on line 1425 reads `!c_inst_code` against the wrong-named recordset.  Reconstructed in PIL because the real popup would block the COM test driver; the error code (DAO 3265) and message text are JET's standard response to a recordset field that doesn't exist._
-
-#### Suggested fix
-
-Change `With tRstAssocCodes` on line 1425 to `With tRstInstitutions`. Single-character class of fix; the underlying recordset variable was simply mis-named.
 
 ### Issue #20 — BOM-prefixed address names can become embedded tabs and misalign GIS exports
 
@@ -490,6 +437,45 @@ On this data snapshot the bug is **DORMANT** — STATUS_DATA has 70,761 rows, bu
 #### Suggested fix
 
 In `View_StatusData` change `YEAR_RANGE_CODES_1.c_range AS c_fy_range_desc` and `YEAR_RANGE_CODES_1.c_range_chn AS c_fy_range_chn` to use the un-aliased `YEAR_RANGE_CODES.*` fields (which the FROM clause already joins on `c_fy_range`).
+
+### Issue #9 — LookAtEntry.CmdNeo4j Institutions block uses the wrong recordset variable — LATENT (gated unreachable on this dump; no ENTRY_DATA row has c_inst_code > 0)
+
+**Affected sub:** `Form_LookAtEntry.CmdNeo4j_Click`
+
+**Severity:** P5 — Latent source-level typo (gated unreachable on this dump; would re-promote to P1 if any future ENTRY_DATA row has c_inst_code > 0)
+
+#### Description
+
+**Source-level typo, currently unreachable on this dump.**
+
+Line 1415 of `Form_LookAtEntry.vb` opens the institutions recordset as `Set tRstInstitutions = CurrentDb.OpenRecordset(tQueryStr)`.  Ten lines later, line 1425 says `With tRstAssocCodes` and the loop reads `!c_inst_code`, `!c_inst_name_code`, etc. against THAT recordset — which was bound much earlier to the AssocCodes SELECT and was already `Close`d at line 1373 of the AssocCodes block.  If executed, this would raise DAO 3021 (`No current record`) on the `.MoveFirst` line; the misnamed reference is a genuine source-level bug.
+
+However, on the current dump the entire SaveAs prompt and buggy `With` block sit inside the gate `If tRecDeleted > 0 Then` at line 1389, where `tRecDeleted` is the row count of an `INSERT INTO ZZ_SCRATCH_P_TEXT … WHERE ZZ_SCRATCH_ENTRY.c_inst_code > 0`.  `ZZ_SCRATCH_ENTRY.c_inst_code` is copied verbatim from `ENTRY_DATA.c_inst_code` by CmdQuery (lines 1645-1652), and on this MDB **0 of 263,454 ENTRY_DATA rows have `c_inst_code > 0`** (also 0 with `c_inst_name_code > 0`).  So `tRecDeleted = 0` for every possible LookAtEntry fixture, the gate evaluates false, the SaveAs prompt is never shown, the `With tRstAssocCodes` line is never executed, and CmdNeo4j proceeds cleanly to "Finished saving to Neo4j" — silently omitting `InstitutionCodes_*.csv` because there are no institution rows to write.
+
+**The missing `InstitutionCodes_*.csv` is not itself a user-visible bug** on the current dump.  Skipping an optional per-block file when its source-table count is 0 is the same gating pattern the surrounding blocks use (when `c_assoc_code = 0` for a fixture, the AssocCodes block is also silently skipped — see the matching behaviour in the re-verification artifacts).  The latent typo only becomes user-visible if a future MDB drop introduces any `ENTRY_DATA` row with `c_inst_code > 0`.
+
+**Re-verification evidence:** SQL pre-image plus real Access COM probes for `c_entry_code = 36` (jinshi) and `c_entry_code = 101` (recommendation / 薦舉) confirmed no popup, chain finishes cleanly, no `InstitutionCode`-shape file in the produced set.  Details in `analysis/issue9_neo4j_institutioncodes_reverification.md` and `reports/issue9_neo4j_institutioncodes_reverification.json`.
+
+#### Steps to reproduce
+
+1. **On the current dump this bug cannot be triggered through the UI** — the `If tRecDeleted > 0 Then` gate at Form_LookAtEntry.vb:1389 is false for every possible LookAtEntry fixture (0 of 263,454 ENTRY_DATA rows have `c_inst_code > 0`).  Verify the source-level typo statically instead:
+2. Open `analysis/dump/vba/Form_LookAtEntry.vb` and read lines 1415-1425.  Line 1415: `Set tRstInstitutions = CurrentDb.OpenRecordset(tQueryStr)`.  Line 1425: `With tRstAssocCodes` (intended: `With tRstInstitutions`).  `tRstAssocCodes` was already `Close`d at line 1373 of the AssocCodes block, so `.MoveFirst` would raise DAO 3021.
+3. (Optional, SQL) Confirm the gate condition on the current dump: `SELECT COUNT(*) FROM ENTRY_DATA WHERE c_inst_code > 0` returns 0 (same with `c_inst_name_code > 0`).  This is what makes the buggy block unreachable.
+4. (Optional, runtime evidence) Pick `c_entry_code = 36` (jinshi) or `c_entry_code = 101` (recommendation / 薦舉) on LookAtEntry → Run Query → Neo4j.  The chain finishes cleanly with `Finished saving to Neo4j`; no popup, no `InstitutionCodes_*.csv` in the output folder.  These are not user-visible errors today — they are evidence that the gate works.
+5. The source-level typo will become user-visible the first time a future MDB drop introduces any `ENTRY_DATA` row with `c_inst_code > 0`.  At that point the gate opens, the `With tRstAssocCodes` line executes against a `Close`d recordset, and DAO 3021 (`No current record`) fires on `.MoveFirst`.
+
+#### Concrete reproduction
+
+These two `c_entry_code` values are used as investigation evidence in the re-verification — they exercise CmdQuery + CmdNeo4j end-to-end and demonstrate that the InstitutionCodes branch is gated out today.  **They are NOT a popup reproduction** — both produce `Finished saving to Neo4j` with no error and no `InstitutionCodes_*.csv`:
+
+  - `c_entry_code = 36` (jinshi / 科舉: 進士) — 92,514 ENTRY_DATA rows, 0 with `c_inst_code > 0`
+  - `c_entry_code = 101` (recommendation / 薦舉) — 878 ENTRY_DATA rows, 0 with `c_inst_code > 0`
+
+Re-run the evidence with `python analysis/investigate_issue9_neo4j_institutioncodes.py` (SQL only) or `… --com` (also runs real Access COM).
+
+#### Suggested fix
+
+Change `With tRstAssocCodes` on line 1425 to `With tRstInstitutions`.  Single-character class of fix; the underlying recordset variable was simply mis-named.  Although currently unreachable on this dump, fixing it costs nothing and prevents a future-data regression.
 
 ### Issue #4 — LookAtPlace.CmdGIS would abort with 'Object required' — LATENT, masked by Issue #15 (no CmdGIS button on the form)
 
