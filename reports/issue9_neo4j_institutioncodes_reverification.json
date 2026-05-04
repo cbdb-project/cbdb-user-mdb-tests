@@ -1,0 +1,317 @@
+{
+  "schema_version": 1,
+  "purpose": "Re-verify Issue #9 InstitutionCodes branch gating on the current dump.  All counts are pure-SQL pre-images of what ZZ_SCRATCH_ENTRY would contain after CmdQuery for a single c_entry_code with no other filters.",
+  "user_mdb": "C:\\Users\\how612\\Documents\\GitHub\\cbdb-user-mdb-tests\\data\\CBDB_BJ_User.mdb",
+  "vba_branch_gating": {
+    "module": "Form_LookAtEntry",
+    "branch_name": "InstitutionCodes SaveAs (CmdNeo4j_Click)",
+    "gating_line": 1389,
+    "gating_condition_vba": "If tRecDeleted > 0 Then",
+    "gating_source_sql": "INSERT INTO ZZ_SCRATCH_P_TEXT ( c_person_id ) SELECT DISTINCT ZZ_SCRATCH_ENTRY.c_personid FROM ZZ_SCRATCH_ENTRY WHERE (((ZZ_SCRATCH_ENTRY.c_inst_code)>0))",
+    "buggy_line": 1425,
+    "buggy_statement_vba": "With tRstAssocCodes",
+    "buggy_intent_vba": "tRstInstitutions (set on line 1415) — typo: tRstAssocCodes was Close-d at line 1373 of the earlier AssocCodes block",
+    "implication": "If 0 rows in ZZ_SCRATCH_ENTRY have c_inst_code > 0, the entire SaveAs prompt + buggy With block are skipped silently.  No popup, no InstitutionCodes_*.csv."
+  },
+  "q1_entry_data_global": {
+    "total_rows": 263454,
+    "rows_with_c_inst_code_gt_0": 0,
+    "rows_with_c_inst_name_code_gt_0": 0,
+    "interpretation": "If both pos-counts are 0, no fixture under any c_entry_code can populate ZZ_SCRATCH_ENTRY.c_inst_code, and the InstitutionCodes branch is unreachable on this dump."
+  },
+  "q1_entry_codes_with_inst_code": [],
+  "q1_per_fixture_preimage": [
+    {
+      "label": "c_entry_code=36 (jinshi / 科舉: 進士)",
+      "c_entry_code": 36,
+      "year_filter": null,
+      "entry_code_desc": {
+        "c_entry_desc": "examination: jinshi (general)",
+        "c_entry_desc_chn": "科舉: 進士(籠統)"
+      },
+      "rows_in_ENTRY_DATA_for_code": 92514,
+      "rows_with_c_assoc_code_gt_0": 2,
+      "rows_with_c_inst_code_gt_0": 0,
+      "rows_with_c_inst_name_code_gt_0": 0,
+      "rows_after_BIOG_MAIN_join_with_c_inst_code_gt_0": 0,
+      "would_enter_InstitutionCodes_branch": false
+    },
+    {
+      "label": "c_entry_code=101 (recommendation / 薦舉)",
+      "c_entry_code": 101,
+      "year_filter": null,
+      "entry_code_desc": {
+        "c_entry_desc": "recommendation",
+        "c_entry_desc_chn": "薦舉 (保任,保舉)"
+      },
+      "rows_in_ENTRY_DATA_for_code": 878,
+      "rows_with_c_assoc_code_gt_0": 6,
+      "rows_with_c_inst_code_gt_0": 0,
+      "rows_with_c_inst_name_code_gt_0": 0,
+      "rows_after_BIOG_MAIN_join_with_c_inst_code_gt_0": 0,
+      "would_enter_InstitutionCodes_branch": false
+    },
+    {
+      "label": "c_entry_code=36 narrowed to 1100-1110 (supplements full-code probe to keep ZZ_SCRATCH_ENTRY tractable)",
+      "c_entry_code": 36,
+      "year_filter": [
+        1100,
+        1110
+      ],
+      "entry_code_desc": {
+        "c_entry_desc": "examination: jinshi (general)",
+        "c_entry_desc_chn": "科舉: 進士(籠統)"
+      },
+      "rows_in_ENTRY_DATA_for_code": 989,
+      "rows_with_c_assoc_code_gt_0": 0,
+      "rows_with_c_inst_code_gt_0": 0,
+      "rows_with_c_inst_name_code_gt_0": 0,
+      "rows_after_BIOG_MAIN_join_with_c_inst_code_gt_0": 0,
+      "would_enter_InstitutionCodes_branch": false
+    }
+  ],
+  "verdict": [
+    {
+      "c_entry_code": 36,
+      "year_filter": null,
+      "outcome_predicted_from_sql": "no popup",
+      "reason": "0 rows would land in ZZ_SCRATCH_ENTRY with c_inst_code > 0, so the gating INSERT...WHERE c_inst_code > 0 returns 0 rows, tRecDeleted = 0, the `If tRecDeleted > 0 Then` branch is skipped, no SaveAs is shown, no InstitutionCodes_*.csv is written, and the buggy `With tRstAssocCodes` is never executed.",
+      "expected_files_missing": [
+        "InstitutionCodes_*.csv"
+      ],
+      "classification_on_current_dump": "LATENT source-level typo (gated out by data)"
+    },
+    {
+      "c_entry_code": 101,
+      "year_filter": null,
+      "outcome_predicted_from_sql": "no popup",
+      "reason": "0 rows would land in ZZ_SCRATCH_ENTRY with c_inst_code > 0, so the gating INSERT...WHERE c_inst_code > 0 returns 0 rows, tRecDeleted = 0, the `If tRecDeleted > 0 Then` branch is skipped, no SaveAs is shown, no InstitutionCodes_*.csv is written, and the buggy `With tRstAssocCodes` is never executed.",
+      "expected_files_missing": [
+        "InstitutionCodes_*.csv"
+      ],
+      "classification_on_current_dump": "LATENT source-level typo (gated out by data)"
+    },
+    {
+      "c_entry_code": 36,
+      "year_filter": [
+        1100,
+        1110
+      ],
+      "outcome_predicted_from_sql": "no popup",
+      "reason": "0 rows would land in ZZ_SCRATCH_ENTRY with c_inst_code > 0, so the gating INSERT...WHERE c_inst_code > 0 returns 0 rows, tRecDeleted = 0, the `If tRecDeleted > 0 Then` branch is skipped, no SaveAs is shown, no InstitutionCodes_*.csv is written, and the buggy `With tRstAssocCodes` is never executed.",
+      "expected_files_missing": [
+        "InstitutionCodes_*.csv"
+      ],
+      "classification_on_current_dump": "LATENT source-level typo (gated out by data)"
+    }
+  ],
+  "q2_com_probe_status": {
+    "ran_in_this_script": true,
+    "reason": "Brief explicitly asks for at least two COM fixtures; ran both even though SQL evidence is unambiguous, so the JSON carries observed-not-just-predicted evidence.",
+    "fixtures_to_probe_if_branch_predicted_entered": []
+  },
+  "q2_per_fixture_observed": [
+    {
+      "label": "c_entry_code=36 (jinshi / 科舉: 進士)",
+      "c_entry_code": 36,
+      "year_filter": null,
+      "out_dir": "C:\\Users\\how612\\Documents\\GitHub\\cbdb-user-mdb-tests\\analysis\\_issue9_reverify_neo4j_out\\entry_36",
+      "errors": [
+        "COM probe raised: com_error(-2147023170, 'The remote procedure call failed.', None, None)"
+      ],
+      "com_outcome": "COM probe aborted before completion: com_error(-2147023170, 'The remote procedure call failed.', None, None)"
+    },
+    {
+      "label": "c_entry_code=101 (recommendation / 薦舉)",
+      "c_entry_code": 101,
+      "year_filter": null,
+      "out_dir": "C:\\Users\\how612\\Documents\\GitHub\\cbdb-user-mdb-tests\\analysis\\_issue9_reverify_neo4j_out\\entry_101",
+      "errors": [],
+      "cmdquery_zz_scratch_entry_rows": 878,
+      "zz_scratch_entry_rows_c_assoc_code_gt_0": 6,
+      "zz_scratch_entry_rows_c_inst_code_gt_0": 0,
+      "zz_scratch_entry_rows_c_inst_name_code_gt_0": 0,
+      "cmdneo4j_returned_rows": 878,
+      "zz_test_debug_transcript": [
+        {
+          "id": 1,
+          "msg": "LookAtEntry:ENTER"
+        },
+        {
+          "id": 2,
+          "msg": "LookAtEntry:DONE"
+        },
+        {
+          "id": 3,
+          "msg": "LookAtEntry:MSGBOX"
+        },
+        {
+          "id": 4,
+          "msg": "LookAtEntry:MSGBOX"
+        }
+      ],
+      "cmdneo4j_enter_marker_seen": false,
+      "cmdneo4j_done_marker_seen": false,
+      "cmdneo4j_err_marker_seen": false,
+      "cmdneo4j_msgbox_count": 2,
+      "output_files": [
+        {
+          "name": "f12.out.csv",
+          "size": 12431,
+          "header_first_column": "nameID",
+          "header": "nameID,placeID,personPlaceCode"
+        },
+        {
+          "name": "f15.out.csv",
+          "size": 197,
+          "header_first_column": "personPlaceCode",
+          "header": "personPlaceCode,personPlaceTrans,personPlaceHZ"
+        },
+        {
+          "name": "f18.out.csv",
+          "size": 79,
+          "header_first_column": "EntryCode",
+          "header": "EntryCode,EntryDesc,EntryDescHZ"
+        },
+        {
+          "name": "f21.out.csv",
+          "size": 89,
+          "header_first_column": "AssocCode",
+          "header": "AssocCode,AssocDesc,AssocDescHZ"
+        },
+        {
+          "name": "f3.out.csv",
+          "size": 33333,
+          "header_first_column": "nameID",
+          "header": "nameID,nameHZ,namePY,indexyear,dynasty,sex"
+        },
+        {
+          "name": "f6.out.csv",
+          "size": 35458,
+          "header_first_column": "NameID",
+          "header": "NameID,EntryCode,EntryPlaceID,KinID,KinRelCode,AssocPersonID,AssocRelCode,SocialInstID,EntryYear,EntryDynasty"
+        },
+        {
+          "name": "f9.out.csv",
+          "size": 20594,
+          "header_first_column": "placeID",
+          "header": "placeID,placePY,placeHZ,placeX,placeY"
+        }
+      ],
+      "output_file_count": 7,
+      "institutioncodes_files_observed": [],
+      "institutioncodes_branch_observed_to_fire": false,
+      "com_outcome": "chain finished cleanly, no ERR marker, 7 files produced, InstitutionCodes file ABSENT",
+      "elapsed_seconds": 7.0
+    },
+    {
+      "label": "c_entry_code=36 narrowed to 1100-1110 (supplements full-code probe to keep ZZ_SCRATCH_ENTRY tractable)",
+      "c_entry_code": 36,
+      "year_filter": [
+        1100,
+        1110
+      ],
+      "out_dir": "C:\\Users\\how612\\Documents\\GitHub\\cbdb-user-mdb-tests\\analysis\\_issue9_reverify_neo4j_out\\entry_36_yrs_1100_1110",
+      "errors": [],
+      "cmdquery_zz_scratch_entry_rows": 989,
+      "zz_scratch_entry_rows_c_assoc_code_gt_0": 0,
+      "zz_scratch_entry_rows_c_inst_code_gt_0": 0,
+      "zz_scratch_entry_rows_c_inst_name_code_gt_0": 0,
+      "cmdneo4j_returned_rows": 989,
+      "zz_test_debug_transcript": [
+        {
+          "id": 1,
+          "msg": "LookAtEntry:ENTER"
+        },
+        {
+          "id": 2,
+          "msg": "LookAtEntry:DONE"
+        },
+        {
+          "id": 3,
+          "msg": "LookAtEntry:MSGBOX"
+        },
+        {
+          "id": 4,
+          "msg": "LookAtEntry:MSGBOX"
+        }
+      ],
+      "cmdneo4j_enter_marker_seen": false,
+      "cmdneo4j_done_marker_seen": false,
+      "cmdneo4j_err_marker_seen": false,
+      "cmdneo4j_msgbox_count": 2,
+      "output_files": [
+        {
+          "name": "f12.out.csv",
+          "size": 15364,
+          "header_first_column": "nameID",
+          "header": "nameID,placeID,personPlaceCode"
+        },
+        {
+          "name": "f15.out.csv",
+          "size": 159,
+          "header_first_column": "personPlaceCode",
+          "header": "personPlaceCode,personPlaceTrans,personPlaceHZ"
+        },
+        {
+          "name": "f18.out.csv",
+          "size": 93,
+          "header_first_column": "EntryCode",
+          "header": "EntryCode,EntryDesc,EntryDescHZ"
+        },
+        {
+          "name": "f3.out.csv",
+          "size": 37158,
+          "header_first_column": "nameID",
+          "header": "nameID,nameHZ,namePY,indexyear,dynasty,sex"
+        },
+        {
+          "name": "f6.out.csv",
+          "size": 41110,
+          "header_first_column": "NameID",
+          "header": "NameID,EntryCode,EntryPlaceID,KinID,KinRelCode,AssocPersonID,AssocRelCode,SocialInstID,EntryYear,EntryDynasty"
+        },
+        {
+          "name": "f9.out.csv",
+          "size": 12155,
+          "header_first_column": "placeID",
+          "header": "placeID,placePY,placeHZ,placeX,placeY"
+        }
+      ],
+      "output_file_count": 6,
+      "institutioncodes_files_observed": [],
+      "institutioncodes_branch_observed_to_fire": false,
+      "com_outcome": "chain finished cleanly, no ERR marker, 6 files produced, InstitutionCodes file ABSENT",
+      "elapsed_seconds": 7.1
+    }
+  ],
+  "reconciliation": [
+    {
+      "c_entry_code": 36,
+      "year_filter": null,
+      "predicted_from_sql": "no popup",
+      "observed_from_com": "COM probe aborted before completion: com_error(-2147023170, 'The remote procedure call failed.', None, None)",
+      "matches": false,
+      "com_probe_completed": false
+    },
+    {
+      "c_entry_code": 101,
+      "year_filter": null,
+      "predicted_from_sql": "no popup",
+      "observed_from_com": "chain finished cleanly, no ERR marker, 7 files produced, InstitutionCodes file ABSENT",
+      "matches": true,
+      "com_probe_completed": true
+    },
+    {
+      "c_entry_code": 36,
+      "year_filter": [
+        1100,
+        1110
+      ],
+      "predicted_from_sql": "no popup",
+      "observed_from_com": "chain finished cleanly, no ERR marker, 6 files produced, InstitutionCodes file ABSENT",
+      "matches": true,
+      "com_probe_completed": true
+    }
+  ]
+}
