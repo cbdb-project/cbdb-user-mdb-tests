@@ -268,6 +268,16 @@ EXPORT_TEST_MANIFEST: list[dict] = [
      "test_module": "tests/test_vba_pajek_gephi_cross_form.py",
      "test_node": "test_export_produces_file[LookAtAssociations-CmdPajek]",
      "status": "covered", "notes": "shape: .net / *vertices header"},
+    {"form": "LookAtAssociationPairs", "button": "CmdPajek",
+     "test_module": "tests/test_vba_pajek_gephi_cross_form.py",
+     "test_node": "test_export_button_produces_file"
+                  "[LookAtAssociationPairs_CmdPajek]",
+     "status": "covered",
+     "notes": "shape: .net / *vertices header.  Uses custom 1×3 "
+              "known-edged person pair (NOT matrix's default 4×5; "
+              "see _assocpairs_1x3_fixture in the test).  "
+              "Unblocked by the AssociationPairs SetFocus driver "
+              "patch in _PER_FORM_CMDGIS_PATCHES."},
 
     # ---- CmdGephi ----
     {"form": "LookAtPlace", "button": "CmdGephi",
@@ -283,6 +293,16 @@ EXPORT_TEST_MANIFEST: list[dict] = [
      "test_module": "tests/test_vba_pajek_gephi_cross_form.py",
      "test_node": "test_export_produces_file[LookAtAssociations-CmdGephi]",
      "status": "covered", "notes": "shape: .gdf / nodedef header"},
+    {"form": "LookAtAssociationPairs", "button": "CmdGephi",
+     "test_module": "tests/test_vba_pajek_gephi_cross_form.py",
+     "test_node": "test_export_button_produces_file"
+                  "[LookAtAssociationPairs_CmdGephi]",
+     "status": "covered",
+     "notes": "shape: .gdf / nodedef header.  Uses custom 1×3 "
+              "known-edged person pair (NOT matrix's default 4×5; "
+              "see _assocpairs_1x3_fixture in the test).  "
+              "Unblocked by the AssociationPairs SetFocus driver "
+              "patch in _PER_FORM_CMDGIS_PATCHES."},
 
     # ---- CmdGUESS ----
     {"form": "LookAtKinship", "button": "CmdGUESS",

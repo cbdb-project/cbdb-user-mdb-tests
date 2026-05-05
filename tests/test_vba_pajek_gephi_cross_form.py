@@ -16,9 +16,15 @@ Skip rationale:
     #3.5).  Same family as matrix Networks + picker test skips.
     Form_Open verified fine via minimal injection in
     tests/test_vba_networks_small_fixture.py.
-  - AssociationPairs: matrix CmdQuery / CmdRun itself doesn't
-    complete (item 7 still open); without a working query the
-    CmdQuery → CmdPajek chain has nothing to feed.
+  - AssociationPairs (was previously SKIPPED): the prior matrix
+    CmdQuery / CmdRun blocker has been resolved by the
+    AssociationPairs SetFocus driver patch
+    (`_PER_FORM_CMDGIS_PATCHES["Form_LookAtAssociationPairs"]`).
+    AssociationPairs × CmdPajek and × CmdGephi are now wired in
+    here using a known-edged 1×3 person pair (NOT the matrix's
+    default 4×5 pair, which on the current dump shares 0 first-
+    order associations and would leave ZZ_SOCIAL_NETWORK empty).
+    See `_assocpairs_1x3_fixture()` for the custom CrossFixture.
 
 Structural assertions only — exact bytes drift with each CBDB data
 release.
@@ -58,14 +64,54 @@ class Case:
 
 
 _CASES: tuple[Case, ...] = (
-    Case("LookAtKinship",      "CmdPajek", ".net", "*vertices"),
-    Case("LookAtPlace",        "CmdPajek", ".net", "*vertices"),
-    Case("LookAtStatus",       "CmdPajek", ".net", "*vertices"),
-    Case("LookAtAssociations", "CmdPajek", ".net", "*vertices"),
-    Case("LookAtPlace",        "CmdGephi", ".gdf", "nodedef"),
-    Case("LookAtStatus",       "CmdGephi", ".gdf", "nodedef"),
-    Case("LookAtAssociations", "CmdGephi", ".gdf", "nodedef"),
+    Case("LookAtKinship",          "CmdPajek", ".net", "*vertices"),
+    Case("LookAtPlace",            "CmdPajek", ".net", "*vertices"),
+    Case("LookAtStatus",           "CmdPajek", ".net", "*vertices"),
+    Case("LookAtAssociations",     "CmdPajek", ".net", "*vertices"),
+    Case("LookAtAssociationPairs", "CmdPajek", ".net", "*vertices"),
+    Case("LookAtPlace",            "CmdGephi", ".gdf", "nodedef"),
+    Case("LookAtStatus",           "CmdGephi", ".gdf", "nodedef"),
+    Case("LookAtAssociations",     "CmdGephi", ".gdf", "nodedef"),
+    Case("LookAtAssociationPairs", "CmdGephi", ".gdf", "nodedef"),
 )
+
+
+def _assocpairs_1x3_fixture() -> CrossFixture:
+    """Custom 1×3 known-edged fixture for AssociationPairs.
+
+    The matrix's default `_make_assoc_pairs_fixtures` picks the
+    top pair from `discover_test_inputs.py`'s
+    `top_pairs_by_edge_count`, which on the current dump is the
+    4×5 pair — that pair shares 0 first-order ASSOC_DATA edges
+    and leaves ZZ_SOCIAL_NETWORK empty after CmdQuery, so the
+    chained CmdPajek / CmdGephi would bail on RecordCount=0.
+
+    1×3 was selected by direct SQL on ASSOC_DATA (
+    `WHERE c_personid=1 AND c_assoc_id=3`) — the smallest
+    person-id pair on the current dump that shares at least one
+    direct edge.  Verified end-to-end by the SetFocus driver
+    patch's smoke probe (`tests/test_vba_associationpairs_probe.
+    py::test_associationpairs_cmdquery_setfocus_patch_unblocks
+    _inserts`): ZZ_SCRATCH_PEOPLE = 2, ZZ_SOCIAL_NETWORK > 0.
+
+    If a future dump removes the 1↔3 ASSOC_DATA edge (or
+    person 1 / 3 entirely), the test will fail at the chained
+    export's RecordCount=0 check; pick a new known-edged small
+    pair via the same SQL.
+    """
+    from cbdb_driver.form_specs import LOOKATASSOCIATIONPAIRS
+    return CrossFixture(
+        name="assocpair_1x3_known_edged",
+        spec=LOOKATASSOCIATIONPAIRS,
+        controls={
+            "TxtID1": 1, "TxtID2": 3,
+            "TxtPerson1": "1", "TxtPerson2": "3",
+            "FrameFilterYears": 1,
+            "Chk2Nodes": 0, "ChkKinship": 0,
+        },
+        expected_min_rows=1,
+        source_sql=None,
+    )
 
 
 def _case_skip_marks(c: Case):
@@ -89,6 +135,12 @@ def _case_skip_marks(c: Case):
 
 
 def _fixture_for(form: str) -> CrossFixture | None:
+    # AssociationPairs uses a custom 1×3 known-edged fixture
+    # rather than the matrix's default 4×5 (which has 0
+    # first-order edges on the current dump — see
+    # `_assocpairs_1x3_fixture` docstring).
+    if form == "LookAtAssociationPairs":
+        return _assocpairs_1x3_fixture()
     for fx in _all_fixtures():
         if fx.spec.name == form:
             return fx
