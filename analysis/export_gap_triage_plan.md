@@ -1,9 +1,9 @@
 # Export coverage gap triage plan
 
-**Date:** 2026-05-04
-**Branch:** `plan/export-gap-triage` (off main `434168a`)
+**Date:** 2026-05-04 · **Refreshed:** 2026-05-05 (post GroupData × CmdGIS coverage merge)
+**Branch:** `plan/export-gap-triage` (off main `434168a`); refresh on `refresh/export-gap-triage-after-groupdata`
 **Source data (read-only):**
-- `reports/export_coverage_inventory.json` — 13 `gap` cells
+- `reports/export_coverage_inventory.json` — **12 `gap` cells** (was 13; GroupData × CmdGIS landed in PR `cover/groupdata-cmdgis-clean-branches` commit `294cbda`)
 - `analysis/dump/vba/Form_LookAt*.vb` — handler presence + chain shape
 - `analysis/dump/control_inventory.json` — button presence
 - `tests/test_vba_matrix_all_forms.py::_xfail_marks` — matrix CmdQuery/CmdRun blockers
@@ -17,6 +17,72 @@ This document does NOT prescribe writing tests.  It triages the 13
 gaps so the next implementation PR has a defensible scope and the
 high-time-cost areas (Networks/AssociationPairs full-injection +
 matrix CmdQuery family) are NOT autopilot-implemented.
+
+---
+
+## Refresh 2026-05-05 — what changed
+
+After PR `cover/groupdata-cmdgis-clean-branches` (commit `294cbda`)
+landed, inventory dropped from 13 → 12 gaps and the only
+bucket-A cell (GroupData × CmdGIS) became `covered`.
+
+**Bucket distribution of remaining 12 gaps:**
+
+| Bucket | Count | Cells |
+|---|---:|---|
+| A small_candidate | **0** (was 1) | — |
+| B blocked_by_known_driver_issue | 5 | AssociationPairs CmdGIS / CmdPajek / CmdGephi / CmdNeo4j; Networks CmdGIS / CmdPajek (split below) |
+| C blocked_by_form_query_timeout | 1 (was 2) | GroupData × CmdNeo4j |
+| D new_export_family_needs_design | 3 | Associations / Place / Kinship × CmdUCINet |
+| D + B stacked | 2 | AssociationPairs × CmdUCINet; Networks × CmdUCINet |
+
+(B-bucket count is 5 across two driver causes: 4 cells gated on
+the AssociationPairs SetFocus driver patch, 2 cells gated on
+Networks Form_Open landmine #3.5.  CmdNeo4j AssociationPairs sits
+in B; the 4 vs 2 above sums to 6 because Networks CmdUCINet is
+counted under "D + B stacked", not in the pure-B row.)
+
+**Next cheapest 1-3 cells, after applying the refresh-brief
+exclusions** (no AssociationPairs · no driver/meta-PR-needed · no
+CmdUCINet new family):
+
+| Rank | Cell | Why it is cheaper than every other remaining cell |
+|---|---|---|
+| 1 | **LookAtGroupData × CmdNeo4j** | The just-merged PR proved the person_1 small fixture drives GroupData CmdRun + a multi-file export chain end-to-end inside the standard 180s watcher.  That dispels the "matrix CmdRun timeout" half of this cell's bucket-C blocker.  The all-`Chk*`-reset pattern from the GroupData CmdGIS test directly transfers (Issue #6 avoidance).  Only one unknown remains: whether the CmdNeo4j chain's own SaveAs count fits the 180s watcher on person_1 (cheaper to settle than any other remaining cell, all of which need either a driver patch or a new export-family design pass first). |
+
+There is no rank 2 or rank 3 under the brief's exclusions —
+**every other gap requires a driver patch, the Networks Form_Open
+scaffold, or a CmdUCINet family-level design + probe pass**, none of
+which is cheap.  The refresh deliberately reports a single
+candidate rather than padding the list.
+
+**Required prerequisite before opening rank-1 PR:** a probe
+(read-only, similar shape to `analysis/probe_groupdata_cmdgis.py`)
+that drives CmdRun + CmdNeo4j on person_1, times the chain, and
+counts files.  If chain runtime ≤ 120s and ≥ 1 file is produced,
+promote GroupData × CmdNeo4j from bucket C → bucket A and open the
+coverage PR.  If chain trips the watcher OR mid-chain `:ERR`
+appears, do NOT open the coverage PR — instead investigate first
+(this is the AssociationPairs lesson: don't trust passing
+infrastructure-adjacent tests as evidence the export chain works).
+
+**Cells the brief explicitly excludes from "next cheapest"
+ranking** (do not touch in the next 1-3 PRs without a fresh
+maintainer brief):
+
+| Cell | Exclusion reason |
+|---|---|
+| LookAtAssociationPairs × CmdGIS / CmdNeo4j / CmdPajek / CmdGephi | AssociationPairs (per refresh brief); also gated on CmdQuery SetFocus driver patch |
+| LookAtAssociationPairs × CmdUCINet | AssociationPairs + CmdUCINet new family (per refresh brief) |
+| LookAtNetworks × CmdGIS / CmdPajek | Driver/meta-PR (Form_Open landmine #3.5) — per refresh brief |
+| LookAtNetworks × CmdUCINet | Driver/meta-PR + CmdUCINet new family — per refresh brief |
+| LookAtAssociations × CmdUCINet | CmdUCINet new family — per refresh brief |
+| LookAtPlace × CmdUCINet | CmdUCINet new family — per refresh brief |
+| LookAtKinship × CmdUCINet | CmdUCINet new family — per refresh brief |
+
+11 of the 12 remaining gaps fall into the do-not-touch table; only
+GroupData × CmdNeo4j is open for consideration, and only after a
+read-only probe.
 
 ---
 
@@ -190,14 +256,11 @@ which the gap-triage incorrectly read as "small fixture works".
 - **recommended next action:** **NOT in the next 1-3 PRs.**  Resolve CmdUCINet design AND Networks driver pattern first.
 - **risk:** **high** — combined.
 
-### LookAtGroupData × CmdGIS — bucket A (small_candidate)
+### LookAtGroupData × CmdGIS — **COVERED 2026-05-05** (was bucket A small_candidate)
 
-- **handler exists?** yes
-- **button exists?** yes
-- **current blocker:** matrix CmdRun timeout (GroupData aggregates across many tables on heavy fixtures).  But person_1 small fixture works (`tests/test_vba_matrix_hard_forms.py::_HARD_FIXTURES`).
-- **nearest existing test pattern:** `tests/test_vba_cmdgis_other_forms.py` covers 6 other forms × CmdGIS; LookAtGroupData was explicitly excluded (`"omitted because their CmdQuery / CmdRun ... matrix"` per docstring).
-- **recommended next action:** wire GroupData into a small-fixture variant of the cross-form CmdGIS test (similar shape to the AssociationPairs.CmdGIS recommendation above — both share the matrix-timeout-but-small-fixture-works pattern).
-- **risk:** **low-medium** — small fixture proven for CmdRun; CmdGIS export chain on the same small input is uncharted but conceptually the standard CmdGIS `.tab` write loop.
+- **status:** **covered** by `tests/test_vba_cmdgis_other_forms.py::test_cmd_gis_groupdata_clean_branches` (PR `cover/groupdata-cmdgis-clean-branches`, commit `294cbda`).  Inventory `gap: 13 → 12`, `real_vba_covered: 16 → 17`.
+- **scope:** clean branches only — Status / Office / Addr.  Entry deliberately excluded (Issue #6 separately bug-pinned in `tests/test_vba_bug_behaviors.py::test_bug6_lookat_groupdata_query_entry_fires_no_such_field`).  Text excluded (benign 0-files on person_1).
+- **lesson for refresh:** the all-`Chk*`-reset pattern (reset all 11 checkboxes to False BEFORE setting target ones) is now baked in — first-attempt failure surfaced because Form_Open defaults left Issue #6's branch enabled.  This pattern is directly transferable to a future GroupData × CmdNeo4j probe.
 
 ### LookAtGroupData × CmdNeo4j — bucket C (blocked_by_form_query_timeout)
 
@@ -222,7 +285,7 @@ for full context).
 | LookAtAssociationPairs × CmdGIS | ~~A small_candidate~~ → **B blocked_by_known_driver_issue** | medium |
 | LookAtAssociationPairs × CmdPajek | ~~A small_candidate~~ → **B blocked_by_known_driver_issue** | medium |
 | LookAtAssociationPairs × CmdGephi | ~~A small_candidate~~ → **B blocked_by_known_driver_issue** | medium |
-| LookAtGroupData × CmdGIS | A small_candidate | low-medium |
+| LookAtGroupData × CmdGIS | ~~A small_candidate~~ → **COVERED 2026-05-05** | — |
 | LookAtAssociationPairs × CmdNeo4j | C blocked_by_form_query_timeout | medium-high |
 | LookAtGroupData × CmdNeo4j | C blocked_by_form_query_timeout | medium |
 | LookAtNetworks × CmdGIS | B blocked_by_known_driver_issue | medium |
@@ -233,13 +296,18 @@ for full context).
 | LookAtAssociationPairs × CmdUCINet | D + B stacked | high |
 | LookAtNetworks × CmdUCINet | D + B stacked | high |
 
-| Bucket | Count (updated) |
+| Bucket (12 remaining gaps after 2026-05-05) | Count |
 |---|---:|
-| A small_candidate | **1** (was 4) |
-| B blocked_by_known_driver_issue | **5** (was 2) |
+| A small_candidate | **0** (was 1 on 2026-05-04; GroupData × CmdGIS now covered) |
+| B blocked_by_known_driver_issue | 5 |
 | C blocked_by_form_query_timeout | 2 |
 | D new_export_family_needs_design | 3 |
-| D + B stacked | **2** (was 1 D+C, 1 D+B) |
+| D + B stacked | 2 |
+
+(Counts above use the post-2026-05-04 reclassifications.  See the
+JSON for canonical bucket-per-cell assignments — the per-cell rows
+in this MD's table above predate the JSON's CmdNeo4j AssocPairs
+re-class and are kept as historical record.)
 
 (LookAtAssociationPairs × CmdUCINet was previously stacked
 D + C; the underlying matrix-CmdQuery blocker is actually the
@@ -275,12 +343,38 @@ blocker).  See per-cell entries above.
 
 Same blocker as PR 1 — withdrawn for the same reason.
 
-### PR 3 (now PR 1) — GroupData × CmdGIS via person_1 small fixture
-- **Bucket:** A
-- **Risk:** low-medium
-- **Scope sketch:** add `LookAtGroupData` to `tests/test_vba_cmdgis_other_forms.py::_FORMS_WITH_CMDGIS_TESTABLE_HERE`; wire person_1 small fixture similarly.  Single-file `.tab` export.
-- **Caveat:** GroupData's CmdRun behaviour (UPDATE-style backfill) differs from Associations/Place/Kinship CmdQuery — and given that AssociationPairs's CmdQuery turned out to have a hidden SetFocus blocker, **probe GroupData's CmdRun + CmdGIS chain end-to-end FIRST** before promising this is "low risk".  The triage plan repeatedly under-estimated risk for matrix-blocked forms; assume the same may be true here until probed.
-- **Status:** **the only remaining bucket-A cell**, but its risk profile is no longer "guaranteed low" — re-baseline via probe before the next implementer commits to it.
+### ~~PR 3 (now PR 1) — GroupData × CmdGIS via person_1 small fixture~~ — **LANDED 2026-05-05**
+
+Implemented in PR `cover/groupdata-cmdgis-clean-branches`, commit
+`294cbda`.  The probe-first caveat from this PR's recommendation
+proved correct: a probe (`analysis/probe_groupdata_cmdgis.py` and
+the sub-call follow-up) found mid-chain `:ERR` from Issue #6's
+queryEntry sub.  The shipped coverage PR therefore covered Status
+/ Office / Addr only and explicitly excluded Entry (separately
+bug-pinned) and Text (benign 0-files on person_1).  Inventory
+delta: `gap: 13 → 12`, `real_vba_covered: 16 → 17`.
+
+### PR 1 (post-refresh) — GroupData × CmdNeo4j probe-first
+
+- **Bucket:** C → maybe A after probe
+- **Risk:** medium until probed
+- **Why this is the cheapest remaining cell:** see the "Refresh
+  2026-05-05" section near the top of this document.  Person_1
+  fixture is now end-to-end-proven for GroupData CmdRun + a multi-
+  file export chain, dispelling the matrix-CmdRun-timeout half of
+  the original blocker.  All other remaining gaps require either a
+  driver patch, the Networks Form_Open scaffold, or a CmdUCINet
+  family design pass first.
+- **Required prerequisite:** read-only probe — drive CmdRun +
+  CmdNeo4j on person_1, time the chain, count files, snapshot
+  ZZ_TEST_DEBUG.  Reuse the all-`Chk*`-reset pattern baked into
+  `test_cmd_gis_groupdata_clean_branches`.
+- **Promote-to-coverage condition:** chain runtime ≤ 120s AND ≥ 1
+  file produced AND no `LookAtGroupData:ERR` mid-chain.
+- **Reject-to-investigation condition:** chain trips watcher OR
+  mid-chain `:ERR` appears.  In that case, do NOT open the
+  coverage PR — open an investigation PR instead (the
+  AssociationPairs lesson).
 
 ### Driver-side meta-PR (would unblock 3-5 cells at once)
 

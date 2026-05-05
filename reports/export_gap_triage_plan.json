@@ -1,13 +1,64 @@
 {
   "schema_version": 1,
   "generated_date": "2026-05-04",
+  "refreshed_date": "2026-05-05",
   "source_inventory": "reports/export_coverage_inventory.json",
-  "scope": "read-only triage of the 13 `gap` cells in the export-coverage inventory; no Access COM, no test changes, no reports/issues/README touched",
+  "scope": "read-only triage of the export-coverage gap cells; no Access COM, no test changes, no reports/issues/README touched",
+  "refresh_2026_05_05": {
+    "trigger": "PR cover/groupdata-cmdgis-clean-branches (commit 294cbda) merged; inventory gap 13 -> 12, real_vba_covered 16 -> 17",
+    "remaining_gap_count": 12,
+    "bucket_distribution_remaining": {
+      "A_small_candidate": 0,
+      "B_blocked_by_known_driver_issue": 5,
+      "C_blocked_by_form_query_timeout": 2,
+      "D_new_export_family_needs_design": 3,
+      "D_plus_B_stacked": 2
+    },
+    "exclusions_applied_per_brief": [
+      "AssociationPairs (any cell) — driver-side SetFocus blocker, treated as out-of-scope for next 1-3 PRs",
+      "any cell needing a driver/meta-PR (Networks Form_Open landmine #3.5)",
+      "CmdUCINet new family (Associations / Place / Kinship CmdUCINet — and the stacked AssociationPairs / Networks CmdUCINet)"
+    ],
+    "eligible_after_exclusions": ["LookAtGroupData × CmdNeo4j"],
+    "ineligible_after_exclusions": [
+      "LookAtAssociationPairs × CmdGIS (AssocPairs + driver)",
+      "LookAtAssociationPairs × CmdNeo4j (AssocPairs + driver)",
+      "LookAtAssociationPairs × CmdPajek (AssocPairs + driver)",
+      "LookAtAssociationPairs × CmdGephi (AssocPairs + driver)",
+      "LookAtAssociationPairs × CmdUCINet (AssocPairs + driver + CmdUCINet)",
+      "LookAtNetworks × CmdGIS (driver/meta-PR)",
+      "LookAtNetworks × CmdPajek (driver/meta-PR)",
+      "LookAtNetworks × CmdUCINet (driver/meta-PR + CmdUCINet)",
+      "LookAtAssociations × CmdUCINet (CmdUCINet new family)",
+      "LookAtPlace × CmdUCINet (CmdUCINet new family)",
+      "LookAtKinship × CmdUCINet (CmdUCINet new family)"
+    ],
+    "next_cheapest_cells": [
+      {
+        "rank": 1,
+        "cell": "LookAtGroupData × CmdNeo4j",
+        "current_bucket": "C_blocked_by_form_query_timeout",
+        "why_cheaper_than_others": "The just-merged GroupData × CmdGIS PR proved person_1 small fixture drives CmdRun + a multi-file export chain end-to-end inside the standard 180s watcher.  That dispels the matrix-CmdRun-timeout half of this cell's bucket-C blocker.  All other remaining gaps require either a driver patch (AssocPairs, Networks), the Networks Form_Open scaffold, or a CmdUCINet family-level design + probe pass first.  None of those is cheap.",
+        "transferable_assets_from_groupdata_cmdgis_pr": [
+          "all-Chk*-reset-first pattern (avoids Issue #6's queryEntry branch)",
+          "person_1 fixture wiring",
+          "shape-classifier pattern for multi-file export verification"
+        ],
+        "remaining_unknown": "Whether the CmdNeo4j chain's own SaveAs count fits the 180s watcher on person_1.  Cheaper to settle than any other remaining cell.",
+        "required_prerequisite_before_coverage_pr": "Read-only probe (similar shape to analysis/probe_groupdata_cmdgis.py) that drives CmdRun + CmdNeo4j on person_1, times the chain, counts files, snapshots ZZ_TEST_DEBUG.",
+        "promote_to_coverage_condition": "chain runtime <= 120s AND >= 1 file produced AND no LookAtGroupData:ERR mid-chain",
+        "reject_to_investigation_condition": "chain trips watcher OR mid-chain :ERR (open investigation PR, NOT coverage PR — the AssociationPairs lesson)"
+      }
+    ],
+    "no_rank_2_or_3_reason": "Under the brief's three exclusion criteria, only one cell qualifies as cheap.  Padding the list with cells that require driver/meta-PR or CmdUCINet design work would mis-represent the cost.  Refresh deliberately reports a single candidate."
+  },
   "buckets": {
     "A_small_candidate": {
       "definition": "Existing small-fixture pattern (matrix_hard_forms / networks_small_fixture) covers this form's CmdQuery, AND the export's per-block logic is well-understood enough that a new cross-form test slice should pass with low driver risk.",
-      "count": 1,
-      "count_was": 4,
+      "count": 0,
+      "count_was_2026_05_04": 1,
+      "count_was_original": 4,
+      "_note_2026_05_05": "Bucket emptied: GroupData × CmdGIS (the lone bucket-A cell after 2026-05-04 reclassifications) is now COVERED by PR cover/groupdata-cmdgis-clean-branches commit 294cbda.",
       "_note": "Updated 2026-05-04 by PR cover/assocpairs-pajek-gephi: 3 AssociationPairs cells (CmdGIS/CmdPajek/CmdGephi) moved A -> B after the probe surfaced the upstream CmdQuery SetFocus driver blocker."
     },
     "B_blocked_by_known_driver_issue": {
@@ -144,11 +195,13 @@
     {
       "form": "LookAtGroupData", "command": "CmdGIS",
       "handler_present": true, "button_present": true,
-      "bucket": "A_small_candidate",
-      "current_blocker": "Matrix CmdRun timeout (GroupData aggregates across many tables on heavy fixtures).  But person_1 small fixture works (tests/test_vba_matrix_hard_forms.py::_HARD_FIXTURES).",
-      "nearest_existing_test_pattern": "tests/test_vba_cmdgis_other_forms.py covers 6 other forms × CmdGIS; LookAtGroupData explicitly excluded per its docstring.",
-      "recommended_next_action": "Wire GroupData into a small-fixture variant of the cross-form CmdGIS test (similar shape to AssociationPairs.CmdGIS).",
-      "risk": "low-medium"
+      "bucket": "covered_2026_05_05",
+      "bucket_was": "A_small_candidate",
+      "covered_by_pr": "cover/groupdata-cmdgis-clean-branches",
+      "covered_by_commit": "294cbda",
+      "covered_by_test": "tests/test_vba_cmdgis_other_forms.py::test_cmd_gis_groupdata_clean_branches",
+      "scope": "Status / Office / Addr clean branches; Entry excluded (Issue #6 separately bug-pinned); Text excluded (benign 0-files on person_1).",
+      "lesson_for_future_probes": "All-Chk*-reset-first pattern is required because Form_Open defaults leave at least one Chk True (Issue #6's queryEntry branch).  The probe-first caveat from the original recommendation proved correct."
     },
     {
       "form": "LookAtGroupData", "command": "CmdNeo4j",
@@ -163,12 +216,25 @@
   "recommended_next_prs_in_order": [
     {
       "rank": 1,
+      "title": "GroupData × CmdNeo4j probe-first (then maybe coverage)",
+      "considers_cells": ["LookAtGroupData.CmdNeo4j"],
+      "current_bucket": "C_blocked_by_form_query_timeout",
+      "step_1_probe_only": "Read-only probe under analysis/ (e.g. probe_groupdata_cmdneo4j.py modeled on probe_groupdata_cmdgis.py) that drives CmdRun + CmdNeo4j on person_1, times the chain, counts files, snapshots ZZ_TEST_DEBUG.  Reuse the all-Chk*-reset pattern.",
+      "step_2_only_if_probe_clean": "Coverage PR adding a sibling test to test_cmd_gis_groupdata_clean_branches for CmdNeo4j; same fixture, same Chk-reset, same per-file shape classifier pattern adapted to Neo4j multi-file output.",
+      "promote_condition": "chain runtime <= 120s AND >= 1 file produced AND no LookAtGroupData:ERR mid-chain",
+      "reject_condition": "chain trips watcher OR mid-chain :ERR (open investigation PR, NOT coverage PR)",
+      "why_cheapest_remaining": "Person_1 fixture is now end-to-end-proven for GroupData CmdRun + multi-file export chain (just-merged GroupData CmdGIS PR).  All-Chk*-reset pattern is transferable.  Only CmdNeo4j chain runtime on person_1 remains unknown.  Every other remaining gap requires a driver patch, the Networks Form_Open scaffold, or a CmdUCINet family design + probe pass — none of which is cheap.",
+      "_no_rank_2_or_3": "Under the refresh brief's exclusions (no AssocPairs, no driver/meta-PR, no CmdUCINet), only one cell qualifies."
+    }
+  ],
+  "completed_recommendations_2026_05_05": [
+    {
       "title": "GroupData × CmdGIS via person_1 small fixture",
-      "closes_cells": ["LookAtGroupData.CmdGIS"],
-      "bucket": "A",
-      "risk": "low-medium",
-      "scope_sketch": "Add LookAtGroupData to tests/test_vba_cmdgis_other_forms.py::_FORMS_WITH_CMDGIS_TESTABLE_HERE; wire person_1 small fixture similarly to the existing 6 CmdGIS forms.",
-      "_caveat": "Triage repeatedly under-estimated risk for matrix-blocked forms (the AssociationPairs cells were 'low risk' in the original triage but turned out to be bucket B due to a hidden CmdQuery SetFocus driver bug).  Probe GroupData's CmdRun + CmdGIS chain end-to-end FIRST before committing to this PR; do NOT assume small-fixture-passes-matrix-test means cross-form-export-passes-too."
+      "closed_cell": "LookAtGroupData.CmdGIS",
+      "pr": "cover/groupdata-cmdgis-clean-branches",
+      "commit": "294cbda",
+      "scope_actually_shipped": "Status / Office / Addr clean branches.  Entry separately bug-pinned (Issue #6).  Text excluded (benign 0-files).",
+      "the_probe_first_caveat_was_correct": "Probe found mid-chain :ERR from Issue #6's queryEntry sub when Chk* defaults left ChkEntry true.  Coverage PR explicitly resets all 11 Chk* to False first."
     }
   ],
   "withdrawn_recommendations_2026_05_04": [
@@ -204,5 +270,6 @@
     "LookAtKinship × CmdUCINet",
     "LookAtAssociationPairs × CmdUCINet",
     "LookAtNetworks × CmdUCINet"
-  ]
+  ],
+  "_do_not_autopilot_note_2026_05_05": "GroupData × CmdNeo4j stays in this list even though it is the rank-1 next-cheapest: the rank-1 entry recommends a probe-first PR, NOT a direct coverage PR.  The cell is only autopilot-safe AFTER the probe shows clean chain timing and no mid-chain :ERR — at which point the next implementer would open a coverage PR with a fresh maintainer brief."
 }
