@@ -1,0 +1,183 @@
+{
+  "schema_version": 1,
+  "generated_date": "2026-05-04",
+  "source_inventory": "reports/export_coverage_inventory.json",
+  "scope": "read-only triage of the 13 `gap` cells in the export-coverage inventory; no Access COM, no test changes, no reports/issues/README touched",
+  "buckets": {
+    "A_small_candidate": {
+      "definition": "Existing small-fixture pattern (matrix_hard_forms / networks_small_fixture) covers this form's CmdQuery, AND the export's per-block logic is well-understood enough that a new cross-form test slice should pass with low driver risk.",
+      "count": 4
+    },
+    "B_blocked_by_known_driver_issue": {
+      "definition": "Form_Open / VBE-injection blocker (Networks AGENTS landmine #3.5) — CmdQuery itself works only via the `skip_inject_autodetect_forms` minimal-injection scaffold.  Standard cross-form test infra (full injection) cannot host it.",
+      "count": 2
+    },
+    "C_blocked_by_form_query_timeout": {
+      "definition": "Matrix CmdQuery/CmdRun on the default heavy fixture times out within `click_via_timer`'s 180s watcher.  Could in principle become A by reusing the small-fixture pattern, but the export chain's own runtime might still blow past the timeout.  Investigate before promising.",
+      "count": 2
+    },
+    "D_new_export_family_needs_design": {
+      "definition": "Handler family has zero existing tests; classifier knows none of its file shapes; export semantics need a probe pass before any assertion strictness can be defined.  CmdUCINet today.",
+      "count": 3
+    },
+    "D_plus_C_stacked": {"count": 1},
+    "D_plus_B_stacked": {"count": 1},
+    "E_low_value_or_duplicate": {"count": 0}
+  },
+  "cells": [
+    {
+      "form": "LookAtAssociations", "command": "CmdUCINet",
+      "handler_present": true, "button_present": true,
+      "bucket": "D_new_export_family_needs_design",
+      "current_blocker": "CmdUCINet handler family has zero existing tests anywhere; depth-check classifier has zero entries that match a UCINet output (.dl format is unrelated to existing People/Place/EntryCode shapes).",
+      "nearest_existing_test_pattern": "tests/test_vba_pajek_gephi_cross_form.py (different file format per export, single-file output assertion) — but doesn't help with .dl-specific structure.",
+      "recommended_next_action": "Separate design+probe PR: drive the handler against an Associations small fixture, identify .dl file structure, define what 'passes' means BEFORE writing the cross-form test.",
+      "risk": "medium"
+    },
+    {
+      "form": "LookAtPlace", "command": "CmdUCINet",
+      "handler_present": true, "button_present": true,
+      "bucket": "D_new_export_family_needs_design",
+      "current_blocker": "Same CmdUCINet family blocker as Associations.CmdUCINet.",
+      "nearest_existing_test_pattern": "None for CmdUCINet; closest non-UCINet equivalent is tests/test_vba_pajek_gephi_cross_form.py for LookAtPlace × CmdPajek.",
+      "recommended_next_action": "Wait for CmdUCINet family infra (see Associations.CmdUCINet).  Place is one of three forms a cross-form CmdUCINet test would cover.",
+      "risk": "medium"
+    },
+    {
+      "form": "LookAtKinship", "command": "CmdUCINet",
+      "handler_present": true, "button_present": true,
+      "bucket": "D_new_export_family_needs_design",
+      "current_blocker": "Same CmdUCINet family blocker.",
+      "nearest_existing_test_pattern": "None for CmdUCINet; closest for Kinship is tests/test_vba_cmdguess_cross_form.py (CmdGUESS) and tests/test_vba_pajek_gephi_cross_form.py (CmdPajek).",
+      "recommended_next_action": "Wait for CmdUCINet family infra.",
+      "risk": "medium"
+    },
+    {
+      "form": "LookAtAssociationPairs", "command": "CmdGIS",
+      "handler_present": true, "button_present": true,
+      "bucket": "A_small_candidate",
+      "current_blocker": "Matrix CmdQuery for AssociationPairs times out (Link1stOrder JET self-join — see _xfail_marks docstring).  Small fixture (4×5, in tests/test_vba_matrix_hard_forms.py) DOES complete CmdQuery to ZZ_SOCIAL_NETWORK.",
+      "nearest_existing_test_pattern": "tests/test_vba_cmdgis_other_forms.py (5 forms × CmdGIS, single-file output, structural assertion).",
+      "recommended_next_action": "Add LookAtAssociationPairs to _FORMS_WITH_CMDGIS_TESTABLE_HERE; wire small-fixture seeding similar to the matrix_hard_forms pattern.  Single-file CmdGIS shape; assertion machinery already generic.",
+      "risk": "low"
+    },
+    {
+      "form": "LookAtAssociationPairs", "command": "CmdNeo4j",
+      "handler_present": true, "button_present": true,
+      "bucket": "C_blocked_by_form_query_timeout",
+      "current_blocker": "Matrix CmdQuery timeout would block it like CmdGIS, but Neo4j's multi-file chain (6-10 SaveAs blocks) on a 4×5 fixture might still complete OR might blow past 180s — unknown.  Also: sibling LookAtAssociations CmdNeo4j is currently skipped with 'produces 0 files in directory mode — needs investigation alongside Place'.",
+      "nearest_existing_test_pattern": "tests/test_vba_cmdneo4j_cross_form.py cross-form host; LookAtAssociations is the closest sibling and is currently skipped.",
+      "recommended_next_action": "NOT in next 1-3 PRs.  Two unknowns stack.  Probe first to confirm small-fixture chain runtime AND whether AssociationPairs-Neo4j has the 0-file-mode failure.  If both probes are clean, promote to bucket A.",
+      "risk": "medium-high"
+    },
+    {
+      "form": "LookAtAssociationPairs", "command": "CmdPajek",
+      "handler_present": true, "button_present": true,
+      "bucket": "A_small_candidate",
+      "current_blocker": "Not in _CASES of tests/test_vba_pajek_gephi_cross_form.py.  Needs the small-fixture (4×5) wiring.",
+      "nearest_existing_test_pattern": "Case('LookAtAssociations', 'CmdPajek', '.net', '*vertices') — same .net format, same *vertices anchor.",
+      "recommended_next_action": "Add Case('LookAtAssociationPairs', 'CmdPajek', '.net', '*vertices') to _CASES; arrange small-fixture seeding.  Same shape class as already-passing Associations.CmdPajek.",
+      "risk": "low"
+    },
+    {
+      "form": "LookAtAssociationPairs", "command": "CmdGephi",
+      "handler_present": true, "button_present": true,
+      "bucket": "A_small_candidate",
+      "current_blocker": "Same as CmdPajek above — not in _CASES.",
+      "nearest_existing_test_pattern": "Case('LookAtAssociations', 'CmdGephi', '.gdf', 'nodedef') already passes.",
+      "recommended_next_action": "Add Case('LookAtAssociationPairs', 'CmdGephi', '.gdf', 'nodedef') alongside the CmdPajek slice (same PR is reasonable).",
+      "risk": "low"
+    },
+    {
+      "form": "LookAtAssociationPairs", "command": "CmdUCINet",
+      "handler_present": true, "button_present": true,
+      "bucket": "D_plus_C_stacked",
+      "current_blocker": "Stacks both CmdUCINet family blocker AND matrix-CmdQuery timeout.",
+      "nearest_existing_test_pattern": "None for CmdUCINet.",
+      "recommended_next_action": "NOT in next 1-3 PRs.  Resolve CmdUCINet family first; AssociationPairs is then the highest-risk member.",
+      "risk": "high"
+    },
+    {
+      "form": "LookAtNetworks", "command": "CmdGIS",
+      "handler_present": true, "button_present": true,
+      "bucket": "B_blocked_by_known_driver_issue",
+      "current_blocker": "Networks Form_Open deadlock under default full injection (AGENTS landmine #3.5).  Cross-form CmdGIS test uses full-injection VbaSession; Networks needs skip_inject_autodetect_forms=SKIP_SIBLINGS.  AND matrix CmdRun on Zhu Xi heavy fixture times out — needs Cao Zhi small fixture.",
+      "nearest_existing_test_pattern": "tests/test_vba_networks_small_fixture.py uses minimal injection successfully on Cao Zhi for CmdRun only — has not extended to CmdGIS.",
+      "recommended_next_action": "NOT in next 1-3 PRs.  Needs either (a) extending networks_small_fixture.py with a CmdGIS slice, OR (b) refactoring cross-form CmdGIS test infrastructure to thread skip_inject_autodetect_forms through.  Both are scope-defining design work.",
+      "risk": "medium"
+    },
+    {
+      "form": "LookAtNetworks", "command": "CmdPajek",
+      "handler_present": true, "button_present": true,
+      "bucket": "B_blocked_by_known_driver_issue",
+      "current_blocker": "Same Networks Form_Open blocker as CmdGIS.  CmdPajek hosts list at test_vba_pajek_gephi_cross_form.py:9 includes Networks but it's NOT in _CASES (omitted precisely because of the Form_Open blocker).",
+      "nearest_existing_test_pattern": "tests/test_vba_networks_small_fixture.py for the minimal-injection pattern; Case('LookAtAssociations', 'CmdPajek', ...) for the export shape.",
+      "recommended_next_action": "NOT in next 1-3 PRs.  Same Networks driver-pattern dependency.",
+      "risk": "medium"
+    },
+    {
+      "form": "LookAtNetworks", "command": "CmdUCINet",
+      "handler_present": true, "button_present": true,
+      "bucket": "D_plus_B_stacked",
+      "current_blocker": "Networks Form_Open AND CmdUCINet family.  Stacked.",
+      "nearest_existing_test_pattern": "None.",
+      "recommended_next_action": "NOT in next 1-3 PRs.  Resolve CmdUCINet design AND Networks driver pattern first.",
+      "risk": "high"
+    },
+    {
+      "form": "LookAtGroupData", "command": "CmdGIS",
+      "handler_present": true, "button_present": true,
+      "bucket": "A_small_candidate",
+      "current_blocker": "Matrix CmdRun timeout (GroupData aggregates across many tables on heavy fixtures).  But person_1 small fixture works (tests/test_vba_matrix_hard_forms.py::_HARD_FIXTURES).",
+      "nearest_existing_test_pattern": "tests/test_vba_cmdgis_other_forms.py covers 6 other forms × CmdGIS; LookAtGroupData explicitly excluded per its docstring.",
+      "recommended_next_action": "Wire GroupData into a small-fixture variant of the cross-form CmdGIS test (similar shape to AssociationPairs.CmdGIS).",
+      "risk": "low-medium"
+    },
+    {
+      "form": "LookAtGroupData", "command": "CmdNeo4j",
+      "handler_present": true, "button_present": true,
+      "bucket": "C_blocked_by_form_query_timeout",
+      "current_blocker": "Matrix CmdRun timeout AND multi-file Neo4j chain heaviness.  CmdNeo4j cross-form test's hardcoded 180s watcher timeout (already on the edge for Office's 37k rows) might still trip on GroupData even with person_1 small fixture.",
+      "nearest_existing_test_pattern": "tests/test_vba_cmdneo4j_cross_form.py (GroupData absent from _SPECS).",
+      "recommended_next_action": "NOT in next 1-3 PRs unless GroupData CmdGIS lands first AND a probe confirms the Neo4j chain completes on person_1 within the watcher timeout.  Sequence-dependent.",
+      "risk": "medium"
+    }
+  ],
+  "recommended_next_prs_in_order": [
+    {
+      "rank": 1,
+      "title": "AssociationPairs × CmdPajek + CmdGephi via small 4×5 fixture",
+      "closes_cells": ["LookAtAssociationPairs.CmdPajek", "LookAtAssociationPairs.CmdGephi"],
+      "bucket": "A",
+      "risk": "low",
+      "scope_sketch": "Add Case('LookAtAssociationPairs', 'CmdPajek', '.net', '*vertices') and Case('LookAtAssociationPairs', 'CmdGephi', '.gdf', 'nodedef') to tests/test_vba_pajek_gephi_cross_form.py::_CASES; arrange _fixture_for('LookAtAssociationPairs') to return the 4×5 small fixture from tests/test_vba_matrix_hard_forms.py."
+    },
+    {
+      "rank": 2,
+      "title": "AssociationPairs × CmdGIS via the same 4×5 fixture",
+      "closes_cells": ["LookAtAssociationPairs.CmdGIS"],
+      "bucket": "A",
+      "risk": "low",
+      "scope_sketch": "Add LookAtAssociationPairs to tests/test_vba_cmdgis_other_forms.py::_FORMS_WITH_CMDGIS_TESTABLE_HERE; same small-fixture wiring pattern as PR 1."
+    },
+    {
+      "rank": 3,
+      "title": "GroupData × CmdGIS via person_1 small fixture",
+      "closes_cells": ["LookAtGroupData.CmdGIS"],
+      "bucket": "A",
+      "risk": "low-medium",
+      "scope_sketch": "Add LookAtGroupData to tests/test_vba_cmdgis_other_forms.py::_FORMS_WITH_CMDGIS_TESTABLE_HERE; wire person_1 small fixture similarly."
+    }
+  ],
+  "do_not_autopilot": [
+    "LookAtAssociationPairs × CmdNeo4j",
+    "LookAtGroupData × CmdNeo4j",
+    "LookAtNetworks × CmdGIS",
+    "LookAtNetworks × CmdPajek",
+    "LookAtAssociations × CmdUCINet",
+    "LookAtPlace × CmdUCINet",
+    "LookAtKinship × CmdUCINet",
+    "LookAtAssociationPairs × CmdUCINet",
+    "LookAtNetworks × CmdUCINet"
+  ]
+}
