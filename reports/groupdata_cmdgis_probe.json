@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "purpose": "Probe-first investigation: does GroupData x CmdGIS have a hidden activation blocker (like AssociationPairs CmdQuery) before any cross-form coverage test is wired.",
+  "fixture": {
+    "form": "LookAtGroupData",
+    "person_id": 1,
+    "checkboxes_enabled": [
+      "ChkStatus",
+      "ChkGisStatus"
+    ],
+    "rationale": "Person 1 has 2 statuses (per matrix_hard_forms's docstring); ChkStatus -> CmdRun calls queryStatus -> ZZ_SCRATCH_STATUS populated; ChkGisStatus -> CmdGIS calls WriteGIS_Status -> writes status_gis_*.tab.  Smallest end-to-end CmdGIS exercise on this form."
+  },
+  "user_mdb": "C:\\Users\\how612\\Documents\\GitHub\\cbdb-user-mdb-tests\\data\\CBDB_BJ_User.mdb",
+  "errors": [],
+  "preprobe_status_data_count": 2,
+  "preprobe_biog_main_count": 1,
+  "form_opened": true,
+  "picker_seeded": true,
+  "cmd_run_returned_n_rows_in_zz_scratch_status": 2,
+  "cmd_run_backfill_seen": true,
+  "cmd_run_backfill_sample": {
+    "c_person_id": 1,
+    "c_name": "An Dun",
+    "c_dynasty": "Song"
+  },
+  "zz_scratch_status_actual_count": 2,
+  "zz_test_debug_transcript": [
+    {
+      "id": 1,
+      "msg": "LookAtGroupData:ENTER"
+    },
+    {
+      "id": 2,
+      "msg": "LookAtGroupData:ERR No value given for one or more required parameters."
+    },
+    {
+      "id": 3,
+      "msg": "LookAtGroupData:DONE"
+    }
+  ],
+  "enter_marker_seen": true,
+  "done_marker_seen": true,
+  "err_marker_seen": true,
+  "err_marker_messages": [
+    "LookAtGroupData:ERR No value given for one or more required parameters."
+  ],
+  "msgbox_marker_count": 0,
+  "output_files": [
+    {
+      "name": "groupdata_status_gis.tab",
+      "size_bytes": 142,
+      "n_data_rows": 1,
+      "header": "Name\tNameChn\tSex\tIndexYear\tAddrID\tAddrName\tAddrChn\tX\tY\txy_count",
+      "header_n_cols": 10,
+      "first_data_row_n_cols": 10,
+      "header_cols_match_first_row": true
+    },
+    {
+      "name": "groupdata_status_gis.tab.tab",
+      "size_bytes": 1277,
+      "n_data_rows": 12,
+      "header": "Office\tOfficeChn\tFirstYear\tLastYear\tDynasty\tOfficeAddr\tOfficeAddrChn\tX\tY\txy_count",
+      "header_n_cols": 10,
+      "first_data_row_n_cols": 10,
+      "header_cols_match_first_row": true
+    }
+  ],
+  "q3_structural_checks": {
+    "file_exists": true,
+    "non_empty": true,
+    "header_reasonable": true,
+    "first_rows_consistent": true
+  },
+  "elapsed_seconds": 8.2,
+  "verdict": "needs_investigation",
+  "verdict_reason": "Chain produced output (2 file(s)) AND reached DONE, but a non-fatal ERR marker fired mid-chain: ['LookAtGroupData:ERR No value given for one or more required parameters.'].  This is NOT the AssociationPairs SetFocus blocker (which blocks all output) — it's a separate runtime error embedded in the chain.  Coverage feasible AFTER identifying which sub the ERR comes from (likely a JET 'missing parameter' = column reference against wrong recordset/projection — same bug-class as Issues #7-9 if it surfaces in a release-shipped code path)."
+}
