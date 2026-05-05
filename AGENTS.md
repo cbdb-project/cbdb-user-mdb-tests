@@ -237,90 +237,25 @@ When triaging future findings, weight P0/P1 heavier than P2-P5.
 Static scans tend to surface a lot of low-priority noise — flag it,
 but don't let it crowd out the P0/P1 stuff.
 
-Re-run ALL FOUR static auditors on every CBDB release — they're
-cheap (seconds) and they keep finding bugs:
-- `analysis/audit_missing_controls.py` — control-name typos
-  (found Bug #5)
-- `analysis/audit_sql_columns.py` — SQL `<Table>.<Column>` typos
-  (found Bug #6, also expanded scope of Bug #5)
-- `analysis/audit_sql_columns.py`-style INSERT/SELECT cardinality
-  check is in `analysis/audit_insert_select_columns.py` — currently
-  clean (0 findings on 295 pure-literal INSERT statements);
-  guards against future regressions
-- `analysis/audit_sql_table_names.py` — table-name typos in SQL
-  strings; currently surfaces only `frmIndexAddr` (orphan
-  maintenance form, end users can't reach), filed as 🟢 LOW
-- `analysis/audit_saved_queries.py` — same `<Table>.<Column>` check
-  as `audit_sql_columns.py` but applied to the 21 saved queries in
-  `queries.json`.  Currently clean; guards against view definitions
-  drifting away from the underlying table schema.
-- `analysis/audit_recordset_fields.py` — tracks `Set <var> =
-  CurrentDb.OpenRecordset("<TABLE>", ...)` per Sub and flags
-  `<var>!<field>` references where `<field>` isn't on `<TABLE>`.
-  Per-sub scope, invalidates on any `Set <var> = ...` reassignment
-  (including reassignment to a SQL string we can't statically
-  evaluate).  Currently clean.
-- `analysis/audit_recordset_sql_projection.py` — sister scanner to
-  the above for the SQL-string case.  Tracks `tQueryStr = "SELECT
-  ..."` literal-only concats and `Set <var> = CurrentDb.OpenRecordset
-  (tQueryStr)`, parses the SELECT projection, and flags `<var>!field`
-  AND bare `!field` (inside `With <var>`) reads where `field` isn't
-  projected.  **Found Bugs #7 / #8 / #9** (CmdNeo4j family across
-  LookAtPlace / LookAtNetworks / LookAtEntry).  Run on every release.
-- `analysis/audit_subform_control_sources.py` — for every sub-form
-  whose RecordSource is a saved query (View_*), check each bound
-  control's ControlSource exists in the saved query's SELECT
-  projection.  **Found Bugs #10 / #11 / #12** (silent display bugs
-  in EVENT_ADDR_2 / EVENTS_DATA_2 / POSTED_TO_OFFICE_DATA_2 sub-
-  forms).
-- `analysis/audit_error_label_targets.py` — every `On Error GoTo
-  <label>` / `Resume <label>` / `GoTo <label>` must point at a
-  label defined in the same Sub.  Currently clean — long-term
-  guard for typo'd error-handler renames.
-- `analysis/audit_event_handlers_exist.py` — every form-control
-  event handler named in `control_inventory.json` must have a
-  matching `Sub <name>()` defined in the form's VBA module.
-  Currently clean — long-term guard for "renamed Sub but forgot to
-  update OnClick property" silent-no-op bugs.
-- `analysis/audit_dcount_where_columns.py` — every D-aggregate
-  call (DCount / DLookup / DSum / etc.) with a literal table+criteria
-  must reference columns that exist on the named table.  Currently
-  clean — long-term guard for stale-criteria silent-False bugs.
-- `analysis/audit_cross_form_references.py` — every
-  `Forms!<form>!<ctl>` reference must resolve to an existing form
-  AND existing control on that form (case-insensitive).  Skips
-  Form__TMPCLP*.vb auto-backup snapshots.  **Found Bugs #13 / #14**
-  (BIOG_MAIN_2_Subform / KIN_DATA_Subform reference picker forms
-  that don't exist in the .mdb).
-- `analysis/audit_doc_md_open_form.py` — every literal
-  `DoCmd.OpenForm "<form>"` must resolve.  Currently clean — Bug
-  #13's reference uses a string variable so it's caught by the
-  cross-form-references audit instead.  Long-term guard for direct-
-  literal regressions.
-- `analysis/audit_dlookup_fields.py` — every `DLookup("<field>",
-  "<table>", ...)` literal call must reference a valid field on
-  the table.  Currently clean — companion to dcount-where-columns.
-- `analysis/audit_orphan_event_handlers.py` — find Subs named
-  like `<Control>_<Event>` where `<Control>` doesn't exist on the
-  form.  Code-smell signal (exit 0, informational).  **Found
-  Bugs #15-#19** (LookAtPlace / LookAtStatus / LookAtOffice each
-  have export-button event handlers with no matching button on
-  the form design — silent missing UI).
-- `analysis/audit_blocking_msgbox.py` — list every
-  `If MsgBox(...) = vb<Yes|No|...>` confirmation prompt.  Not bugs;
-  informational guard so `tests/cbdb_driver/vba_session._inject_autodetect`
-  knows which prompts to pre-arrange.
-- `analysis/audit_control_row_sources.py` — for every ListBox /
-  ComboBox with a non-empty RowSource SQL, verify each
-  `<Table>.<Column>` reference is in the schema.  Currently clean —
-  third leg of the SQL-column-resolution stool.
+**Static audits** are a release-workflow must-run.  Every audit
+under `analysis/audit_*.py` runs via
+`python analysis/run_all_audits.py` (cheap — ~6 s for the full
+set; latest sweep: 6 of 19 audits flagged).  Per-audit
+descriptions, current state, and "long-term guard" rationale
+live in [`docs/static-audits.md`](docs/static-audits.md) — read
+that catalogue when extending audits or triaging which audit
+caught a regression.
 
-**Runner**: `analysis/run_all_audits.py` runs every static audit and
-prints a FLAGGED / CLEAN summary.  Per-release workflow.  Latest run
-on the shipped dump: 6 of 19 audits flagged, 6.5 s total.
-
-All audits share `analysis/audit_lib.read_vba_lines` for proper
-`\\r\\r\\n` handling so reported line numbers match grep / VBE.
+**Bug attribution from the audit set:** `audit_missing_controls`
+caught Bug #5, `audit_sql_columns` caught Bug #6 (and expanded
+#5), `audit_recordset_sql_projection` caught Bugs #7 / #8 / #9
+(the CmdNeo4j family), `audit_subform_control_sources` caught
+Bugs #10 / #11 / #12 (silent-display sub-forms),
+`audit_cross_form_references` caught Bugs #13 / #14 (missing
+picker forms), and `audit_orphan_event_handlers` caught Bugs
+#15-#19 (export-button handlers with no matching UI button).
+The remaining audits are currently clean; they are long-term
+guards against future regressions in their respective scopes.
 
 Each audit's confirmed bugs are guarded by `tests/test_known_bugs
 .py`.  **Marker-failure policy** (must internalize): a failing
