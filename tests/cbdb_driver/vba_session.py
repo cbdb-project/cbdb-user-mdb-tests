@@ -355,6 +355,47 @@ class VbaSession:
         # person ids → Pajek export still runs.  Real fix is for CBDB
         # to add the missing checkbox to Status's form design.
         "Form_LookAtStatus": [(r"\bChkIDs\.Value\b", "False")],
+
+        # Headless-Form_Timer SetFocus blocker on
+        # Form_LookAtAssociationPairs.  The form's CmdQuery_Click
+        # body has six standalone `.SetFocus` statements
+        # (TxtFromYear / TxtToYear / CmdQuery on lines 1620 / 1627
+        # / 1634, then Me.TxtID1 / Me.TxtID2 / Me.CmdQuery on
+        # lines 1655 / 1658 / 1660).  When CmdQuery_Click fires
+        # via the driver's Form_Timer dispatch the active form
+        # is the welcome / Navigation Pane, not
+        # LookAtAssociationPairs, so the very first `.SetFocus`
+        # raises VBA error 2110 ("can't move the focus to the
+        # control X.") and the handler exits via its error trap
+        # BEFORE running the INSERTs into ZZ_SCRATCH_PEOPLE /
+        # ZZ_SOCIAL_NETWORK — every downstream export
+        # (CmdGIS / CmdNeo4j / CmdPajek / CmdGephi) then bails
+        # on RecordCount = 0.  See triage in
+        # `analysis/export_gap_triage_plan.md` (the
+        # AssociationPairs B-bucket entries) for the full
+        # diagnosis.
+        #
+        # Surgical patch: line-anchored regex matches a standalone
+        # `<receiver>.SetFocus` statement (leading whitespace +
+        # non-space receiver + `.SetFocus` + EOL) and replaces it
+        # with a comment line that preserves the original code as
+        # text.  The line anchoring means an inline shape such as
+        # `If x Then y.SetFocus` would NOT match — verified there
+        # are zero such inline `.SetFocus` constructs in this
+        # form's body via grep.
+        #
+        # This is a driver-side workaround, NOT a CBDB-source fix.
+        # The underlying defect remains: a real CBDB fix would
+        # either remove the `.SetFocus` calls (UI scaffolding only,
+        # not load-bearing) or guard them with `On Error Resume
+        # Next` around the focus-move.  The workaround keeps the
+        # test suite operational on the existing source.
+        "Form_LookAtAssociationPairs": [
+            (r"(?m)^([ \t]*)(\S+?)\.SetFocus\b[ \t]*(?=\r?$)",
+             r"\1' SetFocus suppressed (driver patch — headless "
+             r"Form_Timer dispatch can't focus controls on the "
+             r"inactive form): \2.SetFocus"),
+        ],
     }
 
     # Subform controls whose `RecordSource` is a saved query at design
