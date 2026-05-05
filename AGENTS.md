@@ -47,11 +47,24 @@ else.  Do not duplicate their content elsewhere — copies drift.
   `ISSUES` dict and re-run `python reports/generate_report.py`
   in the same PR**.  Don't paste bug content into `README.md`,
   `AGENTS.md`, or any other markdown — link to the report instead.
-  `analysis/reverify_all_issues.py` cross-checks the classifier
-  against the report and should be run when you touch any issue.
+  Full workflow (6-step sync rule, when artifacts-only PR vs.
+  canonical change, marker-failure policy, screenshot consistency,
+  PR self-checklist) lives in
+  [`docs/skills/issue-report-maintainer.md`](docs/skills/issue-report-maintainer.md).
 - This file (`AGENTS.md`) holds *operational* knowledge — the COM
   landmines, JET quirks, driver patterns.  Plan/status and issue
   content do *not* belong here.
+
+**Two repo-local skill files** capture the long workflow detail
+that used to live in this file.  Read them when the task fits:
+
+- [`docs/skills/issue-report-maintainer.md`](docs/skills/issue-report-maintainer.md)
+  — any change to issue content / tier / severity / screenshots,
+  or any investigate→reclassify pair PR.
+- [`docs/skills/access-vba-probe.md`](docs/skills/access-vba-probe.md)
+  — any new real-VBA test, Access COM probe, or screenshot
+  capture; pure-SQL-first principle + when NOT to escalate to
+  COM.
 
 ## Repo layout
 
@@ -104,203 +117,91 @@ cbdb-user-mdb-tests/
 
 ## ⭐ Mission-critical landmines (DO NOT relearn these the hard way)
 
-### 1. (legacy) Probe vs pytest: `pywinauto.click_input()` only fires if Access
-window is in the FOREGROUND, and silently drops on disabled controls
-or locked-screen sessions.  We've migrated to Form_Timer trigger
-universally — see #4 below.  Original gotcha kept here as reference:
+**Index of conclusions only.**  Full code examples, escalation
+rules, probe scaffolding, and the
+"when NOT to open Access COM" list live in
+[`docs/skills/access-vba-probe.md`](docs/skills/access-vba-probe.md)
+— read it before any new real-VBA test or COM probe.
 
-```python
-# REQUIRED before any click:
-main = pwa.window(title="Welcome to CBDB!")
-main.wait("ready", timeout=10).set_focus()    # ← without this, click is dropped silently
-time.sleep(0.5)
-```
+The conclusions below are the floor every agent must internalize
+by default; the skill expands each with the working code and
+debugging detail.
 
-Symptom of missing this: click reports success, but `ZZ_SCRATCH_<X>` stays empty.
-
-### 2. `gUseADDRID` and other Public globals don't auto-set when you
-INSERT into picker scratch tables.
-
-The form's `CmdQuery_Click` gates the address branch on the Public
-global `gUseADDRID`, which is normally set by `CmdSelectPlace_Click`
-or `CmdImportPlaces_Click`.  Tests that bypass pickers (by direct
-INSERT) leave the global False and the address filter is ignored.
-
-**Fix used here**: `tests/cbdb_driver/vba_session.py:_inject_autodetect()`
-prepends a 3-line auto-detect to `CmdQuery_Click` that sets
-`gUseADDRID = (DCount("ZZ_SCRATCH_ADDR") > 0)`.
-
-If you change the autodetect, **do NOT use variable names starting
-with underscore** — VBA forbids them and will crash with a compile
-dialog mid-test (e.g. don't use `_td`, use `tdAddrCount`).
-
-### 3. NAVIGATION_PANE.Form_Open hangs forever if `LinkListInit.c_path`
-doesn't equal the working-copy file path.
-
-The form's startup tries to relink all data tables to
-`<path>_<version>_DATA.mdb`, which doesn't exist at our working-copy
-location.  **Pre-patch via pyodbc BEFORE Access opens**:
-
-```python
-conn.cursor().execute(
-    f"UPDATE LinkListInit SET c_path = '{work_path}'"
-)
-```
-
-### 3.5. LookAtNetworks Form_Open deadlocks under default `_inject_autodetect`
-because ANY sibling `Form_LookAt*` module modification dirties the
-VBA project, and Networks's Form_Open then hits a project-wide
-auto-compile interaction with its `Forms!LookAtNetworks!<sub>.Form
-.Recordset` self-reference during Open.  Bisected by PR AR–AX:
-
-  - `Form_Open` is fine by itself (~2 s under bare DispatchEx).
-  - `_inject_autodetect` IS the trigger of the OpenForm hang.
-  - Skipping ONLY Networks's own injection still hangs (PR AT V3).
-  - Skipping ANY single sibling form's injection still hangs (PR AU).
-  - Compile-after-inject mitigation FAILED (PR AV).
-  - Warm-open + close + reopen still hangs (PR AW W2/W4).
-  - The two viable paths: keep form loaded across injection (PR AW W3,
-    fragile ergonomics) OR use minimal injection — skip all 9 sibling
-    `Form_LookAt*` autodetect entries via the PR AT
-    `skip_inject_autodetect_forms` kwarg (PR AU V12 / AX-verified).
-
-For Networks-specific tests use:
-
-```python
-SKIP_SIBLINGS = {
-    "Form_LookAtEntry", "Form_LookAtOffice", "Form_LookAtStatus",
-    "Form_LookAtTexts", "Form_LookAtAssociations",
-    "Form_LookAtPlace", "Form_LookAtKinship",
-    "Form_LookAtAssociationPairs", "Form_LookAtGroupData",
-}
-sess = VbaSession(SRC, WORK, skip_inject_autodetect_forms=SKIP_SIBLINGS)
-```
-
-Live example: `tests/test_vba_networks_small_fixture.py` (PR AY).
-The general matrix Networks case stays skipped — fixing it requires
-either re-architecting the matrix harness to use minimal-injection
-per-form, or a deeper Access-side workaround.
-
-### 4. `Application.Run "Form_X.SubName"` does NOT work for form-module
-subs on this Office install.
-
-We tried 7 variants.  Use `vba_session.click_via_timer(form, ctl)`
-instead — it injects a `Form_Timer` sub that calls the private
-`<ctl>_Click` then disables the timer.  Trigger by setting
-`Forms(form).TimerInterval = 100`.  Access fires Form_Timer itself,
-bypassing both the Application.Run unreachability and any
-disabled-button click drop.
-
-(Earlier we used `pywinauto.click_input` for forms with enabled
-buttons, but its UIA tree corrupts after a few open/close cycles in
-one pytest session — assoc tests fail with 0 rows after biblcat,
-plus desktop-locked sessions silently drop clicks.  Form_Timer is
-the universal trigger now.)
-
-### 5. `VBComponents.Add(1)` (new standard module) fails with
-COM error 0x800AC471 even with `AccessVBOM=1`.
-
-Workaround: append helpers to an EXISTING form module
-(`Form_LookAtEntry`).  See `vba_inject.py:HOST_FORM_MODULE`.
-
-### 6. Office's `AutomationSecurity` defaults to `2` (ByUI), which
-blocks macros for COM-opened mdbs.
-
-```python
-app.AutomationSecurity = 1  # msoAutomationSecurityLow
-# MUST be set BEFORE OpenCurrentDatabase()
-```
-
-### 7. The shipped .mdb has a broken DAO 3.6 reference.
-
-`dao360.dll` doesn't exist on Office 2016+.  `vba_session.py:open()`
-auto-detects + replaces with `ACEDAO.DLL`.  This is also a real bug
-in the .mdb that the user's report found.
-
-### 8b. LookAtOffice's CmdQuery starts `Enabled=False` and pywinauto
-clicks are silently dropped on disabled controls.
-
-Setting `Forms("LookAtOffice").Controls("CmdQuery").Enabled = True` via
-COM works (verified — `Properties("Enabled") = True` afterwards), but
-pywinauto's UIA tree caches the *disabled* state.  `click_input()`
-returns success but Windows blocks the actual click (any click on a
-disabled control is dropped).  After `force_enable`, `Repaint()`,
-`time.sleep` — pywinauto STILL sees disabled.
-
-Also: `Application.Run "Form_LookAtOffice.PublicWrapperSub"` returns
-success but doesn't actually invoke (same as #4).
-
-**FIX (use Form_Timer trigger):** `vba_session.click_via_timer(form, ctl)`
-injects a `Form_Timer` sub into the form module that calls `<ctl>_Click`
-on first tick, then sets `TimerInterval=0` to stop.  Python triggers
-by setting `Forms("LookAtOffice").TimerInterval = 100`.  Access fires
-the timer event itself — no click, no Application.Run, no UIA cache
-issue.  Required for any form whose CmdQuery starts disabled.
-
-The autodetect injection ALSO appends an `INSERT INTO ZZ_TEST_DEBUG
-VALUES ('<form>:DONE')` right before the `Exit_<sub>:` label so
-callers can poll for *true* completion: row_count alone is insufficient
-because backfill UPDATEs don't change row count.  Office's CmdQuery_Click
-runs ~3 backfill UPDATE statements (5-7 table joins each on 37k rows)
-that take 30-60s each — the DONE marker is the only reliable signal
-the chain finished.
-
-After the chain finishes, **don't use pandas.read_sql for large
-results** — it deadlocks with Access's internal recordset binding on
-big local tables.  Use raw `vba.conn.cursor().execute(...).fetchall()`
-instead.  See `tests/test_vba_matrix_all_forms.py` step 5+.
-
-### 8e. `win32com.client.Dispatch("Access.Application")` can hit
-Windows fatal exception 0x800706ba (RPC server unavailable) when the
-ROT has stale entries from killed Access processes.  Use
-`DispatchEx` instead — it forces a fresh out-of-proc instance.
-`vba_session.open()` already does this.
-
-### 8g. Real export tests — Form_Timer fires only once per OpenForm,
-so CmdQuery + CmdGIS must run in the SAME fire.
-
-Chain pattern: pass `"<chain>|<path>"` to `Forms(form).Tag` (in-process
-property, no JET cache delay).  Form_Timer calls CmdQuery_Click.  An
-autodetect-injected post-body block in CmdQuery_Click reads Me.Tag,
-parses chain after the first comma, calls `CmdGIS_Click`.  CmdGIS_Click
-uses `GetTestExportPath()` (also reads Me.Tag) instead of popping
-SaveAs dialog (patch by `vba.patch_filedialog`).
-
-Two non-obvious VBA gotchas the chain hit:
-- VBA `Or` is NOT short-circuited.  `If GetTestExportPath() <> "" Or
-  dlgSaveAs.Show = -1 Then` STILL pops the dialog because `.Show` is
-  evaluated even when the test path is non-empty.  Use `If ... Then ...
-  ElseIf .Show = -1 Then ... End If` instead.
-- After `Call CmdQuery_Click` from inside Form_Timer, control DOES
-  return cleanly — but only if the called sub completes.  Chaining
-  TWO calls (Call A; Call B) inside Form_Timer hangs (CmdGIS_Click's
-  internal MsgBox or recordset binding blocks).  Hence chain inside
-  CmdQuery_Click body, not in Form_Timer.
-
-Working impl: `tests/test_vba_export.py` + `vba_session.set_form_tag`
-+ `vba_session.patch_filedialog` + autodetect-injected chain block in
-`vba_session._inject_autodetect`.
-
-### 8f. Don't try to gracefully close Access via `DoCmd.Close /
-CloseCurrentDatabase / Quit` after a heavy CmdQuery_Click.  Those
-COM calls hang for minutes while Access finishes background subform
-renders / UPDATE chains.  `vba_session.close()` skips them and goes
-straight to `taskkill /F` which is reliable.
-
-### 8c. `Form_LookAtOffice.Form_Open` wipes `ZZ_OFFICE_CODE` on every
-open.  No other LookAt form's Form_Open touches its own picker table.
-
-Implication: must populate ZZ_OFFICE_CODE *after* `open_form()`, not
-before.  See `tests/test_vba_matrix_all_forms.py::test_cross_form_matrix`.
-
-### 8d. JET page-cache coherence: pyodbc INSERTs are invisible to
-Access's internal SQL/DCount for several seconds.
-
-After `set_picker_codes` (which writes via pyodbc), call
-`app.DBEngine.Idle(8)` (dbRefreshCache) + `app.RefreshDatabaseWindow()`
-to flush.  Without it, autodetect's `DCount("*", "ZZ_OFFICE_CODE")`
-returns 0 even though pyodbc just inserted 1 row.  Already wired into
-`vba_session.set_picker_codes`.
+1. **(legacy) `pywinauto.click_input` is fragile** — silently drops
+   on disabled controls + locked-screen sessions; UIA cache
+   corrupts after a few open/close cycles per pytest session.
+   We migrated to Form_Timer trigger universally (see #4).  Don't
+   reintroduce `click_input` in new tests.
+2. **Public globals (`gUseADDRID`, `gUseIndexYears`, etc.) don't
+   auto-set when tests bypass pickers** by direct INSERT.
+   `VbaSession._inject_autodetect()` prepends auto-detect logic
+   to `CmdQuery_Click`.  Don't change the autodetect with
+   variable names starting with `_` — VBA forbids them and pops a
+   compile dialog mid-test.
+3. **`LinkListInit.c_path` pre-patch via pyodbc BEFORE Access
+   opens.**  Without it `NAVIGATION_PANE.Form_Open` hangs forever
+   trying to relink to a non-existent `CBDB_<ver>_DATA.mdb` at the
+   working-copy path.  `VbaSession.open()` already handles this;
+   manual probes that bypass `VbaSession` MUST do it themselves
+   (snippet in skill).
+4. **LookAtNetworks Form_Open deadlocks under default
+   `_inject_autodetect`** because any sibling `Form_LookAt*`
+   modification dirties the VBA project and Networks's Form_Open
+   self-references on its own subform recordsets during open.
+   Workaround = minimal injection — pass
+   `skip_inject_autodetect_forms=SKIP_SIBLINGS` (set of all 9
+   sibling `Form_LookAt*` keys) to `VbaSession`.  Live reference:
+   `tests/test_vba_networks_small_fixture.py`.  General matrix
+   Networks case stays skipped; fixing it = scope-defining design
+   work.
+5. **`Application.Run "Form_X.SubName"` does NOT work** for
+   form-module subs on this Office install.  Use
+   `VbaSession.click_via_timer(form, ctl)` exclusively for new
+   tests.
+6. **`VBComponents.Add(1)` (new standard module) fails** with
+   COM error 0x800AC471.  Workaround: append helpers to an
+   existing form module.
+7. **`AutomationSecurity = 1` MUST be set BEFORE
+   `OpenCurrentDatabase`** — default `2` (ByUI) blocks macros
+   for COM-opened mdbs.  `VbaSession.open()` already handles this.
+8. **Shipped .mdb has a broken DAO 3.6 reference** (`dao360.dll`).
+   `VbaSession.open()` auto-detects + replaces with `ACEDAO.DLL`.
+   This is also Issue #2 in the report.
+9. **`win32com.client.Dispatch` can hit fatal exception 0x800706ba**
+   (RPC server unavailable) when ROT has stale entries from killed
+   Access procs.  `VbaSession.open()` uses `DispatchEx` (fresh
+   out-of-proc instance) to avoid this.
+10. **Don't gracefully close Access via `DoCmd.Close /
+    CloseCurrentDatabase / Quit`** after a heavy CmdQuery — those
+    COM calls hang for minutes.  `VbaSession.close()` goes
+    straight to scoped `taskkill /F`.
+11. **`Form_LookAtOffice.Form_Open` wipes `ZZ_OFFICE_CODE`** on
+    every open.  Populate AFTER `open_form()`, not before.  No
+    other LookAt form has this property.
+12. **JET page-cache coherence:** pyodbc INSERTs are invisible to
+    Access's internal SQL/DCount for several seconds.  After any
+    pyodbc write to a picker table, call
+    `app.DBEngine.Idle(8)` + `app.RefreshDatabaseWindow()` to
+    flush.  `VbaSession.set_picker_codes` already does this.
+13. **LookAtOffice CmdQuery starts disabled** + has 3 backfill
+    UPDATE chains (30-60 s each on 37k rows).  Use Form_Timer
+    trigger (#5).  The `<form>:DONE` marker in `ZZ_TEST_DEBUG` is
+    the only reliable completion signal — row count alone misses
+    UPDATE backfills.  Don't use `pandas.read_sql` for large
+    results either; it deadlocks Access — use raw cursor.
+14. **Real export chain:** `CmdQuery + Cmd<Export>` must run in
+    the SAME Form_Timer fire.  Chain via `set_form_tag(form,
+    "CmdQuery,Cmd<X>", path)`; `patch_filedialog` redirects
+    `dlgSaveAs.Show` calls to `GetTestExportPath()`.  Working
+    impl: `tests/test_vba_export.py`.
+15. **AssociationPairs `CmdQuery_Click:1635` calls
+    `Me.CmdQuery.SetFocus`** which fails under Form_Timer
+    dispatch (active form is welcome / NAVIGATION_PANE).
+    `ZZ_SOCIAL_NETWORK` ends up empty; downstream exports bail
+    on `RecordCount=0`.  `tests/test_vba_matrix_hard_forms.py`
+    silently swallows this — DO NOT read its loose-pass as
+    evidence the export chain works.  Until a driver-side patch
+    lands, all 4 AssociationPairs export cells are blocked.
 
 The current Python SQL-replay tests CANNOT find VBA bugs.
 
@@ -421,17 +322,16 @@ on the shipped dump: 6 of 19 audits flagged, 6.5 s total.
 All audits share `analysis/audit_lib.read_vba_lines` for proper
 `\\r\\r\\n` handling so reported line numbers match grep / VBE.
 
-These are guarded by `tests/test_known_bugs.py`; if those tests
-start failing, the marker no longer reproduces — that's a signal
-to investigate, **not** an automatic confirmation that upstream
-fixed the bug.  The candidates are: (a) upstream actually patched
-the source .mdb / VBA, (b) the input fixture or Access driver
-behaviour changed out from under the test, (c) the original bug was
-misclassified.  Only (a) justifies marking the issue as fixed in
-`reports/generate_report.py`'s `ISSUES` dict, and only after
-inspecting the new VBA / queries dump or hearing from the
-maintainer.  Until then, prefer re-classifying (Dormant / Latent /
-Not currently reproducible) over removing the issue.
+Each audit's confirmed bugs are guarded by `tests/test_known_bugs
+.py`.  **Marker-failure policy** (must internalize): a failing
+marker is a signal to investigate, NOT a fix confirmation.
+Investigation candidates are (a) upstream actually patched, (b)
+fixture/driver behaviour drifted, (c) original was misclassified.
+Default to reclassifying as P5 dormant/latent over removal; only
+(a) with explicit evidence (new VBA dump or maintainer
+confirmation) justifies "fixed".  Full workflow + 6-step sync
+rule for any severity / count change in
+[`docs/skills/issue-report-maintainer.md`](docs/skills/issue-report-maintainer.md).
 
 ### Index-year cross-check: User MDB ≠ cbdb-online-main-server SQLite (classification still open)
 
