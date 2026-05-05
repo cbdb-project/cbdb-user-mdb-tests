@@ -1,0 +1,528 @@
+{
+  "schema_version": 1,
+  "purpose": "Localise the LookAtGroupData:ERR ('No value given for one or more required parameters') from the previous GroupData × CmdGIS probe to a specific sub-call.",
+  "fixture": {
+    "form": "LookAtGroupData",
+    "person_id": 1
+  },
+  "iterations": [
+    {
+      "name": "queryStatus_alone",
+      "chk_set": [
+        "ChkStatus"
+      ],
+      "tests_subs": [
+        "queryStatus"
+      ],
+      "errors": [],
+      "zz_test_debug_cutoff_id_before": 0,
+      "click_via_timer_returned_n": 2,
+      "scratch_counts_after": {
+        "ZZ_SCRATCH_IMPORT_PEOPLE": 1,
+        "ZZ_SCRATCH_STATUS": 2,
+        "ZZ_SCRATCH_OFFICE": 0,
+        "ZZ_SCRATCH_ENTRY": 0,
+        "ZZ_SCRATCH_TEXT": null,
+        "ZZ_SCRATCH_ADDR": 0,
+        "ZZ_SCRATCH_PEOPLE": 0
+      },
+      "zz_test_debug_delta": [
+        {
+          "id": 1,
+          "msg": "LookAtGroupData:ENTER"
+        },
+        {
+          "id": 2,
+          "msg": "LookAtGroupData:DONE"
+        }
+      ],
+      "enter_marker_seen": true,
+      "done_marker_seen": true,
+      "err_marker_seen": false,
+      "err_marker_messages": [],
+      "msgbox_marker_count": 0,
+      "output_files": [
+        {
+          "name": "f3.out.tab",
+          "size_bytes": 127,
+          "header": "Name\tNameChn\tSex\tIndexYear\tAddrName\tAddrChn\tX\tY\txy_count"
+        }
+      ],
+      "output_file_count": 1
+    },
+    {
+      "name": "queryOffice_alone",
+      "chk_set": [
+        "ChkOffice"
+      ],
+      "tests_subs": [
+        "queryOffice"
+      ],
+      "errors": [],
+      "zz_test_debug_cutoff_id_before": 2,
+      "click_via_timer_returned_n": 12,
+      "scratch_counts_after": {
+        "ZZ_SCRATCH_IMPORT_PEOPLE": 1,
+        "ZZ_SCRATCH_STATUS": 2,
+        "ZZ_SCRATCH_OFFICE": 12,
+        "ZZ_SCRATCH_ENTRY": 0,
+        "ZZ_SCRATCH_TEXT": null,
+        "ZZ_SCRATCH_ADDR": 0,
+        "ZZ_SCRATCH_PEOPLE": 0
+      },
+      "zz_test_debug_delta": [
+        {
+          "id": 3,
+          "msg": "LookAtGroupData:ENTER"
+        },
+        {
+          "id": 4,
+          "msg": "LookAtGroupData:DONE"
+        }
+      ],
+      "enter_marker_seen": true,
+      "done_marker_seen": true,
+      "err_marker_seen": false,
+      "err_marker_messages": [],
+      "msgbox_marker_count": 0,
+      "output_files": [
+        {
+          "name": "f6.out.tab",
+          "size_bytes": 1277,
+          "header": "Office\tOfficeChn\tFirstYear\tLastYear\tDynasty\tOfficeAddr\tOfficeAddrChn\tX\tY\txy_count"
+        },
+        {
+          "name": "f9.out.tab",
+          "size_bytes": 142,
+          "header": "Name\tNameChn\tSex\tIndexYear\tAddrID\tAddrName\tAddrChn\tX\tY\txy_count"
+        }
+      ],
+      "output_file_count": 2
+    },
+    {
+      "name": "queryEntry_alone",
+      "chk_set": [
+        "ChkEntry"
+      ],
+      "tests_subs": [
+        "queryEntry"
+      ],
+      "errors": [],
+      "zz_test_debug_cutoff_id_before": 4,
+      "click_via_timer_returned_n": 0,
+      "scratch_counts_after": {
+        "ZZ_SCRATCH_IMPORT_PEOPLE": 1,
+        "ZZ_SCRATCH_STATUS": 2,
+        "ZZ_SCRATCH_OFFICE": 12,
+        "ZZ_SCRATCH_ENTRY": 0,
+        "ZZ_SCRATCH_TEXT": null,
+        "ZZ_SCRATCH_ADDR": 0,
+        "ZZ_SCRATCH_PEOPLE": 0
+      },
+      "zz_test_debug_delta": [
+        {
+          "id": 5,
+          "msg": "LookAtGroupData:ENTER"
+        },
+        {
+          "id": 6,
+          "msg": "LookAtGroupData:ERR No value given for one or more required parameters."
+        },
+        {
+          "id": 7,
+          "msg": "LookAtGroupData:DONE"
+        }
+      ],
+      "enter_marker_seen": true,
+      "done_marker_seen": true,
+      "err_marker_seen": true,
+      "err_marker_messages": [
+        "LookAtGroupData:ERR No value given for one or more required parameters."
+      ],
+      "msgbox_marker_count": 0,
+      "output_files": [],
+      "output_file_count": 0
+    },
+    {
+      "name": "queryText_alone",
+      "chk_set": [
+        "ChkText"
+      ],
+      "tests_subs": [
+        "queryText"
+      ],
+      "errors": [],
+      "zz_test_debug_cutoff_id_before": 7,
+      "click_via_timer_returned_n": -1,
+      "scratch_counts_after": {
+        "ZZ_SCRATCH_IMPORT_PEOPLE": 1,
+        "ZZ_SCRATCH_STATUS": 2,
+        "ZZ_SCRATCH_OFFICE": 12,
+        "ZZ_SCRATCH_ENTRY": 0,
+        "ZZ_SCRATCH_TEXT": null,
+        "ZZ_SCRATCH_ADDR": 0,
+        "ZZ_SCRATCH_PEOPLE": 0
+      },
+      "zz_test_debug_delta": [
+        {
+          "id": 8,
+          "msg": "LookAtGroupData:ENTER"
+        },
+        {
+          "id": 9,
+          "msg": "LookAtGroupData:DONE"
+        }
+      ],
+      "enter_marker_seen": true,
+      "done_marker_seen": true,
+      "err_marker_seen": false,
+      "err_marker_messages": [],
+      "msgbox_marker_count": 0,
+      "output_files": [],
+      "output_file_count": 0
+    },
+    {
+      "name": "queryAddr_alone",
+      "chk_set": [
+        "ChkAddr"
+      ],
+      "tests_subs": [
+        "queryAddr"
+      ],
+      "errors": [],
+      "zz_test_debug_cutoff_id_before": 9,
+      "click_via_timer_returned_n": 0,
+      "scratch_counts_after": {
+        "ZZ_SCRATCH_IMPORT_PEOPLE": 1,
+        "ZZ_SCRATCH_STATUS": 2,
+        "ZZ_SCRATCH_OFFICE": 12,
+        "ZZ_SCRATCH_ENTRY": 0,
+        "ZZ_SCRATCH_TEXT": null,
+        "ZZ_SCRATCH_ADDR": 0,
+        "ZZ_SCRATCH_PEOPLE": 1
+      },
+      "zz_test_debug_delta": [
+        {
+          "id": 10,
+          "msg": "LookAtGroupData:ENTER"
+        },
+        {
+          "id": 11,
+          "msg": "LookAtGroupData:DONE"
+        }
+      ],
+      "enter_marker_seen": true,
+      "done_marker_seen": true,
+      "err_marker_seen": false,
+      "err_marker_messages": [],
+      "msgbox_marker_count": 0,
+      "output_files": [
+        {
+          "name": "f12.out.tab",
+          "size_bytes": 127,
+          "header": "Name\tNameChn\tSex\tIndexYear\tAddrName\tAddrChn\tX\tY\txy_count"
+        }
+      ],
+      "output_file_count": 1
+    },
+    {
+      "name": "Status_full_chain",
+      "chk_set": [
+        "ChkStatus",
+        "ChkGisStatus"
+      ],
+      "tests_subs": [
+        "queryStatus",
+        "WriteGIS_Status"
+      ],
+      "errors": [],
+      "zz_test_debug_cutoff_id_before": 11,
+      "click_via_timer_returned_n": 2,
+      "scratch_counts_after": {
+        "ZZ_SCRATCH_IMPORT_PEOPLE": 1,
+        "ZZ_SCRATCH_STATUS": 2,
+        "ZZ_SCRATCH_OFFICE": 12,
+        "ZZ_SCRATCH_ENTRY": 0,
+        "ZZ_SCRATCH_TEXT": null,
+        "ZZ_SCRATCH_ADDR": 0,
+        "ZZ_SCRATCH_PEOPLE": 1
+      },
+      "zz_test_debug_delta": [
+        {
+          "id": 12,
+          "msg": "LookAtGroupData:ENTER"
+        },
+        {
+          "id": 13,
+          "msg": "LookAtGroupData:DONE"
+        }
+      ],
+      "enter_marker_seen": true,
+      "done_marker_seen": true,
+      "err_marker_seen": false,
+      "err_marker_messages": [],
+      "msgbox_marker_count": 0,
+      "output_files": [
+        {
+          "name": "f15.out.tab",
+          "size_bytes": 127,
+          "header": "Name\tNameChn\tSex\tIndexYear\tAddrName\tAddrChn\tX\tY\txy_count"
+        }
+      ],
+      "output_file_count": 1
+    },
+    {
+      "name": "Office_OfficeOffice",
+      "chk_set": [
+        "ChkOffice",
+        "ChkGisOffice"
+      ],
+      "tests_subs": [
+        "queryOffice",
+        "WriteGIS_OfficeOffice"
+      ],
+      "errors": [],
+      "zz_test_debug_cutoff_id_before": 13,
+      "click_via_timer_returned_n": 12,
+      "scratch_counts_after": {
+        "ZZ_SCRATCH_IMPORT_PEOPLE": 1,
+        "ZZ_SCRATCH_STATUS": 2,
+        "ZZ_SCRATCH_OFFICE": 12,
+        "ZZ_SCRATCH_ENTRY": 0,
+        "ZZ_SCRATCH_TEXT": null,
+        "ZZ_SCRATCH_ADDR": 0,
+        "ZZ_SCRATCH_PEOPLE": 1
+      },
+      "zz_test_debug_delta": [
+        {
+          "id": 14,
+          "msg": "LookAtGroupData:ENTER"
+        },
+        {
+          "id": 15,
+          "msg": "LookAtGroupData:DONE"
+        }
+      ],
+      "enter_marker_seen": true,
+      "done_marker_seen": true,
+      "err_marker_seen": false,
+      "err_marker_messages": [],
+      "msgbox_marker_count": 0,
+      "output_files": [
+        {
+          "name": "f18.out.tab",
+          "size_bytes": 1277,
+          "header": "Office\tOfficeChn\tFirstYear\tLastYear\tDynasty\tOfficeAddr\tOfficeAddrChn\tX\tY\txy_count"
+        },
+        {
+          "name": "f21.out.tab",
+          "size_bytes": 216,
+          "header": "Name\tNameChn\tSex\tIndexYear\tAddrID\tAddrName\tAddrChn\tX\tY\txy_count"
+        }
+      ],
+      "output_file_count": 2
+    },
+    {
+      "name": "Office_OfficePeople",
+      "chk_set": [
+        "ChkOffice",
+        "ChkGisOfficePeople"
+      ],
+      "tests_subs": [
+        "queryOffice",
+        "WriteGIS_OfficePeople"
+      ],
+      "errors": [],
+      "zz_test_debug_cutoff_id_before": 15,
+      "click_via_timer_returned_n": 12,
+      "scratch_counts_after": {
+        "ZZ_SCRATCH_IMPORT_PEOPLE": 1,
+        "ZZ_SCRATCH_STATUS": 2,
+        "ZZ_SCRATCH_OFFICE": 12,
+        "ZZ_SCRATCH_ENTRY": 0,
+        "ZZ_SCRATCH_TEXT": null,
+        "ZZ_SCRATCH_ADDR": 0,
+        "ZZ_SCRATCH_PEOPLE": 1
+      },
+      "zz_test_debug_delta": [
+        {
+          "id": 16,
+          "msg": "LookAtGroupData:ENTER"
+        },
+        {
+          "id": 17,
+          "msg": "LookAtGroupData:DONE"
+        }
+      ],
+      "enter_marker_seen": true,
+      "done_marker_seen": true,
+      "err_marker_seen": false,
+      "err_marker_messages": [],
+      "msgbox_marker_count": 0,
+      "output_files": [
+        {
+          "name": "f24.out.tab",
+          "size_bytes": 1277,
+          "header": "Office\tOfficeChn\tFirstYear\tLastYear\tDynasty\tOfficeAddr\tOfficeAddrChn\tX\tY\txy_count"
+        },
+        {
+          "name": "f27.out.tab",
+          "size_bytes": 290,
+          "header": "Name\tNameChn\tSex\tIndexYear\tAddrID\tAddrName\tAddrChn\tX\tY\txy_count"
+        }
+      ],
+      "output_file_count": 2
+    },
+    {
+      "name": "Entry_full_chain",
+      "chk_set": [
+        "ChkEntry",
+        "ChkGisEntry"
+      ],
+      "tests_subs": [
+        "queryEntry",
+        "WriteGIS_Entry"
+      ],
+      "errors": [],
+      "zz_test_debug_cutoff_id_before": 17,
+      "click_via_timer_returned_n": 0,
+      "scratch_counts_after": {
+        "ZZ_SCRATCH_IMPORT_PEOPLE": 1,
+        "ZZ_SCRATCH_STATUS": 2,
+        "ZZ_SCRATCH_OFFICE": 12,
+        "ZZ_SCRATCH_ENTRY": 0,
+        "ZZ_SCRATCH_TEXT": null,
+        "ZZ_SCRATCH_ADDR": 0,
+        "ZZ_SCRATCH_PEOPLE": 1
+      },
+      "zz_test_debug_delta": [
+        {
+          "id": 18,
+          "msg": "LookAtGroupData:ENTER"
+        },
+        {
+          "id": 19,
+          "msg": "LookAtGroupData:ERR No value given for one or more required parameters."
+        },
+        {
+          "id": 20,
+          "msg": "LookAtGroupData:MSGBOX"
+        },
+        {
+          "id": 21,
+          "msg": "LookAtGroupData:DONE"
+        }
+      ],
+      "enter_marker_seen": true,
+      "done_marker_seen": true,
+      "err_marker_seen": true,
+      "err_marker_messages": [
+        "LookAtGroupData:ERR No value given for one or more required parameters."
+      ],
+      "msgbox_marker_count": 1,
+      "output_files": [],
+      "output_file_count": 0
+    },
+    {
+      "name": "Text_full_chain",
+      "chk_set": [
+        "ChkText",
+        "ChkGisText"
+      ],
+      "tests_subs": [
+        "queryText",
+        "WriteGIS_Text"
+      ],
+      "errors": [],
+      "zz_test_debug_cutoff_id_before": 21,
+      "click_via_timer_returned_n": -1,
+      "scratch_counts_after": {
+        "ZZ_SCRATCH_IMPORT_PEOPLE": 1,
+        "ZZ_SCRATCH_STATUS": 2,
+        "ZZ_SCRATCH_OFFICE": 12,
+        "ZZ_SCRATCH_ENTRY": 0,
+        "ZZ_SCRATCH_TEXT": null,
+        "ZZ_SCRATCH_ADDR": 0,
+        "ZZ_SCRATCH_PEOPLE": 1
+      },
+      "zz_test_debug_delta": [
+        {
+          "id": 22,
+          "msg": "LookAtGroupData:ENTER"
+        },
+        {
+          "id": 23,
+          "msg": "LookAtGroupData:DONE"
+        }
+      ],
+      "enter_marker_seen": true,
+      "done_marker_seen": true,
+      "err_marker_seen": false,
+      "err_marker_messages": [],
+      "msgbox_marker_count": 0,
+      "output_files": [],
+      "output_file_count": 0
+    },
+    {
+      "name": "Addr_full_chain",
+      "chk_set": [
+        "ChkAddr",
+        "ChkGisAddr"
+      ],
+      "tests_subs": [
+        "queryAddr",
+        "WriteGIS_Addr"
+      ],
+      "errors": [],
+      "zz_test_debug_cutoff_id_before": 23,
+      "click_via_timer_returned_n": 0,
+      "scratch_counts_after": {
+        "ZZ_SCRATCH_IMPORT_PEOPLE": 1,
+        "ZZ_SCRATCH_STATUS": 2,
+        "ZZ_SCRATCH_OFFICE": 12,
+        "ZZ_SCRATCH_ENTRY": 0,
+        "ZZ_SCRATCH_TEXT": null,
+        "ZZ_SCRATCH_ADDR": 0,
+        "ZZ_SCRATCH_PEOPLE": 1
+      },
+      "zz_test_debug_delta": [
+        {
+          "id": 24,
+          "msg": "LookAtGroupData:ENTER"
+        },
+        {
+          "id": 25,
+          "msg": "LookAtGroupData:DONE"
+        }
+      ],
+      "enter_marker_seen": true,
+      "done_marker_seen": true,
+      "err_marker_seen": false,
+      "err_marker_messages": [],
+      "msgbox_marker_count": 0,
+      "output_files": [
+        {
+          "name": "f30.out.tab",
+          "size_bytes": 127,
+          "header": "Name\tNameChn\tSex\tIndexYear\tAddrName\tAddrChn\tX\tY\txy_count"
+        }
+      ],
+      "output_file_count": 1
+    }
+  ],
+  "errors": [],
+  "err_localisation": {
+    "queryEntry": [
+      "queryEntry_alone",
+      "Entry_full_chain"
+    ],
+    "WriteGIS_Entry": [
+      "Entry_full_chain"
+    ]
+  },
+  "per_sub_verdicts": {
+    "queryEntry": "ERR_in_alone_iteration"
+  },
+  "verdict": "real_cbdb_bug_candidate",
+  "verdict_reason": "ERR fired even when each suspect sub was isolated (no other Chk* set).  The sub itself raises the JET parameter error: ['queryEntry'].  Same bug-class as Issues #7-9.  Investigate per the issue-report-maintainer skill."
+}
