@@ -163,3 +163,152 @@ def test_associationpairs_cmdquery_setfocus_patch_unblocks_inserts(
         "k-hop expansion.  This is NOT a patch failure — the "
         "patch is working as designed; the fixture is too small."
     )
+
+
+def test_associationpairs_cmdquery_then_cmdpajek_export_chain(
+        vba: VbaSession, tmp_path):
+    """Downstream export smoke for the SetFocus driver patch.
+
+    The previous test
+    (`test_associationpairs_cmdquery_setfocus_patch_unblocks_
+    inserts`) only proved that CmdQuery_Click's body runs to
+    completion and populates ZZ_SCRATCH_PEOPLE / ZZ_SOCIAL_
+    NETWORK.  This test goes one hop further and proves that an
+    actual export chain (CmdQuery → CmdPajek) is now executable —
+    the business goal of the patch (4 AssocPairs export gap cells:
+    CmdGIS / CmdNeo4j / CmdPajek / CmdGephi).
+
+    Pajek was picked over the other 3 because:
+      - Single-file output (`.net` text format) — easiest to
+        assert structurally
+      - Same code-path shape as CmdGephi / CmdGIS / CmdNeo4j
+        (each starts with a RecordCount > 0 gate that bails if
+        ZZ_SOCIAL_NETWORK is empty), so passing here proves the
+        precondition for all 4
+      - Doesn't require the full `_NEO4J_SHAPES` classifier
+        (CmdNeo4j) or the GIS shape dictionary (CmdGIS)
+
+    Strict positive markers:
+      - At least 1 .net file produced
+      - File is non-empty
+      - File header looks like Pajek (`*Vertices` token present
+        somewhere in the first 200 bytes)
+      - No `LookAtAssociationPairs:ERR` marker in ZZ_TEST_DEBUG
+
+    If this test fails post-patch with the export markers showing
+    a different blocker (e.g. a cleanup-rebind issue similar to
+    LookAtStatus's CmdPajek skip), the SetFocus patch is still
+    correct — the export chain just has its own separate blocker
+    that needs follow-up triage.  Honest negative outcomes per
+    the brief: don't hard-merge if the smoke fails for an
+    unrelated downstream reason.
+    """
+    spec = LOOKATASSOCIATIONPAIRS
+
+    # 1. patch FileDialog so CmdPajek's dlgSaveAs.Show short-
+    # circuits to a fresh f<n>.out (directory mode, trailing \).
+    vba.patch_filedialog(spec.name)
+
+    # 2. open form, set the same 1×3 known-edged pair as the
+    # other test (proven to give ZZ_SOCIAL_NETWORK > 0).
+    vba.open_form(spec.name)
+    for ctl, val in (
+        ("TxtID1", 1), ("TxtID2", 3),
+        ("TxtPerson1", "1"), ("TxtPerson2", "3"),
+        ("FrameFilterYears", 1),
+        ("Chk2Nodes", 0), ("ChkKinship", 0),
+    ):
+        try:
+            vba.set_control(spec.name, ctl, val)
+        except Exception as e:
+            print(f"  warn setting {ctl}={val!r}: {e}", flush=True)
+
+    # 3. wire chain CmdQuery -> CmdPajek via Form.Tag, directory
+    # mode (same pattern as the GroupData CmdGIS test).
+    out_dir = tmp_path / "assocpairs_pajek_out"
+    out_dir.mkdir()
+    vba.set_form_tag(
+        spec.name,
+        f"{spec.cmd_name},CmdPajek",
+        str(out_dir) + "\\",
+    )
+
+    # 4. fire CmdQuery via timer; chain dispatches to CmdPajek
+    # after CmdQuery's body completes (which depends on the
+    # SetFocus patch being applied).
+    n = vba.click_via_timer(
+        spec.name, ctl=spec.cmd_name,
+        result_table=spec.result_table, timeout=180,
+    )
+    print(f"\n[LookAtAssociationPairs] CmdQuery+CmdPajek chain "
+          f"-> {n} rows in {spec.result_table}", flush=True)
+
+    # 5. Inspect ZZ_TEST_DEBUG for any :ERR marker — would
+    # indicate either the SetFocus patch didn't apply OR a
+    # different downstream blocker fired.
+    cur = vba.conn.cursor()
+    cur.execute("SELECT msg FROM ZZ_TEST_DEBUG ORDER BY id")
+    msgs = [str(r[0]) for r in cur.fetchall()]
+    cur.close()
+    err_msgs = [m for m in msgs
+                if "LookAtAssociationPairs:ERR" in m]
+    print(f"[LookAtAssociationPairs] ZZ_TEST_DEBUG entries: "
+          f"{len(msgs)}, ERR entries: {len(err_msgs)}",
+          flush=True)
+    assert not err_msgs, (
+        "AssociationPairs CmdQuery+CmdPajek chain saw "
+        f"LookAtAssociationPairs:ERR marker(s): {err_msgs}.  "
+        "Either the SetFocus patch didn't apply (check "
+        "_PER_FORM_CMDGIS_PATCHES is being injected) or the "
+        "chain has a separate downstream blocker beyond the "
+        "scope of this driver patch.  Honest negative outcome: "
+        "do NOT hard-merge until the new blocker is understood."
+    )
+
+    # 6. Inventory output files.
+    files = sorted(out_dir.glob("*"))
+    print(f"[LookAtAssociationPairs] CmdPajek produced "
+          f"{len(files)} files:", flush=True)
+    for f in files:
+        print(f"   {f.name}: {f.stat().st_size} bytes",
+              flush=True)
+    assert len(files) >= 1, (
+        "CmdPajek produced 0 files — chain didn't reach the "
+        "dlgSaveAs block.  This means CmdPajek itself bailed "
+        "(e.g. RecordCount=0 from a different issue), or the "
+        "Form.Tag chain didn't dispatch to CmdPajek.  Honest "
+        "negative outcome: investigate before merging."
+    )
+
+    # 7. Each produced file must be non-empty.
+    for f in files:
+        sz = f.stat().st_size
+        assert sz > 0, (
+            f"CmdPajek output file {f.name} is zero bytes — "
+            "the export sub ran the dlgSaveAs.Show but never "
+            "wrote anything.  Suggests an empty source recordset "
+            "with no .EOF guard (Issue #21-style pattern, but "
+            "for a different sub)."
+        )
+
+    # 8. At least one file should look like a Pajek .net header.
+    # Pajek .net files start with `*Vertices N` then list the
+    # vertices, then `*Arcs` or `*Edges`.  Loose check for the
+    # `*Vertices` token in the first ~200 bytes of any file.
+    pajek_shaped = []
+    for f in files:
+        head = f.read_bytes()[:200].decode("utf-8",
+                                            errors="replace")
+        if "*Vertices" in head or "*vertices" in head:
+            pajek_shaped.append(f.name)
+    assert pajek_shaped, (
+        "CmdPajek produced files but none has a `*Vertices` "
+        "header — output may not be valid Pajek .net format.  "
+        "Files seen: "
+        f"{[(f.name, f.stat().st_size) for f in files]}.  "
+        "Honest negative outcome: the SetFocus patch unblocked "
+        "the chain, but the export shape is wrong — investigate "
+        "before merging."
+    )
+    print(f"[LookAtAssociationPairs] Pajek-shaped files: "
+          f"{pajek_shaped}", flush=True)

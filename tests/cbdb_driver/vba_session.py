@@ -47,6 +47,77 @@ ACEDAO_CANDIDATES = [
 ]
 
 
+# Targets per sub.  Discovery (this PR's runtime probe):
+# narrowing the patch to ONLY CmdQuery_Click's 6 lines was not
+# sufficient — the test still hung at the 180s DONE timeout
+# with ZZ_SCRATCH_PEOPLE / ZZ_SOCIAL_NETWORK both empty.  Reason:
+# CmdQuery_Click body calls `Call Link1stOrder(...)` (line 1682)
+# and conditionally `Call Link2ndOrder(...)` (line 1709+); both of
+# those subs have their own standalone `.SetFocus` calls that fire
+# transitively under the same headless Form_Timer dispatch.  So
+# the actual minimum scope is those 3 subs combined: 6 + 3 + 3 =
+# 12 lines.  Any other `.SetFocus` calls in the form (the
+# CmdPickPerson1/2 picker handlers, dynasty-picker handlers,
+# CmdImportList, etc.) are NOT on this code path and are left
+# untouched.
+_ASSOCPAIRS_SETFOCUS_TARGETS_BY_SUB: dict[str, tuple[str, ...]] = {
+    "CmdQuery_Click": (
+        "TxtFromYear.SetFocus",
+        "TxtToYear.SetFocus",
+        "CmdQuery.SetFocus",
+        "Me.TxtID1.SetFocus",
+        "Me.TxtID2.SetFocus",
+        "Me.CmdQuery.SetFocus",
+    ),
+    "Link1stOrder": (
+        "Me.TxtID1.SetFocus",
+        "Me.TxtID2.SetFocus",
+        "Me.CmdQuery.SetFocus",
+    ),
+    "Link2ndOrder": (
+        "Me.TxtID1.SetFocus",
+        "Me.TxtID2.SetFocus",
+        "Me.CmdQuery.SetFocus",
+    ),
+}
+
+
+def _suppress_setfocus_in_sub(match, targets: tuple[str, ...]) -> str:
+    """Replace the listed `.SetFocus` statements inside a matched
+    sub body with comment lines.  `match.group(0)` is the entire
+    `Private Sub <name>(...)...End Sub` block.  Each target is
+    matched as a standalone statement (line-anchored, leading
+    whitespace + exact identifier-and-method + EOL) so a chained
+    shape like `Me.CmdQuery.Enabled = True` does NOT match.
+    """
+    sub_body = match.group(0)
+    for target in targets:
+        line_pat = re.compile(
+            r"(?m)^([ \t]+)" + re.escape(target) + r"[ \t]*(?=\r?$)"
+        )
+        sub_body = line_pat.sub(
+            r"\1' SetFocus suppressed (driver patch — headless "
+            "Form_Timer dispatch): " + target,
+            sub_body,
+        )
+    return sub_body
+
+
+def _suppress_assocpairs_cmdquery_setfocus(match) -> str:
+    return _suppress_setfocus_in_sub(
+        match, _ASSOCPAIRS_SETFOCUS_TARGETS_BY_SUB["CmdQuery_Click"])
+
+
+def _suppress_assocpairs_link1storder_setfocus(match) -> str:
+    return _suppress_setfocus_in_sub(
+        match, _ASSOCPAIRS_SETFOCUS_TARGETS_BY_SUB["Link1stOrder"])
+
+
+def _suppress_assocpairs_link2ndorder_setfocus(match) -> str:
+    return _suppress_setfocus_in_sub(
+        match, _ASSOCPAIRS_SETFOCUS_TARGETS_BY_SUB["Link2ndOrder"])
+
+
 def _pid_for_access_app(app) -> int | None:
     """PID of an Access.Application COM object via its main HWND."""
     try:
@@ -357,7 +428,7 @@ class VbaSession:
         "Form_LookAtStatus": [(r"\bChkIDs\.Value\b", "False")],
 
         # Headless-Form_Timer SetFocus blocker on
-        # Form_LookAtAssociationPairs.  The form's CmdQuery_Click
+        # Form_LookAtAssociationPairs.CmdQuery_Click.  That sub's
         # body has six standalone `.SetFocus` statements
         # (TxtFromYear / TxtToYear / CmdQuery on lines 1620 / 1627
         # / 1634, then Me.TxtID1 / Me.TxtID2 / Me.CmdQuery on
@@ -375,14 +446,58 @@ class VbaSession:
         # AssociationPairs B-bucket entries) for the full
         # diagnosis.
         #
-        # Surgical patch: line-anchored regex matches a standalone
-        # `<receiver>.SetFocus` statement (leading whitespace +
-        # non-space receiver + `.SetFocus` + EOL) and replaces it
-        # with a comment line that preserves the original code as
-        # text.  The line anchoring means an inline shape such as
-        # `If x Then y.SetFocus` would NOT match — verified there
-        # are zero such inline `.SetFocus` constructs in this
-        # form's body via grep.
+        # Scope-narrowed patch (PR feedback round 2): the patch
+        # ONLY suppresses 12 specific `.SetFocus` lines, scoped to
+        # the 3 subs on the headless CmdQuery dispatch path:
+        #
+        #   CmdQuery_Click    — 6 targets (TxtFromYear / TxtToYear
+        #                       / CmdQuery on lines 1620 / 1627 /
+        #                       1634; Me.TxtID1 / Me.TxtID2 /
+        #                       Me.CmdQuery on lines 1655 / 1658 /
+        #                       1660)
+        #   Link1stOrder      — 3 targets (Me.TxtID1 / Me.TxtID2 /
+        #                       Me.CmdQuery near lines 3296 /
+        #                       3299 / 3301).  Called from
+        #                       CmdQuery_Click line 1682+ via
+        #                       `Call Link1stOrder("NONKIN", ...)`.
+        #   Link2ndOrder      — 3 targets (Me.TxtID1 / Me.TxtID2 /
+        #                       Me.CmdQuery near lines 3484 /
+        #                       3487 / 3489).  Called from
+        #                       CmdQuery_Click line 1709+ via
+        #                       `Call Link2ndOrder(...)`.
+        #
+        # Other `.SetFocus` calls in this form (20 total — the
+        # CmdPickPerson1/2 picker handlers, the dynasty-picker
+        # handlers in CmdPickDynastyFrom / To, CmdImportList,
+        # etc.) are NOT on the headless CmdQuery dispatch path
+        # and are left UNTOUCHED.
+        #
+        # Discovery note: this round-2 narrowing started with
+        # ONLY the 6 CmdQuery_Click targets (per the original
+        # PR feedback).  The probe immediately exposed that the
+        # 6 alone are insufficient — CmdQuery_Click body calls
+        # Link1stOrder which then calls Link2ndOrder, both of
+        # which have their own `.SetFocus` blockers that fire
+        # transitively under the same headless dispatch.  This
+        # is a *call-chain* observation, not a "wider scope is
+        # safer" observation: each of the 3 subs is on the
+        # confirmed dispatch path (verified via the 1×3 probe's
+        # 180s DONE-marker timeout and ZZ_SCRATCH_PEOPLE = 0
+        # when only CmdQuery_Click was patched).  An earlier
+        # iteration (commit 3bb69ef) used a single line-anchored
+        # regex over the whole module — which incidentally
+        # covered these 3 subs but also 20 unrelated ones; this
+        # version keeps the same call-chain coverage with a 60%
+        # narrower surface (12 lines vs 32).
+        #
+        # Implementation: 3 entries (one per sub).  Each outer
+        # pattern matches the `Private Sub <name>(...) ... End
+        # Sub` block; the callable `repl` runs the per-target
+        # line replacement only on the matched body.  Each target
+        # is line-anchored so a chained shape like
+        # `Me.CmdQuery.Enabled = True` won't match (verified zero
+        # such inline `.SetFocus` constructs in this form's body
+        # via grep).
         #
         # This is a driver-side workaround, NOT a CBDB-source fix.
         # The underlying defect remains: a real CBDB fix would
@@ -391,10 +506,12 @@ class VbaSession:
         # Next` around the focus-move.  The workaround keeps the
         # test suite operational on the existing source.
         "Form_LookAtAssociationPairs": [
-            (r"(?m)^([ \t]*)(\S+?)\.SetFocus\b[ \t]*(?=\r?$)",
-             r"\1' SetFocus suppressed (driver patch — headless "
-             r"Form_Timer dispatch can't focus controls on the "
-             r"inactive form): \2.SetFocus"),
+            (r"Private Sub CmdQuery_Click\(\)[\s\S]*?\nEnd Sub",
+             _suppress_assocpairs_cmdquery_setfocus),
+            (r"Private Sub Link1stOrder\([^\)]*\)[\s\S]*?\nEnd Sub",
+             _suppress_assocpairs_link1storder_setfocus),
+            (r"Private Sub Link2ndOrder\([^\)]*\)[\s\S]*?\nEnd Sub",
+             _suppress_assocpairs_link2ndorder_setfocus),
         ],
     }
 
