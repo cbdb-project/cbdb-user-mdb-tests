@@ -37,6 +37,49 @@ nasty (RPC death, focus loss, Form_Open deadlock).
 | `analysis/dump/control_inventory.json` | Per-form control catalogue.  AUTHORITATIVE for "does this button exist on the form".  Read this before claiming a button is missing. |
 | `AGENTS.md` § Mission-critical landmines | The full landmine list.  Read it before your first probe; refer back when something hangs / errors. |
 
+## When NOT to escalate to Access COM (do these first; stay out of COM)
+
+If the question fits ANY of these shapes, **do not open Access**.
+Use pyodbc + the dump files instead.  COM is the heaviest hammer
+in this repo and the failure modes are nasty (RPC death, focus
+loss, Form_Open deadlock); resist the impulse to open it
+"just to confirm."
+
+- **Gate reachability questions** — "does any row in `<TABLE>`
+  satisfy `<predicate>` so a code branch can fire?"  Answerable
+  via pyodbc `SELECT COUNT(*) FROM <TABLE> WHERE <predicate>`.
+  Example: PR `investigate/issue9-neo4j-institutioncodes` proved
+  `ENTRY_DATA.c_inst_code > 0 == 0` across 263,454 rows; the
+  Issue #9 popup branch is unreachable today.  No COM was needed.
+- **Code-table / row-count / branch-guard questions** — "how
+  many `EntryCode` rows? does this picker code exist? does
+  ASSOC_DATA contain shared rows for these two persons?"
+  Pure pyodbc.
+- **Label / screenshot / issue-text consistency questions** —
+  "does the report's hardcoded label match the MDB dictionary
+  table?  does the screenshot caption claim something the issue
+  body contradicts?"  These have dedicated audit scripts:
+  `analysis/audit_report_code_labels.py`,
+  `analysis/audit_report_screenshot_consistency.py`.  Both
+  read-only, both pure-Python, no COM.
+- **Static source-level questions** — "does this Sub still call
+  `Me.X.SetFocus`?  is this column projected by the View_*
+  saved query?  what controls does this form host?"  Read
+  `analysis/dump/vba/Form_*.vb`,
+  `analysis/dump/queries.json`,
+  `analysis/dump/control_inventory.json`.  Never grep the live
+  MDB for source code; the dump is fresher than your memory.
+- **Cross-form coverage / inventory questions** — "which (form,
+  button) cells have tests?  which gaps are blocked by what?"
+  Read `reports/export_coverage_inventory.json` +
+  `analysis/inventory_export_coverage.py`.  No COM.
+
+**The escalation rule:** if you can answer the question without
+opening Access, you are NOT allowed to open Access for that
+question.  Even "I just want to confirm" is a slippery slope —
+each COM session costs ~12 s baseline and at least one orphan-
+process risk.
+
 ## Pure SQL first, COM only when necessary
 
 **Pure SQL via pyodbc** answers most questions without ever opening

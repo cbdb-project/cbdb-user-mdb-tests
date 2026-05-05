@@ -209,6 +209,33 @@ python analysis/<your_probe>.py --com   # if it has an opt-in COM mode
   table AND a ZH "已確認 N 個 issue（…P0 ×N / P1 ×N / …）" line.
   They must agree with each other and with `ISSUES`.
 
+## PR self-checklist (paste into PR description, tick before requesting review)
+
+```
+[ ] touched the right ISSUES entry in reports/generate_report.py
+[ ] regenerated the four reports/CBDB_Issues_Report_*.{md,docx}
+[ ] synced README tier-count table + ZH summary line if severity / count changed
+[ ] ran `python analysis/reverify_all_issues.py` and updated its
+    bucket logic for this issue if classification shifted
+[ ] ran `pytest tests/test_known_bugs.py tests/test_markdown_report.py
+    -W ignore --no-discover-inputs`
+[ ] updated screenshots / captions if the tier changed
+    (P5 latent must NOT carry active-tense "users see ... popup"
+    wording; faux popups need "Hypothetical" / hedge keywords)
+```
+
+For artifacts-only investigation PRs the checklist is shorter:
+
+```
+[ ] shipped under analysis/<topic>.md + reports/<topic>.json (+
+    optional analysis/<probe>.py)
+[ ] did NOT touch reports/generate_report.py
+[ ] did NOT touch tests/test_known_bugs.py
+[ ] did NOT touch README tier counts
+[ ] PR summary explicitly states the maintainer-decision is the
+    follow-up reclassification PR, not this one
+```
+
 ## Reference: where each policy lives
 
 - "Don't duplicate bug content" → `AGENTS.md` § Single source of
