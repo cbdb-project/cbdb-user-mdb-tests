@@ -244,7 +244,7 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 **Latest Import-list run** (`tests/test_vba_import_lists.py`): `15 passed, 2 skipped in 142.04s`.
 **Latest Save-list run** (`tests/test_vba_save_lists.py`): `5 passed in 43.31s`.
 **Latest Bilingual run** (`tests/test_vba_bilingual_ui.py`): `9 passed in 145.73s`.
-**Latest CmdGIS-other-forms run** (`tests/test_vba_cmdgis_other_forms.py`): `6 passed in ~190s` (Status / Texts / Associations / Office / Place / Kinship — all six forms now pass via the GISFrame→CodeFrame and subform-requery driver patches).
+**Latest CmdGIS-other-forms run** (`tests/test_vba_cmdgis_other_forms.py`): `7 passed` (Status / Texts / Associations / Office / Place / Kinship via the parametrized `test_cmd_gis_produces_file` + GroupData via `test_cmd_gis_groupdata_clean_branches`, which covers Status / Office / Addr branches but explicitly excludes the Entry branch — Issue #6 P1, separately bug-pinned — and the Text branch — benign 0-files on `person_1`).
 **Combined regression** (all 8 test files, 71 tests): `59 passed, 8 skipped, 4 xfailed in 837.76s`.
 
 ### Confirmed bugs

@@ -1,6 +1,6 @@
 # Export coverage inventory (LookAt form × export button)
 
-**Generated:** 2026-05-04T14:53:24+00:00
+**Generated:** 2026-05-05T08:24:33+00:00
 **Generator:** `analysis/inventory_export_coverage.py`
 **Companion JSON:** `reports/export_coverage_inventory.json`
 
@@ -48,8 +48,8 @@ If a `FAIL` cell ever wants to graduate to `real_vba_covered`, the path is to (a
 
 - **Cells total:** 80 (10 forms × 8 buttons)
 - `not_applicable` (—): **40**
-- `real_vba_covered` (✓): **16**
-- `gap` (GAP): **13**
+- `real_vba_covered` (✓): **17**
+- `gap` (GAP): **12**
 - `real_vba_skipped` (skip): **5**
 - `real_vba_covered_via_handler_dispatch` (✓*): **3**
 - `real_vba_skipped_via_handler_dispatch` (skip*): **2**
@@ -68,7 +68,7 @@ If a `FAIL` cell ever wants to graduate to `real_vba_covered`, the path is to (a
 | **LookAtStatus** | ✓ | skip | skip* | skip* | — | — | no-btn | — |
 | **LookAtAssociationPairs** | GAP | GAP | GAP | GAP | — | — | GAP | — |
 | **LookAtNetworks** | GAP | skip | GAP | — | skip | — | GAP | — |
-| **LookAtGroupData** | GAP | GAP | — | — | — | — | — | — |
+| **LookAtGroupData** | ✓ | GAP | — | — | — | — | — | — |
 
 ## Per-cell detail (non-trivial cells)
 
@@ -337,11 +337,12 @@ Cells with status `not_applicable` are omitted to keep the noise down.
 - Button on form: yes
 - Why: Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.
 
-### LookAtGroupData × CmdGIS — `gap`
+### LookAtGroupData × CmdGIS — `real_vba_covered`
 
 - Handler in source: yes
 - Button on form: yes
-- Why: Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.
+- Why: Real-VBA test exists and passes for this cell.
+- Test: `tests/test_vba_cmdgis_other_forms.py::test_cmd_gis_groupdata_clean_branches` — **covered**; notes: Clean-branches coverage (Status / Office / Addr) using matrix_hard_forms's groupdata_person_1_small fixture.  Explicitly excludes Entry (Issue #6 P1 fires JET 3061; pinned by tests/test_known_bugs.py::test_bug6_groupdata_query_entry_wrong_field [static] AND tests/test_vba_bug_behaviors.py::test_bug6_lookat_groupdata_query_entry_fires_no_such_field [runtime]).  Excludes Text (person_1 has 0 BIOG_TEXT_DATA rows -> WriteGIS_Text bails on RecCount=0; benign 0-files state, not a coverage gap).  Excludes ChkGisOfficePeople (the Office_OfficeOffice variant alone exercises queryOffice -> WriteGIS_OfficeOffice cleanly; OfficePeople adds a second writer without coverage value).  Probe evidence: analysis/probe_groupdata_cmdgis_subcalls.py + analysis/groupdata_cmdgis_subcall_trace.md.
 
 ### LookAtGroupData × CmdNeo4j — `gap`
 
@@ -368,15 +369,14 @@ Cells ranked by family priority (lower = lower-risk, smaller blast radius).  Not
 | # | Form | Button | Family priority | Known family blocker |
 |---:|---|---|---:|---|
 | 1 | LookAtAssociationPairs | CmdGIS | 1 | matrix CmdQuery times out — no CrossFixture promoted to a passing assertion |
-| 2 | LookAtGroupData | CmdGIS | 1 | matrix CmdQuery has issues; depends on a CrossFixture that doesn't exist for GroupData |
-| 3 | LookAtNetworks | CmdGIS | 1 | Form_Open hang / CmdRun timeout (AGENTS landmine #3.5) |
-| 4 | LookAtAssociationPairs | CmdGephi | 3 | matrix CmdQuery times out — no CrossFixture promoted to a passing assertion |
-| 5 | LookAtAssociationPairs | CmdPajek | 3 | matrix CmdQuery times out — no CrossFixture promoted to a passing assertion |
-| 6 | LookAtNetworks | CmdPajek | 3 | Form_Open hang / CmdRun timeout (AGENTS landmine #3.5) |
-| 7 | LookAtAssociationPairs | CmdNeo4j | 5 | matrix CmdQuery times out — no CrossFixture promoted to a passing assertion |
-| 8 | LookAtGroupData | CmdNeo4j | 5 | matrix CmdQuery has issues; depends on a CrossFixture that doesn't exist for GroupData |
-| 9 | LookAtAssociationPairs | CmdUCINet | 6 | matrix CmdQuery times out — no CrossFixture promoted to a passing assertion |
-| 10 | LookAtAssociations | CmdUCINet | 6 | entirely untested handler family — no existing test infrastructure to extend |
-| 11 | LookAtKinship | CmdUCINet | 6 | entirely untested handler family — no existing test infrastructure to extend |
-| 12 | LookAtNetworks | CmdUCINet | 6 | Form_Open hang / CmdRun timeout (AGENTS landmine #3.5) |
-| 13 | LookAtPlace | CmdUCINet | 6 | entirely untested handler family — no existing test infrastructure to extend |
+| 2 | LookAtNetworks | CmdGIS | 1 | Form_Open hang / CmdRun timeout (AGENTS landmine #3.5) |
+| 3 | LookAtAssociationPairs | CmdGephi | 3 | matrix CmdQuery times out — no CrossFixture promoted to a passing assertion |
+| 4 | LookAtAssociationPairs | CmdPajek | 3 | matrix CmdQuery times out — no CrossFixture promoted to a passing assertion |
+| 5 | LookAtNetworks | CmdPajek | 3 | Form_Open hang / CmdRun timeout (AGENTS landmine #3.5) |
+| 6 | LookAtAssociationPairs | CmdNeo4j | 5 | matrix CmdQuery times out — no CrossFixture promoted to a passing assertion |
+| 7 | LookAtGroupData | CmdNeo4j | 5 | matrix CmdQuery has issues; depends on a CrossFixture that doesn't exist for GroupData |
+| 8 | LookAtAssociationPairs | CmdUCINet | 6 | matrix CmdQuery times out — no CrossFixture promoted to a passing assertion |
+| 9 | LookAtAssociations | CmdUCINet | 6 | entirely untested handler family — no existing test infrastructure to extend |
+| 10 | LookAtKinship | CmdUCINet | 6 | entirely untested handler family — no existing test infrastructure to extend |
+| 11 | LookAtNetworks | CmdUCINet | 6 | Form_Open hang / CmdRun timeout (AGENTS landmine #3.5) |
+| 12 | LookAtPlace | CmdUCINet | 6 | entirely untested handler family — no existing test infrastructure to extend |

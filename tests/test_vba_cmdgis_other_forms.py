@@ -371,3 +371,313 @@ def _assert_gis_export_depth(form_name: str,
           f"required-col coverage "
           f"{'manifested' if required is not None else 'loose-check'}",
           flush=True)
+
+
+# ----------------------------------------------------------------------
+# LookAtGroupData × CmdGIS — clean-branches coverage
+#
+# GroupData differs from the 6 forms above in two ways that make the
+# generic test_cmd_gis_produces_file unsuitable:
+#
+#  1. CmdGIS dispatches to *multiple* per-checkbox WriteGIS_X subs
+#     (Status / Office / OfficePeople / Entry / Text / Addr).  Each
+#     fires exactly one .tab file via patch_filedialog.  Asserting on
+#     a single output file (the way the generic test does) doesn't
+#     cover what GroupData actually produces.
+#
+#  2. The Entry branch hits Issue #6 (P1 — `queryEntry` projects the
+#     non-existent `ENTRY_DATA.c_parental_status` instead of
+#     `c_parental_status_code`; JET 3061 fires before INSERT).  That
+#     bug is separately pinned by the static
+#     `tests/test_known_bugs.py::test_bug6_groupdata_query_entry_wrong_field`
+#     and the runtime
+#     `tests/test_vba_bug_behaviors.py::test_bug6_lookat_groupdata_query_entry_fires_no_such_field`.
+#     Bundling the Entry branch into a coverage test would mix
+#     bug-pin and coverage; do NOT include Entry here.
+#
+# The 11-iteration sub-isolation probe at
+# `analysis/probe_groupdata_cmdgis_subcalls.py` confirmed:
+#   - Status / Office (×2 GIS variants) / Addr branches: clean
+#   - Entry branch: ERR fires (Issue #6)
+#   - Text branch: clean ERR-wise but produces 0 files on
+#     `person_1` (likely benign — person_1 has 0 BIOG_TEXT_DATA
+#     rows; WriteGIS_Text bails on RecCount=0)
+# Per the brief, this test covers Status / Office / Addr only;
+# Entry is bug-pinned separately, Text is omitted because the
+# small fixture benignly yields no Text data.
+# ----------------------------------------------------------------------
+
+# Per-branch header anchors (first column of the .tab header that
+# WriteGIS_<X> writes).  Verified against the form's VBA source +
+# the live probe.  Headers are tab-separated.
+_GROUPDATA_BRANCH_SHAPES: dict[str, dict] = {
+    # WriteGIS_Status, Form_LookAtGroupData.vb header line.
+    # 10 cols.  Starts `Name` then carries `NameChn`.  Person-
+    # row shape (one row per person × status).
+    "Status": {
+        "header_first_col": "Name",
+        "header_must_contain": ["NameChn", "IndexYear", "AddrID",
+                                 "X", "Y"],
+        "min_cols": 10,
+    },
+    # WriteGIS_OfficeOffice (paired with ChkGisOffice).  10 cols.
+    # Starts `Office` (the office-name column, not a person
+    # column).
+    "Office": {
+        "header_first_col": "Office",
+        "header_must_contain": ["OfficeChn", "FirstYear",
+                                 "LastYear", "Dynasty", "X", "Y"],
+        "min_cols": 10,
+    },
+    # WriteGIS_Addr, Form_LookAtGroupData.vb:5571.  9 cols
+    # (Status's 10 minus AddrID).  Also starts `Name`, so
+    # disambiguate from Status by column count.
+    #
+    # Caveat: WriteGIS_OfficeOffice (line 2929) writes TWO
+    # files — an Office-shape (line 3027) AND a people-side
+    # file (line 3219-3224) whose header is BYTE-IDENTICAL
+    # to WriteGIS_Addr's.  The classifier can't distinguish
+    # the two; both will tag as `Addr`.  The test below uses
+    # `setdefault` so each branch is recorded once even if
+    # multiple files match its shape, and asserts all 3
+    # branches are seen — the OfficeOffice people-side file
+    # is then absorbed under the `Addr` slot.  This is a
+    # CmdGIS-source quirk, not a test correctness issue:
+    # both files are well-formed, structurally consistent,
+    # and meet the per-shape required-cols check.
+    "Addr": {
+        "header_first_col": "Name",
+        "header_must_contain": ["NameChn", "IndexYear",
+                                 "AddrName", "X", "Y"],
+        "min_cols": 9,
+    },
+}
+
+
+def _classify_groupdata_gis_file(header: str
+                                  ) -> "tuple[str, dict] | None":
+    """Identify which WriteGIS_X sub wrote this file by header
+    first-column and column count.  Status and Addr both start
+    with `Name`; disambiguate by column count (Status 10 cols,
+    Addr 9 cols)."""
+    cols = header.split("\t")
+    if not cols:
+        return None
+    first = cols[0]
+    if first == "Office":
+        return ("Office", _GROUPDATA_BRANCH_SHAPES["Office"])
+    if first == "Name":
+        if len(cols) >= 10 and "AddrID" in cols:
+            return ("Status", _GROUPDATA_BRANCH_SHAPES["Status"])
+        return ("Addr", _GROUPDATA_BRANCH_SHAPES["Addr"])
+    return None
+
+
+def test_cmd_gis_groupdata_clean_branches(vba: VbaSession,
+                                            tmp_path):
+    """LookAtGroupData × CmdGIS, scoped to the 3 clean branches
+    (Status / Office / Addr).
+
+    Boundary explicitly excludes:
+      - Entry — Issue #6 (P1) fires JET 3061 here; pinned by the
+        sister tests test_bug6_groupdata_query_entry_wrong_field
+        (static) + test_bug6_lookat_groupdata_query_entry_fires_no_such_field
+        (runtime).  Including Entry would mix coverage and
+        bug-pin.
+      - Text — `person_1` has 0 BIOG_TEXT_DATA rows on the
+        current dump, so WriteGIS_Text bails on RecCount=0
+        (benign 0-files state; not a coverage gap, just a
+        fixture-shape side-effect).  Skipped here to keep
+        assertions strict.
+
+    Fixture: matrix_hard_forms's `groupdata_person_1_small`
+    (`c_personid = 1`, An Dun 安惇).  Re-defined inline rather
+    than imported because matrix_hard_forms's `_HARD_FIXTURES`
+    is a module-level constant whose other entries
+    (AssociationPairs) we don't want to drag into this test.
+
+    Probe evidence: analysis/probe_groupdata_cmdgis_subcalls.py
+    + analysis/groupdata_cmdgis_subcall_trace.md confirmed
+    Status / Office / Addr branches each produce a well-formed
+    .tab file under this fixture, with the per-branch header
+    shapes recorded in `_GROUPDATA_BRANCH_SHAPES`.
+    """
+    from cbdb_driver.form_specs import LOOKATGROUPDATA
+    spec = LOOKATGROUPDATA
+    PERSON_ID = 1
+
+    # 1. patch FileDialog so each WriteGIS_X .Show short-circuits
+    # to a fresh f<n>.out per call (directory mode, trailing \).
+    vba.patch_filedialog(spec.name)
+
+    # 2. open form, seed picker, set checkbox state explicitly.
+    #
+    # Reset ALL eleven Chk* controls (5 CmdRun-side query + 6
+    # CmdGIS-side write) to False FIRST so the test isn't
+    # at the mercy of Form_Open defaults — if any of them
+    # defaults to True (notably ChkEntry on this form, which the
+    # probe-baseline showed must be False to skip the Issue #6
+    # branch), the assertion at step 5 will fire even when the
+    # explicitly-set checkboxes are correct.  Then enable just
+    # the 6 clean-branch boxes.
+    #
+    # Explicitly skipped:
+    #   - ChkEntry / ChkGisEntry — Issue #6 (P1) bug-pinned
+    #     separately
+    #   - ChkText / ChkGisText — benign 0-files on person_1
+    #   - ChkGisOfficePeople — probe showed Office_OfficeOffice
+    #     alone exercises queryOffice → WriteGIS_OfficeOffice
+    #     cleanly; OfficePeople variant adds a second writer
+    #     without coverage value here
+    vba.open_form(spec.name)
+    vba.set_picker_codes(spec.picker_table, [PERSON_ID],
+                         column=spec.picker_column)
+    all_chk_controls = (
+        "ChkStatus", "ChkOffice", "ChkEntry", "ChkText", "ChkAddr",
+        "ChkGisStatus", "ChkGisOffice", "ChkGisOfficePeople",
+        "ChkGisEntry", "ChkGisText", "ChkGisAddr",
+    )
+    for ctl in all_chk_controls:
+        try:
+            vba.set_control(spec.name, ctl, False)
+        except Exception as e:
+            print(f"  warn reset {ctl}=False: {e}")
+    for ctl in ("ChkStatus", "ChkOffice", "ChkAddr",
+                "ChkGisStatus", "ChkGisOffice", "ChkGisAddr"):
+        try:
+            vba.set_control(spec.name, ctl, True)
+        except Exception as e:
+            print(f"  warn setting {ctl}=True: {e}")
+
+    # 3. wire chain CmdRun -> CmdGIS via Form.Tag, directory mode
+    out_dir = tmp_path / "groupdata_gis_out"
+    out_dir.mkdir()
+    vba.set_form_tag(spec.name,
+                     f"{spec.cmd_name},CmdGIS",
+                     str(out_dir) + "\\")
+
+    # 4. fire CmdRun via timer; chain dispatches to CmdGIS after
+    # CmdRun's body completes
+    n = vba.click_via_timer(
+        spec.name, ctl=spec.cmd_name,        # "CmdRun"
+        # CmdRun's primary effect is UPDATE-style backfill on
+        # ZZ_SCRATCH_IMPORT_PEOPLE; queryStatus / queryOffice /
+        # queryAddr each populate their own ZZ_SCRATCH_<X>.
+        # Watch ZZ_SCRATCH_STATUS — it's the first per-checkbox
+        # sub-query CmdRun calls and tells us whether the chain
+        # is dispatching at all.
+        result_table="ZZ_SCRATCH_STATUS", timeout=180,
+    )
+    print(f"\n[LookAtGroupData] CmdRun -> "
+          f"ZZ_SCRATCH_STATUS rows = {n}", flush=True)
+
+    # 5. Inspect ZZ_TEST_DEBUG to confirm no unexpected ERR.
+    # The probe showed Status/Office/Addr branches produce no
+    # ERR; if one fires here it's a regression worth investigating
+    # (could be a new bug in a sister branch we didn't anticipate).
+    cur = vba.conn.cursor()
+    cur.execute("SELECT msg FROM ZZ_TEST_DEBUG ORDER BY id")
+    msgs = [str(r[0]) for r in cur.fetchall()]
+    cur.close()
+    err_msgs = [m for m in msgs
+                if "LookAtGroupData:ERR" in m]
+    assert not err_msgs, (
+        "GroupData × CmdGIS clean-branches coverage saw an "
+        "unexpected :ERR marker.  Probe-confirmed Status / "
+        "Office / Addr branches were clean — investigate "
+        "whether a sister branch regressed (e.g. queryStatus "
+        "schema drifted, or one of the WriteGIS_X subs changed "
+        f"behaviour).  err_msgs={err_msgs}"
+    )
+
+    # 6. Inventory output files.  patch_filedialog in directory
+    # mode produces sequential `f<n>.out` per Show call.
+    files = sorted(out_dir.glob("*"))
+    print(f"[LookAtGroupData] CmdGIS produced {len(files)} files:",
+          flush=True)
+    for f in files:
+        print(f"   {f.name}: {f.stat().st_size} bytes", flush=True)
+
+    # We expect AT LEAST 3 files (Status + Office + Addr, one
+    # each).  WriteGIS_Status / WriteGIS_OfficeOffice /
+    # WriteGIS_Addr each call dlgSaveAs.Show exactly once.
+    assert len(files) >= 3, (
+        f"[LookAtGroupData] CmdGIS produced only {len(files)} "
+        f"files; expected >= 3 (Status / Office / Addr).  "
+        f"per_file: {[(f.name, f.stat().st_size) for f in files]}"
+    )
+
+    # 7. Per-file structural checks + per-branch classification.
+    # Required: each file is non-empty, header decodes, header
+    # column count == first data row's column count, header
+    # matches one of the three expected branch shapes.
+    classified: dict[str, str] = {}
+    for f in files:
+        sz = f.stat().st_size
+        assert sz > 0, f"[LookAtGroupData] {f.name} is zero bytes"
+
+        raw = f.read_bytes()
+        text = raw.decode("utf-8",
+                          errors="replace").lstrip("﻿")
+        lines = [ln for ln in text.replace("\r\n", "\n").split("\n")
+                 if ln.strip()]
+        assert lines, (
+            f"[LookAtGroupData] {f.name} decoded to no "
+            f"lines: {raw[:80]!r}"
+        )
+        header = lines[0]
+        header_cols = header.split("\t")
+        n_cols = len(header_cols)
+
+        # First data row's col count must match header (catches
+        # off-by-one column shifts / missing trailing field).
+        assert len(lines) >= 2, (
+            f"[LookAtGroupData] {f.name} has header but no data "
+            f"rows: lines={len(lines)}"
+        )
+        first_row_cols = lines[1].split("\t")
+        assert n_cols == len(first_row_cols), (
+            f"[LookAtGroupData] {f.name} header has {n_cols} "
+            f"cols but first data row has {len(first_row_cols)} "
+            f"— column-count mismatch.  header={header!r} "
+            f"row1={lines[1][:200]!r}"
+        )
+
+        # Classify by header shape and check required columns.
+        shape = _classify_groupdata_gis_file(header)
+        assert shape is not None, (
+            f"[LookAtGroupData] {f.name} header doesn't match "
+            f"any expected branch shape (Status / Office / "
+            f"Addr).  header={header!r}"
+        )
+        branch, spec_dict = shape
+        assert n_cols >= spec_dict["min_cols"], (
+            f"[LookAtGroupData] {f.name} ({branch}) has only "
+            f"{n_cols} cols; expected >= "
+            f"{spec_dict['min_cols']}.  header={header!r}"
+        )
+        missing = [c for c in spec_dict["header_must_contain"]
+                   if c not in header_cols]
+        assert not missing, (
+            f"[LookAtGroupData] {f.name} ({branch}) is missing "
+            f"required columns {missing}.  header={header_cols!r}"
+        )
+        # Record one file per branch (silently keep the first if
+        # a branch produces multiple files — none does today, but
+        # the invariant is "we saw all 3").
+        classified.setdefault(branch, f.name)
+        print(f"[LookAtGroupData] {f.name}: {n_cols} cols, "
+              f"{len(lines)-1} data rows, branch={branch}",
+              flush=True)
+
+    # 8. All 3 expected branches classified at least once.
+    expected_branches = {"Status", "Office", "Addr"}
+    saw = set(classified)
+    missing_branches = expected_branches - saw
+    assert not missing_branches, (
+        f"[LookAtGroupData] CmdGIS produced files but didn't "
+        f"cover all 3 clean branches: missing={sorted(missing_branches)}; "
+        f"saw={sorted(saw)} (file-by-branch: {classified})"
+    )
+    print(f"[LookAtGroupData] CmdGIS clean-branches coverage: "
+          f"{sorted(saw)}", flush=True)

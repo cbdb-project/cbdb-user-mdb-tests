@@ -141,6 +141,26 @@ EXPORT_TEST_MANIFEST: list[dict] = [
      "status": "covered",
      "notes": "structural; subform requery via "
               "_SUBFORMS_TO_REQUERY"},
+    {"form": "LookAtGroupData", "button": "CmdGIS",
+     "test_module": "tests/test_vba_cmdgis_other_forms.py",
+     "test_node": "test_cmd_gis_groupdata_clean_branches",
+     "status": "covered",
+     "notes":
+         "Clean-branches coverage (Status / Office / Addr) using "
+         "matrix_hard_forms's groupdata_person_1_small fixture.  "
+         "Explicitly excludes Entry (Issue #6 P1 fires JET 3061; "
+         "pinned by tests/test_known_bugs.py::test_bug6_groupdata"
+         "_query_entry_wrong_field [static] AND tests/test_vba_"
+         "bug_behaviors.py::test_bug6_lookat_groupdata_query_"
+         "entry_fires_no_such_field [runtime]).  Excludes Text "
+         "(person_1 has 0 BIOG_TEXT_DATA rows -> WriteGIS_Text "
+         "bails on RecCount=0; benign 0-files state, not a "
+         "coverage gap).  Excludes ChkGisOfficePeople (the "
+         "Office_OfficeOffice variant alone exercises queryOffice "
+         "-> WriteGIS_OfficeOffice cleanly; OfficePeople adds a "
+         "second writer without coverage value).  Probe evidence: "
+         "analysis/probe_groupdata_cmdgis_subcalls.py + "
+         "analysis/groupdata_cmdgis_subcall_trace.md."},
 
     # ---- CmdNeo4j ----
     {"form": "LookAtEntry", "button": "CmdNeo4j",
