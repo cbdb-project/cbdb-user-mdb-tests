@@ -178,15 +178,36 @@ def test_associationpairs_cmdquery_then_cmdpajek_export_chain(
     the business goal of the patch (4 AssocPairs export gap cells:
     CmdGIS / CmdNeo4j / CmdPajek / CmdGephi).
 
-    Pajek was picked over the other 3 because:
+    Pajek was picked as the **cheapest downstream representative
+    smoke** for this driver patch, NOT as a substitute for
+    dedicated CmdGIS / CmdGephi / CmdNeo4j coverage.  Reasons:
       - Single-file output (`.net` text format) — easiest to
         assert structurally
-      - Same code-path shape as CmdGephi / CmdGIS / CmdNeo4j
-        (each starts with a RecordCount > 0 gate that bails if
-        ZZ_SOCIAL_NETWORK is empty), so passing here proves the
-        precondition for all 4
       - Doesn't require the full `_NEO4J_SHAPES` classifier
         (CmdNeo4j) or the GIS shape dictionary (CmdGIS)
+
+    What this test DOES prove:
+      - The headless SetFocus blocker on the CmdQuery dispatch
+        path is removed (sister test
+        `test_associationpairs_cmdquery_setfocus_patch_unblocks
+        _inserts` proves CmdQuery body completes; this test
+        proves a downstream export sub can also fire).
+      - At least one downstream export chain (CmdPajek) now runs
+        end-to-end on this fixture.
+
+    What this test does NOT prove:
+      - CmdNeo4j has no shape / tail / file-chain bugs of its own
+        (e.g. an Issue-#21-style empty-recordset-no-EOF-guard).
+      - CmdGIS has no form-specific export bug (e.g. a missing
+        control reference like Bug #4 on LookAtPlace, or a
+        subform-recordset rebind issue).
+      - CmdGephi has no format-specific bug (e.g. a writer that
+        assumes a column the SELECT doesn't project).
+      - Any of the 4 export cells is "covered" in the inventory
+        sense — they each still need their own coverage PR with
+        proper per-form structural assertions before
+        `inventory_export_coverage.py` should mark them
+        `covered`.
 
     Strict positive markers:
       - At least 1 .net file produced
