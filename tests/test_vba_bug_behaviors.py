@@ -204,14 +204,36 @@ def test_bug5_lookat_status_cmdpajek_sql_fires_field_error(vba: VbaSession):
 
 
 def test_bug6_lookat_groupdata_query_entry_fires_no_such_field(vba: VbaSession):
-    """Bug #6: LookAtGroupData.queryEntry projects
-    `ENTRY_DATA.c_parental_status` (no `_code` suffix) but the actual
-    column is `c_parental_status_code`.  Triggers when the user
-    checks ChkEntry and clicks Run.
+    """Bug #6 (P1) — runtime-side pin.
 
-    The matrix hard-forms test already exercises CmdRun without
-    ChkEntry (just IMPORT_PEOPLE backfill).  This test enables
-    ChkEntry first to force `Call queryEntry` from CmdRun_Click.
+    `Form_LookAtGroupData.queryEntry()` at vba:2593-2625.  The
+    INSERT target column list (line 2612) ends with
+    `c_parental_status_code`; the SELECT projection (line 2621)
+    ends with `ENTRY_DATA.c_parental_status` — no `_code` suffix.
+    JET parses the unknown column as an unbound parameter and
+    raises VBA error 3061 ("No value given for one or more
+    required parameters") before any INSERT executes, so
+    `ZZ_SCRATCH_ENTRY` stays at 0.
+
+    Sister test in `tests/test_known_bugs.py::test_bug6_groupdata
+    _query_entry_wrong_field` pins the source-string substring;
+    this test pins the runtime symptom on the documented
+    reproduction (person 1 / An Dun 安惇 / only ChkEntry checked
+    / click Run).  Don't replace the static test — both the
+    source typo and the runtime crash should be guarded.
+
+    Localisation evidence:
+      analysis/groupdata_cmdgis_subcall_trace.md
+      reports/groupdata_cmdgis_subcall_trace.json
+    The 11-iteration sub-isolation probe found ERR fires in
+    EXACTLY the 2 iterations that exercise queryEntry
+    (queryEntry_alone + Entry_full_chain) and clean in the
+    other 9.
+
+    Fixture: matrix_hard_forms's groupdata_person_1_small —
+    person 1 has 2 ENTRY_DATA rows so queryEntry's INSERT...
+    SELECT genuinely tries to run against real data (not a
+    "0 rows so SQL no-ops" false negative).
     """
     from cbdb_driver.form_specs import LOOKATGROUPDATA
     spec = LOOKATGROUPDATA
@@ -228,18 +250,61 @@ def test_bug6_lookat_groupdata_query_entry_fires_no_such_field(vba: VbaSession):
                            chain="CmdRun",
                            target_table="")
     print(f"\nDEBUG log: {msgs}", flush=True)
-    err_msgs = [m for m in msgs if ":ERR " in m]
-    # The bad SQL fires Access JET 'No value given for one or more
-    # required parameters.' / 'Could not find field' / similar — the
-    # exact wording differs by ODBC vs DAO path.  Accept any of them.
-    field_err = any(
-        ("field" in m.lower() or "parameter" in m.lower()
-         or "no such" in m.lower() or "c_parental_status" in m.lower())
-        for m in err_msgs
+
+    # ---- Assertion 1: ZZ_TEST_DEBUG carries a LookAtGroupData:ERR
+    err_msgs = [m for m in msgs if "LookAtGroupData:ERR" in m]
+    assert err_msgs, (
+        f"Bug #6 marker no longer reproduces (investigate upstream "
+        f"fix vs. fixture/driver change vs. misclassification "
+        f"before flipping) — LookAtGroupData.CmdRun with ChkEntry "
+        f"didn't raise any :ERR marker.  Full transcript: {msgs}"
     )
-    assert field_err, (
-        f"Bug #6 marker no longer reproduces (investigate upstream fix vs. fixture/driver change vs. misclassification before flipping) — LookAtGroupData.CmdRun with ChkEntry "
-        f"no longer raises a field-related ERR.  err_msgs={err_msgs}"
+
+    # ---- Assertion 2: error text matches the JET 3061 family
+    # ("No value given for one or more required parameters").
+    # That's the exact wording the probe observed and what
+    # Issue #6 documents.  Some Office builds / ODBC paths
+    # surface the same root cause as "Could not find field
+    # 'c_parental_status'" — accept either, but the parameter-
+    # phrasing is the canonical one on the current dump.
+    expected_signatures = (
+        "no value given for one or more required parameters",
+        "could not find field",
+        "c_parental_status",       # the typo'd column name itself
+    )
+    matched_sigs = [
+        sig for sig in expected_signatures
+        if any(sig in m.lower() for m in err_msgs)
+    ]
+    assert matched_sigs, (
+        f"Bug #6 ERR fired but its text doesn't match any of the "
+        f"expected JET 3061 signatures {expected_signatures}.  "
+        f"Investigate whether the underlying typo changed (Issue "
+        f"#6's source-side fix would make `c_parental_status` go "
+        f"away — flip both this test AND the static test_bug6 in "
+        f"tests/test_known_bugs.py).  err_msgs={err_msgs}"
+    )
+
+    # ---- Assertion 3: ZZ_SCRATCH_ENTRY stays at 0 because the
+    # JET parameter error fires BEFORE queryEntry's INSERT
+    # executes.  Pinned at 0 to catch silent upstream fixes that
+    # would let the INSERT proceed (in which case scratch_entry
+    # would jump to person_1's 2 ENTRY_DATA rows).  Either
+    # outcome — error gone OR INSERT proceeds — means the bug
+    # behaviour shifted; both warrant manual review per the
+    # marker-failure policy.
+    cur = vba.conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM ZZ_SCRATCH_ENTRY")
+    n_entry = int(cur.fetchone()[0] or 0)
+    cur.close()
+    assert n_entry == 0, (
+        f"Bug #6 marker partially reproduces but ZZ_SCRATCH_ENTRY "
+        f"got populated ({n_entry} rows) — the JET 3061 error "
+        f"used to fire BEFORE INSERT.  If the INSERT now succeeds, "
+        f"either the typo was fixed OR JET's parameter handling "
+        f"changed.  Investigate per the marker-failure policy "
+        f"(docs/skills/issue-report-maintainer.md) before "
+        f"flipping this assertion."
     )
 
 
