@@ -86,6 +86,73 @@ read-only probe.
 
 ---
 
+## Refresh 2026-05-05 (later) — AssociationPairs × CmdGIS confirmed NOT cheap
+
+Sequel mini-refresh after the SetFocus driver patch
+(`feat/driver-patch-associationpairs-setfocus`, commit `89b46a9`)
+and the AssociationPairs × CmdPajek + CmdGephi coverage PR
+(`cover/assocpairs-pajek-gephi-1x3`, commit `4b8a927`) both
+landed.  The natural next-cheapest cell appeared to be
+`LookAtAssociationPairs × CmdGIS`, but a focused attempt
+(branch `cover/assocpairs-cmdgis-1x3`, deleted; no commits)
+confirmed the cell is **NOT** in the same equivalence class as
+LookAtPlace / LookAtKinship for the existing
+`_SUBFORMS_TO_REQUERY` driver mechanism.
+
+**Negative finding** documented in
+[`analysis/assocpairs_cmdgis_note.md`](./assocpairs_cmdgis_note.md):
+the 1-line `_SUBFORMS_TO_REQUERY` extension fails because
+AssociationPairs's CmdQuery cleanup (line 2000) opens a fresh
+`dbOpenDynaset` whose `RecordCount` returns 0 until visited,
+and the existing dict-mechanism's `.Form.Requery` after that
+rebind likely *invalidates* the fresh recordset (per the
+pre-existing Status warning comment in the dict).  A more
+aggressive shim (e.g. per-form `.MoveLast` action) was outside
+the brief's authorized scope; reviewer chose option (c) accept
+& document.
+
+**Triage adjustment:**
+
+- AssociationPairs × CmdGIS stays in bucket B
+  (`blocked_by_known_driver_issue`) — already classified there
+  per the original 2026-05-04 SetFocus reclassification.  This
+  mini-refresh just confirms that the SetFocus driver patch
+  alone (now merged) does NOT lift this cell out of bucket B;
+  it has a second, independent stale-subform-RecordCount
+  blocker that needs its own driver/meta investigation.
+- **Removed from "cheapest next cell" candidates.**  After the
+  AssocPairs SetFocus driver patch + Pajek/Gephi coverage,
+  this cell briefly looked like the next cheap win.  It isn't.
+  Future work needs either (a) per-form-action expansion of
+  `_SUBFORMS_TO_REQUERY` (e.g. `MoveLast` after `Requery` for
+  AssocPairs only) or (b) a deeper investigation into why
+  AssocPairs's `Set ... = OpenRecordset(...)` rebind doesn't
+  populate the subform's RecordCount the way Place / Kinship's
+  do.  Neither is justified on cost-benefit today.
+
+**Cheapest-next ranking after this refresh:** still
+LookAtGroupData × CmdNeo4j (probe-first per the prior
+refresh's recommendation), and that's the only candidate.
+Every other remaining gap continues to fall into the brief's
+exclusion zones (AssocPairs, Networks driver-meta, CmdUCINet
+new family).
+
+**AssociationPairs line of work — final state per this
+refresh:**
+
+| PR | Status | Outcome |
+|---|---|---|
+| `feat/driver-patch-associationpairs-setfocus` (`89b46a9`) | merged | SetFocus driver patch unblocks CmdQuery body |
+| `cover/assocpairs-pajek-gephi-1x3` (`4b8a927`) | merged | 2 cells closed: CmdPajek + CmdGephi |
+| `cover/assocpairs-cmdgis-1x3` | abandoned (no commits) | CmdGIS proven NOT cheap; see `analysis/assocpairs_cmdgis_note.md` |
+| this refresh | in flight | reclassifies CmdGIS as not-cheap; removes from candidate list |
+
+The line has produced its high-value PRs.  Successor
+recommendation: change direction (a fresh export-gap triage
+refresh after this lands), not deeper into AssociationPairs.
+
+---
+
 ## Bucket taxonomy
 
 | Bucket | Meaning |

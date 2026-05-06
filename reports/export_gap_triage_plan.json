@@ -52,6 +52,34 @@
     ],
     "no_rank_2_or_3_reason": "Under the brief's three exclusion criteria, only one cell qualifies as cheap.  Padding the list with cells that require driver/meta-PR or CmdUCINet design work would mis-represent the cost.  Refresh deliberately reports a single candidate."
   },
+  "refresh_2026_05_05_later": {
+    "trigger": "AssociationPairs SetFocus driver patch (89b46a9) merged + Pajek/Gephi coverage (4b8a927) merged; AssocPairs x CmdGIS attempt confirmed NOT cheap (branch cover/assocpairs-cmdgis-1x3, no commits, abandoned)",
+    "negative_finding_doc": "analysis/assocpairs_cmdgis_note.md",
+    "summary": "AssociationPairs x CmdGIS is NOT in the same equivalence class as LookAtPlace / LookAtKinship for _SUBFORMS_TO_REQUERY.  Authorized 1-line same-class extension was tried and proven insufficient: AssocPairs's CmdQuery cleanup at line 2000 opens a fresh dbOpenDynaset whose RecordCount returns 0 until visited; .Form.Requery after that rebind likely invalidates the fresh recordset (per the pre-existing Status warning comment in _SUBFORMS_TO_REQUERY).  Reviewer chose option (c) accept-and-document.",
+    "triage_adjustment": {
+      "cell": "LookAtAssociationPairs x CmdGIS",
+      "stays_in_bucket": "B_blocked_by_known_driver_issue",
+      "removed_from_cheapest_next_candidates": true,
+      "future_work_options": [
+        "(a) per-form-action expansion of _SUBFORMS_TO_REQUERY (e.g. MoveLast after Requery for AssocPairs only) -- expands driver dict shape",
+        "(b) deeper investigation into why AssocPairs's Set ... = OpenRecordset(...) rebind doesn't populate subform RecordCount the way Place/Kinship's do"
+      ],
+      "neither_option_justified_today": "Both expansions cost more than the value of one closed cell, and AssociationPairs's other still-blocked cells (CmdNeo4j, CmdUCINet) need separate work this investigation wouldn't help with."
+    },
+    "associationpairs_line_final_state": [
+      {"pr": "feat/driver-patch-associationpairs-setfocus", "commit": "89b46a9", "status": "merged", "outcome": "SetFocus driver patch unblocks CmdQuery body"},
+      {"pr": "cover/assocpairs-pajek-gephi-1x3", "commit": "4b8a927", "status": "merged", "outcome": "2 cells closed: CmdPajek + CmdGephi"},
+      {"pr": "cover/assocpairs-cmdgis-1x3", "commit": null, "status": "abandoned (no commits)", "outcome": "CmdGIS proven NOT cheap; see analysis/assocpairs_cmdgis_note.md"},
+      {"pr": "note/assocpairs-cmdgis-not-cheap-next", "commit": "(this note)", "status": "in flight", "outcome": "reclassifies CmdGIS as not-cheap; removes from candidate list"}
+    ],
+    "cheapest_next_after_this_refresh": {
+      "cell": "LookAtGroupData x CmdNeo4j",
+      "rank": 1,
+      "approach": "probe-first per the prior refresh's recommendation",
+      "no_rank_2_or_3": "Every other remaining gap continues to fall into the brief's exclusion zones (AssocPairs other cells, Networks driver-meta, CmdUCINet new family)."
+    },
+    "successor_recommendation": "The AssociationPairs line of work has produced its high-value PRs.  Successor direction should be AWAY from AssociationPairs, not deeper.  A fresh export-gap triage refresh after this lands is probably the right next step rather than picking another specific cell."
+  },
   "buckets": {
     "A_small_candidate": {
       "definition": "Existing small-fixture pattern (matrix_hard_forms / networks_small_fixture) covers this form's CmdQuery, AND the export's per-block logic is well-understood enough that a new cross-form test slice should pass with low driver risk.",
