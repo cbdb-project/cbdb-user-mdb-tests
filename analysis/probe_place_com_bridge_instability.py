@@ -510,26 +510,39 @@ def _synthesize(trials: list[dict]) -> dict:
         narrowest_class = (
             "long_click_via_timer_polling_loop_correlated")
         rationale_parts.append(
-            "T1+T2 baselines stable. T3 leaves bridge DEAD "
-            "AND its `click_via_timer(CmdQuery)` step ran for "
-            "the full 120s timeout (DONE marker not surfaced "
-            "via the autodetect inject — `click_via_timer` "
-            "kept polling Access COM for the full window). "
-            "T5 leaves bridge ALIVE AND its `click_via_timer"
-            "(CmdQuery)` step returned cleanly in "
-            f"{cmdquery_elapsed('T5')} s (DONE marker "
-            "surfaced or result_table count grew).  Same "
-            "form, same picker, same checkboxes — the only "
-            "behavioural difference between the two is HOW "
-            "`click_via_timer` returned.  This strongly "
-            "suggests the narrowest trigger is NOT CmdQuery "
-            "itself but `click_via_timer`'s polling loop "
-            "running for the full timeout window, which "
-            "appears to age out / poison the COM bridge.  "
-            "CmdQuery is NOT exonerated (the polling-timeout "
-            "happens during CmdQuery), but a clean CmdQuery "
-            "completion does NOT poison the bridge in this "
-            "matrix.")
+            "**Correlation finding (NOT an isolated trigger "
+            "proof).**  T1+T2 baselines stable. T3 leaves "
+            "bridge DEAD AND its `click_via_timer(CmdQuery)` "
+            "step ran for the full 120s timeout (DONE marker "
+            "not surfaced via the autodetect inject — "
+            "`click_via_timer` kept polling Access COM for "
+            "the full window). T5 leaves bridge ALIVE AND "
+            "its `click_via_timer(CmdQuery)` step returned "
+            f"cleanly in {cmdquery_elapsed('T5')} s (DONE "
+            "marker surfaced or result_table count grew).  "
+            "What the data DOES support: (a) the long-CmdQuery-"
+            "polling-timeout path correlates with later "
+            "bridge-dead in this matrix; (b) clean CmdQuery "
+            "completion does NOT kill minimal post-CmdQuery "
+            "COM access (Forms.Count) in this matrix.  "
+            "**Unresolved confound:** T3 and T5 differ along "
+            "TWO dimensions, not one — `click_via_timer`'s "
+            "return mode (polling-timeout vs clean-DONE) AND "
+            "the post-CmdQuery COM-touch type (T3 = second "
+            "`set_form_tag`, T5 = `Forms.Count` minimal "
+            "read).  This matrix does NOT isolate polling-"
+            "return-mode from post-CmdQuery-COM-touch type, "
+            "so 'long polling alone is the trigger' is a "
+            "hypothesis the matrix is consistent with but "
+            "does not prove.  An equally consistent reading "
+            "is 'set_form_tag specifically (or any heavier "
+            "COM call) post-long-CmdQuery is what dies'.  "
+            "Disentangling would need additional trials "
+            "(e.g. polling-timeout + Forms.Count, and "
+            "clean-DONE + set_form_tag) — out of scope for "
+            "this PR's brief boundary.  CmdQuery is NOT "
+            "exonerated either (the polling-timeout happens "
+            "during CmdQuery).")
     elif (baselines_stable
             and s3 == "unstable" and s5 == "unstable"):
         narrowest_class = (
@@ -740,7 +753,7 @@ def _write_md(trials: list[dict], synthesis: dict) -> None:
     md.append("")
     md.append("**Date:** 2026-05-06  ·  **Branch:** "
               "`investigate/place-com-bridge-instability`  ·  "
-              "**Base:** main `db16c03`")
+              "**Base:** main `b28a09e`")
     md.append("")
     md.append("**Brief context:** PR AS's Place × CmdUCINet "
               "probe established that the bridge fails RPC-"
@@ -872,7 +885,7 @@ def _write_md(trials: list[dict], synthesis: dict) -> None:
     md.append("")
     md.append("- **A. Branch shape.** "
               "`investigate/place-com-bridge-instability` cut "
-              "from clean main `db16c03`; only the 3 brief-"
+              "from clean main `b28a09e`; only the 3 brief-"
               "named files in the diff (script + MD + JSON); "
               "no driver / tests / canonical changes.")
     md.append("- **B. Source-of-truth sync.** MD ↔ JSON "
@@ -960,17 +973,22 @@ def main() -> int:
         prior = json.loads(OUT_JSON.read_text(encoding="utf-8"))
         trials = prior["trials"]
         synthesis = _synthesize(trials)
-        out = {
-            "schema_version": prior.get("schema_version", 1),
-            "generated_date": "2026-05-06",
-            "probe_branch": prior.get(
-                "probe_branch",
-                "investigate/place-com-bridge-instability"),
-            "follow_up_to": prior.get("follow_up_to", ""),
-            "trials": trials,
-            "synthesis": synthesis,
-            "_reclassified_only": True,
-        }
+        # Preserve all prior metadata fields (e.g.
+        # base_main_commit, follow_up_to); only overwrite the
+        # ones we're updating.  Same pattern as
+        # --retry-trial.
+        out = dict(prior)
+        out["trials"] = trials
+        out["synthesis"] = synthesis
+        out["_reclassified_only"] = True
+        # Allow base_main_commit to be re-pinned via env var
+        # so a corrected base value persists through reclassify
+        # without needing a manual JSON edit.
+        env_base = (sys.argv[sys.argv.index(
+            "--set-base-main") + 1]
+            if "--set-base-main" in sys.argv else None)
+        if env_base:
+            out["base_main_commit"] = env_base
         OUT_JSON.write_text(
             json.dumps(out, ensure_ascii=False, indent=2,
                        default=str),
@@ -1003,7 +1021,7 @@ def main() -> int:
         "generated_date": "2026-05-06",
         "probe_branch": (
             "investigate/place-com-bridge-instability"),
-        "base_main_commit": "db16c03",
+        "base_main_commit": "b28a09e",
         "follow_up_to": (
             "PR AS (investigate: LookAtPlace × CmdUCINet "
             "runtime probe) -- specifically the unresolved "
