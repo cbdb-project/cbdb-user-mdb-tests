@@ -304,7 +304,7 @@ Set tVNA = tFileSystem.CreateTextFile(tFileName, True)
 Set tVNA = tFileSystem.CreateTextFile(tFileName, True, True)
 ```
 
-這樣 `tVNA.WriteLine` 就用 UTF-16LE 寫入所有字元，cp1252 無法表示的字元不再造成崩潰，下游的 UCINET / Visone 也都接受 UTF-16 的 `.vna` 檔。
+這樣 `tVNA.WriteLine` 應能用 UTF-16LE 寫入所有字元，避免 cp1252 寫出時在非 cp1252 c_name 上的崩潰。下游 UCINET / Visone 對 UTF-16 `.vna` 的相容性 **不在本 PR 證據範圍內**，仍應在修補版上再驗證一次，才能宣告本 issue 關閉。
 
 替代方案（不太推薦）：在 `WriteLine` 之前把 `c_name` 裡的非 cp1252 字元剝掉或轉寫。會丟失匯出的真實資料，而且程式碼量更大；Unicode flag 才是正解。
 

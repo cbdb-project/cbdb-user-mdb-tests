@@ -304,7 +304,7 @@ Set tVNA = tFileSystem.CreateTextFile(tFileName, True)
 Set tVNA = tFileSystem.CreateTextFile(tFileName, True, True)
 ```
 
-This makes `tVNA.WriteLine` write all characters as UTF-16LE; cp1252-only chars no longer crash, and downstream consumers (UCINET, Visone) accept UTF-16 `.vna`.
+This should make `tVNA.WriteLine` write all characters as UTF-16LE and prevent the cp1252 write crash on non-cp1252 c_name values.  Downstream UCINET / Visone compatibility with UTF-16 `.vna` is NOT verified by this PR's evidence and should be verified on the fixed build before declaring the bug closed.
 
 Alternative (less recommended): strip / transliterate non-cp1252 chars from `c_name` before the `WriteLine` call.  Loses real data from the export and is more code; the Unicode flag is the right fix.
 
