@@ -573,3 +573,188 @@ later implementer re-discover the SetFocus issue after spending
 hours wiring tests.
 
 The 4 bucket-A small_candidates above are the only cells worth promoting in narrow PRs without first investing in design/probe work.  The rest will close eventually but each requires a PR brief from the maintainer that names the specific blocker being lifted.
+
+---
+
+## Refresh 2026-05-06 — post Issue #22 + Kinship sibling-form alignment
+
+Triggering event: `chore/align-issue22-kinship-sibling-confirmed`
+merged into main (current `14099a7`). The CmdUCINet family's
+3-cell truth has stabilized; this refresh re-baselines the queue
+on top of that truth. **Read-only analysis. No COM. No tests /
+driver / README / canonical-report changes in this PR.**
+
+### CmdUCINet family — current state on main (14099a7)
+
+| Cell | Status | Truth label (consistent across canonical + inventory + README + tests) |
+|---|---|---|
+| `LookAtAssociations × CmdUCINet` | **gap** | canonical **Issue #22** (P1_visible_crash); FSO ANSI cp1252 cannot encode CJK — runtime-pinned, static-marked. NOT a coverage candidate. |
+| `LookAtKinship × CmdUCINet` | **covered (fixture-fragile)** | runtime-confirmed sibling form of Issue #22 (probe `154bb4b`, picker pid 152930 → kin pid 140733 He Mou 取 U+53D6); test passes only on the matrix `kinship_person_3211` fixture. NOT downgraded to gap; the fragility IS the truth. |
+| `LookAtPlace × CmdUCINet` | **gap (uninvestigated, different mechanism)** | not yet probed; uses ADO Stream not FSO (see static signal below). Explicitly outside Issue #22's scope. |
+
+### Place × CmdUCINet — read-only static signal (this refresh's analysis)
+
+Static read of `analysis/dump/vba/Form_LookAtPlace.vb`
+inside `Sub CmdUCINet_Click`:
+
+```
+tStream.Charset = "utf-8"   ' default; alt branches: "big5", "gb18030"
+tStream.Type    = adTypeText
+tStream.Open
+'Set tVNA = tFileSystem.CreateTextFile(tFileName, True)   ' ← FSO path COMMENTED OUT
+```
+
+Implication: **Place's CmdUCINet write path is Unicode-by-design
+via ADO Stream**; the FSO `CreateTextFile` path that drives Issue
+#22 in Associations + Kinship is commented out in Place. So
+Place CmdUCINet does NOT structurally share Issue #22's bug class.
+A probe is therefore expected to either (a) succeed cleanly on a
+Han-name fixture, or (b) reveal a *different* failure mode
+(charset encoder mismatch, recordset-empty guard, or ADO-specific
+issue).
+
+### Next 1–3 work items, ranked — by category
+
+#### Rank 1 — probe-first investigation: `LookAtPlace × CmdUCINet`
+
+- **Category:** probe-first investigation (NOT coverage PR, NOT
+  canonical issue).
+- **Why now:** It is the cheapest next probe in the family. The
+  static signal above is favorable enough that the probe is mostly
+  about *characterizing the file shape* (sections, columns, row
+  counts, encoding/BOM), not about reproducing Issue #22. Closing
+  this probe gives the queue a clean fork: either a coverage PR
+  candidate, a new canonical issue, or a deferred gap with a
+  recorded reason.
+- **Shape:** one tiny fixture (a place network whose member
+  recordset includes ≥1 CJK person), a Form_Open + CmdRun + CmdUCINet
+  split-fire, a file-poll for the `.vna` output, and a strict
+  file-shape classifier. Probe MD + JSON only — no `test_*`
+  additions.
+- **Risk:** low; Place's writer is structurally distinct from the
+  failing FSO writer.
+
+#### Rank 2 — canonical issue / maintainer-line: Issue #22 upstream-fix coordination
+
+- **Category:** maintainer line (outside this repo's PR surface).
+- **Why second:** Issue #22 is filed P1 and has a recommended fix
+  (`CreateTextFile(..., True, True)` for the 3rd Unicode arg, with
+  the downstream-acceptance hedge). The next forward step is
+  reaching the CBDB maintainer to land that fix on the upstream
+  `.mdb`, not more local activity here.
+- **Shape:** out-of-band; not a PR action.
+
+#### Rank 3 — deferred coverage hardening: Kinship CmdUCINet runtime pin
+
+- **Category:** coverage hardening (NOT new coverage).
+- **Why third:** the previous Issue #22 alignment PR deliberately
+  deferred adding a runtime `:ERR Invalid procedure call or
+  argument` pin in `tests/test_vba_bug_behaviors.py` for Kinship
+  (the analog of the Associations one). It would tighten evidence
+  but does not change any cell's coverage state.
+- **Shape:** small; mirrors the existing Associations runtime pin.
+
+### Place × CmdUCINet — direct answers to the brief
+
+**Q1: Is `LookAtPlace × CmdUCINet` the cheapest next probe?**
+
+**Yes**, conditional on staying on the export-CmdUCINet line.
+Reasons:
+
+1. *Adjacency:* it is the last unprobed cell in a family whose
+   other two cells just stabilized — context cost is at its
+   minimum.
+2. *Static prep already in hand:* the write mechanism is
+   characterized (ADO Stream, UTF-8 default), so the probe
+   does not need a separate static-analysis pass first.
+3. *Bounded outcome space:* probable result is "Place is robust
+   against Issue #22's bug class; characterize sections/columns";
+   alternative result is a *different* failure mode that itself
+   would be a clean separate finding. Either branch produces a
+   small, self-contained probe artifact.
+4. *No driver / fixture-design dependency:* unlike the AssocPairs
+   driver-meta cells, Place CmdUCINet does not require any
+   driver-side change first.
+
+**Q2: Is anything else cheaper / better-sequenced than Place
+CmdUCINet right now?**
+
+**Realistically, no — within this repo's PR surface.** The
+remaining queue is thin:
+
+- AssocPairs × CmdGIS / CmdNeo4j / CmdUCINet — all in bucket B/C
+  (driver-meta or query-timeout); not cheap.
+- Networks × CmdGIS / CmdPajek / CmdUCINet — bucket B (driver-meta).
+- GroupData × CmdNeo4j — Issue #21 maintainer line, same shape as
+  Issue #22 maintainer line (outside this repo's PR surface).
+- Associations × CmdUCINet — explicitly NOT coverage line.
+
+If you want to *leave the CmdUCINet line entirely*, the strongest
+candidate is the Issue #21 upstream-fix maintainer line (already
+listed in `refresh_2026_05_05_later` as "next reasonable forward
+move"), but that is also outside this repo's PR surface — not a
+local-implementation alternative.
+
+So the practical choice is: do the Place probe (Rank 1), or pause
+implementation and pursue maintainer-line work (Rank 2 / Issue #21).
+There is no third "cheaper local PR" that out-ranks Place.
+
+### Explicitly NOT to touch (this refresh + onward, until briefed otherwise)
+
+- ❌ Do NOT pursue Associations × CmdUCINet **coverage** — canonical
+  Issue #22 IS the truth label for this cell; trying to wrap
+  coverage around a known crashing form would either (a) require
+  asserting `:ERR` (which we already do as a runtime pin in
+  `test_vba_bug_behaviors.py`) or (b) silently mask the bug.
+- ❌ Do NOT downgrade Kinship × CmdUCINet from `covered` back to
+  `gap` — it is covered with a fixture-fragile caveat documented
+  in 4 places (canonical Issue #22, manifest, README, test
+  docstring). The fragility is the truth, not absence of coverage.
+- ❌ Do NOT reopen Issue #22 wording — current canonical (Associations
+  directly + Kinship sibling-runtime-confirmed via probe `154bb4b`)
+  is the agreed truth. Issue #23 was deliberately NOT filed (sibling
+  pattern was the chosen shape).
+- ❌ Do NOT return to AssociationPairs × CmdGIS — canonical not-cheap
+  per `analysis/assocpairs_cmdgis_note.md` and the 2026-05-04 refresh.
+- ❌ Do NOT promote Place × CmdUCINet to coverage PR before the
+  Rank-1 probe lands — the static UTF-8 signal is favorable but
+  not a substitute for runtime evidence.
+
+### Self-review (per `docs/skills/programmer-self-review-template.md`)
+
+**A. Branch shape.** Branch
+`refresh/queue-after-cmducinet-alignment` cut from clean main
+`14099a7`. Only two files touched: this MD and the paired JSON.
+No tests / driver / README / canonical-report changes — matches
+brief boundary exactly.
+
+**B. Source-of-truth sync.** MD section ↔ JSON
+`refresh_2026_05_06` block carry the same 3-cell state, the same
+ranked list, the same Place static finding, and the same
+do-not-touch list. The 3-cell state itself was checked against
+canonical truth on `main`: Issue #22 entry in
+`reports/generate_report.py`, the manifest entry in
+`analysis/inventory_export_coverage.py`, the static + runtime
+markers in `tests/test_known_bugs.py` and
+`tests/test_vba_bug_behaviors.py`, the README coverage table +
+roadmap-8 lines, and the Kinship coverage test docstring. No
+source-of-truth file is being changed by this refresh; the refresh
+only reflects what is already canonical.
+
+**C. Evidence vs claim.** Place's UTF-8 signal is grounded in a
+verifiable static read (`grep` on `Form_LookAtPlace.vb` reproduced
+in this PR's commit message) — not an inferred property. The
+"probable outcome" language for the proposed Place probe is
+explicitly hedged ("expected to either … or …"); no claim about
+Place's runtime behavior is made beyond what static analysis
+supports. The Issue #22 / Kinship / Associations state is reported
+as-of `14099a7` and cited to canonical files, not paraphrased.
+
+**D. Residual risk.** This is a triage-document refresh, not an
+implementation; the residual risk is purely *advisory error*:
+ranking Place above maintainer-line work could be wrong if the
+user's priority is upstream coordination. Mitigated by: ranking
+maintainer-line work explicitly at Rank 2 and by stating the
+"leave CmdUCINet line entirely" alternative in the Q2 answer
+above. No code path or test is altered, so no runtime regression
+risk.
