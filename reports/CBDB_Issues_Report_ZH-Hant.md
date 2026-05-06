@@ -230,9 +230,11 @@ _Step 2 — the popup users see.  Reconstructed in PIL because the real popup wo
 
 #### 問題描述
 
-`Form_LookAtGroupData.CmdNeo4j_Click` 中的 11 個 CSV 匯出區塊在開啟暫存記錄集後，全部直接呼叫 `.MoveFirst`，而沒有先檢查記錄集是否為空（缺少 `.EOF` 或 `.RecordCount > 0` 防護）。如果使用者查詢的群體在某個類別沒有資料（例如沒有 Entry 資料，導致 `ZZ_SCRATCH_ENTRY` 為空），`.MoveFirst` 呼叫會立刻丟擲 DAO 3021「No current record」，彈出報錯框並中斷整個 Neo4j 匯出。
+`Form_LookAtGroupData.CmdNeo4j_Click` 的多個 CSV 匯出區塊在開啟暫存記錄集後直接呼叫 `.MoveFirst`，沒有先檢查記錄集是否為空（缺少 `.EOF` 或 `.RecordCount > 0` 防護）。如果使用者查詢的群體在某個類別沒有資料（例如沒有 Entry 資料，導致 `ZZ_SCRATCH_ENTRY` 為空），`.MoveFirst` 呼叫會立刻丟擲 DAO 3021「No current record」，彈出報錯框並中斷整個 Neo4j 匯出。
 
-在當前 dump 和典型小 fixture 下，第一個觸發的是 **block #9 PeopleEntry**（line 1243-1245）—— `Set tRstPeopleEntry = CurrentDb.OpenRecordset("ZZ_SCRATCH_ENTRY", dbOpenDynaset)` 後緊接無防護的 `.MoveFirst`。同樣的無防護模式也存在於緊隨其後的 **block #10 EntryCode**（line 1383-1385），實際上 `CmdNeo4j_Click` 的 **全部 11 個 block** 都是這種寫法 —— 其他 8 個之所以能跑通，只是因為它們的上游暫存表（ZZ_SCRATCH_STATUS, ZZ_SCRATCH_OFFICE 等）在任何正常啟用範圍下都不會為空。
+在當前 dump 和典型小 fixture 下，**使用者能首先觸發的失敗是 block #9 PeopleEntry**（line 1243-1245）—— `Set tRstPeopleEntry = CurrentDb.OpenRecordset("ZZ_SCRATCH_ENTRY", dbOpenDynaset)` 後緊接無防護的 `.MoveFirst`。同樣的缺少防護模式也存在於緊隨其後的 **block #10 EntryCode**（line 1383-1385）以及其他沒有上游 gate 的 tail block；block #10 之所以目前沒單獨表現為故障，只是因為鏈條已經在 block #9 中斷了。
+
+關於程式碼範圍的說明：block #1-#8 共用相同的 `Set ... = OpenRecordset(...)` + `.MoveFirst` 寫法，但其上游暫存表（ZZ_SCRATCH_STATUS, ZZ_SCRATCH_OFFICE, ZZ_PLACE, ZZ_SCRATCH_P_TEXT, ZZ_ADDRESSES）在任何正常使用者啟用範圍下都不會為空，所以 empty-feeder 失敗模式 在這些 block 上 使用者無法觸達。Block #11 InstitutionCodes（line 1485-1487）在上游已經被 `If tRecDeleted > 0 Then` 正確 gate 住，不屬於本 issue 範圍。要修復使用者可見的症狀，只需在 block #9 和 #10 加 guard。
 
 這與 Issue #6 **不同**：Issue #6 是 `queryEntry` 裡的列名筆誤（`ENTRY_DATA.c_parental_status` 應為 `c_parental_status_code`），導致 ChkEntry 勾選時 `ZZ_SCRATCH_ENTRY` 寫不進資料。Issue #21 是 `CmdNeo4j_Click` 裡獨立的下游缺少防護的 bug，只要 `ZZ_SCRATCH_ENTRY` 為空就觸發 —— 既可能是上游 Issue #6 的連帶影響，也可能是使用者單純沒勾 ChkEntry。兩個不同層級的程式碼缺陷，應分別歸檔與修復。
 
@@ -246,7 +248,7 @@ _Step 2 — the popup users see.  Reconstructed in PIL because the real popup wo
 
 #### 建議修復方案
 
-在 `Form_LookAtGroupData.CmdNeo4j_Click` 的 **全部 11 個 block** 中，於 `.MoveFirst` 呼叫前加上 `.EOF`（或 `.RecordCount > 0`）防護。其中 block #9 PeopleEntry（約 line 1245）和 block #10 EntryCode（約 line 1385）是使用者最容易觸發的兩段。建議寫法：
+在 `Form_LookAtGroupData.CmdNeo4j_Click` 的 **block #9 PeopleEntry（約 line 1245）和 block #10 EntryCode（約 line 1385）** 上，於 `.MoveFirst` 呼叫前加上 `.EOF`（或 `.RecordCount > 0`）防護。這兩段是使用者能觸發的兩塊；其他 tail block 要麼上游有 gate（block #11 InstitutionCodes 上游有 `If tRecDeleted > 0 Then`），要麼其上游暫存表在任何正常使用者啟用範圍下都非空（block #1-#8）。建議寫法：
 
 ```vb
 Set tRstPeopleEntry = CurrentDb.OpenRecordset("ZZ_SCRATCH_ENTRY", dbOpenDynaset)
@@ -261,7 +263,7 @@ With tRstPeopleEntry
 End With
 ```
 
-Block #11 InstitutionCodes（約 line 1487）上游已有 `If tRecDeleted > 0 Then` 閘門，本身不會觸發，不需要改動。
+防禦性範圍選項（關閉本 issue 不需要）：把同樣的 guard 加到 block #1-#8 也無害，可對未來出現新的啟用路徑讓其上游表為空的情況做防禦。當前沒有這種路徑，所以不必做。
 
 ## P2 — 靜默顯示問題
 

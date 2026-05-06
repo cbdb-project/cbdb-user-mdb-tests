@@ -232,7 +232,9 @@ Either restore the picker form `frmPickNIAN_HAO`, or update the caller in `Form_
 
 All 11 CSV export blocks in `Form_LookAtGroupData.CmdNeo4j_Click` open a scratch recordset and immediately call `.MoveFirst` without first checking if the recordset is empty (no `.EOF` or `.RecordCount > 0` guard).  When a user queries a group whose data has no rows in a given category — for example, no Entry data so `ZZ_SCRATCH_ENTRY` is empty — the `.MoveFirst` call instantly raises DAO 3021 'No current record', a popup blocks the user, and the entire Neo4j export chain aborts.
 
-On the current dump and a typical small fixture the first block to hit this is **block #9 PeopleEntry** (line 1243-1245) — `Set tRstPeopleEntry = CurrentDb.OpenRecordset("ZZ_SCRATCH_ENTRY", dbOpenDynaset)` followed unguarded by `.MoveFirst`.  The same unguarded pattern exists in the immediately-following **block #10 EntryCode** (line 1383-1385) and in fact in **all 11 blocks** of `CmdNeo4j_Click` — the other 8 only happen to work because their feeder scratch tables (ZZ_SCRATCH_STATUS, ZZ_SCRATCH_OFFICE, etc.) are non-empty under any normal enable scope.
+On the current dump and a typical small fixture the **first user-reachable failure is block #9 PeopleEntry** (line 1243-1245) — `Set tRstPeopleEntry = CurrentDb.OpenRecordset("ZZ_SCRATCH_ENTRY", dbOpenDynaset)` followed unguarded by `.MoveFirst`.  The same missing-guard pattern also exists in the immediately-following **block #10 EntryCode** (line 1383-1385) and in other ungated tail blocks; block #10 doesn't currently surface as a separate symptom only because the chain bails at block #9 first.
+
+Note on broader code scope: blocks #1-#8 share the same `Set ... = OpenRecordset(...)` followed by `.MoveFirst` shape, but their feeder scratch tables (ZZ_SCRATCH_STATUS, ZZ_SCRATCH_OFFICE, ZZ_PLACE, ZZ_SCRATCH_P_TEXT, ZZ_ADDRESSES) are non-empty under any normal user enable scope, so the empty-feeder failure mode is NOT user-reachable on those blocks today.  Block #11 InstitutionCodes (line 1485-1487) is correctly gated by `If tRecDeleted > 0 Then` upstream and is NOT part of the bug.  Only blocks #9 and #10 need a guard added to fix the user-reachable symptom.
 
 This is **distinct from Issue #6**: Issue #6 is a column-typo (`ENTRY_DATA.c_parental_status` vs `c_parental_status_code`) in `queryEntry` that prevents `ZZ_SCRATCH_ENTRY` from being populated at all when ChkEntry is on.  Issue #21 is a separate downstream missing-guard bug in `CmdNeo4j_Click` that fires whenever `ZZ_SCRATCH_ENTRY` happens to be empty — including via the upstream Issue #6 path, but also independently when the user simply doesn't tick ChkEntry.  Two different code-level defects; should be filed and fixed separately.
 
@@ -246,7 +248,7 @@ This is **distinct from Issue #6**: Issue #6 is a column-typo (`ENTRY_DATA.c_par
 
 #### Suggested fix
 
-Add an `.EOF` (or `.RecordCount > 0`) guard before the `.MoveFirst` call in **all 11 blocks** of `Form_LookAtGroupData.CmdNeo4j_Click`.  Block #9 PeopleEntry (line ~1245) and block #10 EntryCode (line ~1385) are the most user-reachable.  Suggested shape:
+Add an `.EOF` (or `.RecordCount > 0`) guard before the `.MoveFirst` call in **block #9 PeopleEntry (line ~1245) and block #10 EntryCode (line ~1385)** of `Form_LookAtGroupData.CmdNeo4j_Click`.  These are the two user-reachable blocks; the other tail blocks either have an upstream gate (block #11 InstitutionCodes — `If tRecDeleted > 0 Then`) or their feeder scratch tables are non-empty under any normal user enable scope (blocks #1-#8).  Suggested shape:
 
 ```vb
 Set tRstPeopleEntry = CurrentDb.OpenRecordset("ZZ_SCRATCH_ENTRY", dbOpenDynaset)
@@ -261,7 +263,7 @@ With tRstPeopleEntry
 End With
 ```
 
-Block #11 InstitutionCodes (line ~1487) is already correctly gated by `If tRecDeleted > 0 Then` upstream and does not need this change.
+Defensive scope option (not required to close this issue): adding the same guard to blocks #1-#8 is harmless and would future-proof against a new enable path leaving any of those feeder tables empty.  Not required because no such path exists today.
 
 ## P2 — Silent display
 
