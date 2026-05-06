@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_utc": "2026-05-05T14:23:35+00:00",
+  "generated_utc": "2026-05-06T06:05:27+00:00",
   "forms": [
     "LookAtEntry",
     "LookAtTexts",
@@ -567,8 +567,18 @@
         "button_present": false
       },
       "CmdUCINet": {
-        "status": "gap",
-        "explanation": "Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.",
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
+        "test_entries": [
+          {
+            "form": "LookAtKinship",
+            "button": "CmdUCINet",
+            "test_module": "tests/test_vba_cmducinet_kinship.py",
+            "test_node": "test_cmducinet_kinship_writes_vna_with_three_sections",
+            "status": "covered",
+            "notes": ".vna shape; 3 sections (*node data / *node properties / *tie data); cp1252 no BOM; row counts cross-checked vs ZZ_SCRATCH_KIN + ZZ_SCRATCH_KINNET.  Family shape established by probe investigate/cmducinet-family-shape (commit 4e8e0d2); coverage is Kinship-only because Associations CmdUCINet is blocked by VBA error 5 mid-write and Place uses ADO Stream rather than FSO.  Test uses split-fire (CmdRun via timer, then CmdUCINet alone with file-poll) because CmdUCINet is not in _TIMER_DISPATCH_SUBS — test-side workaround; no driver change in this PR."
+          }
+        ],
         "static_test_notes": [],
         "handler_present": true,
         "button_present": true
@@ -917,10 +927,10 @@
     "n_buttons": 8,
     "n_cells": 80,
     "by_status": {
-      "real_vba_covered": 19,
+      "real_vba_covered": 20,
       "not_applicable": 40,
       "real_vba_skipped": 5,
-      "gap": 10,
+      "gap": 9,
       "real_vba_covered_via_handler_dispatch": 3,
       "real_vba_skipped_via_handler_dispatch": 2,
       "missing_ui_button": 1
@@ -967,12 +977,6 @@
     },
     {
       "form": "LookAtAssociations",
-      "button": "CmdUCINet",
-      "score": 6,
-      "static_test_notes": []
-    },
-    {
-      "form": "LookAtKinship",
       "button": "CmdUCINet",
       "score": 6,
       "static_test_notes": []

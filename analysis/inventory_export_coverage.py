@@ -320,6 +320,29 @@ EXPORT_TEST_MANIFEST: list[dict] = [
      "test_node": "test_cmd_guess_produces_file[LookAtOffice]",
      "status": "covered", "notes": ".gdf shape"},
 
+    # ---- CmdUCINet ----
+    {"form": "LookAtKinship", "button": "CmdUCINet",
+     "test_module": "tests/test_vba_cmducinet_kinship.py",
+     "test_node": (
+         "test_cmducinet_kinship_writes_vna_with_three_sections"
+     ),
+     "status": "covered",
+     "notes": (
+         ".vna shape; 3 sections (*node data / *node "
+         "properties / *tie data); cp1252 no BOM; row "
+         "counts cross-checked vs ZZ_SCRATCH_KIN + "
+         "ZZ_SCRATCH_KINNET.  Family shape established by "
+         "probe investigate/cmducinet-family-shape (commit "
+         "4e8e0d2); coverage is Kinship-only because "
+         "Associations CmdUCINet is blocked by VBA error 5 "
+         "mid-write and Place uses ADO Stream rather than "
+         "FSO.  Test uses split-fire (CmdRun via timer, "
+         "then CmdUCINet alone with file-poll) because "
+         "CmdUCINet is not in _TIMER_DISPATCH_SUBS — "
+         "test-side workaround; no driver change in this "
+         "PR."
+     )},
+
     # ---- CmdGISPeople ----
     {"form": "LookAtOffice", "button": "CmdGISPeople",
      "test_module": "tests/test_vba_cmdgispeople_office.py",

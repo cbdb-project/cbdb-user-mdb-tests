@@ -1,6 +1,6 @@
 # Export coverage inventory (LookAt form × export button)
 
-**Generated:** 2026-05-05T14:23:35+00:00
+**Generated:** 2026-05-06T06:05:27+00:00
 **Generator:** `analysis/inventory_export_coverage.py`
 **Companion JSON:** `reports/export_coverage_inventory.json`
 
@@ -48,8 +48,8 @@ If a `FAIL` cell ever wants to graduate to `real_vba_covered`, the path is to (a
 
 - **Cells total:** 80 (10 forms × 8 buttons)
 - `not_applicable` (—): **40**
-- `real_vba_covered` (✓): **19**
-- `gap` (GAP): **10**
+- `real_vba_covered` (✓): **20**
+- `gap` (GAP): **9**
 - `real_vba_skipped` (skip): **5**
 - `real_vba_covered_via_handler_dispatch` (✓*): **3**
 - `real_vba_skipped_via_handler_dispatch` (skip*): **2**
@@ -64,7 +64,7 @@ If a `FAIL` cell ever wants to graduate to `real_vba_covered`, the path is to (a
 | **LookAtAssociations** | ✓ | skip | ✓ | ✓ | — | — | GAP | — |
 | **LookAtOffice** | ✓ | ✓ | — | — | ✓* | — | — | ✓ |
 | **LookAtPlace** | ✓* | skip | ✓ | ✓ | — | — | GAP | — |
-| **LookAtKinship** | ✓ | ✓ | ✓* | — | ✓ | — | GAP | — |
+| **LookAtKinship** | ✓ | ✓ | ✓* | — | ✓ | — | ✓ | — |
 | **LookAtStatus** | ✓ | skip | skip* | skip* | — | — | no-btn | — |
 | **LookAtAssociationPairs** | GAP | GAP | ✓ | ✓ | — | — | GAP | — |
 | **LookAtNetworks** | GAP | skip | GAP | — | skip | — | GAP | — |
@@ -231,11 +231,12 @@ Cells with status `not_applicable` are omitted to keep the noise down.
 - Why: Real-VBA test exists and passes for this cell.
 - Test: `tests/test_vba_cmdguess_cross_form.py::test_cmd_guess_produces_file[LookAtKinship]` — **covered**; notes: .gdf shape
 
-### LookAtKinship × CmdUCINet — `gap`
+### LookAtKinship × CmdUCINet — `real_vba_covered`
 
 - Handler in source: yes
 - Button on form: yes
-- Why: Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.
+- Why: Real-VBA test exists and passes for this cell.
+- Test: `tests/test_vba_cmducinet_kinship.py::test_cmducinet_kinship_writes_vna_with_three_sections` — **covered**; notes: .vna shape; 3 sections (*node data / *node properties / *tie data); cp1252 no BOM; row counts cross-checked vs ZZ_SCRATCH_KIN + ZZ_SCRATCH_KINNET.  Family shape established by probe investigate/cmducinet-family-shape (commit 4e8e0d2); coverage is Kinship-only because Associations CmdUCINet is blocked by VBA error 5 mid-write and Place uses ADO Stream rather than FSO.  Test uses split-fire (CmdRun via timer, then CmdUCINet alone with file-poll) because CmdUCINet is not in _TIMER_DISPATCH_SUBS — test-side workaround; no driver change in this PR.
 
 ### LookAtStatus × CmdGIS — `real_vba_covered`
 
@@ -377,6 +378,5 @@ Cells ranked by family priority (lower = lower-risk, smaller blast radius).  Not
 | 5 | LookAtGroupData | CmdNeo4j | 5 | matrix CmdQuery has issues; depends on a CrossFixture that doesn't exist for GroupData |
 | 6 | LookAtAssociationPairs | CmdUCINet | 6 | matrix CmdQuery times out — no CrossFixture promoted to a passing assertion |
 | 7 | LookAtAssociations | CmdUCINet | 6 | entirely untested handler family — no existing test infrastructure to extend |
-| 8 | LookAtKinship | CmdUCINet | 6 | entirely untested handler family — no existing test infrastructure to extend |
-| 9 | LookAtNetworks | CmdUCINet | 6 | Form_Open hang / CmdRun timeout (AGENTS landmine #3.5) |
-| 10 | LookAtPlace | CmdUCINet | 6 | entirely untested handler family — no existing test infrastructure to extend |
+| 8 | LookAtNetworks | CmdUCINet | 6 | Form_Open hang / CmdRun timeout (AGENTS landmine #3.5) |
+| 9 | LookAtPlace | CmdUCINet | 6 | entirely untested handler family — no existing test infrastructure to extend |
