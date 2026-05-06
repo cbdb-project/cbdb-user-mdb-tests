@@ -120,6 +120,56 @@ driver handles a dozen landmines for you (DispatchEx, security
 mode, LinkListInit pre-patch, DAO ref repair, Form_Timer
 injection, dialog redirect, scoped per-PID kill on close).
 
+## Program-first probe design
+
+For investigations that would otherwise take multiple manual probe
+rounds, prefer a **program-first probe**: build enough telemetry
+into the script that the run itself produces the answer, or at
+least clearly shows why the answer is still missing.
+
+Good fit:
+
+- export/file-shape characterization
+- section/header/row-count classification
+- "which sub-call fired the error" localization
+- sibling-form confirmation where the driver path is already known
+  to work
+
+Poor fit:
+
+- broad driver instability where even the harness path is not yet
+  trustworthy
+- questions whose main output is a maintainer judgment rather than
+  runtime facts
+
+When you choose the program-first path, keep the probe layered:
+
+1. **Collect raw facts**
+   - debug transcript
+   - marker timeline
+   - scratch-table counts
+   - output files / bytes / decoded text
+   - timings / exceptions
+2. **Classify afterwards**
+   - `clean_complete_export`
+   - `runtime_err_with_partial_file`
+   - `empty_or_guard_bail`
+   - `runtime_unobserved_due_to_harness_instability`
+   - etc.
+3. **Preserve reclassification ability**
+   - when the classification logic is likely to evolve, support
+     `--reclassify-from-json` so a bucket/rationale fix does not
+     require another COM run
+
+Do not build a giant probe that mixes:
+
+- fact collection
+- root-cause claims
+- canonical issue judgment
+- next-step policy
+
+Those belong in different layers.
+
 ## Standard probe scaffolding
 
 Place probes under `analysis/_*` (gitignored).  Pattern:
@@ -177,6 +227,34 @@ Key VbaSession primitives:
 | `set_form_tag(form, chain, path)` | Sets the form's `.Tag` to `<chain>|<path>`.  The autodetect chain block reads this and dispatches to `Cmd<X>_Click` calls after CmdQuery. |
 | `click_via_timer(form, ctl, result_table, timeout)` | Sets `TimerInterval=100`; the injected Form_Timer body calls `<ctl>_Click`; polls `result_table` for change, then waits for the `<form>:DONE` marker in `ZZ_TEST_DEBUG`. |
 | `set_timer_target(target)` | Tells Form_Timer which `<ctl>_Click` to dispatch to (used when the chain has multiple buttons). |
+
+## Probe output contract
+
+For any non-trivial runtime probe, prefer this output shape:
+
+- `analysis/<probe>.py`
+  - reproducible script
+- `reports/<probe>.json`
+  - raw result + classification
+- `analysis/<probe>.md`
+  - human-readable summary that explicitly separates:
+    - probe-observed facts
+    - inferences / follow-up recommendations
+
+Strong default JSON fields:
+
+- `result.form`
+- `result.markers`
+- `result.debug_transcript`
+- `result.row_counts_*`
+- `result.file_*`
+- `result.exception`
+- `classification.conclusion`
+- `classification.rationale`
+
+If the probe never reaches the target runtime path, say so
+directly. "Runtime unobserved" is a better conclusion than a fake
+feature verdict.
 
 ## Mission-critical landmines (must internalize)
 

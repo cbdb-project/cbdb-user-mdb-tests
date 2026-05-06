@@ -51,6 +51,10 @@ and re-run this section.
       test/probe that this PR ran (or that's already merged
       to `main`), or a clearly-labeled inference from
       static evidence.
+- [ ] For probe / classifier scripts, raw fact collection is
+      separated from classification, and the PR summary does
+      not treat bucket wording as stronger evidence than the
+      preserved transcript / file / row-count facts.
 - [ ] Inferences are NOT phrased as proven facts.  Use
       hedges like *"likely"* / *"static evidence suggests"*
       / *"probe-confirmed"* to keep the line clean.

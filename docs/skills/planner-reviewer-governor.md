@@ -49,6 +49,64 @@ Use it especially when the task can:
 You may omit it only for tiny edits where branch shape, source sync,
 and evidence-vs-claim are genuinely irrelevant.
 
+## Program-first investigations
+
+When an exploration is likely to take multiple probe / review /
+re-probe rounds, first ask whether the question can be turned into
+a **program-first investigation**.
+
+This means spending more effort on the probe program up front so
+the run itself produces the decisive evidence, instead of using the
+agent to manually steer each micro-step.
+
+Prefer program-first investigation when most of these are true:
+
+- the question has a bounded outcome space that can be classified
+- the probe can collect structured telemetry automatically
+- the same run would otherwise need repeated manual comparison
+- the runtime path is already known-good enough that harness noise
+  is not the main risk
+- the answer depends more on file shape / row counts / transcripts /
+  markers than on maintainer judgment
+
+Do NOT default to a large probe when either of these is true:
+
+- the main risk is driver / COM / UI instability
+- the main question is canonicalization, severity, or other
+  maintainer judgment rather than runtime fact collection
+
+In those cases, keep the probe narrow and isolate the unstable
+layer first.
+
+## Program-first design rules
+
+When you brief a program-first investigation, ask for a layered
+probe, not a one-shot "smart script".
+
+Required shape:
+
+1. **One core question per probe**
+   - e.g. "does this export produce a file", not "does it produce a
+     file and is it canonical-worthy and should inventory flip"
+2. **Raw fact collection separated from classification**
+   - collect markers, debug transcript, scratch-table counts, file
+     bytes / sections / headers, timings, exceptions
+   - classify those facts afterwards
+3. **Artifacts preserved for reclassification**
+   - write MD + JSON
+   - when classification may evolve, prefer a
+     `--reclassify-from-json` path so a wording / bucket fix does
+     not require another COM run
+4. **Static expectation vs runtime observation**
+   - if the script predicts a shape from source, report that
+     separately from what runtime actually produced
+5. **Outcome labels must not outrun evidence**
+   - if the runtime path is never reached, say "runtime unobserved"
+     rather than speculating about the target feature
+
+The planner's goal is to spend runtime on deterministic fact
+collection, not to bury multiple unknowns inside a giant harness.
+
 ## How to write a programmer brief
 
 Keep briefs narrow and reviewable.
@@ -68,6 +126,13 @@ Keep briefs narrow and reviewable.
    - README minimal sync
 4. State the questions the report-back must answer.
 5. Append the self-review sentence above when applicable.
+
+For program-first investigations, also state:
+
+- the single core question the probe must answer
+- the minimum telemetry that must be preserved in JSON/MD
+- whether `--reclassify-from-json` is expected
+- which conclusions are explicitly out of scope for this PR
 
 Do not ask for "fix this" when the real task is:
 
@@ -93,6 +158,9 @@ When reviewing a programmer report or PR, check in this order:
    - What is directly shown by tests/probes?
    - What is inference?
    - Does the summary over-extrapolate?
+   - For probe scripts: are raw facts and classification kept
+     distinct, or is the script smuggling conclusions into the
+     evidence layer?
 4. **Residual risk**
    - What remains unverified?
    - What should explicitly NOT be autopiloted next?
@@ -130,6 +198,9 @@ Do not let these pass without calling them out:
 - latent bug rewritten as active without new runtime evidence
 - implementation workaround added when the task brief forbade driver
   work
+- probe harness instability presented as target-feature behaviour
+- giant probe script that mixes fact collection, classification, and
+  maintainer judgment into one unreviewable blob
 
 ## Companion files
 

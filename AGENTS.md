@@ -28,7 +28,7 @@ else.  Do not duplicate their content elsewhere — copies drift.
 
 1. **Roadmap, coverage table, fixture status** →
    **`README.md` § Plan & status**.
-2. **Issues / bugs (all 20 of them, content + tier + severity +
+2. **Issues / bugs (all 21 of them, content + tier + severity +
    reproduction steps)** → the `ISSUES` dict in
    **`reports/generate_report.py`**, which auto-generates the four
    `reports/CBDB_Issues_Report_*.md` outputs (en + zh; the same
@@ -68,9 +68,10 @@ that used to live in this file.  Read them when the task fits:
 - [`docs/skills/planner-reviewer-governor.md`](docs/skills/planner-reviewer-governor.md)
   (planner/reviewer only).  Use when writing programmer
   briefs or merge verdicts; includes when to require
-  `docs/skills/programmer-self-review-template.md`.  Implementation
-  agents should treat this as reviewer workflow, not as their own
-  task brief.
+  `docs/skills/programmer-self-review-template.md`, and when to
+  prefer a program-first probe/classifier workflow over manual
+  multi-round exploration.  Implementation agents should treat
+  this as reviewer workflow, not as their own task brief.
 
 ## Repo layout
 
@@ -114,7 +115,7 @@ cbdb-user-mdb-tests/
 │   ├── test_vba_matrix.py        # ⭐ data-driven param matrix
 │   └── test_other_forms_skeletons.py
 ├── reports/                      # auto-generated bilingual issue report
-│   ├── generate_report.py        #   ⭐ source of truth for all 20 issues
+│   ├── generate_report.py        #   ⭐ source of truth for all 21 issues
 │   └── CBDB_Issues_Report_*.md   (committed; .docx is generated on demand and gitignored)
 ├── tests/MANUAL_SMOKE.md         # 5-min checklist (UI things tests miss)
 ├── tests/VALIDATION_DIMENSIONS.md  # menu of test dimensions
@@ -221,7 +222,7 @@ with INDEPENDENT source SQL (not the Python replay).
 
 ## Confirmed bugs in the live .mdb
 
-→ **All 20 issues + reproduction steps live in
+→ **All 21 issues + reproduction steps live in
 [`reports/CBDB_Issues_Report_EN.md`](reports/CBDB_Issues_Report_EN.md)**
 ([中文](reports/CBDB_Issues_Report_ZH-Hant.md)). The `ISSUES` dict
 in `reports/generate_report.py` is the source of truth — do **not**
