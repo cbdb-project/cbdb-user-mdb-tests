@@ -164,10 +164,13 @@ cmdneo4j` (commit `4ace85b`) and `investigate/groupdata-
 cmdneo4j-tail` (commit `3bfcba8`) — both already merged to
 main — confirmed mid-chain `LookAtGroupData:ERR No current
 record.` (DAO 3021, an unguarded `.MoveFirst` on empty
-recordset).  Bug #21 was filed for that in PR
-`chore/file-issue-21` (commit `934f220`, awaiting review).
-GroupData × CmdNeo4j is now investigation-first / bug-
-candidate, NOT a coverage candidate.
+recordset).  A candidate issue has been filed separately on
+branch `chore/file-issue-21` (commit `934f220`, pending
+maintainer review; **not yet merged into
+`reports/generate_report.py::ISSUES`, so the bug has no
+canonical issue number on this dump**).  GroupData × CmdNeo4j
+is now investigation-first / bug-candidate, NOT a coverage
+candidate.
 
 So on the current dump, under the standing brief (no
 AssocPairs, no Networks driver-meta, no CmdUCINet new family,
@@ -179,9 +182,11 @@ Two natural next directions (NOT framed as "pick another
 cell"):
 
 1. **GroupData CmdNeo4j tail / empty-recordset-guard
-   investigation** — review/merge Bug #21
-   (`chore/file-issue-21`) and either coordinate an upstream
-   CBDB fix or write a per-block bugfix verification probe.
+   investigation** — review/merge the candidate-issue PR
+   `chore/file-issue-21` (still on branch, not yet merged
+   into the canonical issue catalogue) and either coordinate
+   an upstream CBDB fix or write a per-block bugfix
+   verification probe.
 2. **A fresh whole-triage refresh** — re-baseline the
    export-gap queue from scratch given that two cells
    (AssocPairs × CmdGIS and GroupData × CmdNeo4j) have moved

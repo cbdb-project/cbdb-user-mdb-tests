@@ -75,7 +75,7 @@
     ],
     "cheapest_next_after_this_refresh": {
       "list_is_empty": true,
-      "_correction_note": "An earlier draft of this field listed LookAtGroupData x CmdNeo4j as rank-1 cheapest-next.  That was stale: probe/groupdata-cmdneo4j (4ace85b) and investigate/groupdata-cmdneo4j-tail (3bfcba8) had already merged and confirmed mid-chain LookAtGroupData:ERR No current record. (DAO 3021).  Bug #21 was filed for this in PR chore/file-issue-21 (934f220, awaiting review).  GroupData x CmdNeo4j is now investigation-first / bug-candidate, NOT a coverage candidate.",
+      "_correction_note": "An earlier draft of this field listed LookAtGroupData x CmdNeo4j as rank-1 cheapest-next.  That was stale: probe/groupdata-cmdneo4j (4ace85b) and investigate/groupdata-cmdneo4j-tail (3bfcba8) had already merged and confirmed mid-chain LookAtGroupData:ERR No current record. (DAO 3021).  A candidate issue has been filed separately on branch chore/file-issue-21 (934f220, pending maintainer review; NOT yet merged into reports/generate_report.py::ISSUES, so the bug has no canonical issue number on this dump).  GroupData x CmdNeo4j is now investigation-first / bug-candidate, NOT a coverage candidate.",
       "current_state_of_remaining_gaps": {
         "LookAtAssociationPairs x CmdGIS": "bucket B + this refresh's not-cheap negative finding (analysis/assocpairs_cmdgis_note.md)",
         "LookAtAssociationPairs x CmdNeo4j": "bucket B + brief exclusion (AssocPairs)",
@@ -86,11 +86,11 @@
         "LookAtAssociations x CmdUCINet": "bucket D + brief exclusion (CmdUCINet new family)",
         "LookAtPlace x CmdUCINet": "bucket D + brief exclusion (CmdUCINet new family)",
         "LookAtKinship x CmdUCINet": "bucket D + brief exclusion (CmdUCINet new family)",
-        "LookAtGroupData x CmdNeo4j": "investigation-first / bug-candidate (probe + tail probe merged; Bug #21 filed in chore/file-issue-21 awaiting review)"
+        "LookAtGroupData x CmdNeo4j": "investigation-first / bug-candidate (probe + tail probe merged; candidate issue filed separately on branch chore/file-issue-21, pending maintainer review, NOT yet canonical in reports/generate_report.py::ISSUES)"
       },
       "_no_cell_is_autopilot_safe_today": "None of the 10 remaining gaps qualifies as cheap-next under the standing brief (no AssocPairs, no Networks driver-meta, no CmdUCINet new family, no investigation-first cells without a fresh brief).  The cheapest-next list is genuinely empty."
     },
-    "successor_recommendation": "The AssociationPairs line of work has produced its high-value PRs.  Combined with the GroupData CmdNeo4j tail probe's bug-candidate finding, NO remaining export-gap cell qualifies as cheap-next under the standing brief.  Two natural next directions (NOT framed as 'pick another cell'): (1) GroupData CmdNeo4j tail / empty-recordset-guard investigation -- review/merge Bug #21 (chore/file-issue-21, 934f220) and either coordinate an upstream CBDB fix or write a per-block bugfix verification probe; OR (2) a fresh whole-triage refresh that re-baselines the export-gap queue from scratch given two cells have moved out of the cheap-next zone since the original 2026-05-04 plan.  Explicitly NOT recommended: 'continue closing the next cheapest cell' -- there is no next cheapest cell on this dump under the standing brief today."
+    "successor_recommendation": "The AssociationPairs line of work has produced its high-value PRs.  Combined with the GroupData CmdNeo4j tail probe's bug-candidate finding, NO remaining export-gap cell qualifies as cheap-next under the standing brief.  Two natural next directions (NOT framed as 'pick another cell'): (1) GroupData CmdNeo4j tail / empty-recordset-guard investigation -- review/merge the candidate-issue PR chore/file-issue-21 (934f220, still on branch; not yet merged into reports/generate_report.py::ISSUES, so the bug has no canonical issue number on this dump) and either coordinate an upstream CBDB fix or write a per-block bugfix verification probe; OR (2) a fresh whole-triage refresh that re-baselines the export-gap queue from scratch given two cells have moved out of the cheap-next zone since the original 2026-05-04 plan.  Explicitly NOT recommended: 'continue closing the next cheapest cell' -- there is no next cheapest cell on this dump under the standing brief today."
   },
   "buckets": {
     "A_small_candidate": {

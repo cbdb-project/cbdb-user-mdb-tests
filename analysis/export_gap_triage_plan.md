@@ -54,7 +54,13 @@ CmdUCINet new family):
 > candidate above was probed (`probe/groupdata-cmdneo4j` and
 > `investigate/groupdata-cmdneo4j-tail`, both merged to main).
 > The probe found mid-chain `LookAtGroupData:ERR No current
-> record.` — same pattern Bug #21 captures.  GroupData ×
+> record.` — confirmed bug-candidate class (unguarded
+> `.MoveFirst` on empty recordset; see the tail probe for
+> the per-block isolation evidence).  A candidate issue has
+> been filed separately on branch `chore/file-issue-21`
+> (pending maintainer review; **not yet merged into
+> `reports/generate_report.py::ISSUES` so it is NOT a
+> canonical issue number on this dump**).  GroupData ×
 > CmdNeo4j is now an investigation-first / bug-candidate
 > cell, NOT a coverage candidate.  See the "Refresh
 > 2026-05-05 (later)" section below for the current ranking
@@ -157,8 +163,11 @@ landed on main:
   **`A_new_bug_candidate_empty_recordset_guard`** (PeopleEntry
   / EntryCode blocks unguarded `.MoveFirst` on empty
   `ZZ_SCRATCH_ENTRY`; distinct from Issue #6's column-typo
-  family).  Bug #21 was filed for this in PR
-  `chore/file-issue-21` (commit `934f220`, awaiting review).
+  family).  A candidate issue has been filed separately on
+  branch `chore/file-issue-21` (commit `934f220`, pending
+  maintainer review; **not yet merged into
+  `reports/generate_report.py::ISSUES`, so the bug has no
+  canonical issue number on this dump**).
 
 So GroupData × CmdNeo4j has moved from "probe-first cheapest-
 next coverage candidate" to **"investigation-first / bug-
@@ -188,10 +197,12 @@ family, no investigation-first cells without a fresh brief).
 a "next cell" by ranking, the natural next step is one of:
 
 1. **GroupData CmdNeo4j tail / empty-recordset-guard
-   investigation** — turn the tail probe's bug-candidate into
-   either Bug #21 review/merge + a per-block bugfix
-   verification probe, OR an upstream-fix coordination with
-   the CBDB maintainer.
+   investigation** — review/merge the candidate-issue PR
+   `chore/file-issue-21` (still on branch, not yet merged
+   into `reports/generate_report.py::ISSUES`) into the
+   canonical issue catalogue, then either coordinate an
+   upstream CBDB fix or write a per-block bugfix
+   verification probe.
 2. **A fresh whole-triage refresh** — re-baseline the export-
    gap queue from scratch given that two cells (AssocPairs ×
    CmdGIS and GroupData × CmdNeo4j) have moved out of the
