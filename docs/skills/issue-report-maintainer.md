@@ -209,6 +209,96 @@ python analysis/<your_probe>.py --com   # if it has an opt-in COM mode
   table AND a ZH "已確認 N 個 issue（…P0 ×N / P1 ×N / …）" line.
   They must agree with each other and with `ISSUES`.
 
+## Branch-shape gate for issue / canonicalization PRs
+
+Before discussing PR content with a reviewer, gate on branch
+shape.  A correct issue / canonicalization PR MUST be cut clean
+from current `main`.  A stale-base branch (typically: cut weeks
+or hours ago, then unrelated work merged into `main` since)
+will silently roll back already-merged commits when its diff
+is computed against the new `main`.
+
+**Pre-submission self-check (run from your branch):**
+
+```bash
+git fetch origin
+git log -1 main                          # confirm you know the current HEAD
+git diff --name-only main..HEAD          # what files this PR changes
+git diff --stat main..HEAD               # how big the changes are
+```
+
+**Branch-shape failure** = the diff includes files this task
+should NOT touch AND those edits would roll back work already
+merged into `main`.  When you see this:
+
+1. Do NOT defend the diff to the reviewer; the conversation
+   shouldn't be about content yet.
+2. Re-cut a fresh branch off current `main`.
+3. Re-apply ONLY the task-relevant changes.
+4. Verify the new diff against `main` is additive-only or at
+   least free of unrelated reverts before re-pushing.
+
+**Allowed-file set for canonical issue-filing PRs is usually
+narrow:**
+
+- `reports/generate_report.py` — the new / changed `ISSUES`
+  entry
+- `reports/CBDB_Issues_Report_EN.md`,
+  `reports/CBDB_Issues_Report_ZH-Hant.md` — auto-regenerated
+  outputs (run `python reports/generate_report.py` after
+  editing the source)
+- `tests/test_known_bugs.py` — static marker
+- `tests/test_vba_bug_behaviors.py` — runtime behavioural pin
+  (when the issue is a P1 with reachable runtime evidence)
+- `README.md` — minimal sync (issue count + tier count + the
+  ZH 已確認 line; nothing else)
+
+Anything outside this set on a canonical issue-filing PR is
+the default warning sign.  If you genuinely need to touch a
+broader file set, surface that in the PR summary BEFORE
+requesting review.
+
+## Candidate → canonical cleanup check
+
+When a candidate issue PR (e.g. one that was originally filed
+on a feature branch with wording like "candidate issue filed
+separately, pending maintainer review, NOT yet canonical")
+gets merged and the issue becomes canonical, the OTHER
+documents that referenced it as "candidate / not yet
+canonical" become stale and need a follow-up sweep.
+
+**Sweep these locations after canonicalization merges:**
+
+- The canonical report files
+  (`reports/generate_report.py::ISSUES` +
+  `reports/CBDB_Issues_Report_*.md`) — these are the new
+  source of truth; they should already be updated as part of
+  the canonicalization PR itself.
+- Paired triage MD/JSON
+  (e.g. `analysis/export_gap_triage_plan.md` +
+  `reports/export_gap_triage_plan.json`) — both halves of the
+  pair drift together; updating one without the other creates
+  a new MD↔JSON inconsistency.
+- Historical investigation notes
+  (e.g. `analysis/<topic>_note.md`) — these will continue to
+  be read by future maintainers and must not leave a
+  misleading "current state is candidate" claim.
+
+**Historical note rule:** do NOT rewrite history.  Don't
+delete the original "candidate filed on branch X" sentence as
+if it never existed.  Instead, prefix or append a small
+hedge so the historical context survives but the current
+state is unambiguous:
+
+- *"At the time this note was written, ..."*
+- *"Current main has since canonicalized this as Issue #N
+  (PR …, commit …)."*
+- *"Originally filed as candidate on branch X; subsequently
+  promoted to canonical Issue #N when PR Y merged."*
+
+This pattern keeps the artifact honest about the moment it
+was written AND about the current canonical state.
+
 ## PR self-checklist (paste into PR description, tick before requesting review)
 
 ```
