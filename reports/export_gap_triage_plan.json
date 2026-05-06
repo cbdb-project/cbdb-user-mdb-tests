@@ -429,5 +429,125 @@
       "evidence_vs_claim": "Place's UTF-8 signal grounded in a verifiable static read (grep on Form_LookAtPlace.vb reproduced in commit message); 'probable outcome' for proposed Place probe explicitly hedged; no claim about Place's runtime behavior beyond what static analysis supports; Issue #22 / Kinship / Associations state reported as-of 14099a7 and cited to canonical files",
       "residual_risk": "advisory error only — ranking Place above maintainer-line work could be wrong if user's priority is upstream coordination; mitigated by explicit Rank-2 maintainer-line entry and explicit 'leave CmdUCINet line entirely' alternative; no code path or test altered, so no runtime regression risk"
     }
+  },
+  "refresh_2026_05_06_second": {
+    "trigger": "main bd6337f (PR AV #106 — test_inputs.json auto-refresh gate).  Three PRs since prior refresh (14099a7): PR AT (#104) Kinship runtime pin landed; PR AS (#103) Place probe concluded COM bridge instability; PR AU (#105) 5-trial isolation matrix, unresolved confound; PR AV (#106) auto-refresh gate infra.  Read-only analysis only; no Access COM; no tests / driver / README / canonical-report changes.",
+    "main_commit_at_refresh": "bd6337f",
+    "delta_since_prior_refresh_14099a7": [
+      {
+        "pr": "AT", "number": 104,
+        "landing": "Kinship CmdUCINet runtime :ERR pin (test_bug22_kinship_cmducinet_sibling_form_fires_invalid_procedure_call in tests/test_vba_bug_behaviors.py); Rank-3 deferred item from prior refresh is DONE"
+      },
+      {
+        "pr": "AS", "number": 103,
+        "landing": "Place x CmdUCINet probe attempted; 4 iterations; all ended COM RPC unavailable on second set_form_tag; classified still_needs_better_fixture"
+      },
+      {
+        "pr": "AU", "number": 105,
+        "landing": "5-trial Place COM bridge instability matrix; narrowest_class = long_click_via_timer_polling_loop_correlated; unresolved confound (T3 vs T5 differ on two dimensions: polling return mode AND post-CmdQuery COM-touch type); more matrix work in current probe shape does not resolve confound"
+      },
+      {
+        "pr": "AV", "number": 106,
+        "landing": "pytest_configure auto-refresh gate (_refresh_decision + _resolve_data_mdb helpers + 11 unit tests in tests/test_infra_refresh_decision.py); stale fixture-input drift no longer top queue concern"
+      }
+    ],
+    "cmducinet_family_state": {
+      "LookAtAssociations × CmdUCINet": {
+        "status": "gap",
+        "truth_label": "canonical Issue #22 (P1_visible_crash); unchanged since prior refresh",
+        "is_coverage_candidate": false
+      },
+      "LookAtKinship × CmdUCINet": {
+        "status": "covered",
+        "covered_caveat": "fixture-fragile",
+        "update_since_prior_refresh": "Rank-3 item done: runtime :ERR pin test_bug22_kinship_cmducinet_sibling_form_fires_invalid_procedure_call now in tests/test_vba_bug_behaviors.py (PR AT #104)",
+        "downgrade_to_gap": false
+      },
+      "LookAtPlace × CmdUCINet": {
+        "status": "gap",
+        "sub_status": "paused",
+        "blocker": "COM bridge instability after long CmdQuery (timeout-path-correlated per PR AU); unresolved confound: T3 vs T5 differ along two dimensions (polling return mode AND post-CmdQuery COM-touch type); more matrix work in current probe shape does not isolate the trigger",
+        "continue_place_com_bridge_matrix": false,
+        "resume_condition": "only if a fundamentally different fixture (light CmdQuery, avoids timeout path) can be designed and briefed"
+      }
+    },
+    "infra_state": {
+      "test_inputs_json_auto_refresh": "landed (PR AV #106); _refresh_decision + _resolve_data_mdb helpers + 11 unit tests; stale fixture-input drift no longer a top queue concern"
+    },
+    "is_best_work_still_on_cmducinet_line": false,
+    "cmducinet_line_status_summary": "effectively paused: Associations = canonical Issue #22 (no local action); Kinship = covered + runtime pin (done); Place = paused (COM bridge instability, unresolved confound, brief prohibits more matrix work)",
+    "new_rank1": "AssocPairs CmdQuery SetFocus driver patch (infra)",
+    "rank1_vs_place_driver_meta_rationale": [
+      "Place COM bridge instability has unresolved confound (T3 vs T5 differ on two dimensions); more matrix work speculative and prohibited by brief",
+      "AssocPairs SetFocus mechanism already well-characterized (Form_LookAtAssociationPairs.vb:1635 confirmed by prior cover/assocpairs-pajek-gephi probe); fix direction known; no further probe pass needed",
+      "ROI: AssocPairs patch unblocks 3-4 cells; more Place matrix at best narrows one confound in one paused cell with uncertain outcome"
+    ],
+    "next_work_items_ranked": [
+      {
+        "rank": 1,
+        "category": "infra",
+        "item": "AssocPairs CmdQuery SetFocus driver patch",
+        "scope": "add per-form inline VBA patch in cbdb_driver/vba_session.py (a la _PER_FORM_CMDGIS_PATCHES) that strips Me.CmdQuery.SetFocus (line 1635) from Form_LookAtAssociationPairs.CmdQuery_Click, OR extends Form_Timer dispatcher to DoCmd-activate form before dispatch",
+        "unblocks": [
+          "LookAtAssociationPairs x CmdGIS: bucket B -> bucket A (coverage candidate)",
+          "LookAtAssociationPairs x CmdPajek: bucket B -> bucket A (coverage candidate)",
+          "LookAtAssociationPairs x CmdGephi: bucket B -> bucket A (coverage candidate)",
+          "LookAtAssociationPairs x CmdUCINet: D+B stacked -> D-only"
+        ],
+        "needs_fresh_brief": true,
+        "autopilot_safe": false,
+        "reason_not_autopilot": "driver patch touches shared VBA injection path; must confirm no other form's CmdQuery body relies on the same SetFocus pattern; regression check required"
+      },
+      {
+        "rank": 2,
+        "category": "maintainer-line / upstream-fix coordination",
+        "item": "Issue #22 upstream fix",
+        "scope": "out-of-band; reach CBDB maintainer to land CreateTextFile(..., True, True) Unicode arg fix in Form_LookAtAssociations.CmdUCINet_Click and Form_LookAtKinship.CmdUCINet_Click",
+        "in_this_repo_pr_surface": false,
+        "why_ranked": "P1 visible crash; fix recommendation canonical in reports/generate_report.py::ISSUES; local evidence pins (static + runtime) in place; only upstream action remains"
+      },
+      {
+        "rank": 3,
+        "category": "infra",
+        "item": "Networks Form_Open minimal-injection scaffold",
+        "scope": "extend tests/test_vba_networks_small_fixture.py to cover CmdGIS / CmdPajek slices using proven Cao Zhi minimal-injection pattern (skip_inject_autodetect_forms=SKIP_SIBLINGS), OR refactor cross-form CmdGIS / CmdPajek infrastructure to thread skip_inject_autodetect_forms through",
+        "unblocks": [
+          "LookAtNetworks x CmdGIS: bucket B -> coverage candidate",
+          "LookAtNetworks x CmdPajek: bucket B -> coverage candidate"
+        ],
+        "needs_fresh_brief": true,
+        "autopilot_safe": false,
+        "reason_not_autopilot": "scaffold approach choice (extend networks_small_fixture.py vs refactor cross-form driver) is a design decision, not mechanical"
+      }
+    ],
+    "do_not_touch_until_briefed_otherwise": [
+      {
+        "item": "Continue Place x CmdUCINet COM bridge matrix",
+        "reason": "prohibited per brief; unresolved confound; more isolation work hits diminishing returns without a fundamentally different fixture"
+      },
+      {
+        "item": "Downgrade LookAtKinship x CmdUCINet from covered",
+        "reason": "fixture-fragile caveat is the truth; runtime pin now in place (PR AT)"
+      },
+      {
+        "item": "Reopen Issue #22 / #23 wording",
+        "reason": "canonical; agreed"
+      },
+      {
+        "item": "AssocPairs x CmdGIS coverage PR before driver patch",
+        "reason": "SetFocus blocker still present; coverage PR only meaningful after the patch lands"
+      },
+      {
+        "item": "Matrix/probe batches without clear target",
+        "reason": "infra is now stable; more probes need a specific hypothesis, not general exploration"
+      }
+    ],
+    "self_review": {
+      "template": "docs/skills/programmer-self-review-template.md",
+      "A_branch_shape": "branch queue/recheck-2026-05-06 cut from clean main bd6337f; only two files touched (this JSON + analysis/export_gap_triage_plan.md); no tests / driver / README / canonical-report changes",
+      "B_source_of_truth_sync": "MD section <-> this JSON refresh_2026_05_06_second block carry same CmdUCINet family state, infra state, ranked list, Q&A answer, and do-not-touch list; state verified against: PR AT test_bug22_kinship_cmducinet_sibling_form_fires_invalid_procedure_call in tests/test_vba_bug_behaviors.py; PR AU narrowest_class and T3/T5 confound wording; PR AV pytest_configure helpers + test file; no source-of-truth file changed",
+      "C_evidence_vs_claim": "all state claims grounded in specific PR commits (AT #104, AS #103, AU #105, AV #106) merged to main bd6337f; well-characterized claim for AssocPairs SetFocus grounded in Form_LookAtAssociationPairs.vb:1635 confirmed by prior cover/assocpairs-pajek-gephi probe (already in the triage doc); no claim extends beyond what those PRs established",
+      "D_residual_risk": "triage refresh only; residual risk is advisory error — ranking AssocPairs driver patch above Networks scaffold or Place continuation could be wrong if maintainer has different priority; mitigated by full ranked list + explicit do-not-touch list giving reviewer context to redirect; no code path or test altered, no runtime regression risk"
+    }
   }
 }
