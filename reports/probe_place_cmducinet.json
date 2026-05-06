@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "generated_date": "2026-05-06",
+  "probe_branch": "investigate/place-cmducinet-shape",
+  "follow_up_to": "PR AR (refresh: export-gap queue after Issue #22 + Kinship sibling alignment) -- Rank-1 probe-first investigation per analysis/export_gap_triage_plan.md refresh_2026_05_06",
+  "result": {
+    "form": "LookAtPlace",
+    "picker_addr_id": 3089,
+    "picker_addr_label": "Chenliu (陳留)",
+    "expected_file_shape_per_static_read": {
+      "section_markers_in_order": [
+        "*node data",
+        "*node properties",
+        "*tie data"
+      ],
+      "headers": {
+        "*node data": "ID index_year x_coord y_coord",
+        "*node properties": "ID shape size shortlabel",
+        "*tie data": "from to \"EdgeWeight\" \"edgedesc\""
+      },
+      "tie_properties_section_present": false,
+      "tie_properties_section_status_in_source": "commented out (lines around line 280-310)",
+      "writer_mechanism": "ADO Stream tStream.WriteText + adWriteLine",
+      "default_charset_branch_value": "utf-8",
+      "fso_path_status_in_source": "commented out"
+    },
+    "markers": [
+      {
+        "t": 0.0,
+        "marker": "constructing_session"
+      },
+      {
+        "t": 6.05,
+        "marker": "session_opened_attempt_1"
+      },
+      {
+        "t": 6.33,
+        "marker": "filedialog_patched"
+      },
+      {
+        "t": 7.22,
+        "marker": "picker_seeded_addr_3089"
+      },
+      {
+        "t": 7.23,
+        "marker": "checkbox_overrides_{'ChkKin': {'requested': True, 'actual': True}}"
+      },
+      {
+        "t": 127.44,
+        "marker": "cmdquery_returned_3"
+      },
+      {
+        "t": 127.44,
+        "marker": "zz_place_count_3_rel_types_1"
+      },
+      {
+        "t": 127.44,
+        "marker": "cmducinet_fire_exc: com_error(-2147023174, 'The RPC server is unavailable.', None, None)"
+      },
+      {
+        "t": 187.47,
+        "marker": "file_appeared_False"
+      },
+      {
+        "t": 187.48,
+        "marker": "scratch_tbl_counts_{'ZZ_SOCIAL_NETWORK': 0, 'ZZ_SCRATCH_PEOPLE': 0}"
+      },
+      {
+        "t": 187.48,
+        "marker": "debug_captured"
+      },
+      {
+        "t": 187.48,
+        "marker": "parity_checks_done"
+      }
+    ],
+    "outcome": "no_file_no_err_no_guard",
+    "elapsed_sec": 189.81,
+    "exception": null,
+    "row_counts_after_cmdquery": {
+      "ZZ_PLACE": 3
+    },
+    "rel_type_distribution_in_zz_place": [
+      {
+        "c_rel_type": "Biography",
+        "count": 3
+      }
+    ],
+    "scratch_tables_after_cmducinet": {
+      "ZZ_SOCIAL_NETWORK": 0,
+      "ZZ_SCRATCH_PEOPLE": 0
+    },
+    "debug_transcript": [
+      {
+        "id": 1,
+        "msg": "LookAtPlace:ENTER"
+      }
+    ],
+    "err_messages": [],
+    "file_path": null,
+    "file_size": null,
+    "file_first_bytes_hex": null,
+    "file_bom": null,
+    "file_encoding_used": null,
+    "file_parse": null,
+    "parity_checks": {
+      "node_data_rows_in_file": null,
+      "node_properties_rows_in_file": null,
+      "tie_data_rows_in_file": null,
+      "expected_node_rows_zz_scratch_people": 0,
+      "expected_tie_rows_zz_social_network": 0,
+      "node_data_parity_holds": null,
+      "tie_data_parity_holds": null,
+      "node_data_eq_node_properties": null
+    },
+    "checkbox_overrides": {
+      "ChkKin": {
+        "requested": true,
+        "actual": true
+      }
+    }
+  },
+  "classification": {
+    "conclusion": "still_needs_better_fixture",
+    "rationale": "CmdUCINet was never able to fire: every probe iteration on this dump shows that the second COM call (set_form_tag for CmdUCINet) raises `com_error('The RPC server is unavailable.')` AFTER the CmdQuery timer either completes or times out. This is a *driver-CmdQuery interaction issue on the Place form*, not a Place CmdUCINet bug — Place CmdUCINet's runtime behaviour is still unobserved.\n\nPicker size / checkbox state / synthetic-row injection are NOT the root cause: the same failure mode reproduced across (a) Kaifeng addr 100658 with default checkbox state, (b) Kaifeng with ChkKin+ChkAssocPlace enabled, (c) synthetic-row inject bypassing CmdQuery, (d) Chenliu addr 3089 (3 BIOG_ADDR_DATA rows). The common factor is that CmdQuery on the Place form holds Access in a state where the next set_form_tag call fails.\n\nThe brief explicitly forbids driver changes in this PR, so this probe cannot complete CmdUCINet's runtime characterization. A follow-up needs either (a) a driver-side change so CmdQuery's completion releases the COM bridge cleanly (separate maintainer brief), OR (b) a different probe shape that fires CmdUCINet via a path that doesn't go through click_via_timer (e.g. pywinauto UI click on the Access window — but VbaSession.click_button currently expects a visible form, and headless Access may not support it). The static prediction (ADO Stream + UTF-8, 3-section file shape, FSO path commented out) remains the only available characterization of Place CmdUCINet's writer.",
+    "outcome": "no_file_no_err_no_guard",
+    "section_markers_match_static_prediction": false,
+    "encoding_matches_static_prediction": false,
+    "bom_matches_static_prediction": true,
+    "row_count_parity_holds": false,
+    "any_err_messages": false
+  },
+  "_reclassified_only": true
+}
