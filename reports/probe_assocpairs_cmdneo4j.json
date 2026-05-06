@@ -1,0 +1,260 @@
+{
+  "schema_version": 1,
+  "generated_date": "2026-05-06",
+  "probe_branch": "probe/assocpairs-cmdneo4j",
+  "main_at_probe": "bd6337f",
+  "fixture": "assocpairs_1x3_known_edged (TxtID1=1, TxtID2=3, FrameFilterYears=1, ChkKinship=0, Chk2Nodes=0)",
+  "static_pre_analysis": {
+    "blocking_msgboxes_in_vba": [
+      {
+        "line": 1069,
+        "msg": "Kinship code records = ..."
+      },
+      {
+        "line": 1151,
+        "msg": "Literary genre code records = ..."
+      },
+      {
+        "line": 1234,
+        "msg": "Institution code records = ..."
+      },
+      {
+        "line": 1317,
+        "msg": "Occasion code records = ..."
+      },
+      {
+        "line": 1400,
+        "msg": "Topic code records = ..."
+      },
+      {
+        "line": 1470,
+        "msg": "Finished saving to Neo4j"
+      }
+    ],
+    "always_produces_files": [
+      "People (line 399)",
+      "Places (line 594)",
+      "PeoplePlaces (line 690)",
+      "PeopleAssociations (line 766)",
+      "AssociationCodes (line 974)"
+    ],
+    "conditional_on_chkkinship": [
+      "KinshipRelations (line 912)"
+    ],
+    "conditional_on_kin_codes_present": [
+      "KinshipCodes (line 1072)"
+    ],
+    "conditional_on_code_records_present": [
+      "LiteraryGenreCodes (line 1154)",
+      "InstitutionCodes (line 1237)",
+      "OccasionCodes (line 1320)",
+      "TopicCodes (line 1403)"
+    ]
+  },
+  "config": {
+    "click_via_timer_timeout_sec": 120,
+    "per_probe_outer_timeout_sec": 300,
+    "promote_elapsed_threshold_sec": 120
+  },
+  "result": {
+    "form": "LookAtAssociationPairs",
+    "fixture": "1x3_known_edged",
+    "fixture_controls": {
+      "TxtID1": 1,
+      "TxtID2": 3,
+      "TxtPerson1": "1",
+      "TxtPerson2": "3",
+      "FrameFilterYears": 1,
+      "Chk2Nodes": 0,
+      "ChkKinship": 0
+    },
+    "markers": [
+      {
+        "t": 0.0,
+        "marker": "constructing_session"
+      },
+      {
+        "t": 5.4,
+        "marker": "session_opened_attempt_1"
+      },
+      {
+        "t": 5.77,
+        "marker": "filedialog_patched"
+      },
+      {
+        "t": 6.43,
+        "marker": "form_opened"
+      },
+      {
+        "t": 6.5,
+        "marker": "fixture_controls_set"
+      },
+      {
+        "t": 6.5,
+        "marker": "form_tag_set_chain_CmdQuery_CmdNeo4j"
+      },
+      {
+        "t": 6.5,
+        "marker": "chain_fire_t_start"
+      },
+      {
+        "t": 9.03,
+        "marker": "click_via_timer_returned_5"
+      },
+      {
+        "t": 19.05,
+        "marker": "chain_quiescent_files_6"
+      },
+      {
+        "t": 19.05,
+        "marker": "chain_elapsed_12.54s"
+      },
+      {
+        "t": 19.05,
+        "marker": "files_inventoried_6"
+      },
+      {
+        "t": 19.05,
+        "marker": "row_counts_captured"
+      }
+    ],
+    "outcome": "clean_probe_promote_to_coverage_candidate",
+    "elapsed_sec": 21.37,
+    "exception": null,
+    "row_counts": {
+      "ZZ_SOCIAL_NETWORK": 5,
+      "ZZ_SCRATCH_PEOPLE": 3,
+      "ZZ_SCRATCH_P_ASSOC": 4,
+      "ZZ_KIN_LIST_TMP": 132,
+      "ZZ_TEST_DEBUG": 3
+    },
+    "files": [
+      {
+        "name": "f12.out.csv",
+        "size": 490,
+        "header_first_col": "Person1_ID",
+        "header_n_cols": 13,
+        "header_preview": "Person1_ID,Person2_ID,Association_Code,Kin_ID,Kin_Code,AssocKin_ID,AssocKin_Code,LiteraryGenreCode,OccasionCode,TopicCode,InstitutionCode,TextTitle,AssociationClaimer_ID",
+        "data_row_count": 5
+      },
+      {
+        "name": "f15.out.csv",
+        "size": 186,
+        "header_first_col": "AssociationCode",
+        "header_n_cols": 3,
+        "header_preview": "AssociationCode,AssociationTrans,AssociationHZ",
+        "data_row_count": 5
+      },
+      {
+        "name": "f18.out.csv",
+        "size": 1322,
+        "header_first_col": "KinshipCode",
+        "header_n_cols": 3,
+        "header_preview": "KinshipCode,KinshipTrans,KinshipHZ",
+        "data_row_count": 96
+      },
+      {
+        "name": "f3.out.csv",
+        "size": 164,
+        "header_first_col": "nameID",
+        "header_n_cols": 6,
+        "header_preview": "nameID,nameHZ,namePY,indexyear,dynasty,sex",
+        "data_row_count": 4
+      },
+      {
+        "name": "f6.out.csv",
+        "size": 180,
+        "header_first_col": "placeID",
+        "header_n_cols": 5,
+        "header_preview": "placeID,placePY,placeHZ,placeX,placeY",
+        "data_row_count": 3
+      },
+      {
+        "name": "f9.out.csv",
+        "size": 220,
+        "header_first_col": "nameID",
+        "header_n_cols": 5,
+        "header_preview": "nameID,placeID,personPlaceCode,personPlaceTrans,personPlaceHZ",
+        "data_row_count": 3
+      }
+    ],
+    "file_count": 6,
+    "click_via_timer_returned": 5,
+    "chain_elapsed_sec": 12.54,
+    "chain_observed_done": true,
+    "msgbox_dismissed": [
+      {
+        "t": 7.08,
+        "hwnd": 41816272,
+        "msg_text": "Kinship code records = 4"
+      },
+      {
+        "t": 7.5,
+        "hwnd": 41881808,
+        "msg_text": "Literary genre code records = 0"
+      },
+      {
+        "t": 7.91,
+        "hwnd": 41947344,
+        "msg_text": "Institution code records = 0"
+      },
+      {
+        "t": 8.33,
+        "hwnd": 42012880,
+        "msg_text": "Occasion code records = 0"
+      },
+      {
+        "t": 8.75,
+        "hwnd": 42078416,
+        "msg_text": "Topic code records = 0"
+      }
+    ],
+    "static_analysis_blocking_msgboxes": [
+      "Kinship code records =",
+      "Literary genre code records =",
+      "Institution code records =",
+      "Occasion code records =",
+      "Topic code records =",
+      "Finished saving to Neo4j"
+    ],
+    "finished_msgbox_seen": false
+  },
+  "verdict": "clean_probe_promote_to_coverage_candidate",
+  "verdict_note": "Chain completed (12.54s, ≤120s), produced 6 files, finished_neo4j MsgBox dismissed. Note: coverage PR will require either (a) removing the 6 blocking debug MsgBox calls from the upstream VBA, or (b) handling them in the test driver. Per the triage brief, do NOT auto-promote — report first.",
+  "answers": {
+    "Q1_cmdquery_plus_cmdneo4j_completed_same_session": true,
+    "Q2_chain_elapsed_under_120s": true,
+    "Q3_files_produced": {
+      "count": 6,
+      "names": [
+        "f12.out.csv",
+        "f15.out.csv",
+        "f18.out.csv",
+        "f3.out.csv",
+        "f6.out.csv",
+        "f9.out.csv"
+      ],
+      "headers": [
+        "Person1_ID",
+        "AssociationCode",
+        "KinshipCode",
+        "nameID",
+        "placeID",
+        "nameID"
+      ]
+    },
+    "Q4_blocking_symptoms": {
+      "msgbox_auto_dismissed_count": 5,
+      "finished_neo4j_msgbox_seen": false,
+      "static_analysis_msgboxes_in_vba": [
+        "Kinship code records =",
+        "Literary genre code records =",
+        "Institution code records =",
+        "Occasion code records =",
+        "Topic code records =",
+        "Finished saving to Neo4j"
+      ]
+    },
+    "Q5_vs_lookatassociations_0file_mode": "different — LookAtAssociations CmdNeo4j produces 0 files in directory mode (likely bails before any SaveAs); AssocPairs CmdNeo4j uses ZZ_SOCIAL_NETWORK (populated by CmdQuery on the 1x3 fixture) and can proceed to write multiple files before hitting the blocking MsgBox chain. The failure class is blocking_debug_msgbox, not 0-file mode."
+  }
+}
