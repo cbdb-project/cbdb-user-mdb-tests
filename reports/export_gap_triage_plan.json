@@ -116,10 +116,11 @@
       "count": 3
     },
     "D_plus_B_stacked": {
-      "count": 2,
-      "count_was": "1 D+C, 1 D+B",
+      "count": 1,
+      "count_was_2026_05_05": 2,
+      "count_was_2026_05_04": "1 D+C, 1 D+B",
       "_note_historical_2026_05_04": "AssociationPairs CmdUCINet: its underlying matrix-CmdQuery blocker is actually the same SetFocus driver issue, so the inner blocker moves from C -> B.  Stack was D + B (was D + C).  Networks CmdUCINet stays D + B.",
-      "_superseded_note_2026_05_06_second": "AssociationPairs CmdUCINet moved from D+B to D-only: SetFocus patch landed (commits 3bb69ef + 0c0eaf1). Current count of D_plus_B_stacked = 1 (Networks CmdUCINet only). See cells[AssociationPairs CmdUCINet].bucket_now = D_new_export_family_needs_design."
+      "_note_2026_05_06_second": "count updated from 2 to 1: AssociationPairs CmdUCINet moved from D+B to D-only (SetFocus patch landed, commits 3bb69ef + 0c0eaf1). Only Networks CmdUCINet remains D+B. See cells[AssociationPairs CmdUCINet].bucket_was_2026_05_05 + bucket_now."
     },
     "E_low_value_or_duplicate": {"count": 0}
   },
@@ -208,8 +209,8 @@
     {
       "form": "LookAtAssociationPairs", "command": "CmdUCINet",
       "handler_present": true, "button_present": true,
-      "bucket": "D_plus_B_stacked",
-      "bucket_was": "D_plus_C_stacked",
+      "bucket_was_2026_05_05": "D_plus_B_stacked",
+      "bucket_was_2026_05_04": "D_plus_C_stacked",
       "_reclassified_2026_05_04_historical": "Inner blocker re-classified from C (matrix-CmdQuery timeout) -> B (SetFocus driver bug); see CmdNeo4j entry above for the same correction.  Stack was D + B at this point (historical; superseded — see _superseded_by).",
       "_superseded_by": "Refresh 2026-05-06 (second): SetFocus patch landed (commits 3bb69ef + 0c0eaf1); inner B-stack (SetFocus) resolved. Bucket is now D-only (CmdUCINet family design is sole remaining blocker).",
       "bucket_now": "D_new_export_family_needs_design",

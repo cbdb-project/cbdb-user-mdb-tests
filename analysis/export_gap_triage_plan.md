@@ -34,7 +34,7 @@ bucket-A cell (GroupData × CmdGIS) became `covered`.
 | B blocked_by_known_driver_issue | 5 | AssociationPairs CmdGIS / CmdPajek / CmdGephi / CmdNeo4j; Networks CmdGIS / CmdPajek (split below) |
 | C blocked_by_form_query_timeout | 1 (was 2) | GroupData × CmdNeo4j |
 | D new_export_family_needs_design | 3 | Associations / Place / Kinship × CmdUCINet |
-| D + B stacked | 2 *(state as of 2026-05-05; see Refresh 2026-05-06 second — AssocPairs × CmdUCINet is now D-only)* | ~~AssociationPairs × CmdUCINet~~ *(now D-only)*; Networks × CmdUCINet |
+| D + B stacked | **1** *(was 2 on 2026-05-05; AssocPairs × CmdUCINet moved to D-only — see superseded note below)* | Networks × CmdUCINet |
 
 *(State as of 2026-05-05. Superseded by Refresh 2026-05-06 (second):
 AssocPairs × CmdUCINet moved from D+B to D-only (SetFocus patch landed,
