@@ -326,6 +326,13 @@ For artifacts-only investigation PRs the checklist is shorter:
     follow-up reclassification PR, not this one
 ```
 
+When the reviewer brief explicitly says
+`提交前按 docs/skills/programmer-self-review-template.md 做 self-review，并把结果写进汇报。`,
+run that template too and paste the filled-in answers into the
+report-back. The checklist above is issue-report-specific; the
+self-review template adds branch-shape, source-sync, and
+evidence-vs-claim checks that catch stale-base and drift failures.
+
 ## Reference: where each policy lives
 
 - "Don't duplicate bug content" → `AGENTS.md` § Single source of
