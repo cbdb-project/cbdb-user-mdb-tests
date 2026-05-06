@@ -164,13 +164,26 @@ cmdneo4j` (commit `4ace85b`) and `investigate/groupdata-
 cmdneo4j-tail` (commit `3bfcba8`) — both already merged to
 main — confirmed mid-chain `LookAtGroupData:ERR No current
 record.` (DAO 3021, an unguarded `.MoveFirst` on empty
-recordset).  A candidate issue has been filed separately on
-branch `chore/file-issue-21` (commit `934f220`, pending
-maintainer review; **not yet merged into
-`reports/generate_report.py::ISSUES`, so the bug has no
-canonical issue number on this dump**).  GroupData × CmdNeo4j
-is now investigation-first / bug-candidate, NOT a coverage
-candidate.
+recordset).
+
+> **At the time this note was written, a candidate issue had
+> been filed separately on branch `chore/file-issue-21`
+> (commit `934f220`) pending maintainer review.**  Current
+> main has since canonicalized this as **Issue #21 (P1)** in
+> `reports/generate_report.py::ISSUES` via the re-spun PR
+> `chore/file-issue-21-v2` (commit `bc85092`, merged to
+> main; the original `chore/file-issue-21` branch was
+> rejected for branch-shape failure and deleted without
+> merging).  Both source-side static marker
+> (`tests/test_known_bugs.py::test_bug21_groupdata_cmdneo4j
+> _missing_eof_guard`) and runtime behavioural pin
+> (`tests/test_vba_bug_behaviors.py::test_bug21_lookat
+> _groupdata_cmdneo4j_fires_no_current_record`) are in
+> place.
+
+Either way (then-candidate or now-canonical), GroupData ×
+CmdNeo4j sits on the issue / investigation line, NOT on the
+coverage line.
 
 So on the current dump, under the standing brief (no
 AssocPairs, no Networks driver-meta, no CmdUCINet new family,
@@ -182,11 +195,14 @@ Two natural next directions (NOT framed as "pick another
 cell"):
 
 1. **GroupData CmdNeo4j tail / empty-recordset-guard
-   investigation** — review/merge the candidate-issue PR
-   `chore/file-issue-21` (still on branch, not yet merged
-   into the canonical issue catalogue) and either coordinate
-   an upstream CBDB fix or write a per-block bugfix
-   verification probe.
+   follow-up** — Issue #21 is now canonical on main (PR
+   `chore/file-issue-21-v2`, commit `bc85092`).  Next step
+   is either coordinating an upstream CBDB fix (per the
+   canonical issue's `fix_en` recommendation: guard the
+   `.MoveFirst` in blocks #9 and #10), OR writing a
+   per-block bugfix verification probe that flips the
+   existing test_bug21 markers when the upstream fix
+   lands.
 2. **A fresh whole-triage refresh** — re-baseline the
    export-gap queue from scratch given that two cells
    (AssocPairs × CmdGIS and GroupData × CmdNeo4j) have moved

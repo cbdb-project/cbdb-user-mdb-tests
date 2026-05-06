@@ -56,15 +56,13 @@ CmdUCINet new family):
 > The probe found mid-chain `LookAtGroupData:ERR No current
 > record.` — confirmed bug-candidate class (unguarded
 > `.MoveFirst` on empty recordset; see the tail probe for
-> the per-block isolation evidence).  A candidate issue has
-> been filed separately on branch `chore/file-issue-21`
-> (pending maintainer review; **not yet merged into
-> `reports/generate_report.py::ISSUES` so it is NOT a
-> canonical issue number on this dump**).  GroupData ×
-> CmdNeo4j is now an investigation-first / bug-candidate
-> cell, NOT a coverage candidate.  See the "Refresh
-> 2026-05-05 (later)" section below for the current ranking
-> (which is empty).
+> the per-block isolation evidence).  Filed as **canonical
+> Issue #21 (P1)** in `reports/generate_report.py::ISSUES`
+> via PR `chore/file-issue-21-v2` (commit `bc85092`, merged
+> to main).  GroupData × CmdNeo4j is now firmly on the
+> issue / investigation line, NOT a coverage candidate.
+> See the "Refresh 2026-05-05 (later)" section below for
+> the current ranking (which is empty).
 
 There is no rank 2 or rank 3 under the brief's exclusions —
 **every other gap requires a driver patch, the Networks Form_Open
@@ -163,11 +161,15 @@ landed on main:
   **`A_new_bug_candidate_empty_recordset_guard`** (PeopleEntry
   / EntryCode blocks unguarded `.MoveFirst` on empty
   `ZZ_SCRATCH_ENTRY`; distinct from Issue #6's column-typo
-  family).  A candidate issue has been filed separately on
-  branch `chore/file-issue-21` (commit `934f220`, pending
-  maintainer review; **not yet merged into
-  `reports/generate_report.py::ISSUES`, so the bug has no
-  canonical issue number on this dump**).
+  family).  Filed as **canonical Issue #21 (P1)** in
+  `reports/generate_report.py::ISSUES` via PR
+  `chore/file-issue-21-v2` (commit `bc85092`, merged to
+  main).  Both source-side static marker
+  (`tests/test_known_bugs.py::test_bug21_groupdata_cmdneo4j
+  _missing_eof_guard`) and runtime behavioural pin
+  (`tests/test_vba_bug_behaviors.py::test_bug21_lookat
+  _groupdata_cmdneo4j_fires_no_current_record`) are in
+  place.
 
 So GroupData × CmdNeo4j has moved from "probe-first cheapest-
 next coverage candidate" to **"investigation-first / bug-
@@ -197,12 +199,15 @@ family, no investigation-first cells without a fresh brief).
 a "next cell" by ranking, the natural next step is one of:
 
 1. **GroupData CmdNeo4j tail / empty-recordset-guard
-   investigation** — review/merge the candidate-issue PR
-   `chore/file-issue-21` (still on branch, not yet merged
-   into `reports/generate_report.py::ISSUES`) into the
-   canonical issue catalogue, then either coordinate an
-   upstream CBDB fix or write a per-block bugfix
-   verification probe.
+   follow-up** — Issue #21 is now canonical
+   (`reports/generate_report.py::ISSUES`, merged via
+   `chore/file-issue-21-v2` commit `bc85092`).  Next step
+   is either coordinating an upstream CBDB fix (per the
+   canonical issue's `fix_en` recommendation: guard the
+   `.MoveFirst` in blocks #9 and #10), OR writing a
+   per-block bugfix verification probe that flips the
+   existing test_bug21 markers when the upstream fix
+   lands.
 2. **A fresh whole-triage refresh** — re-baseline the export-
    gap queue from scratch given that two cells (AssocPairs ×
    CmdGIS and GroupData × CmdNeo4j) have moved out of the
