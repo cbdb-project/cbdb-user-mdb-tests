@@ -34,7 +34,7 @@ from pathlib import Path
 import pytest
 
 from cbdb_driver.vba_session import VbaSession, make_fixture
-from cbdb_driver.form_specs import LOOKATPLACE, LOOKATENTRY
+from cbdb_driver.form_specs import LOOKATPLACE, LOOKATENTRY, LOOKATKINSHIP
 from test_vba_matrix_all_forms import _all_fixtures, CrossFixture, SRC
 
 
@@ -625,6 +625,280 @@ def test_bug22_associations_cmducinet_fires_invalid_procedure_call(
           f"call or argument') observed in {len(err_msgs)} "
           f":ERR marker(s); partial .vna file at {out_path} "
           f"({out_path.stat().st_size if out_path.exists() else 0} bytes).",
+          flush=True)
+
+
+def test_bug22_kinship_cmducinet_sibling_form_fires_invalid_procedure_call(
+        vba: VbaSession):
+    """Bug #22 (P1) — runtime-side pin, Kinship sibling form.
+
+    Issue #22 canonicalises a P1 visible-crash on
+    `Form_LookAtAssociations.CmdUCINet_Click`'s FSO write path
+    (`Set tVNA = tFileSystem.CreateTextFile(tFileName, True)` —
+    missing 3rd Unicode arg → cp1252 ANSI → `tVNA.WriteLine`
+    raises VBA error 5 on CJK Han ideographs without an FSO
+    substitute mapping).  The same source-string pattern lives
+    on `Form_LookAtKinship.CmdUCINet_Click` (line ~2510), and
+    the sibling-risk probe (commit `154bb4b`,
+    `analysis/probe_kinship_cmducinet_sibling_risk.{py,md,json}`)
+    runtime-confirmed that Kinship reproduces the SAME failure
+    mode under a Han-name fixture: picker pid 152930 (He Jing
+    何淨) → reachable kin pid 140733 (He Mou 取, U+53D6).
+    `LookAtKinship:ERR Invalid procedure call or argument`
+    fires on the FIRST `*node properties` row's WriteLine,
+    leaving a partial `.vna` with `*node data` complete +
+    `*node properties` header-only (zero data rows) +
+    `*tie data` never written.
+    PR AR's queue refresh
+    (`analysis/export_gap_triage_plan.md` § Refresh
+    2026-05-06) flagged adding this runtime pin as Rank-3
+    coverage hardening, deliberately deferred from the
+    sibling-risk alignment PR.
+
+    What this test pins:
+      - Runtime symptom on Kinship matches Issue #22's class.
+      - Trigger location (FIRST `*node properties` row's
+        WriteLine, NOT mid-section) — distinct from
+        Associations' shape (Associations bails at row ~3974
+        of 8087; Kinship bails at row 1).
+
+    What this test deliberately does NOT do:
+      - Does NOT file Issue #23 — sibling-form pattern under
+        Issue #22 is the agreed shape.
+      - Does NOT change Kinship × CmdUCINet inventory status
+        (stays `covered` with the existing fixture-fragile
+        caveat documented in 4 places: canonical Issue #22 in
+        `reports/generate_report.py`, manifest in
+        `analysis/inventory_export_coverage.py`, README
+        coverage table + roadmap-8 lines, Kinship coverage
+        test docstring).
+      - Does NOT extend the static marker test in
+        `tests/test_known_bugs.py::test_bug22_associations_
+        cmducinet_createtextfile_no_unicode_arg` — that test
+        already covers BOTH Associations and Kinship (it loops
+        over both forms asserting the 2-arg pattern).
+      - Does NOT touch driver / README / canonical reports /
+        issue severity.
+
+    Custom probe-class fixture (NOT a matrix fixture):
+      - picker_pid = 152930 (He Jing 何淨) — chosen because
+        their sole 1-hop kin row points to pid 140733 whose
+        c_name in BIOG_MAIN contains Han ideograph 取
+        (U+53D6).  This guarantees ZZ_SCRATCH_KIN.c_kin_name
+        contains a non-cp1252-without-FSO-substitute char
+        within minimal expansion (the bail trigger).
+      - This is fixture-fragile by construction: if a future
+        MDB drop removes pid 140733's Han-name row OR breaks
+        the 152930→140733 kin link, this test will fail.
+        Marker-failure policy applies: investigate (upstream
+        data scrub vs. upstream fix vs. misclassification)
+        before flipping.
+    """
+    spec = LOOKATKINSHIP
+    PICKER_PID = 152930          # He Jing 何淨
+    EXPECTED_TRIGGER_KIN_PID = 140733  # He Mou 取
+
+    # Custom seeding (no matrix fixture for this picker).
+    vba.open_form(spec.name)
+    vba.set_picker_codes(spec.picker_table, [PICKER_PID],
+                         column=spec.picker_column)
+
+    # Stage 1: fire CmdRun via timer (Kinship's populate sub).
+    vba.set_form_tag(spec.name, spec.cmd_name, "")
+    n = vba.click_via_timer(
+        spec.name, ctl=spec.cmd_name,
+        result_table=spec.result_table, timeout=180,
+    )
+    print(f"\n[LookAtKinship] CmdRun -> {n} ZZ_SCRATCH_KIN "
+          f"rows", flush=True)
+
+    # Stage 1b: confirm scratch tables populated AND the
+    # trigger pid is present.  If either fails the bail
+    # localisation below would be misleading — bail at this
+    # stage with a clear marker-failure-policy message.
+    cur = vba.conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM ZZ_SCRATCH_KIN")
+    n_kin = int(cur.fetchone()[0])
+    cur.execute(
+        "SELECT 1 FROM ZZ_SCRATCH_KIN WHERE c_kin_id = ?",
+        EXPECTED_TRIGGER_KIN_PID)
+    trigger_present = cur.fetchone() is not None
+    cur.close()
+    assert n_kin > 0, (
+        f"ZZ_SCRATCH_KIN is empty after CmdRun "
+        f"(n={n_kin}); CmdUCINet would bail at its "
+        f"RecordCount=0 guard before reaching the WriteLine.  "
+        f"Bug #22 sibling-form reproduction needs a "
+        f"populated ZZ_SCRATCH_KIN; investigate fixture / "
+        f"upstream INSERT change."
+    )
+    assert trigger_present, (
+        f"Trigger kin pid {EXPECTED_TRIGGER_KIN_PID} (He Mou "
+        f"取) NOT in ZZ_SCRATCH_KIN after CmdRun on picker "
+        f"pid {PICKER_PID}.  Either (a) the 152930→140733 kin "
+        f"link was removed/changed in a recent MDB drop, OR "
+        f"(b) Kinship's recursion default changed.  "
+        f"Investigate before flipping — the runtime "
+        f"reproduction is fixture-fragile by construction "
+        f"(see docstring)."
+    )
+
+    # Stage 2: fire CmdUCINet via separate timer with
+    # wait_done=False (CmdUCINet body has no autodetect
+    # ENTER/DONE markers).  Patch the form's filedialog AFTER
+    # set_form_tag so GetTestExportPath() reads Tag's path part.
+    vba.patch_filedialog(spec.name)
+    out_dir = WORK.parent / "_bug22_kinship_ucinet_out"
+    out_dir.mkdir(exist_ok=True)
+    out_path = out_dir / "bug22_kinship_ucinet.vna"
+    if out_path.exists():
+        try:
+            out_path.unlink()
+        except Exception:
+            pass
+    vba.set_form_tag(spec.name, "CmdUCINet", str(out_path))
+    vba.click_via_timer(
+        spec.name, ctl="CmdUCINet",
+        result_table=None, wait_done=False,
+    )
+
+    # Poll briefly for the partial file to appear (FSO writes
+    # *node data* successfully before bailing on the FIRST
+    # *node properties* row; partial file appears within a
+    # few seconds).
+    import time as _time
+    file_deadline = _time.time() + 60
+    while _time.time() < file_deadline:
+        if out_path.exists() and out_path.stat().st_size > 0:
+            break
+        _time.sleep(1)
+
+    msgs = _read_debug_log(vba)
+    print(f"DEBUG log: {msgs}", flush=True)
+
+    # ---- Assertion 1: at least one LookAtKinship:ERR fired.
+    err_msgs = [m for m in msgs
+                if "LookAtKinship:ERR" in m]
+    assert err_msgs, (
+        "Bug #22 sibling-form marker no longer reproduces "
+        "(investigate upstream fix vs. fixture/driver change "
+        "vs. misclassification before flipping) — "
+        "LookAtKinship.CmdUCINet on the verified picker-152930 "
+        "→ kin-140733 (He Mou 取) fixture didn't raise any "
+        ":ERR marker.  Either CBDB upstream added the Unicode "
+        "flag to CreateTextFile, OR pid 140733's c_name no "
+        "longer contains Han characters.  Investigate via the "
+        "static marker test in test_known_bugs.py first "
+        "(it covers both Associations + Kinship 2-arg "
+        f"patterns).  Full transcript: {msgs}"
+    )
+
+    # ---- Assertion 2: error text matches VBA error 5
+    # ('Invalid procedure call or argument').  Pin the exact
+    # wording so a future different error class on the same
+    # code path is distinguishable.
+    err_blob = " | ".join(err_msgs).lower()
+    assert "invalid procedure call or argument" in err_blob, (
+        f"Bug #22 sibling-form ERR fired but its text doesn't "
+        f"match the expected VBA error 5 wording.  Expected: "
+        f"'Invalid procedure call or argument'.  Got: "
+        f"{err_msgs}.  If this is a different error class, "
+        f"the failure mode shifted — investigate before "
+        f"flipping."
+    )
+
+    # ---- Assertion 3: partial .vna file shape matches the
+    # sibling-risk probe finding (`*node data` complete +
+    # `*node properties` header-only + no `*tie data`).
+    assert out_path.exists() and out_path.stat().st_size > 0, (
+        f"Expected a partial .vna file at {out_path} after "
+        f"the bail (FSO writes *node data* successfully "
+        f"before the bail on the FIRST *node properties* "
+        f"row's WriteLine), but no file appeared.  This "
+        f"contradicts the sibling-risk probe's finding "
+        f"(commit 154bb4b) — investigate before flipping."
+    )
+
+    # FSO writes via cp1252 (ANSI), so decode that way.
+    raw = out_path.read_bytes()
+    text = raw.decode("cp1252", errors="strict")
+    sections: list[dict] = []
+    cur_sec: dict | None = None
+    for ln in text.replace("\r\n", "\n").split("\n"):
+        s = ln.rstrip()
+        if s.startswith("*"):
+            if cur_sec is not None:
+                sections.append(cur_sec)
+            cur_sec = {"marker": s.strip(), "header": None,
+                       "rows": []}
+            continue
+        if cur_sec is not None and s.strip():
+            if cur_sec["header"] is None:
+                cur_sec["header"] = s
+            else:
+                cur_sec["rows"].append(s)
+    if cur_sec is not None:
+        sections.append(cur_sec)
+    section_markers = [s["marker"] for s in sections]
+
+    # *node data complete (= present with at least 1 data row).
+    nd = next((s for s in sections
+               if s["marker"] == "*node data"), None)
+    assert nd is not None and len(nd["rows"]) > 0, (
+        f"Bug #22 sibling-form partial-file shape regressed: "
+        f"expected `*node data` section to be COMPLETE (> 0 "
+        f"rows) before the bail.  Got sections "
+        f"{section_markers} with `*node data` rows = "
+        f"{len(nd['rows']) if nd else 'MISSING'}.  Either "
+        f"the bail moved earlier (different bug class?) or "
+        f"the file shape changed.  Investigate before "
+        f"flipping."
+    )
+
+    # *node properties header written but ZERO data rows
+    # (the probe-confirmed shape: bail on the FIRST WriteLine
+    # attempt).  Distinct from Associations' bail-mid-section.
+    np = next((s for s in sections
+               if s["marker"] == "*node properties"), None)
+    assert np is not None, (
+        f"Bug #22 sibling-form partial-file shape regressed: "
+        f"expected `*node properties` section header to be "
+        f"present (FSO writes the header line before the "
+        f"data-row loop where the bail fires).  Got "
+        f"{section_markers}."
+    )
+    assert len(np["rows"]) == 0, (
+        f"Bug #22 sibling-form partial-file shape regressed: "
+        f"expected `*node properties` to have ZERO data rows "
+        f"(probe finding: bail fires on FIRST row's WriteLine "
+        f"because pid 140733's Han name 取 is the first "
+        f"c_kin_id in iteration order).  Got "
+        f"{len(np['rows'])} data rows.  This means EITHER "
+        f"the trigger row moved to a later iteration position "
+        f"(fixture drift) OR the bail mechanism changed.  If "
+        f"the row count is non-zero, the test should be re-"
+        f"investigated, not auto-flipped."
+    )
+
+    # No *tie data section (the bail aborts the sub before
+    # reaching it).
+    assert "*tie data" not in section_markers, (
+        f"Bug #22 sibling-form partial-file shape regressed: "
+        f"expected `*tie data` to be ABSENT (the bail in "
+        f"`*node properties` aborts the sub before the "
+        f"`*tie data` write loop).  Got {section_markers}.  "
+        f"If `*tie data` is present, the bail mechanism "
+        f"changed — investigate before flipping."
+    )
+
+    print(f"\nBug #22 sibling-form runtime pin OK: "
+          f"ZZ_SCRATCH_KIN={n_kin}, trigger pid "
+          f"{EXPECTED_TRIGGER_KIN_PID} present, VBA error 5 "
+          f"('Invalid procedure call or argument') observed "
+          f"in {len(err_msgs)} :ERR marker(s); partial .vna "
+          f"file at {out_path} ({out_path.stat().st_size} "
+          f"bytes); shape = {section_markers} with *node "
+          f"properties rows = 0 (bail on FIRST row).",
           flush=True)
 
 
