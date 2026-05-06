@@ -84,6 +84,60 @@ def user_mdb_path(request) -> Path:
     return p
 
 
+def _resolve_data_mdb(root: Path) -> Path | None:
+    """Resolve the linked DATA mdb if a single glob match exists.
+
+    The Place / Kinship / etc forms read from `BIOG_ADDR_DATA`,
+    `KIN_DATA` etc. — linked tables whose backing mdb path is
+    stored in `LinkListInit.c_path`.  Resolving that at gate
+    time would require opening Access COM (heavy + flaky per
+    PR AS / PR AU findings) or pyodbc against the user mdb
+    (Windows-only ODBC dependency at gate time).
+
+    A simple `data/CBDB_*_DATA.mdb` glob is the cheap stable
+    proxy: when there's exactly ONE such file, it's almost
+    certainly the linked DATA mdb and a stale-comparison is
+    safe.  If there are zero or multiple matches, we fall back
+    to user-mdb-only gating per the brief's "若不稳，先以
+    user mdb 为 gate" guidance.
+    """
+    matches = list((root / "data").glob("CBDB_*_DATA.mdb"))
+    if len(matches) == 1:
+        return matches[0]
+    return None
+
+
+def _refresh_decision(
+    inputs_json: Path,
+    user_mdb: Path,
+    data_mdb: Path | None,
+) -> tuple[str, str]:
+    """Decide whether to refresh `analysis/dump/test_inputs.json`.
+
+    Returns ``(action, reason)`` where ``action`` is ``"skip"``
+    or ``"refresh"`` and ``reason`` is one of:
+      - ``"no_user_mdb"``  — user mdb missing; can't gate
+      - ``"missing"``       — test_inputs.json doesn't exist
+      - ``"stale_user_mdb"`` — older than user mdb
+      - ``"stale_data_mdb"`` — older than linked DATA mdb
+      - ``"fresh"``         — newer than both gates
+
+    Pure file-mtime logic; no COM, no pyodbc.  Tested in
+    `tests/test_infra_refresh_decision.py`.
+    """
+    if not user_mdb.exists():
+        return ("skip", "no_user_mdb")
+    if not inputs_json.exists():
+        return ("refresh", "missing")
+    inputs_mtime = inputs_json.stat().st_mtime
+    if inputs_mtime < user_mdb.stat().st_mtime:
+        return ("refresh", "stale_user_mdb")
+    if data_mdb is not None and data_mdb.exists():
+        if inputs_mtime < data_mdb.stat().st_mtime:
+            return ("refresh", "stale_data_mdb")
+    return ("skip", "fresh")
+
+
 def pytest_configure(config):
     """Register markers AND refresh test_inputs.json if stale.
 
@@ -102,35 +156,40 @@ def pytest_configure(config):
         return
     inputs_json = ROOT / "analysis" / "dump" / "test_inputs.json"
     mdb = ROOT / "data" / "CBDB_BJ_User.mdb"
-    if not mdb.exists():
+    data_mdb = _resolve_data_mdb(ROOT)
+    action, reason = _refresh_decision(inputs_json, mdb, data_mdb)
+    if action == "skip":
+        if reason == "fresh":
+            # Short single-line ack so the gate is visible in
+            # CI logs without adding measurable cost.
+            print(f"\n[conftest] {inputs_json.name} fresh; "
+                  f"skipping discovery")
+        # ("skip", "no_user_mdb") stays silent — preserves the
+        # pre-refactor behaviour for environments without the
+        # user mdb (e.g. headless / non-Windows collection).
         return
-    needs_refresh = (
-        not inputs_json.exists()
-        or inputs_json.stat().st_mtime < mdb.stat().st_mtime
+    # action == "refresh"
+    print(f"\n[conftest] refreshing {inputs_json.name} "
+          f"(reason: {reason}) ...")
+    import subprocess
+    rc = subprocess.run(
+        [sys.executable, str(ROOT / "analysis" / "discover_test_inputs.py")],
+        capture_output=True, text=True,
     )
-    if needs_refresh:
-        print(f"\n[conftest] refreshing {inputs_json.name} "
-              f"(stale or missing) ...")
-        import subprocess
-        rc = subprocess.run(
-            [sys.executable, str(ROOT / "analysis" / "discover_test_inputs.py")],
-            capture_output=True, text=True,
+    if rc.returncode != 0:
+        # Hard-exit rather than continue with stale fixtures.  The
+        # original behaviour (warn + continue) would let matrix
+        # tests pass against an outdated test_inputs.json — which
+        # silently masks data-version drift and produces misleading
+        # green CI runs.
+        pytest.exit(
+            f"[conftest] discover_test_inputs.py FAILED (rc="
+            f"{rc.returncode}).  Tests would otherwise run against "
+            f"a stale fixture file ({inputs_json.name}).  Fix the "
+            f"discovery error or pass `--no-discover-inputs` to "
+            f"skip refresh.\n\n  stderr tail:\n{rc.stderr[-1000:]}"
         )
-        if rc.returncode != 0:
-            # Hard-exit rather than continue with stale fixtures.  The
-            # original behaviour (warn + continue) would let matrix
-            # tests pass against an outdated test_inputs.json — which
-            # silently masks data-version drift and produces misleading
-            # green CI runs.
-            pytest.exit(
-                f"[conftest] discover_test_inputs.py FAILED (rc="
-                f"{rc.returncode}).  Tests would otherwise run against "
-                f"a stale fixture file ({inputs_json.name}).  Fix the "
-                f"discovery error or pass `--no-discover-inputs` to "
-                f"skip refresh.\n\n  stderr tail:\n{rc.stderr[-1000:]}"
-            )
-        else:
-            print(f"[conftest] discovery refreshed.")
+    print(f"[conftest] discovery refreshed.")
 
 
 @pytest.fixture(scope="session")
