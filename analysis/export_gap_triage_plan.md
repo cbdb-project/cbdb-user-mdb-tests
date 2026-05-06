@@ -34,13 +34,20 @@ bucket-A cell (GroupData × CmdGIS) became `covered`.
 | B blocked_by_known_driver_issue | 5 | AssociationPairs CmdGIS / CmdPajek / CmdGephi / CmdNeo4j; Networks CmdGIS / CmdPajek (split below) |
 | C blocked_by_form_query_timeout | 1 (was 2) | GroupData × CmdNeo4j |
 | D new_export_family_needs_design | 3 | Associations / Place / Kinship × CmdUCINet |
-| D + B stacked | 2 | AssociationPairs × CmdUCINet; Networks × CmdUCINet |
+| D + B stacked | 2 *(state as of 2026-05-05; see Refresh 2026-05-06 second — AssocPairs × CmdUCINet is now D-only)* | ~~AssociationPairs × CmdUCINet~~ *(now D-only)*; Networks × CmdUCINet |
 
-(B-bucket count is 5 across two driver causes: 4 cells gated on
-the AssociationPairs SetFocus driver patch, 2 cells gated on
-Networks Form_Open landmine #3.5.  CmdNeo4j AssociationPairs sits
-in B; the 4 vs 2 above sums to 6 because Networks CmdUCINet is
-counted under "D + B stacked", not in the pure-B row.)
+*(State as of 2026-05-05. Superseded by Refresh 2026-05-06 (second):
+AssocPairs × CmdUCINet moved from D+B to D-only (SetFocus patch landed,
+commits `3bb69ef` + `0c0eaf1`); CmdPajek + CmdGephi covered (commit
+`4b8a927`); CmdGIS has a second independent stale-subform-RecordCount
+blocker; CmdNeo4j is now probe-first candidate. See Refresh 2026-05-06
+(second) for current truth.)*
+
+*(Historical context for B-bucket count: B-bucket was 5 — 4 cells gated on
+the AssociationPairs SetFocus driver patch (now resolved), 2 cells gated on
+Networks Form_Open landmine #3.5.  CmdNeo4j AssociationPairs sat in B; the
+4 vs 2 summed to 6 because Networks CmdUCINet was counted under "D + B
+stacked", not in the pure-B row.)*
 
 **Next cheapest 1-3 cells, after applying the refresh-brief
 exclusions** (no AssociationPairs · no driver/meta-PR-needed · no
@@ -485,35 +492,42 @@ for full context).
 |---|---|---|
 | LookAtAssociationPairs × CmdGIS | ~~A small_candidate~~ → **B blocked_by_known_driver_issue** | medium |
 | LookAtAssociationPairs × CmdPajek | ~~A small_candidate~~ → **B blocked_by_known_driver_issue** | medium |
-| LookAtAssociationPairs × CmdGephi | ~~A small_candidate~~ → **B blocked_by_known_driver_issue** | medium |
+| LookAtAssociationPairs × CmdGephi | ~~A small_candidate~~ → ~~B blocked_by_known_driver_issue~~ → **COVERED** (commit `4b8a927`, Refresh 2026-05-06 second) | — |
 | LookAtGroupData × CmdGIS | ~~A small_candidate~~ → **COVERED 2026-05-05** | — |
-| LookAtAssociationPairs × CmdNeo4j | C blocked_by_form_query_timeout | medium-high |
+| LookAtAssociationPairs × CmdNeo4j | ~~C blocked_by_form_query_timeout~~ → ~~B~~ → **probe-first candidate** (SetFocus lifted, Refresh 2026-05-06 second) | medium |
 | LookAtGroupData × CmdNeo4j | C blocked_by_form_query_timeout | medium |
 | LookAtNetworks × CmdGIS | B blocked_by_known_driver_issue | medium |
 | LookAtNetworks × CmdPajek | B blocked_by_known_driver_issue | medium |
 | LookAtAssociations × CmdUCINet | D new_export_family_needs_design | medium |
 | LookAtPlace × CmdUCINet | D new_export_family_needs_design | medium |
 | LookAtKinship × CmdUCINet | D new_export_family_needs_design | medium |
-| LookAtAssociationPairs × CmdUCINet | D + B stacked | high |
+| LookAtAssociationPairs × CmdUCINet | ~~D + B stacked~~ → **D-only** (SetFocus lifted, Refresh 2026-05-06 second) | high |
 | LookAtNetworks × CmdUCINet | D + B stacked | high |
 
-| Bucket (12 remaining gaps after 2026-05-05) | Count |
+*(The two tables below show counts as of 2026-05-05; superseded by
+Refresh 2026-05-06 (second). For current truth see the Refresh
+2026-05-06 (second) section. Key changes: CmdPajek + CmdGephi covered;
+AssocPairs × CmdUCINet is D-only; CmdNeo4j is probe-first candidate.)*
+
+| Bucket (12 remaining gaps after 2026-05-05) — **historical; see note above** | Count |
 |---|---:|
 | A small_candidate | **0** (was 1 on 2026-05-04; GroupData × CmdGIS now covered) |
-| B blocked_by_known_driver_issue | 5 |
+| B blocked_by_known_driver_issue | 5 *(historical; CmdPajek+CmdGephi now covered; counts pre-date Refresh 2026-05-06 second)* |
 | C blocked_by_form_query_timeout | 2 |
 | D new_export_family_needs_design | 3 |
-| D + B stacked | 2 |
+| D + B stacked | 2 *(historical; AssocPairs × CmdUCINet is now D-only)* |
 
-(Counts above use the post-2026-05-04 reclassifications.  See the
+*(Counts above use the post-2026-05-04 reclassifications.  See the
 JSON for canonical bucket-per-cell assignments — the per-cell rows
 in this MD's table above predate the JSON's CmdNeo4j AssocPairs
-re-class and are kept as historical record.)
+re-class and are kept as historical record.)*
 
-(LookAtAssociationPairs × CmdUCINet was previously stacked
-D + C; the underlying matrix-CmdQuery blocker is actually the
-same SetFocus driver issue as the Pajek/Gephi cells, so its
-inner blocker also moves from C → B.  Stack is now D + B.)
+*(Historical note: LookAtAssociationPairs × CmdUCINet was previously
+stacked D + C; the underlying matrix-CmdQuery blocker was later
+corrected to the same SetFocus driver issue as the Pajek/Gephi cells,
+so its inner blocker moved from C → B.  Stack was D + B — but the
+SetFocus patch has since landed (commits `3bb69ef` + `0c0eaf1`), making
+it D-only.  Current truth: D-only.  See Refresh 2026-05-06 (second).)*
 
 ---
 
