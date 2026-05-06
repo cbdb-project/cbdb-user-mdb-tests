@@ -763,28 +763,55 @@ risk.
 
 ## Refresh 2026-05-06 (second) — post Place-probe-pause + infra landing
 
-Triggering event: main is now at `bd6337f` (PR AV #106 —
-`test_inputs.json` auto-refresh gate). Three PRs have landed
-since the prior refresh (`14099a7`):
+**Correction from initial draft:** the initial draft incorrectly
+listed the AssocPairs CmdQuery SetFocus driver patch as Rank-1
+next work.  That patch is already merged on main (commits
+`3bb69ef` + `0c0eaf1`; `_PER_FORM_CMDGIS_PATCHES["Form_LookAt
+AssociationPairs"]` in `cbdb_driver/vba_session.py`).
+AssocPairs × CmdPajek + CmdGephi coverage is also already
+merged (commit `4b8a927`; `test_vba_pajek_gephi_cross_form.py`
+1×3 known-edged fixture).  This corrected version removes all
+forward-looking references to that work and re-ranks from
+current main truth.
 
-- **PR AT (#104)** `test_bug22_kinship_cmducinet_sibling_form_fires_invalid_procedure_call`
-  runtime `:ERR` pin — Rank-3 deferred item from the prior
-  refresh is now **done**.
+Triggering event: main is now at `bd6337f` (PR AV #106 —
+`test_inputs.json` auto-refresh gate). PRs since prior refresh
+(`14099a7`):
+
+- **PR AT (#104)** Kinship CmdUCINet runtime `:ERR` pin —
+  Rank-3 deferred item from prior refresh is now **done**.
 - **PR AS (#103)** Place × CmdUCINet probe; 4 iterations; all
   concluded with COM RPC unavailable on second `set_form_tag`;
-  classified `still_needs_better_fixture`.  Probe shape does
-  not support a clean characterization of Place's write path.
-- **PR AU (#105)** 5-trial Place COM bridge instability
-  isolation matrix; synthesis: `long_click_via_timer_polling_loop_correlated`
-  (correlation, NOT isolated trigger proof); unresolved
+  classified `still_needs_better_fixture`.
+- **PR AU (#105)** 5-trial Place COM bridge instability matrix;
+  `long_click_via_timer_polling_loop_correlated`; unresolved
   confound — T3 vs T5 differ along two dimensions (polling
-  return mode AND post-CmdQuery COM-touch type); more matrix
-  work in the current probe shape does not resolve the
-  confound.
-- **PR AV (#106)** `pytest_configure` auto-refresh gate
-  (`_refresh_decision` + `_resolve_data_mdb` helpers + 11
-  unit tests); stale fixture-input drift is no longer a top
-  queue concern.
+  return mode AND post-CmdQuery COM-touch type).
+- **PR AV (#106)** `pytest_configure` auto-refresh gate;
+  stale fixture-input drift is no longer a top queue concern.
+
+**AssocPairs context (landed before 14099a7; canonical on main
+— NOT next steps):**
+
+- SetFocus driver patch: merged (`3bb69ef` + `0c0eaf1`;
+  `_ASSOCPAIRS_SETFOCUS_TARGETS_BY_SUB` dict +
+  `_PER_FORM_CMDGIS_PATCHES["Form_LookAtAssociationPairs"]`
+  in `cbdb_driver/vba_session.py`).
+- AssocPairs × CmdPajek + CmdGephi: covered (`4b8a927`;
+  `test_vba_pajek_gephi_cross_form.py`, 1×3 known-edged
+  fixture).  2 cells closed.
+- AssocPairs × CmdGIS: SetFocus blocker is lifted, but a
+  **second independent blocker** remains — stale-subform-
+  RecordCount (unguarded `.MoveFirst` on freshly-opened
+  `dbOpenDynaset`; documented in
+  `analysis/assocpairs_cmdgis_note.md`).  NOT a coverage
+  candidate under current state.
+- AssocPairs × CmdNeo4j: SetFocus blocker is now lifted.
+  Prior triage condition was "probe after patch lands" — that
+  condition is now met.  **New probe-first candidate.**
+- AssocPairs × CmdUCINet: was D+B stacked (SetFocus +
+  CmdUCINet family); SetFocus now lifted → **D-only**
+  (CmdUCINet family design still needed).
 
 **Read-only analysis. No Access COM. No tests / driver /
 README / canonical-report changes.**
@@ -795,74 +822,44 @@ README / canonical-report changes.**
 |---|---|---|
 | `LookAtAssociations × CmdUCINet` | gap | canonical Issue #22 (P1_visible_crash); unchanged |
 | `LookAtKinship × CmdUCINet` | covered (fixture-fragile) | Rank-3 item done: runtime `:ERR` pin now in `test_vba_bug_behaviors.py` (PR AT) |
-| `LookAtPlace × CmdUCINet` | gap — **paused** | Probe tried and stopped; COM bridge instability after long CmdQuery (timeout-path-correlated); unresolved confound; more matrix work prohibited per brief |
+| `LookAtPlace × CmdUCINet` | gap — **paused** | Probe tried and stopped; COM bridge instability; unresolved confound; more matrix work prohibited |
 
-### infra state
+### AssocPairs line — updated state on main (bd6337f)
 
-`test_inputs.json` auto-refresh gate landed (PR AV).
-`_refresh_decision` helper + 11 unit tests cover all 5
-decision states.  Stale fixture-input drift is no longer a
-queue concern.
-
-### Is the best remaining work still on the CmdUCINet line?
-
-**No.**  The CmdUCINet line is effectively paused for local
-probe work:
-
-- Associations × CmdUCINet: canonical Issue #22 — the truth
-  is "crash on CJK"; no local coverage action possible.
-- Kinship × CmdUCINet: covered (fixture-fragile) + runtime
-  pin now in place.  Done.
-- Place × CmdUCINet: paused.  COM bridge instability has an
-  unresolved confound (polling-timeout path vs post-CmdQuery
-  COM-touch type, or both).  More matrix work is unlikely to
-  resolve the confound without a fundamentally different
-  fixture shape — and the brief prohibits continuing the
-  Place COM bridge matrix.
-
-**New rank-1 is the AssocPairs CmdQuery SetFocus driver patch
-(infra).**  It out-ranks continuing Place driver/meta
-investigation because:
-
-1. **Place's confound is unresolved and speculative to fix.**
-   The isolation matrix showed T3 (long CmdQuery +
-   `set_form_tag`) and T5 (long CmdQuery + `Forms.Count`)
-   differ along two dimensions — isolating which is the
-   actual trigger requires a different fixture (lighter
-   CmdQuery → avoid timeout path), which is speculative and
-   not yet briefed.
-2. **AssocPairs SetFocus is already well-characterized.**  The
-   mechanism (`Me.CmdQuery.SetFocus` at vb:1635, fails under
-   Form_Timer dispatch) was confirmed by prior probes.  The
-   fix direction is known (`_PER_FORM_CMDGIS_PATCHES`-style
-   inline patch or DoCmd-activate before dispatch).  No
-   further probe pass needed — ready for a brief +
-   implementation.
-3. **ROI.**  AssocPairs patch unblocks 3–4 cells (CmdGIS /
-   CmdPajek / CmdGephi → bucket A; CmdUCINet → D-only).
-   More Place matrix work at best narrows one confound in one
-   paused cell, with uncertain outcome.
+| Cell | Current status | Notes |
+|---|---|---|
+| CmdPajek | **covered** | `4b8a927`; 1×3 known-edged fixture |
+| CmdGephi | **covered** | `4b8a927`; 1×3 known-edged fixture |
+| CmdGIS | bucket B (stale-subform-RecordCount blocker) | SetFocus lifted; independent second blocker remains; `analysis/assocpairs_cmdgis_note.md` |
+| CmdNeo4j | **probe-first candidate** | SetFocus lifted; remaining: chain timing on small known-edged fixture |
+| CmdUCINet | bucket D-only | SetFocus lifted; CmdUCINet family design still needed |
 
 ### New next-work ranking (max 3 items)
 
-#### Rank 1 — infra: AssocPairs CmdQuery SetFocus driver patch
+#### Rank 1 — probe-first investigation: AssocPairs × CmdNeo4j
 
-- **Category:** `infra`
-- **Scope:** add a per-form inline VBA patch in
-  `cbdb_driver/vba_session.py` (à la `_PER_FORM_CMDGIS_PATCHES`)
-  that strips `Me.CmdQuery.SetFocus` (line 1635) from
-  `Form_LookAtAssociationPairs.CmdQuery_Click`, OR extends
-  the Form_Timer dispatcher to DoCmd-activate the form
-  before dispatch.
-- **Unblocks:** AssocPairs × CmdGIS / CmdPajek / CmdGephi →
-  bucket A (3 cells become coverage candidates); AssocPairs
-  × CmdUCINet D+B → D-only (reduces stack).
-- **Needs:** fresh maintainer brief before opening (driver
-  surface area; regression check across all LookAt forms
-  that use CmdQuery_Click).
-- **Not autopilot:** driver patch touches the shared VBA
-  injection path; must confirm no other form's CmdQuery body
-  relies on the same `SetFocus` pattern.
+- **Category:** `probe-first investigation`
+- **Why now:** the SetFocus blocker that kept CmdNeo4j in
+  bucket B has been resolved.  The prior triage's own
+  condition — "probe after SetFocus patch lands" — is now
+  met.  This is the cheapest remaining AssocPairs cell
+  without an additional independent blocker.
+- **Shape:** drive CmdQuery + CmdNeo4j on a small known-edged
+  fixture (analog of the 1×3 pair used for CmdPajek/CmdGephi);
+  time the multi-file chain; count files; snapshot
+  ZZ_TEST_DEBUG.  Probe MD + JSON only — no `test_*`
+  additions.  Note: also check whether LookAtAssociations ×
+  CmdNeo4j "0-file mode" (open question in the triage doc)
+  is resolved, since CmdQuery source-data behavior is now
+  confirmed to work.
+- **Promote to coverage condition:** chain completes within
+  watcher timeout AND ≥1 file produced AND no mid-chain
+  `:ERR`.
+- **Reject to investigation condition:** chain trips watcher
+  OR mid-chain `:ERR`.
+- **Risk:** medium (multi-file Neo4j chain on AssocPairs is
+  a new shape; sibling Associations CmdNeo4j 0-file mode is
+  an open companion question).
 
 #### Rank 2 — maintainer-line / upstream-fix coordination: Issue #22 upstream fix
 
@@ -873,9 +870,7 @@ investigation because:
   `Form_LookAtKinship.CmdUCINet_Click`.  Not a PR in this
   repo.
 - **Why second:** Issue #22 is P1 visible crash for end
-  users.  Fix recommendation is canonical
-  (`reports/generate_report.py::ISSUES`).  Local evidence
-  pins (static + runtime) are in place.  Only upstream
+  users.  Fix recommendation is canonical.  Only upstream
   action remains.
 
 #### Rank 3 — infra: Networks Form_Open minimal-injection scaffold
@@ -889,28 +884,26 @@ investigation because:
   thread `skip_inject_autodetect_forms` through.
 - **Unblocks:** Networks × CmdGIS + CmdPajek → coverage
   candidates (2 cells from bucket B).
-- **Why third, not second:** more expensive than AssocPairs
-  patch (design work, not a targeted patch); needs a
-  scope-defining brief.
 - **Not autopilot:** scaffold approach choice (extend vs
-  refactor cross-form infra) is a design decision.
+  refactor) is a design decision; needs scope-defining brief.
 
 ### Explicitly NOT to touch (this refresh + onward)
 
 - ❌ **Continue Place × CmdUCINet COM bridge matrix** —
-  prohibited per brief; unresolved confound; more isolation
-  work hits diminishing returns without a fundamentally
-  different fixture.
+  unresolved confound; more isolation work hits diminishing
+  returns; prohibited.
 - ❌ **Downgrade Kinship × CmdUCINet from covered** —
-  fixture-fragile caveat is the truth; runtime pin now in
-  place.
+  fixture-fragile caveat is the truth; runtime pin in place.
 - ❌ **Reopen Issue #22 / #23 wording** — canonical; agreed.
-- ❌ **AssocPairs × CmdGIS coverage PR before driver patch** —
-  SetFocus blocker still present; coverage PR only meaningful
-  after the patch lands.
+- ❌ **AssocPairs × CmdGIS coverage PR** — stale-subform-
+  RecordCount is the remaining independent blocker (SetFocus
+  is no longer the constraint); needs its own investigation
+  brief before a coverage PR is meaningful.
+- ❌ **AssocPairs × CmdNeo4j coverage PR without probe** —
+  chain timing on small fixture is still unknown; probe
+  outcome determines next step.
 - ❌ **Matrix/probe batches without a clear target** — infra
-  is now stable; more probes need a specific hypothesis, not
-  general exploration.
+  is now stable; more probes need a specific hypothesis.
 
 ### Self-review (per `docs/skills/programmer-self-review-template.md`)
 
@@ -921,27 +914,31 @@ canonical-report changes — matches brief boundary exactly.
 
 **B. Source-of-truth sync.** MD section ↔ JSON
 `refresh_2026_05_06_second` block carry the same CmdUCINet
-family state, infra state, ranked list, Q&A answer, and
-do-not-touch list.  State verified against: PR AT commit
-`test_bug22_kinship_cmducinet_sibling_form_fires_invalid_procedure_call`
-in `tests/test_vba_bug_behaviors.py`; PR AU synthesis
-(`narrowest_class`, T3/T5 confound wording); PR AV
-`pytest_configure` helpers + test file.  No source-of-truth
-file is changed.
+family state, AssocPairs line state, ranked list, and
+do-not-touch list.  AssocPairs state verified against:
+`cbdb_driver/vba_session.py` `_PER_FORM_CMDGIS_PATCHES
+["Form_LookAtAssociationPairs"]`; `test_vba_pajek_gephi_cross
+_form.py` `_CASES` including AssociationPairs rows; prior
+triage `Refresh 2026-05-05 (later)` section documenting the
+stale-subform-RecordCount blocker for CmdGIS.  No source-of-
+truth file is changed.
 
-**C. Evidence vs claim.** All state claims are grounded in
-specific PR commits (AT #104, AS #103, AU #105, AV #106)
-merged to main `bd6337f`.  The "well-characterized" claim
-for AssocPairs SetFocus is grounded in
-`Form_LookAtAssociationPairs.vb:1635` confirmed by the prior
-`cover/assocpairs-pajek-gephi` probe (already in the triage
-doc).  No claim extends beyond what those PRs established.
+**C. Evidence vs claim.** CmdNeo4j "probe-first candidate"
+claim is grounded in the prior triage's own explicit
+condition ("probe after SetFocus patch lands"), now met —
+not an inference.  AssocPairs × CmdGIS "independent second
+blocker" claim cites `analysis/assocpairs_cmdgis_note.md`
+already on main.  AssocPairs × CmdUCINet "D-only" reflects
+the logical consequence of SetFocus being lifted from a D+B
+stack — the CmdUCINet family design requirement is unchanged.
+All state claims are grounded in existing canonical docs on
+main `bd6337f`.
 
 **D. Residual risk.** This is a triage-document refresh, not
 an implementation.  Residual risk is advisory error: ranking
-AssocPairs driver patch above Networks scaffold or Place
-continuation could be wrong if the maintainer has a
-different priority.  Mitigated by: all three ranked items
-with explicit do-not-touch list give the reviewer full
-context to redirect.  No code path or test is altered; no
-runtime regression risk.
+AssocPairs × CmdNeo4j probe above Networks scaffold or
+Issue #22 maintainer-line could be wrong if the maintainer's
+priority differs.  Mitigated by: all three ranked items with
+explicit do-not-touch list give the reviewer full context to
+redirect.  No code path or test is altered; no runtime
+regression risk.
