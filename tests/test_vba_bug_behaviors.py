@@ -308,6 +308,171 @@ def test_bug6_lookat_groupdata_query_entry_fires_no_such_field(vba: VbaSession):
     )
 
 
+def test_bug21_lookat_groupdata_cmdneo4j_fires_no_current_record(
+        vba: VbaSession):
+    """Bug #21 (P1) — runtime-side pin.
+
+    `Form_LookAtGroupData.CmdNeo4j_Click` has 11 dlgSaveAs.Show
+    blocks, each preceded by `Set <var> = OpenRecordset(...)`
+    followed unguarded by `.MoveFirst`.  When `ZZ_SCRATCH_ENTRY`
+    is empty (the common case where the queried person has no
+    Entry data, OR ChkEntry was left unticked), the `.MoveFirst`
+    at vb line 1245 (PeopleEntry, block #9) raises DAO 3021
+    'No current record' and the chain bails before writing the
+    Entry-related tail blocks (PeopleEntry / EntryCode /
+    InstitutionCodes).  See PR
+    `investigate/groupdata-cmdneo4j-tail` (commit 3bfcba8) for
+    the per-block isolation evidence.
+
+    **Distinct from Issue #6.**  Issue #6 is JET 3061 ('No
+    value given for one or more required parameters') in
+    `queryEntry`, UPSTREAM of this bug.  Both can fire on the
+    same Entry-enabled path, but they are different code-level
+    defects: #6 is a column-typo (`ENTRY_DATA.c_parental_status`
+    missing `_code` suffix); #21 is a missing `.EOF` /
+    `.RecordCount > 0` guard before `.MoveFirst`.  This test
+    deliberately leaves `ChkEntry` OFF so Issue #6's path is NOT
+    in scope and ONLY Issue #21 (the downstream missing-guard)
+    can fire.
+
+    Sister test in
+    `tests/test_known_bugs.py::test_bug21_groupdata_cmdneo4j
+    _missing_eof_guard` pins the source-grep pattern (no
+    `If Not .EOF Then` between OpenRecordset and .MoveFirst).
+    This test pins the runtime symptom.  Don't replace the
+    static test — both source-side and runtime-side should be
+    guarded.
+
+    Localisation evidence (already merged to main):
+      analysis/groupdata_cmdneo4j_probe.md
+      analysis/groupdata_cmdneo4j_tail_probe.md
+      reports/groupdata_cmdneo4j_probe.json
+      reports/groupdata_cmdneo4j_tail_probe.json
+    The tail probe's iter 3 (split-then-seed) is the killer
+    evidence: when one synthetic row is inserted into
+    `ZZ_SCRATCH_ENTRY` before CmdNeo4j fires, the chain
+    produces 10 files with no `:ERR` — proving the trigger is
+    the empty source recordset, not anything else.
+
+    Fixture: matrix_hard_forms's `groupdata_person_1_small` —
+    person 1 has 2 STATUS_DATA / 2 ENTRY_DATA / ~12
+    POSTED_TO_OFFICE rows.  Chk state set explicitly:
+    Status / Office / Addr ON, GIS sisters ON, Entry / Text
+    OFF.  Matches the GroupData × CmdGIS coverage scope; with
+    ChkEntry OFF, queryEntry doesn't run and ZZ_SCRATCH_ENTRY
+    stays at 0 — the precise condition Issue #21 needs to fire.
+    """
+    from cbdb_driver.form_specs import LOOKATGROUPDATA
+    spec = LOOKATGROUPDATA
+    PERSON_ID = 1
+
+    # Picker setup
+    vba.set_picker_codes(spec.picker_table, [PERSON_ID],
+                          column=spec.picker_column)
+    vba.open_form(spec.name)
+
+    # All-Chk*-reset (matches the all-Chk*-reset-first pattern
+    # proven by tests/test_vba_cmdgis_other_forms.py
+    # ::test_cmd_gis_groupdata_clean_branches).  Without this,
+    # Form_Open defaults can leave ChkEntry True and pull the
+    # test into Issue #6's path instead.
+    all_chk = (
+        "ChkStatus", "ChkOffice", "ChkEntry", "ChkText",
+        "ChkAddr",
+        "ChkGisStatus", "ChkGisOffice", "ChkGisOfficePeople",
+        "ChkGisEntry", "ChkGisText", "ChkGisAddr",
+    )
+    for c in all_chk:
+        try:
+            vba.set_control(spec.name, c, False)
+        except Exception as e:
+            print(f"  warn reset {c}: {e}")
+
+    # Enable the clean-branches set: Status / Office / Addr +
+    # GIS sisters.  ChkEntry deliberately OFF.
+    for c in ("ChkStatus", "ChkOffice", "ChkAddr",
+              "ChkGisStatus", "ChkGisOffice", "ChkGisAddr"):
+        try:
+            vba.set_control(spec.name, c, True)
+        except Exception as e:
+            print(f"  warn enable {c}: {e}")
+
+    # Chain CmdRun -> CmdNeo4j via Form.Tag.  The autodetect-
+    # injected chain block dispatches CmdNeo4j after CmdRun's
+    # body completes.
+    msgs = _chain_via_tag(vba, "LookAtGroupData",
+                           chain="CmdRun,CmdNeo4j",
+                           target_table="")
+    print(f"\nDEBUG log: {msgs}", flush=True)
+
+    # ---- Assertion 1: ZZ_SCRATCH_ENTRY stays at 0 (the
+    # precondition that distinguishes Issue #21 from Issue #6).
+    cur = vba.conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM ZZ_SCRATCH_ENTRY")
+    n_entry = int(cur.fetchone()[0] or 0)
+    cur.close()
+    assert n_entry == 0, (
+        f"Bug #21 precondition broke — ZZ_SCRATCH_ENTRY = "
+        f"{n_entry} but should be 0 with ChkEntry off.  Either "
+        f"Form_Open default changed (now sets ChkEntry True), "
+        f"or queryStatus / queryOffice / queryAddr now writes "
+        f"to ZZ_SCRATCH_ENTRY (unlikely).  This invalidates the "
+        f"Issue #21 reproduction (Issue #21 needs an empty "
+        f"feeder; if ChkEntry is implicitly enabled, what we "
+        f"reproduced is Issue #6 instead).  Investigate before "
+        f"flipping."
+    )
+
+    # ---- Assertion 2: at least one LookAtGroupData:ERR fired
+    err_msgs = [m for m in msgs if "LookAtGroupData:ERR" in m]
+    assert err_msgs, (
+        f"Bug #21 marker no longer reproduces (investigate "
+        f"upstream fix vs. fixture/driver change vs. "
+        f"misclassification before flipping) — chain "
+        f"CmdRun→CmdNeo4j with ZZ_SCRATCH_ENTRY=0 didn't raise "
+        f"any :ERR marker.  Either the unguarded `.MoveFirst` "
+        f"now has a guard (CBDB upstream fix), the chain didn't "
+        f"reach the PeopleEntry block, or the test infra "
+        f"silenced the error.  Full transcript: {msgs}"
+    )
+
+    # ---- Assertion 3: error text matches the DAO 3021 family
+    # ('no current record').  Critically NOT the Issue #6
+    # family ('no value given for required parameters' / 'could
+    # not find field' / 'c_parental_status') — those signatures
+    # would mean we're actually reproducing Issue #6, not Issue
+    # #21.
+    err_blob = " | ".join(err_msgs).lower()
+    assert "no current record" in err_blob, (
+        f"Bug #21 ERR fired but its text doesn't match DAO 3021 "
+        f"('No current record').  Expected DAO 3021 (unguarded "
+        f"`.MoveFirst` on empty recordset).  err_msgs={err_msgs}.  "
+        f"If this is now an Issue #6-class JET 3061, the fixture "
+        f"has drifted and ChkEntry is implicitly enabled."
+    )
+
+    issue_6_signatures = (
+        "no value given for one or more required parameters",
+        "could not find field",
+        "c_parental_status",
+    )
+    issue_6_match = [s for s in issue_6_signatures
+                     if s in err_blob]
+    assert not issue_6_match, (
+        f"Bug #21 reproduction is contaminated by Issue #6 "
+        f"signatures {issue_6_match} — meaning ChkEntry-side "
+        f"queryEntry fired (which would only happen if "
+        f"ChkEntry was implicitly enabled despite the explicit "
+        f"reset above).  Investigate the all-Chk*-reset step.  "
+        f"err_msgs={err_msgs}"
+    )
+
+    print(f"\nBug #21 runtime pin OK: ZZ_SCRATCH_ENTRY={n_entry}, "
+          f"DAO 3021 ('no current record') observed in "
+          f"{len(err_msgs)} :ERR marker(s); no Issue #6 "
+          f"contamination.", flush=True)
+
+
 def test_bug7_lookat_place_cmdneo4j_fires_item_not_found(vba: VbaSession):
     """Bug #7: LookAtPlace.CmdNeo4j hits 'Item not found in this
     collection' on the first row of the People-CSV loop because

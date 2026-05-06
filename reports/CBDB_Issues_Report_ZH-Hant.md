@@ -17,6 +17,7 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
 - [P1 — 可見的執行時報錯](#p1--可見的執行時報錯)
   - [Issue #6 — LookAtGroupData 的 ChkEntry 路徑引用了不存在的列 ENTRY_DATA.c_parental_status](#issue-6--lookatgroupdata-的-chkentry-路徑引用了不存在的列-entry_datac_parental_status)
   - [Issue #13 — BIOG_MAIN_2 子表單試圖開啟一個不存在的 picker 表單 (frmPickNIAN_HAO)](#issue-13--biog_main_2-子表單試圖開啟一個不存在的-picker-表單-frmpicknian_hao)
+  - [Issue #21 — LookAtGroupData.CmdNeo4j 在匯出空分部時崩潰報「No current record」](#issue-21--lookatgroupdatacmdneo4j-在匯出空分部時崩潰報no-current-record)
 - [P2 — 靜默顯示問題](#p2--靜默顯示問題)
   - [Issue #10 — EVENT_ADDR_2 子表單的地址列默默地顯示為空（ControlSource 寫錯了）](#issue-10--event_addr_2-子表單的地址列默默地顯示為空controlsource-寫錯了)
 - [P3 — 缺失介面](#p3--缺失介面)
@@ -220,6 +221,47 @@ _Step 2 — the popup users see.  Reconstructed in PIL because the real popup wo
 #### 建議修復方案
 
 要麼把 `frmPickNIAN_HAO` 表單恢復回來，要麼在 `Form_BIOG_MAIN_2_Subform.c_fl_ey_notes_Click` 裡把呼叫改成替代的那個 picker 表單。
+
+### Issue #21 — LookAtGroupData.CmdNeo4j 在匯出空分部時崩潰報「No current record」
+
+**涉及位置:** `Form_LookAtGroupData.CmdNeo4j_Click`
+
+**嚴重等級:** P1 — 正常使用者點選下的可見報錯（只要查詢的人沒有 Entry 資料，GroupData 的 Neo4j 匯出就會觸發 —— 這對入仕記錄稀薄的人物屬於常見情況）
+
+#### 問題描述
+
+`Form_LookAtGroupData.CmdNeo4j_Click` 中的 11 個 CSV 匯出區塊在開啟暫存記錄集後，全部直接呼叫 `.MoveFirst`，而沒有先檢查記錄集是否為空（缺少 `.EOF` 或 `.RecordCount > 0` 防護）。如果使用者查詢的群體在某個類別沒有資料（例如沒有 Entry 資料，導致 `ZZ_SCRATCH_ENTRY` 為空），`.MoveFirst` 呼叫會立刻丟擲 DAO 3021「No current record」，彈出報錯框並中斷整個 Neo4j 匯出。
+
+在當前 dump 和典型小 fixture 下，第一個觸發的是 **block #9 PeopleEntry**（line 1243-1245）—— `Set tRstPeopleEntry = CurrentDb.OpenRecordset("ZZ_SCRATCH_ENTRY", dbOpenDynaset)` 後緊接無防護的 `.MoveFirst`。同樣的無防護模式也存在於緊隨其後的 **block #10 EntryCode**（line 1383-1385），實際上 `CmdNeo4j_Click` 的 **全部 11 個 block** 都是這種寫法 —— 其他 8 個之所以能跑通，只是因為它們的上游暫存表（ZZ_SCRATCH_STATUS, ZZ_SCRATCH_OFFICE 等）在任何正常啟用範圍下都不會為空。
+
+這與 Issue #6 **不同**：Issue #6 是 `queryEntry` 裡的列名筆誤（`ENTRY_DATA.c_parental_status` 應為 `c_parental_status_code`），導致 ChkEntry 勾選時 `ZZ_SCRATCH_ENTRY` 寫不進資料。Issue #21 是 `CmdNeo4j_Click` 裡獨立的下游缺少防護的 bug，只要 `ZZ_SCRATCH_ENTRY` 為空就觸發 —— 既可能是上游 Issue #6 的連帶影響，也可能是使用者單純沒勾 ChkEntry。兩個不同層級的程式碼缺陷，應分別歸檔與修復。
+
+#### 復現步驟
+
+1. 在 **LookAtGroupData** 上把匯入清單設為 c_personid = 1（安惇 An Dun）——他有 2 條 STATUS_DATA / 2 條 ENTRY_DATA / 約 12 條 POSTED_TO_OFFICE，鏈條針對 Status / Office 有實際資料，但只要不勾 ChkEntry，`ZZ_SCRATCH_ENTRY` 就會保持為空（勾上 ChkEntry 會另外觸發 Issue #6）。
+2. 勾 **Status**、**Office**、**Addr** 及對應的 **GIS** 三個子項——**Entry 不要勾**（讓 ZZ_SCRATCH_ENTRY 維持為空）。點 **Run**。
+3. CmdRun 完成後（ZZ_SCRATCH_STATUS 寫入 2 行，ZZ_SCRATCH_OFFICE 寫入 12 行），點選 **Neo4j** 匯出按鈕。
+4. 鏈條會先順利產出 8 份 CSV（People / Places / PeoplePlaces / PersonPlaceCodes / PeopleStatus / StatusCode / PeopleOffice / OfficeCodes），然後在進入第 9 個 block（PeopleEntry）時彈出 `執行時錯誤 3021 —— No current record` 對話方塊。餘下的 2-3 份預期檔案（PeopleEntry / EntryCode / 可選的 InstitutionCodes）不會寫出。
+5. 已在 `analysis/probe_groupdata_cmdneo4j.py` 與 `analysis/probe_groupdata_cmdneo4j_tail.py` 端到端驗證 —— tail probe 的 iter 3 split-then-seed 手動向 ZZ_SCRATCH_ENTRY 插入一行後，鏈條產出 10 份檔案且沒有 ERR（證明觸發條件就是空記錄集，沒有其他變數）。
+
+#### 建議修復方案
+
+在 `Form_LookAtGroupData.CmdNeo4j_Click` 的 **全部 11 個 block** 中，於 `.MoveFirst` 呼叫前加上 `.EOF`（或 `.RecordCount > 0`）防護。其中 block #9 PeopleEntry（約 line 1245）和 block #10 EntryCode（約 line 1385）是使用者最容易觸發的兩段。建議寫法：
+
+```vb
+Set tRstPeopleEntry = CurrentDb.OpenRecordset("ZZ_SCRATCH_ENTRY", dbOpenDynaset)
+With tRstPeopleEntry
+    If Not .EOF Then
+        .MoveFirst
+        Do While Not .EOF
+            ' ... 原有的逐行寫出 ...
+            .MoveNext
+        Loop
+    End If
+End With
+```
+
+Block #11 InstitutionCodes（約 line 1487）上游已有 `If tRecDeleted > 0 Then` 閘門，本身不會觸發，不需要改動。
 
 ## P2 — 靜默顯示問題
 

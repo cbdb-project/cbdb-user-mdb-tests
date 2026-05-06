@@ -77,7 +77,7 @@ cbdb-user-mdb-tests/
 │   └── dump/                   # frozen metadata snapshots (committed)
 ├── AGENTS.md                   # contributor / agent guide; landmines
 ├── reports/                    # auto-generated bilingual issue report
-│   ├── generate_report.py      #   ⭐ SOURCE OF TRUTH for all 19 issues
+│   ├── generate_report.py      #   ⭐ SOURCE OF TRUTH for all 20 issues
 │   └── CBDB_Issues_Report_*.{md,docx}   # EN / ZH-Hant × md / docx
 └── FINAL_STATE.md              # snapshot of test-suite coverage
 ```
@@ -249,7 +249,7 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 
 ### Confirmed bugs
 
-**19 documented issues**, all detail in
+**20 documented issues** (highest assigned ID: #21 — ID #3 was retired 2026-05-03 as an early false positive), all detail in
 [`reports/CBDB_Issues_Report_EN.md`](./reports/CBDB_Issues_Report_EN.md)
 ([中文版](./reports/CBDB_Issues_Report_ZH-Hant.md)).  Both Markdown
 files are auto-generated from the `ISSUES` dict in
@@ -262,7 +262,7 @@ produce fresh ones).
 | Tier | Count | Meaning |
 |------|------:|---------|
 | P0 — Silent data corruption | 3 | wrong data shown, no user warning |
-| P1 — Visible runtime crash  | 2 | error popup on a normal user click |
+| P1 — Visible runtime crash  | 3 | error popup on a normal user click |
 | P2 — Silent display         | 1 | user-visible bound control renders blank where data exists |
 | P3 — Missing UI             | 5 | event handler exists in code but no button on the form |
 | P4 — Setup                  | 1 | one-time install fix (dao360.dll on Office 2016+) |

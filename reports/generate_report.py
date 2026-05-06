@@ -970,6 +970,195 @@ ISSUES = [
         "severity_zh": "P1 — 用户点击时可见的报错",
     },
     {
+        "id": 21,
+        "tier": "P1_visible_crash",
+        "form": "Form_LookAtGroupData.CmdNeo4j_Click",
+        "title_en": "LookAtGroupData.CmdNeo4j crashes with 'No current record' on empty sections",
+        "title_zh": "LookAtGroupData.CmdNeo4j 在汇出空分部时崩溃报「No current record」",
+        "summary_en": (
+            "All 11 CSV export blocks in `Form_LookAtGroupData."
+            "CmdNeo4j_Click` open a scratch recordset and "
+            "immediately call `.MoveFirst` without first checking "
+            "if the recordset is empty (no `.EOF` or "
+            "`.RecordCount > 0` guard).  When a user queries a "
+            "group whose data has no rows in a given category — "
+            "for example, no Entry data so `ZZ_SCRATCH_ENTRY` is "
+            "empty — the `.MoveFirst` call instantly raises DAO "
+            "3021 'No current record', a popup blocks the user, "
+            "and the entire Neo4j export chain aborts.\n\n"
+            "On the current dump and a typical small fixture the "
+            "first block to hit this is **block #9 PeopleEntry** "
+            "(line 1243-1245) — `Set tRstPeopleEntry = CurrentDb."
+            "OpenRecordset(\"ZZ_SCRATCH_ENTRY\", dbOpenDynaset)` "
+            "followed unguarded by `.MoveFirst`.  The same "
+            "unguarded pattern exists in the immediately-"
+            "following **block #10 EntryCode** (line 1383-1385) "
+            "and in fact in **all 11 blocks** of `CmdNeo4j_Click` "
+            "— the other 8 only happen to work because their "
+            "feeder scratch tables (ZZ_SCRATCH_STATUS, "
+            "ZZ_SCRATCH_OFFICE, etc.) are non-empty under any "
+            "normal enable scope.\n\n"
+            "This is **distinct from Issue #6**: Issue #6 is a "
+            "column-typo (`ENTRY_DATA.c_parental_status` vs "
+            "`c_parental_status_code`) in `queryEntry` that "
+            "prevents `ZZ_SCRATCH_ENTRY` from being populated at "
+            "all when ChkEntry is on.  Issue #21 is a separate "
+            "downstream missing-guard bug in `CmdNeo4j_Click` "
+            "that fires whenever `ZZ_SCRATCH_ENTRY` happens to "
+            "be empty — including via the upstream Issue #6 "
+            "path, but also independently when the user simply "
+            "doesn't tick ChkEntry.  Two different code-level "
+            "defects; should be filed and fixed separately."
+        ),
+        "summary_zh": (
+            "`Form_LookAtGroupData.CmdNeo4j_Click` 中的 11 个 "
+            "CSV 汇出区块在打开暂存记录集后，全部直接呼叫 "
+            "`.MoveFirst`，而没有先检查记录集是否为空（缺少 "
+            "`.EOF` 或 `.RecordCount > 0` 防护）。如果用户查询的"
+            "群体在某个类别没有数据（例如没有 Entry 数据，导致 "
+            "`ZZ_SCRATCH_ENTRY` 为空），`.MoveFirst` 呼叫会立刻"
+            "抛出 DAO 3021「No current record」，弹出报错框并"
+            "中断整个 Neo4j 汇出。\n\n"
+            "在当前 dump 和典型小 fixture 下，第一个触发的是 "
+            "**block #9 PeopleEntry**（line 1243-1245）—— "
+            "`Set tRstPeopleEntry = CurrentDb.OpenRecordset("
+            "\"ZZ_SCRATCH_ENTRY\", dbOpenDynaset)` 后紧接无防护"
+            "的 `.MoveFirst`。同样的无防护模式也存在于紧随其后"
+            "的 **block #10 EntryCode**（line 1383-1385），实际"
+            "上 `CmdNeo4j_Click` 的 **全部 11 个 block** 都是"
+            "这种写法 —— 其他 8 个之所以能跑通，只是因为它们的"
+            "上游暂存表（ZZ_SCRATCH_STATUS, ZZ_SCRATCH_OFFICE 等）"
+            "在任何正常启用范围下都不会为空。\n\n"
+            "这与 Issue #6 **不同**：Issue #6 是 `queryEntry` 里"
+            "的列名笔误（`ENTRY_DATA.c_parental_status` 应为 "
+            "`c_parental_status_code`），导致 ChkEntry 勾选时 "
+            "`ZZ_SCRATCH_ENTRY` 写不进数据。Issue #21 是 "
+            "`CmdNeo4j_Click` 里独立的下游缺少防护的 bug，只要 "
+            "`ZZ_SCRATCH_ENTRY` 为空就触发 —— 既可能是上游 "
+            "Issue #6 的连带影响，也可能是用户单纯没勾 ChkEntry。"
+            "两个不同层级的代码缺陷，应分别归档与修复。"
+        ),
+        "steps_en": [
+            "In **LookAtGroupData**, populate the import list "
+            "with c_personid = 1 (An Dun 安惇) — he has 2 "
+            "STATUS_DATA / 2 ENTRY_DATA / ~12 POSTED_TO_OFFICE "
+            "rows so the chain has substantive feeder data for "
+            "Status / Office but Entry data won't appear in "
+            "ZZ_SCRATCH_ENTRY unless ChkEntry is ticked (which "
+            "would also trigger Issue #6 separately).",
+            "Tick **Status**, **Office**, **Addr** and the "
+            "matching **GIS** sister checkboxes — but leave "
+            "**Entry** unticked (ZZ_SCRATCH_ENTRY stays empty).  "
+            "Click **Run**.",
+            "After CmdRun finishes (ZZ_SCRATCH_STATUS gets 2 "
+            "rows, ZZ_SCRATCH_OFFICE gets 12), click the "
+            "**Neo4j** export button.",
+            "The chain produces 8 CSVs cleanly (People, Places, "
+            "PeoplePlaces, PersonPlaceCodes, PeopleStatus, "
+            "StatusCode, PeopleOffice, OfficeCodes), then a "
+            "`Run-time error 3021 — No current record` popup "
+            "appears when the chain reaches block #9 "
+            "(PeopleEntry).  The remaining 2-3 expected files "
+            "(PeopleEntry, EntryCode, optional InstitutionCodes) "
+            "are never written.",
+            "Verified end-to-end via probe at "
+            "`analysis/probe_groupdata_cmdneo4j.py` and "
+            "`analysis/probe_groupdata_cmdneo4j_tail.py` — the "
+            "tail probe's iter 3 split-then-seed iteration "
+            "manually inserts one row into ZZ_SCRATCH_ENTRY, at "
+            "which point the chain produces 10 files with no "
+            "ERR (proves the trigger is the empty source "
+            "recordset, not anything else).",
+        ],
+        "steps_zh": [
+            "在 **LookAtGroupData** 上把汇入清单设为 c_personid "
+            "= 1（安惇 An Dun）——他有 2 条 STATUS_DATA / 2 条 "
+            "ENTRY_DATA / 约 12 条 POSTED_TO_OFFICE，链条针对 "
+            "Status / Office 有实际数据，但只要不勾 ChkEntry，"
+            "`ZZ_SCRATCH_ENTRY` 就会保持为空（勾上 ChkEntry 会"
+            "另外触发 Issue #6）。",
+            "勾 **Status**、**Office**、**Addr** 及对应的 "
+            "**GIS** 三个子项——**Entry 不要勾**（让 "
+            "ZZ_SCRATCH_ENTRY 维持为空）。点 **Run**。",
+            "CmdRun 完成后（ZZ_SCRATCH_STATUS 写入 2 行，"
+            "ZZ_SCRATCH_OFFICE 写入 12 行），点选 **Neo4j** "
+            "汇出按钮。",
+            "链条会先顺利产出 8 份 CSV（People / Places / "
+            "PeoplePlaces / PersonPlaceCodes / PeopleStatus / "
+            "StatusCode / PeopleOffice / OfficeCodes），然后在"
+            "进入第 9 个 block（PeopleEntry）时弹出 `执行时错误"
+            " 3021 —— No current record` 对话框。余下的 2-3 份"
+            "预期档案（PeopleEntry / EntryCode / 可选的 "
+            "InstitutionCodes）不会写出。",
+            "已在 `analysis/probe_groupdata_cmdneo4j.py` 与 "
+            "`analysis/probe_groupdata_cmdneo4j_tail.py` 端到端"
+            "验证 —— tail probe 的 iter 3 split-then-seed 手动"
+            "向 ZZ_SCRATCH_ENTRY 插入一行后，链条产出 10 份档案"
+            "且没有 ERR（证明触发条件就是空记录集，没有其他变量）。",
+        ],
+        "fix_en": (
+            "Add an `.EOF` (or `.RecordCount > 0`) guard before "
+            "the `.MoveFirst` call in **all 11 blocks** of "
+            "`Form_LookAtGroupData.CmdNeo4j_Click`.  Block #9 "
+            "PeopleEntry (line ~1245) and block #10 EntryCode "
+            "(line ~1385) are the most user-reachable.  "
+            "Suggested shape:\n\n"
+            "```vb\n"
+            "Set tRstPeopleEntry = CurrentDb.OpenRecordset("
+            "\"ZZ_SCRATCH_ENTRY\", dbOpenDynaset)\n"
+            "With tRstPeopleEntry\n"
+            "    If Not .EOF Then\n"
+            "        .MoveFirst\n"
+            "        Do While Not .EOF\n"
+            "            ' ... existing per-row write ...\n"
+            "            .MoveNext\n"
+            "        Loop\n"
+            "    End If\n"
+            "End With\n"
+            "```\n\n"
+            "Block #11 InstitutionCodes (line ~1487) is already "
+            "correctly gated by `If tRecDeleted > 0 Then` "
+            "upstream and does not need this change."
+        ),
+        "fix_zh": (
+            "在 `Form_LookAtGroupData.CmdNeo4j_Click` 的 **全部 "
+            "11 个 block** 中，于 `.MoveFirst` 呼叫前加上 "
+            "`.EOF`（或 `.RecordCount > 0`）防护。其中 block #9 "
+            "PeopleEntry（约 line 1245）和 block #10 EntryCode"
+            "（约 line 1385）是用户最容易触发的两段。建议写法："
+            "\n\n"
+            "```vb\n"
+            "Set tRstPeopleEntry = CurrentDb.OpenRecordset("
+            "\"ZZ_SCRATCH_ENTRY\", dbOpenDynaset)\n"
+            "With tRstPeopleEntry\n"
+            "    If Not .EOF Then\n"
+            "        .MoveFirst\n"
+            "        Do While Not .EOF\n"
+            "            ' ... 原有的逐行写出 ...\n"
+            "            .MoveNext\n"
+            "        Loop\n"
+            "    End If\n"
+            "End With\n"
+            "```\n\n"
+            "Block #11 InstitutionCodes（约 line 1487）上游已有 "
+            "`If tRecDeleted > 0 Then` 闸门，本身不会触发，不需"
+            "要改动。"
+        ),
+        "screenshots": [],
+        "severity_en": (
+            "P1 — Visible crash on a normal user click "
+            "(any GroupData CmdNeo4j export where Entry data is "
+            "absent for the queried person, which is the common "
+            "case for figures with sparse entry records)"
+        ),
+        "severity_zh": (
+            "P1 — 正常用户点击下的可见报错（只要查询的人没有 "
+            "Entry 资料，GroupData 的 Neo4j 汇出就会触发 —— "
+            "这对入仕记录稀薄的人物属于常见情况）"
+        ),
+    },
+
+    {
         "id": 14,
         "tier": "P5_dormant_or_latent",
         "form": "Form_KIN_DATA_Subform",

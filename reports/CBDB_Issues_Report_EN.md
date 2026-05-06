@@ -17,6 +17,7 @@ The issues are ordered by severity (P0 highest). Each entry includes a concise d
 - [P1 — Visible runtime crash](#p1--visible-runtime-crash)
   - [Issue #6 — LookAtGroupData ChkEntry path references a non-existent column ENTRY_DATA.c_parental_status](#issue-6--lookatgroupdata-chkentry-path-references-a-non-existent-column-entry_datac_parental_status)
   - [Issue #13 — BIOG_MAIN_2 Subform tries to open a picker form (frmPickNIAN_HAO) that doesn't exist](#issue-13--biog_main_2-subform-tries-to-open-a-picker-form-frmpicknian_hao-that-doesnt-exist)
+  - [Issue #21 — LookAtGroupData.CmdNeo4j crashes with 'No current record' on empty sections](#issue-21--lookatgroupdatacmdneo4j-crashes-with-no-current-record-on-empty-sections)
 - [P2 — Silent display](#p2--silent-display)
   - [Issue #10 — EVENT_ADDR_2 Subform address columns silently render blank (wrong ControlSource)](#issue-10--event_addr_2-subform-address-columns-silently-render-blank-wrong-controlsource)
 - [P3 — Missing UI](#p3--missing-ui)
@@ -220,6 +221,47 @@ _Step 2 — the popup users see.  Reconstructed in PIL because the real popup wo
 #### Suggested fix
 
 Either restore the picker form `frmPickNIAN_HAO`, or update the caller in `Form_BIOG_MAIN_2_Subform.c_fl_ey_notes_Click` to use whichever picker form replaced it.
+
+### Issue #21 — LookAtGroupData.CmdNeo4j crashes with 'No current record' on empty sections
+
+**Affected sub:** `Form_LookAtGroupData.CmdNeo4j_Click`
+
+**Severity:** P1 — Visible crash on a normal user click (any GroupData CmdNeo4j export where Entry data is absent for the queried person, which is the common case for figures with sparse entry records)
+
+#### Description
+
+All 11 CSV export blocks in `Form_LookAtGroupData.CmdNeo4j_Click` open a scratch recordset and immediately call `.MoveFirst` without first checking if the recordset is empty (no `.EOF` or `.RecordCount > 0` guard).  When a user queries a group whose data has no rows in a given category — for example, no Entry data so `ZZ_SCRATCH_ENTRY` is empty — the `.MoveFirst` call instantly raises DAO 3021 'No current record', a popup blocks the user, and the entire Neo4j export chain aborts.
+
+On the current dump and a typical small fixture the first block to hit this is **block #9 PeopleEntry** (line 1243-1245) — `Set tRstPeopleEntry = CurrentDb.OpenRecordset("ZZ_SCRATCH_ENTRY", dbOpenDynaset)` followed unguarded by `.MoveFirst`.  The same unguarded pattern exists in the immediately-following **block #10 EntryCode** (line 1383-1385) and in fact in **all 11 blocks** of `CmdNeo4j_Click` — the other 8 only happen to work because their feeder scratch tables (ZZ_SCRATCH_STATUS, ZZ_SCRATCH_OFFICE, etc.) are non-empty under any normal enable scope.
+
+This is **distinct from Issue #6**: Issue #6 is a column-typo (`ENTRY_DATA.c_parental_status` vs `c_parental_status_code`) in `queryEntry` that prevents `ZZ_SCRATCH_ENTRY` from being populated at all when ChkEntry is on.  Issue #21 is a separate downstream missing-guard bug in `CmdNeo4j_Click` that fires whenever `ZZ_SCRATCH_ENTRY` happens to be empty — including via the upstream Issue #6 path, but also independently when the user simply doesn't tick ChkEntry.  Two different code-level defects; should be filed and fixed separately.
+
+#### Steps to reproduce
+
+1. In **LookAtGroupData**, populate the import list with c_personid = 1 (An Dun 安惇) — he has 2 STATUS_DATA / 2 ENTRY_DATA / ~12 POSTED_TO_OFFICE rows so the chain has substantive feeder data for Status / Office but Entry data won't appear in ZZ_SCRATCH_ENTRY unless ChkEntry is ticked (which would also trigger Issue #6 separately).
+2. Tick **Status**, **Office**, **Addr** and the matching **GIS** sister checkboxes — but leave **Entry** unticked (ZZ_SCRATCH_ENTRY stays empty).  Click **Run**.
+3. After CmdRun finishes (ZZ_SCRATCH_STATUS gets 2 rows, ZZ_SCRATCH_OFFICE gets 12), click the **Neo4j** export button.
+4. The chain produces 8 CSVs cleanly (People, Places, PeoplePlaces, PersonPlaceCodes, PeopleStatus, StatusCode, PeopleOffice, OfficeCodes), then a `Run-time error 3021 — No current record` popup appears when the chain reaches block #9 (PeopleEntry).  The remaining 2-3 expected files (PeopleEntry, EntryCode, optional InstitutionCodes) are never written.
+5. Verified end-to-end via probe at `analysis/probe_groupdata_cmdneo4j.py` and `analysis/probe_groupdata_cmdneo4j_tail.py` — the tail probe's iter 3 split-then-seed iteration manually inserts one row into ZZ_SCRATCH_ENTRY, at which point the chain produces 10 files with no ERR (proves the trigger is the empty source recordset, not anything else).
+
+#### Suggested fix
+
+Add an `.EOF` (or `.RecordCount > 0`) guard before the `.MoveFirst` call in **all 11 blocks** of `Form_LookAtGroupData.CmdNeo4j_Click`.  Block #9 PeopleEntry (line ~1245) and block #10 EntryCode (line ~1385) are the most user-reachable.  Suggested shape:
+
+```vb
+Set tRstPeopleEntry = CurrentDb.OpenRecordset("ZZ_SCRATCH_ENTRY", dbOpenDynaset)
+With tRstPeopleEntry
+    If Not .EOF Then
+        .MoveFirst
+        Do While Not .EOF
+            ' ... existing per-row write ...
+            .MoveNext
+        Loop
+    End If
+End With
+```
+
+Block #11 InstitutionCodes (line ~1487) is already correctly gated by `If tRecDeleted > 0 Then` upstream and does not need this change.
 
 ## P2 — Silent display
 

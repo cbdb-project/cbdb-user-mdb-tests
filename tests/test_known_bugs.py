@@ -181,6 +181,101 @@ def test_bug6_groupdata_query_entry_wrong_field():
     )
 
 
+
+def test_bug21_groupdata_cmdneo4j_missing_eof_guard():
+    """Bug #21 (reports/CBDB_Issues_Report_EN.md) —
+    `Form_LookAtGroupData.CmdNeo4j_Click` opens a recordset on
+    `ZZ_SCRATCH_ENTRY` (block #9 PeopleEntry, ~line 1245) and
+    immediately calls `.MoveFirst` without first checking `.EOF`.
+    When `ZZ_SCRATCH_ENTRY` is empty (a normal user state — the
+    queried person has no Entry data, OR ChkEntry was left
+    unticked), `.MoveFirst` raises DAO 3021 'No current record'
+    and the entire Neo4j export chain aborts mid-way.
+
+    Distinct from Issue #6 — Issue #6 is a column-typo upstream
+    in `queryEntry` that prevents `ZZ_SCRATCH_ENTRY` from being
+    populated at all when ChkEntry is on.  Issue #21 is the
+    independent downstream missing-guard bug that fires whenever
+    `ZZ_SCRATCH_ENTRY` is empty for any reason.
+
+    Robust regression marker: anchor on the
+    `OpenRecordset("ZZ_SCRATCH_ENTRY"` call (which is unique in
+    the form's VBA body to the PeopleEntry block), find the
+    immediately-following `.MoveFirst`, and assert that the
+    window between them contains NO `.EOF` / `.RecordCount`
+    guard pattern.  When CBDB fixes this — by inserting any of
+    `If Not .EOF Then`, `If .RecordCount > 0 Then`, etc. between
+    OpenRecordset and .MoveFirst — this test will fire and
+    require a maintainer to update both the test and Issue #21
+    in `reports/generate_report.py`.
+    """
+    vba_path = (REPO / "analysis" / "dump" / "vba"
+                / "Form_LookAtGroupData.vb")
+    body = vba_path.read_bytes().decode("utf-8")
+
+    # Anchor 1: the OpenRecordset call on ZZ_SCRATCH_ENTRY is
+    # unique to block #9 PeopleEntry in the CmdNeo4j_Click body.
+    open_marker = 'CurrentDb.OpenRecordset("ZZ_SCRATCH_ENTRY"'
+    open_idx = body.find(open_marker)
+    assert open_idx >= 0, (
+        "Bug #21 marker no longer reproduces (investigate "
+        "upstream fix vs. fixture/driver change vs. "
+        "misclassification before flipping) — anchor "
+        f"`{open_marker}` not found in Form_LookAtGroupData.vb. "
+        "The PeopleEntry block in CmdNeo4j_Click was likely "
+        "refactored.  Update this test to assert the corrected "
+        "form, and update Issue #21 in "
+        "reports/generate_report.py accordingly."
+    )
+
+    # Anchor 2: the .MoveFirst that follows the OpenRecordset.
+    # In the buggy form these are ~2 lines apart (with a `With
+    # tRstPeopleEntry` between).  Cap the search to 800 chars so
+    # we don't accidentally pick up a different block's
+    # .MoveFirst if the PeopleEntry block is removed but later
+    # blocks remain.
+    move_idx = body.find(".MoveFirst", open_idx)
+    assert 0 <= move_idx - open_idx <= 800, (
+        "Bug #21 marker no longer reproduces — could not locate "
+        "the PeopleEntry block's .MoveFirst within 800 chars "
+        f"after `{open_marker}`.  The block was likely "
+        "refactored.  Investigate upstream fix vs. fixture/"
+        "driver change vs. misclassification before flipping; "
+        "update Issue #21 in reports/generate_report.py."
+    )
+
+    # The window between OpenRecordset and .MoveFirst is where
+    # any reasonable .EOF / .RecordCount guard would live.
+    # Enumerate the guard patterns a fix would plausibly use.
+    window = body[open_idx:move_idx]
+    fix_patterns = (
+        "If Not .EOF",
+        "If Not tRstPeopleEntry.EOF",
+        "If .EOF Then",
+        "If tRstPeopleEntry.EOF Then",
+        ".RecordCount >",
+        ".RecordCount <>",
+        "RecordCount > 0",
+        "RecordCount <> 0",
+    )
+    found_guards = [p for p in fix_patterns if p in window]
+    assert not found_guards, (
+        "Bug #21 marker no longer reproduces (investigate "
+        "upstream fix vs. fixture/driver change vs. "
+        "misclassification before flipping) — found protective "
+        f"guard pattern(s) {found_guards} between "
+        f"`{open_marker}` and the immediately-following "
+        ".MoveFirst.  This suggests the PeopleEntry block now "
+        "guards against an empty ZZ_SCRATCH_ENTRY (Issue #21 "
+        "was fixed upstream).  Update this test to assert the "
+        "corrected form, and update Issue #21 in "
+        "reports/generate_report.py accordingly.  Note: per "
+        "Issue #21's fix recommendation, a complete fix should "
+        "add the same guard to ALL 11 blocks of "
+        "CmdNeo4j_Click; consider extending this test to also "
+        "verify the EntryCode block (around line 1385)."
+    )
+
 def test_bug7_lookat_place_cmdneo4j_select_missing_dynasty_female():
     """Bug #7 (reports/CBDB_Issues_Report_EN.md) — Form_LookAtPlace.CmdNeo4j builds a
     People-CSV from a SELECT that omits c_dynasty / c_dynasty_chn /
