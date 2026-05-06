@@ -156,9 +156,10 @@
       "bucket": "B_blocked_by_known_driver_issue",
       "bucket_was": "A_small_candidate",
       "_reclassified_2026_05_04": "PR cover/assocpairs-pajek-gephi probe surfaced upstream CmdQuery SetFocus blocker (see CmdPajek entry); CmdGIS is downstream of the same CmdQuery so it has no source data either.",
-      "current_blocker": "Upstream CmdQuery_Click `Me.CmdQuery.SetFocus` (Form_LookAtAssociationPairs.vb:1635) fails under Form_Timer dispatch with 'Welcome to CBDB! can't move the focus to the control CmdQuery.' (VBA error 2110).  CmdQuery exits via error handler before INSERT statements run; ZZ_SOCIAL_NETWORK = 0; CmdGIS has nothing to export.",
-      "nearest_existing_test_pattern": "tests/test_vba_cmdgis_other_forms.py (5 forms × CmdGIS, single-file output, structural assertion).  Once the driver-side CmdQuery patch lands, this cell drops back to bucket A.",
-      "recommended_next_action": "Wait for the AssociationPairs CmdQuery driver patch (per-form inline VBA patch à la _PER_FORM_CMDGIS_PATCHES that strips Me.<button>.SetFocus lines).",
+      "_superseded_by": "Refresh 2026-05-06 (second): SetFocus patch landed (commits 3bb69ef + 0c0eaf1); CmdGIS does NOT drop back to bucket A — second independent blocker confirmed (stale-subform-RecordCount; analysis/assocpairs_cmdgis_note.md)",
+      "current_blocker": "HISTORICAL (2026-05-04): CmdQuery SetFocus driver bug. CURRENT (2026-05-06): stale-subform-RecordCount — SetFocus is resolved; CmdQuery now runs its INSERTs but ZZ_SOCIAL_NETWORK.RecordCount returns 0 before .MoveLast; .Form.Requery after CmdQuery's fresh dbOpenDynaset rebind likely invalidates the recordset. Independent of SetFocus fix. See analysis/assocpairs_cmdgis_note.md.",
+      "nearest_existing_test_pattern": "tests/test_vba_cmdgis_other_forms.py (5 forms × CmdGIS). Does not transfer directly — subform-RecordCount issue is AssocPairs-specific.",
+      "recommended_next_action": "HISTORICAL: wait for SetFocus patch. CURRENT (2026-05-06): needs own investigation brief for the stale-subform-RecordCount blocker; waiting for the SetFocus patch is no longer the constraint.",
       "risk": "medium"
     },
     {
@@ -167,10 +168,11 @@
       "bucket": "B_blocked_by_known_driver_issue",
       "bucket_was": "C_blocked_by_form_query_timeout",
       "_reclassified_2026_05_04": "PR cover/assocpairs-pajek-gephi probe: the 'matrix CmdQuery times out' explanation in the original triage was wrong.  The actual blocker is the same SetFocus driver issue surfaced for CmdPajek/Gephi (CmdQuery exits via error handler before INSERTs run; ZZ_SOCIAL_NETWORK = 0; CmdNeo4j has no source data).  Sibling LookAtAssociations CmdNeo4j '0-file-mode' failure remains an open question but is downstream of fixing the SetFocus blocker.",
-      "current_blocker": "Same upstream CmdQuery SetFocus blocker as CmdPajek/Gephi (Form_LookAtAssociationPairs.vb:1635).  Multi-file Neo4j chain on small fixture would also need verification once unblocked.",
-      "nearest_existing_test_pattern": "tests/test_vba_cmdneo4j_cross_form.py cross-form host; LookAtAssociations CmdNeo4j is skipped with '0-file-mode' (separate failure mode worth probing once driver patch lands).",
-      "recommended_next_action": "Wait for the AssociationPairs CmdQuery driver patch.  After that lands, probe the multi-file Neo4j chain on a small fixture before claiming low risk.",
-      "risk": "medium-high"
+      "_superseded_by": "Refresh 2026-05-06 (second): SetFocus patch landed (commits 3bb69ef + 0c0eaf1); SetFocus blocker resolved; cell is now probe-first candidate (Rank 1). Prior triage condition 'probe after patch lands' is now met.",
+      "current_blocker": "HISTORICAL (2026-05-04): matrix-CmdQuery timeout (corrected to SetFocus in 2026-05-05 later). CURRENT (2026-05-06): multi-file Neo4j chain timing on small known-edged fixture — unknown. Sibling LookAtAssociations CmdNeo4j 0-file mode is an open companion question.",
+      "nearest_existing_test_pattern": "tests/test_vba_cmdneo4j_cross_form.py cross-form host; 1x3 known-edged fixture shape from CmdPajek/CmdGephi coverage (4b8a927).",
+      "recommended_next_action": "HISTORICAL: wait for SetFocus patch. CURRENT (2026-05-06): probe-first — drive CmdQuery + CmdNeo4j on small known-edged fixture; time chain; count files; snapshot ZZ_TEST_DEBUG. Promote to coverage only if chain completes within watcher timeout AND >= 1 file AND no mid-chain :ERR. Ranked Rank 1 in refresh_2026_05_06_second.",
+      "risk": "medium"
     },
     {
       "form": "LookAtAssociationPairs", "command": "CmdPajek",
@@ -178,10 +180,14 @@
       "bucket": "B_blocked_by_known_driver_issue",
       "bucket_was": "A_small_candidate",
       "_reclassified_2026_05_04": "PR cover/assocpairs-pajek-gephi: live probe with 4×5 + 4×8121 fixtures both surfaced 'Welcome to CBDB! can't move the focus to the control CmdQuery.' from inside CmdQuery_Click before any INSERT runs.  matrix_hard_forms's existing assocpair_4x5_small test passes only because its _check_assoc_pairs deliberately doesn't assert on row count — silently swallows the same SetFocus failure.  Triage was based on that misleading 'passing' state.",
-      "current_blocker": "Form_LookAtAssociationPairs.CmdQuery_Click line 1635 calls Me.CmdQuery.SetFocus, which fails under Form_Timer dispatch (active form during dispatch is welcome / NAVIGATION_PANE, not LookAtAssociationPairs).  CmdQuery exits via error handler before INSERT statements; ZZ_SOCIAL_NETWORK = 0.  CmdPajek bails on RecordCount=0 per Form_LookAtAssociationPairs.vb:363-364.",
-      "nearest_existing_test_pattern": "Case('LookAtAssociations', 'CmdPajek', '.net', '*vertices') passes because Associations.CmdQuery_Click does not call Me.CmdQuery.SetFocus.  No other LookAt form has this pattern.",
-      "recommended_next_action": "Driver-side fix: per-form inline VBA patch (à la _PER_FORM_CMDGIS_PATCHES) stripping Me.<button>.SetFocus lines from Form_LookAtAssociationPairs, OR extending Form_Timer dispatch to first activate the form via DoCmd.  Out of scope for autopilot.",
-      "risk": "medium"
+      "_superseded_by": "Refresh 2026-05-06 (second): SetFocus patch landed (commits 3bb69ef + 0c0eaf1) + coverage PR (commit 4b8a927). Cell is COVERED.",
+      "bucket_now": "covered_2026_05_05",
+      "covered_by_commit": "4b8a927",
+      "covered_by_test": "tests/test_vba_pajek_gephi_cross_form.py _CASES AssociationPairs CmdPajek via 1x3 known-edged fixture",
+      "current_blocker": "HISTORICAL (2026-05-04): CmdQuery SetFocus driver bug (resolved by commits 3bb69ef + 0c0eaf1). CURRENT: none — cell is covered.",
+      "nearest_existing_test_pattern": "tests/test_vba_pajek_gephi_cross_form.py (now includes AssociationPairs CmdPajek).",
+      "recommended_next_action": "HISTORICAL: driver-side fix. CURRENT (2026-05-06): none — cell is closed.",
+      "risk": "covered"
     },
     {
       "form": "LookAtAssociationPairs", "command": "CmdGephi",
@@ -189,10 +195,14 @@
       "bucket": "B_blocked_by_known_driver_issue",
       "bucket_was": "A_small_candidate",
       "_reclassified_2026_05_04": "Same SetFocus blocker as CmdPajek above.",
-      "current_blocker": "Identical to CmdPajek — same upstream CmdQuery SetFocus bug.  Form_LookAtAssociationPairs.vb:113-119 shows CmdGephi has the same RecordCount=0 early-bail.",
-      "nearest_existing_test_pattern": "Case('LookAtAssociations', 'CmdGephi', '.gdf', 'nodedef') passes for the same reason CmdPajek does on Associations (no SetFocus in CmdQuery body).",
-      "recommended_next_action": "Same as CmdPajek — wait for the driver-side CmdQuery fix; both close together.",
-      "risk": "medium"
+      "_superseded_by": "Refresh 2026-05-06 (second): SetFocus patch landed (commits 3bb69ef + 0c0eaf1) + coverage PR (commit 4b8a927). Cell is COVERED.",
+      "bucket_now": "covered_2026_05_05",
+      "covered_by_commit": "4b8a927",
+      "covered_by_test": "tests/test_vba_pajek_gephi_cross_form.py _CASES AssociationPairs CmdGephi via 1x3 known-edged fixture",
+      "current_blocker": "HISTORICAL (2026-05-04): CmdQuery SetFocus driver bug (resolved). CURRENT: none — cell is covered.",
+      "nearest_existing_test_pattern": "tests/test_vba_pajek_gephi_cross_form.py (now includes AssociationPairs CmdGephi).",
+      "recommended_next_action": "HISTORICAL: wait for driver fix. CURRENT (2026-05-06): none — cell is closed.",
+      "risk": "covered"
     },
     {
       "form": "LookAtAssociationPairs", "command": "CmdUCINet",
@@ -200,9 +210,11 @@
       "bucket": "D_plus_B_stacked",
       "bucket_was": "D_plus_C_stacked",
       "_reclassified_2026_05_04": "Inner blocker re-classified from C (matrix-CmdQuery timeout) -> B (SetFocus driver bug); see CmdNeo4j entry above for the same correction.  Stack is now D + B.",
-      "current_blocker": "Stacks both CmdUCINet family blocker AND the upstream CmdQuery SetFocus driver bug.",
+      "_superseded_by": "Refresh 2026-05-06 (second): SetFocus patch landed; inner B-stack (SetFocus) resolved. Bucket is now D-only (CmdUCINet family design is sole remaining blocker).",
+      "bucket_now": "D_new_export_family_needs_design",
+      "current_blocker": "HISTORICAL (2026-05-04): stacked CmdUCINet family + SetFocus driver bug. CURRENT (2026-05-06): CmdUCINet family design only (D-only). SetFocus stack removed.",
       "nearest_existing_test_pattern": "None for CmdUCINet.",
-      "recommended_next_action": "NOT in next 1-3 PRs.  Resolve CmdUCINet family AND AssociationPairs CmdQuery driver patch first; AssociationPairs is then the highest-risk member of the CmdUCINet family.",
+      "recommended_next_action": "NOT in next 1-3 PRs. Resolve CmdUCINet family design first; AssociationPairs is highest-risk member of the family once design is in place.",
       "risk": "high"
     },
     {
@@ -291,16 +303,16 @@
   ],
   "high_leverage_meta_pr_direction": {
     "title": "Driver-side per-form CmdQuery patch for LookAtAssociationPairs",
+    "_status": "COMPLETED per Refresh 2026-05-06 (second): commits 3bb69ef + 0c0eaf1 landed _ASSOCPAIRS_SETFOCUS_TARGETS_BY_SUB dict + _PER_FORM_CMDGIS_PATCHES['Form_LookAtAssociationPairs'] in cbdb_driver/vba_session.py. CmdPajek + CmdGephi coverage followed in commit 4b8a927. CmdGIS has a second independent blocker (stale-subform-RecordCount); CmdNeo4j is now probe-first candidate; CmdUCINet is D-only.",
     "scope_sketch": "Inline VBA patch (à la _PER_FORM_CMDGIS_PATCHES in cbdb_driver/vba_session.py) that strips Me.<button>.SetFocus lines from Form_LookAtAssociationPairs's CmdQuery_Click body, OR extends Form_Timer dispatch to first activate the form via DoCmd.  Either approach unblocks all 3 AssociationPairs export cells (CmdGIS / CmdPajek / CmdGephi) at once, AND drops AssociationPairs.CmdUCINet's stack from D+B to D-only.",
     "estimated_unblock": "3-4 cells",
     "risk": "medium (driver patch surface area; need to confirm no other forms regress)",
     "out_of_scope_today": true,
-    "_note": "Identified by PR cover/assocpairs-pajek-gephi as the highest-ROI follow-up direction.  Not opened automatically per the autopilot rule."
+    "_note": "HISTORICAL: Identified by PR cover/assocpairs-pajek-gephi as the highest-ROI follow-up direction. COMPLETED: see _status above."
   },
+  "_do_not_autopilot_note_2026_05_06_second": "CmdPajek and CmdGephi removed from this list — both are now covered (commit 4b8a927). CmdGIS remains (second independent blocker). CmdNeo4j remains as probe-first candidate (chain-timing probe required before any coverage PR).",
   "do_not_autopilot": [
     "LookAtAssociationPairs × CmdGIS",
-    "LookAtAssociationPairs × CmdPajek",
-    "LookAtAssociationPairs × CmdGephi",
     "LookAtAssociationPairs × CmdNeo4j",
     "LookAtGroupData × CmdNeo4j",
     "LookAtNetworks × CmdGIS",
