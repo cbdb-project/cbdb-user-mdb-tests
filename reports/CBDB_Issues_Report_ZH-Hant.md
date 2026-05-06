@@ -280,7 +280,13 @@ End With
 
 使用者可見症狀：彈出 Run-time error 5 對話方塊；匯出的 `.vna` 檔案不完整，UCINET / Visone 無法讀取。
 
-**Sibling-form 風險（本 issue 尚未直接 probe 確認）：** `Form_LookAtKinship.CmdUCINet_Click` 在約 line 2510 用同樣的 `CreateTextFile(tFileName, True)` 模式。當前 Kinship × CmdUCINet 覆蓋測試（`tests/test_vba_cmducinet_kinship.py`）能透過，僅是因為 person 3211 的網路剛好沒有帶漢字的 c_name；換個含漢字 c_name 的 Kinship fixture 大機率會在同一處崩潰。`Form_LookAtPlace.CmdUCINet_Click` 用的是 ADO Stream（不是 FSO），編碼行為可能不同，需要單獨 probe 驗證。本 issue 只 canonicalize probe 已直接證實的 Associations 層面。
+**受影響表單（按當前 dump 的證據）：**
+
+- **LookAtAssociations** — 直接 canonicalize。由 `tests/test_known_bugs.py::test_bug22_associations_cmducinet_createtextfile_no_unicode_arg`（靜態）和 `tests/test_vba_bug_behaviors.py::test_bug22_associations_cmducinet_fires_invalid_procedure_call`（執行時）雙重釘死。原始調查證據見 `analysis/probe_associations_cmducinet_error5.md`。
+- **LookAtKinship** — **同 root cause 的 runtime-confirmed sibling form。**`Form_LookAtKinship.CmdUCINet_Click` 在約 line 2510 用同樣的 `CreateTextFile(tFileName, True)` 2-arg 模式。透過 probe `investigate/kinship-cmducinet-sibling-risk`（commit 154bb4b）以 picker = pid 152930（He Jing 何淨，唯一 1-hop kin 是 pid 140733 He Mou 取，U+53D6 = 與 Associations 的 稜 = U+7A1C 同屬 CJK Han ideograph 觸發類）復現。Probe 結果：同樣的 `:ERR Invalid procedure call or argument`，同樣的殘破檔案形狀（`*node data` 完整 + `*node properties` 截斷 + `*tie data` 完全沒寫）。本 PR 已擴充套件靜態 marker `tests/test_known_bugs.py::test_bug22_associations_cmducinet_createtextfile_no_unicode_arg`，讓它同時檢查 `Form_LookAtKinship.vb` 的同樣 2-arg 模式；Kinship 的執行時 pin 暫緩（見下方 Coverage caveat）。
+- **LookAtPlace** — 可能存在的獨立風險；**本 issue 的確認範圍不包含 Place。**`Form_LookAtPlace.CmdUCINet_Click` 用的是 ADO Stream（`tStream.WriteText`），不是 FSO （`tVNA.WriteLine`），編碼行為可能不同，需要單獨的 per-form probe 才能下同 bug-family 的結論。Place CmdUCINet 在 inventory 仍維持 `gap`。
+
+**Coverage caveat：** 現有的 Kinship × CmdUCINet 覆蓋測試（`tests/test_vba_cmducinet_kinship.py`）在 inventory 上仍是 `covered`，但已 **明確標註為 fixture-fragile** —— 它能透過只是因為 matrix 提供的 person 3211 網路剛好沒有 Han 字元 c_name。換成一個網路能觸達Han 名字的 fixture（sibling probe 直接示範了這一點）就會在同一段 .vna 寫出路徑上崩潰。已在測試的 docstring 與 inventory manifest 的 notes 欄位同步備註。
 
 #### 復現步驟
 
@@ -308,7 +314,7 @@ Set tVNA = tFileSystem.CreateTextFile(tFileName, True, True)
 
 替代方案（不太推薦）：在 `WriteLine` 之前把 `c_name` 裡的非 cp1252 字元剝掉或轉寫。會丟失匯出的真實資料，而且程式碼量更大；Unicode flag 才是正解。
 
-`Form_LookAtKinship.CmdUCINet_Click`（約 line 2510）大機率需要套用同樣的一行修改 —— 詳見描述裡的 Sibling-form 風險段。本 issue 的 canonical 驗證範圍不含 Kinship；上游修補時建議一起處理。
+`Form_LookAtKinship.CmdUCINet_Click`（約 line 2510）也需要套用同樣的一行修改 —— 詳見上方「受影響表單」段。Kinship 是本 issue 的 runtime-confirmed sibling form（同 root cause、同 failure class，只是宿主表單與觸發 fixture 不同），所以一次上游修補應同時給兩個 CreateTextFile 加上 Unicode flag。Place （LookAtPlace.CmdUCINet）**不在** 本 issue 的範圍內 —— 它用的是 ADO Stream 而非 FSO，需要單獨的 per-form probe 才能下同 bug-family 的結論或加入修補範圍。
 
 ## P2 — 靜默顯示問題
 

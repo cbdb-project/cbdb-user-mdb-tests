@@ -1,6 +1,6 @@
 # Export coverage inventory (LookAt form × export button)
 
-**Generated:** 2026-05-06T06:05:27+00:00
+**Generated:** 2026-05-06T07:45:51+00:00
 **Generator:** `analysis/inventory_export_coverage.py`
 **Companion JSON:** `reports/export_coverage_inventory.json`
 
@@ -236,7 +236,7 @@ Cells with status `not_applicable` are omitted to keep the noise down.
 - Handler in source: yes
 - Button on form: yes
 - Why: Real-VBA test exists and passes for this cell.
-- Test: `tests/test_vba_cmducinet_kinship.py::test_cmducinet_kinship_writes_vna_with_three_sections` — **covered**; notes: .vna shape; 3 sections (*node data / *node properties / *tie data); cp1252 no BOM; row counts cross-checked vs ZZ_SCRATCH_KIN + ZZ_SCRATCH_KINNET.  Family shape established by probe investigate/cmducinet-family-shape (commit 4e8e0d2); coverage is Kinship-only because Associations CmdUCINet is blocked by VBA error 5 mid-write and Place uses ADO Stream rather than FSO.  Test uses split-fire (CmdRun via timer, then CmdUCINet alone with file-poll) because CmdUCINet is not in _TIMER_DISPATCH_SUBS — test-side workaround; no driver change in this PR.
+- Test: `tests/test_vba_cmducinet_kinship.py::test_cmducinet_kinship_writes_vna_with_three_sections` — **covered**; notes: .vna shape; 3 sections (*node data / *node properties / *tie data); cp1252 no BOM; row counts cross-checked vs ZZ_SCRATCH_KIN + ZZ_SCRATCH_KINNET.  Family shape established by probe investigate/cmducinet-family-shape (commit 4e8e0d2); coverage is Kinship-only because Associations CmdUCINet is blocked by VBA error 5 mid-write and Place uses ADO Stream rather than FSO.  Test uses split-fire (CmdRun via timer, then CmdUCINet alone with file-poll) because CmdUCINet is not in _TIMER_DISPATCH_SUBS -- test-side workaround; no driver change in that PR.  KNOWN FIXTURE-FRAGILE per Issue #22's Kinship sibling-form confirmation (probe investigate/kinship-cmducinet-sibling-risk commit 154bb4b): this test passes only because the matrix-supplied person 3211's kin network happens to contain no Han-character c_name values; switching to a fixture whose network reaches a Han-name person reproduces the same VBA error 5 documented in canonical Issue #22.  Coverage status remains 'covered' because the test does pass on the current matrix fixture, but maintainers should treat this cell as Issue-#22-vulnerable for future fixture / dump changes.
 
 ### LookAtStatus × CmdGIS — `real_vba_covered`
 

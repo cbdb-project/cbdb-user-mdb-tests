@@ -1,6 +1,32 @@
 """LookAtKinship × CmdUCINet — first coverage cell of the
 CmdUCINet family.
 
+**KNOWN FIXTURE-FRAGILE per Issue #22 sibling-form
+confirmation (probe commit `154bb4b`).**  This test passes
+on the current dump's matrix-supplied `kinship_person_3211`
+fixture only because that person's kin network happens to
+contain no Han-character `c_kin_name` values.  The Kinship
+sibling-risk probe (`analysis/probe_kinship_cmducinet_
+sibling_risk.md`) demonstrated directly that switching to
+a fixture whose kin network reaches a Han-name person (e.g.
+picker = pid 152930 He Jing 何淨, whose sole 1-hop kin is
+pid 140733 He Mou 取) reproduces canonical Issue #22's
+exact failure mode here: same `:ERR Invalid procedure call
+or argument` (VBA error 5), same partial-file shape (full
+`*node data` + truncated `*node properties` + missing
+`*tie data`).  See Issue #22's "Affected forms" section for
+the full canonical text including Kinship's runtime-
+confirmed sibling-form status.
+
+This test's `covered` status in the inventory is preserved
+because the test does pass on the current matrix fixture,
+but maintainers should treat this cell as Issue-#22-
+vulnerable when changing fixtures or processing future
+data dumps.  An upstream fix to the
+`CreateTextFile(tFileName, True, True)` Unicode flag (per
+Issue #22's `fix_en`) would simultaneously close
+Associations AND remove the Kinship fixture-fragility.
+
 Per the export-gap triage (post probe `investigate/cmducinet-
 family-shape`, commit `4e8e0d2`, merged to main): CmdUCINet
 on LookAtKinship is the cheapest first coverage candidate

@@ -303,66 +303,99 @@ def test_bug22_associations_cmducinet_createtextfile_no_unicode_arg():
     test will fire and require a maintainer to update both
     the test and Issue #22 in `reports/generate_report.py`.
 
-    Sibling-form note (NOT pinned by this test): the same
-    2-arg CreateTextFile pattern exists in
-    `Form_LookAtKinship.vb` line ~2510.  Coverage there
-    happens to pass on the current Kinship fixture only
-    because no Han-character c_names appear in person 3211's
-    network.  A future canonical-issue or coverage PR may
-    extend this marker to Kinship too.
+    **Extended scope (Kinship sibling form):** As of the
+    Kinship sibling-risk probe (commit 154bb4b on main),
+    `Form_LookAtKinship.CmdUCINet_Click` is **runtime-
+    confirmed** to have the SAME bug-family pattern at line
+    ~2510.  This marker now asserts the buggy 2-arg
+    `CreateTextFile(tFileName, True)` pattern is present in
+    BOTH `Form_LookAtAssociations.vb::CmdUCINet_Click` AND
+    `Form_LookAtKinship.vb::CmdUCINet_Click`, and the fixed
+    3-arg form (with Unicode = True) is in NEITHER.  An
+    upstream fix should add the 3rd arg to BOTH call sites
+    in the same patch (per Issue #22's fix recommendation).
+
+    The existing Kinship × CmdUCINet coverage test
+    (`tests/test_vba_cmducinet_kinship.py`) is now KNOWN
+    fixture-fragile — it passes only because matrix-
+    supplied person 3211's kin network happens to contain
+    no Han-character c_name values.  Documented in that
+    test's docstring + the inventory manifest's notes.
     """
-    vba_path = (REPO / "analysis" / "dump" / "vba"
-                / "Form_LookAtAssociations.vb")
-    body = vba_path.read_bytes().decode("utf-8")
-
-    # Locate the CmdUCINet_Click sub.
-    sub_marker = "Private Sub CmdUCINet_Click()"
-    sub_start = body.find(sub_marker)
-    assert sub_start >= 0, (
-        "Bug #22 marker no longer reproduces (investigate "
-        "upstream fix vs. fixture/driver change vs. "
-        "misclassification before flipping) — "
-        "`Private Sub CmdUCINet_Click()` not found in "
-        "Form_LookAtAssociations.vb.  The whole CmdUCINet "
-        "handler may have been refactored or removed."
-    )
-    sub_end = body.find("End Sub", sub_start)
-    assert sub_end > sub_start, (
-        "couldn't find End Sub for CmdUCINet_Click"
-    )
-    sub_body = body[sub_start:sub_end]
-
-    # Locate the CreateTextFile call inside CmdUCINet_Click.
+    # Both forms share the same 2-arg CreateTextFile pattern
+    # inside their respective CmdUCINet_Click subs.  Iterate
+    # both and apply identical assertions.  When CBDB
+    # upstream fixes either / both — by adding `, True` as
+    # the 3rd argument — this test fires per-form and
+    # requires a maintainer to update both the test and
+    # Issue #22 in reports/generate_report.py.
+    forms = [
+        ("Form_LookAtAssociations", "Associations"),
+        ("Form_LookAtKinship", "Kinship"),
+    ]
     create_call_2arg = (
         'Set tVNA = tFileSystem.CreateTextFile(tFileName, True)'
     )
-    assert create_call_2arg in sub_body, (
-        "Bug #22 marker no longer reproduces (investigate "
-        "upstream fix vs. fixture/driver change vs. "
-        "misclassification before flipping) — the buggy "
-        f"2-argument call `{create_call_2arg}` is no longer "
-        "present in `Form_LookAtAssociations.CmdUCINet_Click`. "
-        "The fix likely added a 3rd arg "
-        "(`CreateTextFile(tFileName, True, True)` for "
-        "Unicode/UTF-16LE) — flip both this assertion AND "
-        "the runtime pin in tests/test_vba_bug_behaviors.py "
-        "AND update Issue #22 in reports/generate_report.py."
-    )
-
-    # Negative check: the corrected 3-argument form (with
-    # Unicode = True) should NOT yet appear.
     create_call_3arg = (
         'Set tVNA = tFileSystem.CreateTextFile(tFileName, '
         'True, True)'
     )
-    assert create_call_3arg not in sub_body, (
-        "Bug #22 marker partially reproduces but the 3-arg "
-        "Unicode form `CreateTextFile(tFileName, True, "
-        "True)` is ALSO present.  This is contradictory — "
-        "investigate before flipping (perhaps two CreateTextFile "
-        "calls now, one fixed and one not).  Update Issue "
-        "#22 to describe the new state."
-    )
+
+    for form_module, form_label in forms:
+        vba_path = (REPO / "analysis" / "dump" / "vba"
+                    / f"{form_module}.vb")
+        body = vba_path.read_bytes().decode("utf-8")
+
+        # Locate the CmdUCINet_Click sub for this form.
+        sub_marker = "Private Sub CmdUCINet_Click()"
+        sub_start = body.find(sub_marker)
+        assert sub_start >= 0, (
+            "Bug #22 marker no longer reproduces "
+            f"({form_label} side) (investigate upstream fix "
+            "vs. fixture/driver change vs. misclassification "
+            "before flipping) — `Private Sub "
+            f"CmdUCINet_Click()` not found in "
+            f"{form_module}.vb.  The whole CmdUCINet "
+            "handler may have been refactored or removed."
+        )
+        sub_end = body.find("End Sub", sub_start)
+        assert sub_end > sub_start, (
+            f"couldn't find End Sub for "
+            f"{form_label}.CmdUCINet_Click"
+        )
+        sub_body = body[sub_start:sub_end]
+
+        # Positive check: the buggy 2-arg call is present.
+        assert create_call_2arg in sub_body, (
+            "Bug #22 marker no longer reproduces "
+            f"({form_label} side) (investigate upstream fix "
+            "vs. fixture/driver change vs. misclassification "
+            f"before flipping) — the buggy 2-argument call "
+            f"`{create_call_2arg}` is no longer present in "
+            f"`{form_module}.CmdUCINet_Click`.  The fix "
+            "likely added a 3rd arg "
+            "(`CreateTextFile(tFileName, True, True)` for "
+            "Unicode/UTF-16LE) — flip this assertion for "
+            f"{form_label}, AND check whether the other "
+            "form was also fixed (a single upstream patch "
+            "should fix both per Issue #22's fix_en), AND "
+            "if both are fixed flip the runtime pin in "
+            "tests/test_vba_bug_behaviors.py + update Issue "
+            "#22 in reports/generate_report.py."
+        )
+
+        # Negative check: the corrected 3-arg form should
+        # NOT yet appear in this sub.
+        assert create_call_3arg not in sub_body, (
+            "Bug #22 marker partially reproduces "
+            f"({form_label} side) but the 3-arg Unicode "
+            "form `CreateTextFile(tFileName, True, True)` "
+            "is ALSO present.  This is contradictory — "
+            "investigate before flipping (perhaps two "
+            "CreateTextFile calls now, one fixed and one "
+            f"not).  Update Issue #22 to describe the new "
+            f"state in {form_label}."
+        )
 
 
 def test_bug7_lookat_place_cmdneo4j_select_missing_dynasty_female():

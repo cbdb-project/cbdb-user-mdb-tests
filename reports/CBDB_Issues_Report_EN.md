@@ -280,7 +280,13 @@ Inside the `*node properties` section, the body writes `tQuote + !c_name + tQuot
 
 User-visible symptom: a Run-time error 5 popup blocks the user; the exported `.vna` file is incomplete and unusable in UCINET / Visone.
 
-**Sibling-form risk (NOT yet probed in this filing):** `Form_LookAtKinship.CmdUCINet_Click` uses the same `CreateTextFile(tFileName, True)` pattern at line ~2510.  The current Kinship × CmdUCINet coverage test (`tests/test_vba_cmducinet_kinship.py`) passes only because person 3211's network happens to have no Han-character c_name values; a different Kinship fixture with such names would likely surface the same crash there.  `Form_LookAtPlace.CmdUCINet_Click` uses ADO Stream rather than FSO so its encoding behaviour is potentially different and would need its own probe.  This issue canonicalizes ONLY the Associations finding because that's all the probe directly verified.
+**Affected forms (per current evidence on this dump):**
+
+- **LookAtAssociations** — directly canonicalized.  Static + runtime pinned via `tests/test_known_bugs.py::test_bug22_associations_cmducinet_createtextfile_no_unicode_arg` and `tests/test_vba_bug_behaviors.py::test_bug22_associations_cmducinet_fires_invalid_procedure_call`.  Original investigation evidence in `analysis/probe_associations_cmducinet_error5.md`.
+- **LookAtKinship** — **runtime-confirmed sibling form sharing the same root cause.**  `Form_LookAtKinship.CmdUCINet_Click` uses the same `CreateTextFile(tFileName, True)` 2-arg pattern at line ~2510.  Reproduced via probe `investigate/kinship-cmducinet-sibling-risk` (commit 154bb4b) using picker = pid 152930 (He Jing 何淨) whose sole 1-hop kin is pid 140733 (He Mou 取, U+53D6 = same CJK Han ideograph trigger class as Associations' 稜 = U+7A1C).  Probe outcome: same `:ERR Invalid procedure call or argument`, same partial-file shape (full `*node data` + truncated `*node properties` + missing `*tie data`).  Static marker `tests/test_known_bugs.py::test_bug22_associations_cmducinet_createtextfile_no_unicode_arg` extended in this PR to also assert the same 2-arg pattern in `Form_LookAtKinship.vb`; runtime pin for Kinship is deferred (see Coverage caveat below).
+- **LookAtPlace** — possible separate risk; **NOT covered by this issue's confirmation.**  `Form_LookAtPlace.CmdUCINet_Click` uses ADO Stream (`tStream.WriteText`) rather than FSO (`tVNA.WriteLine`), so its encoding behaviour is potentially different and would need its own per-form probe before any same-bug-family claim.  Place CmdUCINet stays `gap` in the inventory.
+
+**Coverage caveat:** the existing Kinship × CmdUCINet coverage test (`tests/test_vba_cmducinet_kinship.py`) remains `covered` in the inventory but is now **known fixture-fragile** — it passes only because the matrix-supplied person 3211's network happens to contain no Han-character c_name values.  Switching that fixture to one whose network reaches a Han-name person (the sibling probe demonstrates this directly) reproduces the same crash there.  Documented in the test's docstring + the inventory manifest's notes field.
 
 #### Steps to reproduce
 
@@ -308,7 +314,7 @@ This should make `tVNA.WriteLine` write all characters as UTF-16LE and prevent t
 
 Alternative (less recommended): strip / transliterate non-cp1252 chars from `c_name` before the `WriteLine` call.  Loses real data from the export and is more code; the Unicode flag is the right fix.
 
-Same one-line fix (with the same 3rd-arg addition) likely needs to be applied to `Form_LookAtKinship.CmdUCINet_Click` (line ~2510) — see the Sibling-form risk paragraph in the description.  That sibling fix is out-of-scope for this issue's canonical verification but worth coordinating in the same upstream patch.
+Same one-line fix (with the same 3rd-arg addition) is also required for `Form_LookAtKinship.CmdUCINet_Click` (line ~2510) — see the Affected-forms section above.  Kinship is a runtime-confirmed sibling form of THIS issue (same root cause, same failure class, different host form / fixture trigger), so a single upstream patch should add the Unicode flag to BOTH CreateTextFile call sites in the same change.  Place (LookAtPlace.CmdUCINet) is NOT in scope for this issue — it uses ADO Stream rather than FSO and would need its own per-form probe before any same-bug-family claim or fix coordination.
 
 ## P2 — Silent display
 
