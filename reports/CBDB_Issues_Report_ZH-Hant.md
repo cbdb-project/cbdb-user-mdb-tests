@@ -18,6 +18,7 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
   - [Issue #6 — LookAtGroupData 的 ChkEntry 路徑引用了不存在的列 ENTRY_DATA.c_parental_status](#issue-6--lookatgroupdata-的-chkentry-路徑引用了不存在的列-entry_datac_parental_status)
   - [Issue #13 — BIOG_MAIN_2 子表單試圖開啟一個不存在的 picker 表單 (frmPickNIAN_HAO)](#issue-13--biog_main_2-子表單試圖開啟一個不存在的-picker-表單-frmpicknian_hao)
   - [Issue #21 — LookAtGroupData.CmdNeo4j 在匯出空分部時崩潰報「No current record」](#issue-21--lookatgroupdatacmdneo4j-在匯出空分部時崩潰報no-current-record)
+  - [Issue #22 — LookAtAssociations.CmdUCINet 在被匯出的人物網路含有 c_name 中帶 CJK 漢字時崩潰報「Invalid procedure call or argument」](#issue-22--lookatassociationscmducinet-在被匯出的人物網路含有-c_name-中帶-cjk-漢字時崩潰報invalid-procedure-call-or-argument)
 - [P2 — 靜默顯示問題](#p2--靜默顯示問題)
   - [Issue #10 — EVENT_ADDR_2 子表單的地址列默默地顯示為空（ControlSource 寫錯了）](#issue-10--event_addr_2-子表單的地址列默默地顯示為空controlsource-寫錯了)
 - [P3 — 缺失介面](#p3--缺失介面)
@@ -264,6 +265,50 @@ End With
 ```
 
 防禦性範圍選項（關閉本 issue 不需要）：把同樣的 guard 加到 block #1-#8 也無害，可對未來出現新的啟用路徑讓其上游表為空的情況做防禦。當前沒有這種路徑，所以不必做。
+
+### Issue #22 — LookAtAssociations.CmdUCINet 在被匯出的人物網路含有 c_name 中帶 CJK 漢字時崩潰報「Invalid procedure call or argument」
+
+**涉及位置:** `Form_LookAtAssociations.CmdUCINet_Click`
+
+**嚴重等級:** P1 — 正常使用者點選下的可見報錯。任何使用者只要在 `LookAtAssociations × CmdUCINet` 上選的人在當前 dump 的 1 階關聯網路中含有 c_name 帶 CJK 漢字的人，就會遇到 Run-time error 5 對話方塊，匯出全部失敗。當前 dump 上至少 person 437（已驗證 fixture）的 8087 行暫存表會觸發；更大範圍的影響人數取決於 BIOG_MAIN 中 c_name （理論上是 Latin / Pinyin）含漢字的行數 —— 至少 2 行落在 person 437 的網路裡，只要選的人 1 階鄰居含其中任一行都會受影響。
+
+#### 問題描述
+
+`Form_LookAtAssociations.CmdUCINet_Click` 透過 `Scripting.FileSystemObject.CreateTextFile(tFileName, True)`（約 line 2575）寫出 `.vna` 檔案。第 3 個引數（`Unicode`）省略掉了，預設值為 FALSE，所以檔案以系統預設的 ANSI 碼頁（en-US Windows 上是 cp1252）開啟。
+
+在 `*node properties` 區段，每一行寫出 `tQuote + !c_name + tQuote`。當 `c_name` 含有 cp1252 編碼無法對應、且 FSO 也沒有替代對映的字元（特別是 CJK 漢字，例如 U+7A1C 稜），`tVNA.WriteLine` 就會丟出 VBA 5 錯誤（「Invalid procedure call or argument」），整個 CmdUCINet 匯出中斷。殘破的 `.vna` 檔案會留在硬碟上 —— `*node data` 完整，`*node properties` 截斷，`*tie data` 完全沒寫。
+
+使用者可見症狀：彈出 Run-time error 5 對話方塊；匯出的 `.vna` 檔案不完整，UCINET / Visone 無法讀取。
+
+**Sibling-form 風險（本 issue 尚未直接 probe 確認）：** `Form_LookAtKinship.CmdUCINet_Click` 在約 line 2510 用同樣的 `CreateTextFile(tFileName, True)` 模式。當前 Kinship × CmdUCINet 覆蓋測試（`tests/test_vba_cmducinet_kinship.py`）能透過，僅是因為 person 3211 的網路剛好沒有帶漢字的 c_name；換個含漢字 c_name 的 Kinship fixture 大機率會在同一處崩潰。`Form_LookAtPlace.CmdUCINet_Click` 用的是 ADO Stream（不是 FSO），編碼行為可能不同，需要單獨 probe 驗證。本 issue 只 canonicalize probe 已直接證實的 Associations 層面。
+
+#### 復現步驟
+
+1. 在 Microsoft Access 裡開啟 CBDB_BJ_User.mdb。
+2. 開啟 **LookAtAssociations** 表單（F11 → 導航窗格 → 表單 → 雙擊 `LookAtAssociations`）。
+3. 用人物 picker 選 **c_personid = 437（賈昭明 Jia Zhaoming）** —— 此人在當前 dump 上的 1 階關聯網路含有 c_name 帶漢字的人（具體是 pid 445395，c_name = `Hu Fa稜`）。
+4. 點 **Run**（CmdQuery），等它把 ZZ_SCRATCH_ASSOC 和 ZZ_SCRATCH_P_ASSOC 填好。
+5. 點 **UCINet** 匯出按鈕（CmdUCINet），隨便選一個 `.vna` 檔案的存檔位置。
+6. 彈出對話方塊：`Run-time error '5': Invalid procedure call or argument`。匯出中斷，硬碟上只剩殘破的 `.vna` 檔：`*node data` 區段完整，`*node properties` 區段被截斷，`*tie data` 區段完全沒寫 —— UCINET / Visone 都沒法當成 import 檔案使用。
+7. 已透過 `analysis/probe_associations_cmducinet_error5.py` 端到端驗證 —— 約 15 秒可穩定復現（完整證據鏈與崩潰定位見 `analysis/probe_associations_cmducinet_error5.md`）。
+
+#### 建議修復方案
+
+在 `CreateTextFile` 第 3 個引數加上 `True`，讓檔案以 Unicode（UTF-16LE）模式開啟：
+
+```vb
+' 修改前（Form_LookAtAssociations.vb:2575）
+Set tVNA = tFileSystem.CreateTextFile(tFileName, True)
+
+' 修改後 —— 第 3 個引數 = Unicode = True
+Set tVNA = tFileSystem.CreateTextFile(tFileName, True, True)
+```
+
+這樣 `tVNA.WriteLine` 就用 UTF-16LE 寫入所有字元，cp1252 無法表示的字元不再造成崩潰，下游的 UCINET / Visone 也都接受 UTF-16 的 `.vna` 檔。
+
+替代方案（不太推薦）：在 `WriteLine` 之前把 `c_name` 裡的非 cp1252 字元剝掉或轉寫。會丟失匯出的真實資料，而且程式碼量更大；Unicode flag 才是正解。
+
+`Form_LookAtKinship.CmdUCINet_Click`（約 line 2510）大機率需要套用同樣的一行修改 —— 詳見描述裡的 Sibling-form 風險段。本 issue 的 canonical 驗證範圍不含 Kinship；上游修補時建議一起處理。
 
 ## P2 — 靜默顯示問題
 

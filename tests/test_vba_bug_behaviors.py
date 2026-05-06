@@ -473,6 +473,161 @@ def test_bug21_lookat_groupdata_cmdneo4j_fires_no_current_record(
           f"contamination.", flush=True)
 
 
+def test_bug22_associations_cmducinet_fires_invalid_procedure_call(
+        vba: VbaSession):
+    """Bug #22 (P1) — runtime-side pin.
+
+    `Form_LookAtAssociations.CmdUCINet_Click` writes the
+    `.vna` export via `Scripting.FileSystemObject.
+    CreateTextFile(tFileName, True)` (line ~2575) without
+    the 3rd Unicode argument.  The file opens in cp1252 /
+    system ANSI; `tVNA.WriteLine` raises VBA error 5
+    ('Invalid procedure call or argument') the first time
+    `c_name` contains a character with no cp1252
+    representation AND no FSO substitution mapping (CJK Han
+    ideographs in particular).  Export aborts mid-`*node
+    properties`; partial `.vna` left on disk is unusable.
+
+    Sister test in `tests/test_known_bugs.py::test_bug22_
+    associations_cmducinet_createtextfile_no_unicode_arg`
+    pins the source-string pattern (the missing 3rd arg).
+    This test pins the runtime symptom.  Don't replace the
+    static test — both source-side and runtime-side guards
+    should remain.
+
+    Localisation evidence (already merged to main):
+      analysis/probe_associations_cmducinet_error5.md
+      reports/probe_associations_cmducinet_error5.json
+      analysis/probe_associations_cmducinet_error5.py
+    Probe scanned ZZ_SCRATCH_P_ASSOC.c_name for non-cp1252
+    chars and matched the row immediately after the last-
+    successfully-written one in c_person_id ASC iteration
+    order to the bail point.  Failing row in the verified
+    fixture: c_personid 445395, c_name 'Hu Fa稜' (稜 =
+    U+7A1C, CJK Unified Ideograph).  Earlier non-cp1252
+    row (c_personid 131582, c_name 'Jiao 　', U+3000
+    Ideographic Space) was silently substituted by FSO and
+    did NOT trigger the bail — only chars without an FSO
+    fallback crash.
+
+    Fixture: matrix's `assoc_437_unfiltered` (c_personid
+    437 = Jia Zhaoming 賈昭明).  This person's 1st-order
+    association network reaches at least 2 people whose
+    c_name contains a non-cp1252 char (the only Han-ideograph
+    one — pid 445395 — is what crashes the export).  If a
+    future MDB drop scrubs Han characters from c_name
+    fields, this test will start failing — at which point
+    investigate per the marker-failure policy before
+    flipping (candidates: upstream patched the data; CBDB
+    upstream patched the FSO call; misclassification).
+    """
+    from cbdb_driver.form_specs import LOOKATASSOCIATIONS
+
+    spec = LOOKATASSOCIATIONS
+    fx = _fixture_for("LookAtAssociations")
+    _seed(vba, fx)
+
+    # Stage 1: fire CmdQuery via timer.  Standard chain
+    # pattern; CmdUCINet is NOT in _TIMER_DISPATCH_SUBS so
+    # we can't append it to the chain — fire it separately
+    # below.  Tag carries CmdQuery only (no chain, no
+    # path).
+    vba.set_form_tag("LookAtAssociations", spec.cmd_name, "")
+    n = vba.click_via_timer(
+        "LookAtAssociations", ctl=spec.cmd_name,
+        result_table=spec.result_table, timeout=180,
+    )
+    print(f"\n[LookAtAssociations] CmdQuery -> {n} scratch "
+          f"rows", flush=True)
+
+    # Stage 1b: confirm scratch tables populated.
+    cur = vba.conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM ZZ_SCRATCH_P_ASSOC")
+    n_p_assoc = int(cur.fetchone()[0])
+    cur.close()
+    assert n_p_assoc > 0, (
+        f"ZZ_SCRATCH_P_ASSOC is empty after CmdQuery "
+        f"(n={n_p_assoc}); CmdUCINet would bail at its "
+        f"RecordCount=0 guard before reaching the "
+        f"WriteLine.  Bug #22 reproduction needs a "
+        f"populated ZZ_SCRATCH_P_ASSOC; investigate "
+        f"fixture / upstream INSERT change."
+    )
+
+    # Stage 2: fire CmdUCINet via separate timer with
+    # wait_done=False (CmdUCINet body has no autodetect
+    # ENTER/DONE markers).  Patch the form's filedialog
+    # AFTER set_form_tag so GetTestExportPath() reads the
+    # path part of Tag.
+    vba.patch_filedialog("LookAtAssociations")
+    out_dir = WORK.parent / "_bug22_assoc_ucinet_out"
+    out_dir.mkdir(exist_ok=True)
+    out_path = out_dir / "bug22_assoc_ucinet.vna"
+    if out_path.exists():
+        try:
+            out_path.unlink()
+        except Exception:
+            pass
+    vba.set_form_tag("LookAtAssociations", "CmdUCINet",
+                      str(out_path))
+    vba.click_via_timer(
+        "LookAtAssociations", ctl="CmdUCINet",
+        result_table=None, wait_done=False,
+    )
+
+    # Poll briefly for the partial file to appear (CmdUCINet
+    # writes *node data* successfully before bailing in
+    # *node properties*; partial file appears within a few
+    # seconds).
+    import time as _time
+    file_deadline = _time.time() + 60
+    while _time.time() < file_deadline:
+        if out_path.exists() and out_path.stat().st_size > 0:
+            break
+        _time.sleep(1)
+
+    msgs = _read_debug_log(vba)
+    print(f"DEBUG log: {msgs}", flush=True)
+
+    # ---- Assertion 1: at least one
+    # LookAtAssociations:ERR fired.
+    err_msgs = [m for m in msgs
+                if "LookAtAssociations:ERR" in m]
+    assert err_msgs, (
+        "Bug #22 marker no longer reproduces (investigate "
+        "upstream fix vs. fixture/driver change vs. "
+        "misclassification before flipping) — "
+        "LookAtAssociations.CmdUCINet on the verified "
+        "person-437 fixture didn't raise any :ERR marker.  "
+        "Either CBDB upstream added the Unicode flag to "
+        "CreateTextFile, OR the source data no longer "
+        "contains Han characters in c_name in person 437's "
+        "network.  Investigate via the static marker test "
+        "in test_known_bugs.py first.  Full transcript: "
+        f"{msgs}"
+    )
+
+    # ---- Assertion 2: error text matches VBA error 5
+    # ('Invalid procedure call or argument').  Pin the
+    # exact wording so we can distinguish from any future
+    # different error class on the same code path.
+    err_blob = " | ".join(err_msgs).lower()
+    assert "invalid procedure call or argument" in err_blob, (
+        f"Bug #22 ERR fired but its text doesn't match the "
+        f"expected VBA error 5 wording.  Expected: 'Invalid "
+        f"procedure call or argument'.  Got: {err_msgs}.  "
+        f"If this is a different error class, the failure "
+        f"mode shifted — investigate before flipping."
+    )
+
+    print(f"\nBug #22 runtime pin OK: ZZ_SCRATCH_P_ASSOC="
+          f"{n_p_assoc}, VBA error 5 ('Invalid procedure "
+          f"call or argument') observed in {len(err_msgs)} "
+          f":ERR marker(s); partial .vna file at {out_path} "
+          f"({out_path.stat().st_size if out_path.exists() else 0} bytes).",
+          flush=True)
+
+
 def test_bug7_lookat_place_cmdneo4j_fires_item_not_found(vba: VbaSession):
     """Bug #7: LookAtPlace.CmdNeo4j hits 'Item not found in this
     collection' on the first row of the People-CSV loop because

@@ -77,7 +77,7 @@ cbdb-user-mdb-tests/
 │   └── dump/                   # frozen metadata snapshots (committed)
 ├── AGENTS.md                   # contributor / agent guide; landmines
 ├── reports/                    # auto-generated bilingual issue report
-│   ├── generate_report.py      #   ⭐ SOURCE OF TRUTH for all 20 issues
+│   ├── generate_report.py      #   ⭐ SOURCE OF TRUTH for all 21 issues
 │   └── CBDB_Issues_Report_*.{md,docx}   # EN / ZH-Hant × md / docx
 └── FINAL_STATE.md              # snapshot of test-suite coverage
 ```
@@ -249,7 +249,7 @@ moves** — `AGENTS.md` enforces this as a contributor rule.
 
 ### Confirmed bugs
 
-**20 documented issues** (highest assigned ID: #21 — ID #3 was retired 2026-05-03 as an early false positive), all detail in
+**21 documented issues** (highest assigned ID: #22 — ID #3 was retired 2026-05-03 as an early false positive), all detail in
 [`reports/CBDB_Issues_Report_EN.md`](./reports/CBDB_Issues_Report_EN.md)
 ([中文版](./reports/CBDB_Issues_Report_ZH-Hant.md)).  Both Markdown
 files are auto-generated from the `ISSUES` dict in
@@ -262,7 +262,7 @@ produce fresh ones).
 | Tier | Count | Meaning |
 |------|------:|---------|
 | P0 — Silent data corruption | 3 | wrong data shown, no user warning |
-| P1 — Visible runtime crash  | 3 | error popup on a normal user click |
+| P1 — Visible runtime crash  | 4 | error popup on a normal user click |
 | P2 — Silent display         | 1 | user-visible bound control renders blank where data exists |
 | P3 — Missing UI             | 5 | event handler exists in code but no button on the form |
 | P4 — Setup                  | 1 | one-time install fix (dao360.dll on Office 2016+) |
@@ -397,7 +397,7 @@ CBDB 用戶端是給歷史學家用的 Windows-only Access 介面，每次資料
 - GIS / Neo4j / KML 匯出檔位元組級相等
 - 跨 lookup 表的外鍵完整性
 
-已找到的 bug 在 [`reports/CBDB_Issues_Report_ZH-Hant.md`](./reports/CBDB_Issues_Report_ZH-Hant.md)（共 20 個 issue，由 `reports/generate_report.py` 自動生成 4 份輸出）。
+已找到的 bug 在 [`reports/CBDB_Issues_Report_ZH-Hant.md`](./reports/CBDB_Issues_Report_ZH-Hant.md)（共 21 個 issue，由 `reports/generate_report.py` 自動生成 4 份輸出）。
 
 ## 安裝
 
@@ -441,7 +441,7 @@ python -m pytest tests/test_vba_export.py -v -W ignore --include-vba
 - ✅ 7/10 LookAt 表單已納入真 VBA matrix（12 fixtures，110 秒跑完）
 - ✅ 1 個真實匯出位元組對比（`LookAtEntry.CmdGIS`）
 - ✅ 12 維度資料完整性檢查
-- ✅ 已確認 20 個 issue（最高編號為 #21；ID #3 已於 2026-05-03 退役為早期 false positive；詳見 [`reports/CBDB_Issues_Report_ZH-Hant.md`](./reports/CBDB_Issues_Report_ZH-Hant.md)；P0 ×3 / P1 ×3 / P2 ×1 / P3 ×5 / P4 ×1 / P5 dormant·latent ×7。原 Bug #3 於 2026-05-03 從報告中移除——重新驗證 0 NULL backfill 且無上游源碼修復證據，視為早期 false positive。Issue #9 於 2026-05-04 從 P0 降為 P5 latent——`Form_LookAtEntry.vb:1425` 的 source-level typo 雖然真實存在，但被第 1389 行的 `If tRecDeleted > 0 Then` gate 擋下；當前 dump 263,454 筆 ENTRY_DATA 中 `c_inst_code > 0` 為 0,所以任何 LookAtEntry fixture 都進不到那個分支、不會 popup（端到端 SQL + Access COM 證據見 `analysis/issue9_neo4j_institutioncodes_reverification.md`）。新增 Issue #20（GIS 匯出嵌入 tab／BOM 造成欄位錯位），證據 + probe 腳本見 `analysis/gis_status_embedded_delim_root_cause.md` / `analysis/probe_status_gis_embedded_delim.py` / `analysis/probe_status_gis_export_bytes.py` / `tests/test_addr_codes_embedded_delim.py`）
+- ✅ 已確認 21 個 issue（最高編號為 #22；ID #3 已於 2026-05-03 退役為早期 false positive；詳見 [`reports/CBDB_Issues_Report_ZH-Hant.md`](./reports/CBDB_Issues_Report_ZH-Hant.md)；P0 ×3 / P1 ×4 / P2 ×1 / P3 ×5 / P4 ×1 / P5 dormant·latent ×7。原 Bug #3 於 2026-05-03 從報告中移除——重新驗證 0 NULL backfill 且無上游源碼修復證據，視為早期 false positive。Issue #9 於 2026-05-04 從 P0 降為 P5 latent——`Form_LookAtEntry.vb:1425` 的 source-level typo 雖然真實存在，但被第 1389 行的 `If tRecDeleted > 0 Then` gate 擋下；當前 dump 263,454 筆 ENTRY_DATA 中 `c_inst_code > 0` 為 0,所以任何 LookAtEntry fixture 都進不到那個分支、不會 popup（端到端 SQL + Access COM 證據見 `analysis/issue9_neo4j_institutioncodes_reverification.md`）。新增 Issue #20（GIS 匯出嵌入 tab／BOM 造成欄位錯位），證據 + probe 腳本見 `analysis/gis_status_embedded_delim_root_cause.md` / `analysis/probe_status_gis_embedded_delim.py` / `analysis/probe_status_gis_export_bytes.py` / `tests/test_addr_codes_embedded_delim.py`）
 - 🟡 剩 1 個表單（LookAtNetworks）因 Form_Open hang 暫跳過；其餘 2 個（LookAtAssociationPairs / LookAtGroupData）已用 tiny fixture 覆蓋（`test_vba_matrix_hard_forms.py`）— roadmap 第 7 項
 - 🟡 其他匯出按鈕大多已部分涵蓋：CmdGIS（6 個 form, `test_vba_cmdgis_other_forms.py`）、CmdGUESS（Kinship+Office, `test_vba_cmdguess_cross_form.py`）、CmdPajek/Gephi（`test_vba_pajek_gephi_cross_form.py`，7 過 — 原 5 過 + AssociationPairs 的 CmdPajek/CmdGephi 透過 1×3 known-edged pair 解開（依賴 SetFocus driver patch）/ 2 Status skip）、CmdGISPeople（Office）、CmdNeo4j（4 過 / 3 skip — Entry/Texts/Office/Kinship 通過；Status/Place/Associations 跳過。Entry 於 2026-05-04 從 skip 提升為 covered，固定 Issue #9 LATENT-gate。順手挖出 Bug #7/#8/#9）。CmdKML 仍未測；CmdUCINet 的 family first coverage cell 已落地於 LookAtKinship（`tests/test_vba_cmducinet_kinship.py`，.vna 三段結構由 probe `investigate/cmducinet-family-shape` 確立），Associations CmdUCINet 仍因匯出途中 VBA error 5 受阻，Place CmdUCINet 仍 gap（使用 ADO Stream，需要單獨 per-form 處理）— roadmap 第 8 項
 - ✅ pytest 啟動時自動偵測 `test_inputs.json` 是否過時並重跑 `discover_test_inputs.py`（`pytest --no-discover-inputs` 可關閉）— roadmap 第 9 項

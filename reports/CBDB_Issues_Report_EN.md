@@ -18,6 +18,7 @@ The issues are ordered by severity (P0 highest). Each entry includes a concise d
   - [Issue #6 — LookAtGroupData ChkEntry path references a non-existent column ENTRY_DATA.c_parental_status](#issue-6--lookatgroupdata-chkentry-path-references-a-non-existent-column-entry_datac_parental_status)
   - [Issue #13 — BIOG_MAIN_2 Subform tries to open a picker form (frmPickNIAN_HAO) that doesn't exist](#issue-13--biog_main_2-subform-tries-to-open-a-picker-form-frmpicknian_hao-that-doesnt-exist)
   - [Issue #21 — LookAtGroupData.CmdNeo4j crashes with 'No current record' on empty sections](#issue-21--lookatgroupdatacmdneo4j-crashes-with-no-current-record-on-empty-sections)
+  - [Issue #22 — LookAtAssociations.CmdUCINet crashes with 'Invalid procedure call or argument' on networks containing CJK Han characters in c_name](#issue-22--lookatassociationscmducinet-crashes-with-invalid-procedure-call-or-argument-on-networks-containing-cjk-han-characters-in-c_name)
 - [P2 — Silent display](#p2--silent-display)
   - [Issue #10 — EVENT_ADDR_2 Subform address columns silently render blank (wrong ControlSource)](#issue-10--event_addr_2-subform-address-columns-silently-render-blank-wrong-controlsource)
 - [P3 — Missing UI](#p3--missing-ui)
@@ -264,6 +265,50 @@ End With
 ```
 
 Defensive scope option (not required to close this issue): adding the same guard to blocks #1-#8 is harmless and would future-proof against a new enable path leaving any of those feeder tables empty.  Not required because no such path exists today.
+
+### Issue #22 — LookAtAssociations.CmdUCINet crashes with 'Invalid procedure call or argument' on networks containing CJK Han characters in c_name
+
+**Affected sub:** `Form_LookAtAssociations.CmdUCINet_Click`
+
+**Severity:** P1 — Visible crash on a normal user click.  Any user attempting `LookAtAssociations × CmdUCINet` whose 1st-order association network happens to include a person with a CJK Han ideograph in their `c_name` will hit a Run-time error 5 popup and lose the export.  On the current dump that's at least the 8087-row scratch table for person 437 (the verified fixture); the broader prevalence across CBDB persons depends on how many BIOG_MAIN rows have Han ideographs in their ostensibly-Latin `c_name` field — at minimum 2 such rows reach person 437's network, and any person with even one such 1st-order neighbour is affected.
+
+#### Description
+
+`Form_LookAtAssociations.CmdUCINet_Click` writes the `.vna` export via `Scripting.FileSystemObject.CreateTextFile(tFileName, True)` (line ~2575).  The 3rd argument (`Unicode`) is omitted, so it defaults to FALSE — the file is opened in the system default ANSI code page (cp1252 on en-US Windows).
+
+Inside the `*node properties` section, the body writes `tQuote + !c_name + tQuote` for each row.  When `c_name` contains a character that has no cp1252 representation AND no FSO substitution mapping (CJK Han ideographs in particular — e.g. U+7A1C 稜), `tVNA.WriteLine` raises VBA error 5 ('Invalid procedure call or argument') and the whole CmdUCINet export aborts.  The partial `.vna` file is left on disk — `*node data` complete, `*node properties` truncated, `*tie data` never written.
+
+User-visible symptom: a Run-time error 5 popup blocks the user; the exported `.vna` file is incomplete and unusable in UCINET / Visone.
+
+**Sibling-form risk (NOT yet probed in this filing):** `Form_LookAtKinship.CmdUCINet_Click` uses the same `CreateTextFile(tFileName, True)` pattern at line ~2510.  The current Kinship × CmdUCINet coverage test (`tests/test_vba_cmducinet_kinship.py`) passes only because person 3211's network happens to have no Han-character c_name values; a different Kinship fixture with such names would likely surface the same crash there.  `Form_LookAtPlace.CmdUCINet_Click` uses ADO Stream rather than FSO so its encoding behaviour is potentially different and would need its own probe.  This issue canonicalizes ONLY the Associations finding because that's all the probe directly verified.
+
+#### Steps to reproduce
+
+1. Open CBDB_BJ_User.mdb in Microsoft Access.
+2. Open the **LookAtAssociations** form (F11 → navigation pane → forms → double-click `LookAtAssociations`).
+3. Use the person picker to select **c_personid = 437 (Jia Zhaoming 賈昭明)** — one of the people whose 1st-order association network contains a person with a Han ideograph in their `c_name` field on the current dump (specifically pid 445395, c_name = `Hu Fa稜`).
+4. Click **Run** (CmdQuery) and wait for it to finish populating ZZ_SCRATCH_ASSOC + ZZ_SCRATCH_P_ASSOC.
+5. Click the **UCINet** export button (CmdUCINet) and choose any save location for the `.vna` file.
+6. A popup appears: `Run-time error '5': Invalid procedure call or argument`.  The export aborts.  The partial `.vna` file on disk has the complete `*node data` section but a truncated `*node properties` section and no `*tie data` section at all — unusable as a UCINET / Visone import.
+7. Verified end-to-end via probe at `analysis/probe_associations_cmducinet_error5.py` — reproduces deterministically in ~15 s (see `analysis/probe_associations_cmducinet_error5.md` for the full evidence chain including the row-position localisation).
+
+#### Suggested fix
+
+Add `True` as the 3rd argument of `CreateTextFile` to open the file in Unicode (UTF-16LE) mode:
+
+```vb
+' before (Form_LookAtAssociations.vb:2575)
+Set tVNA = tFileSystem.CreateTextFile(tFileName, True)
+
+' after — 3rd arg = Unicode = True
+Set tVNA = tFileSystem.CreateTextFile(tFileName, True, True)
+```
+
+This makes `tVNA.WriteLine` write all characters as UTF-16LE; cp1252-only chars no longer crash, and downstream consumers (UCINET, Visone) accept UTF-16 `.vna`.
+
+Alternative (less recommended): strip / transliterate non-cp1252 chars from `c_name` before the `WriteLine` call.  Loses real data from the export and is more code; the Unicode flag is the right fix.
+
+Same one-line fix (with the same 3rd-arg addition) likely needs to be applied to `Form_LookAtKinship.CmdUCINet_Click` (line ~2510) — see the Sibling-form risk paragraph in the description.  That sibling fix is out-of-scope for this issue's canonical verification but worth coordinating in the same upstream patch.
 
 ## P2 — Silent display
 

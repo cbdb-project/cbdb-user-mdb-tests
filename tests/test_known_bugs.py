@@ -276,6 +276,95 @@ def test_bug21_groupdata_cmdneo4j_missing_eof_guard():
         "verify the EntryCode block (around line 1385)."
     )
 
+
+def test_bug22_associations_cmducinet_createtextfile_no_unicode_arg():
+    """Bug #22 (reports/CBDB_Issues_Report_EN.md) —
+    `Form_LookAtAssociations.CmdUCINet_Click` writes the .vna
+    export via `Scripting.FileSystemObject.CreateTextFile
+    (tFileName, True)` (line ~2575) WITHOUT the 3rd Unicode
+    argument.  The 3rd arg defaults to FALSE → file opens in
+    cp1252 / system ANSI → `tVNA.WriteLine` raises VBA error
+    5 ('Invalid procedure call or argument') when `c_name`
+    contains a non-cp1252 character with no FSO substitution
+    (CJK Han ideographs in particular).  The export aborts
+    mid-`*node properties`; the partial .vna file on disk is
+    unusable.
+
+    Sister test in `tests/test_vba_bug_behaviors.py::test_bug22
+    _associations_cmducinet_fires_invalid_procedure_call` pins
+    the runtime symptom on the verified person-437 fixture.
+    Don't replace the static test — both source-side and
+    runtime-side guards should remain.
+
+    Robust regression marker: locate the CmdUCINet_Click
+    body's `CreateTextFile` call and assert it has only 2
+    arguments (no Unicode flag).  When CBDB upstream fixes
+    this — by adding `, True` as the 3rd argument — this
+    test will fire and require a maintainer to update both
+    the test and Issue #22 in `reports/generate_report.py`.
+
+    Sibling-form note (NOT pinned by this test): the same
+    2-arg CreateTextFile pattern exists in
+    `Form_LookAtKinship.vb` line ~2510.  Coverage there
+    happens to pass on the current Kinship fixture only
+    because no Han-character c_names appear in person 3211's
+    network.  A future canonical-issue or coverage PR may
+    extend this marker to Kinship too.
+    """
+    vba_path = (REPO / "analysis" / "dump" / "vba"
+                / "Form_LookAtAssociations.vb")
+    body = vba_path.read_bytes().decode("utf-8")
+
+    # Locate the CmdUCINet_Click sub.
+    sub_marker = "Private Sub CmdUCINet_Click()"
+    sub_start = body.find(sub_marker)
+    assert sub_start >= 0, (
+        "Bug #22 marker no longer reproduces (investigate "
+        "upstream fix vs. fixture/driver change vs. "
+        "misclassification before flipping) — "
+        "`Private Sub CmdUCINet_Click()` not found in "
+        "Form_LookAtAssociations.vb.  The whole CmdUCINet "
+        "handler may have been refactored or removed."
+    )
+    sub_end = body.find("End Sub", sub_start)
+    assert sub_end > sub_start, (
+        "couldn't find End Sub for CmdUCINet_Click"
+    )
+    sub_body = body[sub_start:sub_end]
+
+    # Locate the CreateTextFile call inside CmdUCINet_Click.
+    create_call_2arg = (
+        'Set tVNA = tFileSystem.CreateTextFile(tFileName, True)'
+    )
+    assert create_call_2arg in sub_body, (
+        "Bug #22 marker no longer reproduces (investigate "
+        "upstream fix vs. fixture/driver change vs. "
+        "misclassification before flipping) — the buggy "
+        f"2-argument call `{create_call_2arg}` is no longer "
+        "present in `Form_LookAtAssociations.CmdUCINet_Click`. "
+        "The fix likely added a 3rd arg "
+        "(`CreateTextFile(tFileName, True, True)` for "
+        "Unicode/UTF-16LE) — flip both this assertion AND "
+        "the runtime pin in tests/test_vba_bug_behaviors.py "
+        "AND update Issue #22 in reports/generate_report.py."
+    )
+
+    # Negative check: the corrected 3-argument form (with
+    # Unicode = True) should NOT yet appear.
+    create_call_3arg = (
+        'Set tVNA = tFileSystem.CreateTextFile(tFileName, '
+        'True, True)'
+    )
+    assert create_call_3arg not in sub_body, (
+        "Bug #22 marker partially reproduces but the 3-arg "
+        "Unicode form `CreateTextFile(tFileName, True, "
+        "True)` is ALSO present.  This is contradictory — "
+        "investigate before flipping (perhaps two CreateTextFile "
+        "calls now, one fixed and one not).  Update Issue "
+        "#22 to describe the new state."
+    )
+
+
 def test_bug7_lookat_place_cmdneo4j_select_missing_dynasty_female():
     """Bug #7 (reports/CBDB_Issues_Report_EN.md) — Form_LookAtPlace.CmdNeo4j builds a
     People-CSV from a SELECT that omits c_dynasty / c_dynasty_chn /
