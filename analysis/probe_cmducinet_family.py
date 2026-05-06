@@ -684,29 +684,82 @@ def _write_md(results: list[dict], agg: dict) -> None:
     md.append("### 3. Strict structural assertions a coverage "
               "PR could safely make")
     md.append("")
-    md.append("Modeled on the existing CmdGIS / CmdNeo4j depth-"
-              "check shape (`tests/test_vba_cmdgis_other_forms"
-              ".py::_assert_gis_export_depth`):")
+    md.append("Split into **family-level** invariants (apply to "
+              "both probed forms; safe across the family) vs "
+              "**per-form** assertions (specific to a chosen "
+              "coverage target).  Modeled on the existing "
+              "CmdGIS / CmdNeo4j depth-check shape "
+              "(`tests/test_vba_cmdgis_other_forms.py::"
+              "_assert_gis_export_depth`).")
+    md.append("")
+    md.append("#### Family-level (probe-confirmed across the "
+              "two probed forms)")
     md.append("")
     md.append("- File exists at the patched-filedialog path "
               "AND is non-empty.")
     md.append("- File extension is `.vna`.")
-    md.append("- First non-blank line starts with `*node data`.")
-    md.append("- The expected 3 section markers all appear, in "
-              "order: `*node data` → `*node properties` → "
-              "`*tie data`.  No `*tie properties` section "
-              "appears (commented out in source).")
-    md.append("- Each section has a header line whose token "
-              "count matches the per-form column-list literal "
-              "in the VBA source (5/4 for Associations, 8/5 "
-              "for Kinship; check Place separately if added).")
-    md.append("- Each section has ≥ 0 data rows; for sections "
-              "fed by a non-empty scratch table (e.g. `*node "
-              "data` from `ZZ_SCRATCH_P_ASSOC`), assert "
-              "`data_row_count > 0`.")
-    md.append("- File encoding is system-default ASCII / cp1252 "
-              "(no BOM expected) for FSO-path forms.  Place "
-              "may differ — verify if Place is added later.")
+    md.append("- File encoding is `cp1252` (no BOM).  "
+              "Consistent with `Scripting.FileSystemObject."
+              "CreateTextFile` default behaviour.  (Place may "
+              "differ — uses ADO Stream per static read; "
+              "verify if Place is added later.)")
+    md.append("- First non-blank line starts with a `*` "
+              "section marker.")
+    md.append("- Section markers use the `*<name>` syntax "
+              "(e.g. `*node data`).")
+    md.append("- No `*tie properties` section appears (4th "
+              "section is commented out in source for all 3 "
+              "free-standing forms).")
+    md.append("")
+    md.append("#### Per-form: only forms with a clean probe "
+              "outcome can justify section-set + row-count "
+              "assertions")
+    md.append("")
+    clean = agg.get("clean_forms") or []
+    err_forms_list = agg.get("err_forms") or []
+    if clean:
+        md.append("Forms eligible for a strict per-form "
+                  f"manifest today: **{clean}**.  Per-form "
+                  "manifest content (section count, header "
+                  "tokens per section, expected row-count "
+                  "relations to scratch tables) is in the "
+                  "\"Per-form section detail\" table above; "
+                  "those numbers are the manifest baseline a "
+                  "coverage PR can lock in.")
+        md.append("")
+        md.append("Examples of per-form assertions justified "
+                  "by the probe data (LookAtKinship if it is "
+                  "in the clean set):")
+        md.append("- Section markers exactly: `*node data` → "
+                  "`*node properties` → `*tie data`, in that "
+                  "order.")
+        md.append("- `*node data` and `*node properties` row "
+                  "counts equal each other (both = node "
+                  "count) AND match `ZZ_SCRATCH_KIN` count.")
+        md.append("- `*tie data` row count matches "
+                  "`ZZ_SCRATCH_KINNET` count.")
+    else:
+        md.append("No form in this probe produced a clean "
+                  "outcome; per-form strict assertions are "
+                  "NOT yet justified for any form.")
+    md.append("")
+    if err_forms_list:
+        md.append("Forms NOT yet eligible for a strict "
+                  f"per-form manifest: **{err_forms_list}**.  "
+                  "These forms produced an `:ERR` or no file "
+                  "during the probe; their probe data does "
+                  "NOT support claims like \"all 3 sections "
+                  "appear\" or \"row counts match scratch "
+                  "tables\".  A coverage PR targeting any of "
+                  "these would need EITHER (a) a separate "
+                  "per-row / per-block isolation probe to "
+                  "localise the runtime ERR (then either bug-"
+                  "pin it OR coordinate an upstream fix), OR "
+                  "(b) deliberately weaker structural "
+                  "assertions that tolerate the partial "
+                  "export — which would defeat the point of "
+                  "\"strict\" coverage.  Neither path is in "
+                  "this probe's scope.")
     md.append("")
     md.append("### 4. Cheapest first coverage form")
     md.append("")
@@ -836,11 +889,19 @@ def main() -> int:
             canonical_order.index(r["form"])
             if r["form"] in canonical_order else 99))
     agg = _aggregate(results)
+    # `forms_probed` MUST mirror the actual `results[]` (not
+    # the CLI `--form` arg, which only names what THIS
+    # invocation re-ran).  Earlier the field was set to
+    # `forms` directly, which under --form mode wrote a
+    # subset and disagreed with `results[]`.  Derive from
+    # results to keep the two in sync no matter how the
+    # script is invoked.
     out = {
         "schema_version": 1,
         "generated_date": "2026-05-06",
         "probe_branch": "investigate/cmducinet-family-shape",
-        "forms_probed": forms,
+        "forms_probed": [r["form"] for r in results],
+        "_this_invocation_re_probed": forms,
         "results": results,
         "aggregate": agg,
     }

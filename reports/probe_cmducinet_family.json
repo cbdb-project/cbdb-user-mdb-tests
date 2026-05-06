@@ -3,7 +3,8 @@
   "generated_date": "2026-05-06",
   "probe_branch": "investigate/cmducinet-family-shape",
   "forms_probed": [
-    "LookAtAssociations"
+    "LookAtAssociations",
+    "LookAtKinship"
   ],
   "results": [
     {

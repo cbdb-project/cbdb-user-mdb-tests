@@ -116,15 +116,39 @@ These are CONCLUSIONS drawn from the probe + static evidence, NOT additional pro
 
 ### 3. Strict structural assertions a coverage PR could safely make
 
-Modeled on the existing CmdGIS / CmdNeo4j depth-check shape (`tests/test_vba_cmdgis_other_forms.py::_assert_gis_export_depth`):
+Split into **family-level** invariants (apply to both probed
+forms; safe across the family) vs **per-form** assertions
+(specific to a chosen coverage target).  Modeled on the
+existing CmdGIS / CmdNeo4j depth-check shape (`tests/test_vba_cmdgis_other_forms.py::_assert_gis_export_depth`).
+
+#### Family-level (probe-confirmed across Associations + Kinship)
 
 - File exists at the patched-filedialog path AND is non-empty.
 - File extension is `.vna`.
-- First non-blank line starts with `*node data`.
-- The expected 3 section markers all appear, in order: `*node data` → `*node properties` → `*tie data`.  No `*tie properties` section appears (commented out in source).
-- Each section has a header line whose token count matches the per-form column-list literal in the VBA source (5/4 for Associations, 8/5 for Kinship; check Place separately if added).
-- Each section has ≥ 0 data rows; for sections fed by a non-empty scratch table (e.g. `*node data` from `ZZ_SCRATCH_P_ASSOC`), assert `data_row_count > 0`.
-- File encoding is system-default ASCII / cp1252 (no BOM expected) for FSO-path forms.  Place may differ — verify if Place is added later.
+- File encoding is `cp1252` (no BOM).  Consistent with `Scripting.FileSystemObject.CreateTextFile` default behaviour.  (Place may differ — uses ADO Stream per static read; verify if Place is added later.)
+- First non-blank line starts with a `*` section marker.
+- Section markers use the `*<name>` syntax (e.g. `*node data`).
+- No `*tie properties` section appears (4th section is commented out in source for all 3 free-standing forms).
+
+#### Per-form: LookAtKinship (cheapest first coverage)
+
+Strict assertions justified by the probe's clean outcome:
+
+- Section markers exactly: `*node data` → `*node properties` → `*tie data`, in that order.
+- `*node data`: header has 8 tokens (`ID index_year dy_code dynasty sex x_coord y_coord kindist`); data row count == node count.
+- `*node properties`: header has 5 tokens (`ID color shape size shortlabel`); data row count == node count (equals `*node data` row count).
+- `*tie data`: header has 5 tokens; data row count == edge count from `ZZ_SCRATCH_KINNET`.
+- Cross-check: node row count matches `ZZ_SCRATCH_KIN` scratch table count; tie row count matches `ZZ_SCRATCH_KINNET` scratch table count.  In this probe: 949 / 949 / 1260, matching `ZZ_SCRATCH_KIN=949` / `ZZ_SCRATCH_KINNET=1260` exactly.
+
+#### Per-form: LookAtAssociations (NOT yet a coverage candidate)
+
+Cannot justify the same strict assertions today.  The probe observed:
+
+- Only 2 of the 3 expected section markers were written (`*node data` + `*node properties`); `*tie data` was never reached.
+- The chain bailed mid-`*node properties` after writing 3973 of 8087 expected rows.
+- Runtime `:ERR` recorded: `LookAtAssociations:ERR Invalid procedure call or argument` (VBA error 5).
+
+A coverage PR targeting Associations would need EITHER: (a) a separate per-row isolation probe to localise and characterise the VBA error 5 (then either bug-pin it like Issue #21 OR coordinate an upstream fix), OR (b) deliberately weaker structural assertions that tolerate a partial export — which would defeat the point of "strict" coverage.  Neither path is in this probe's scope.
 
 ### 4. Cheapest first coverage form
 
