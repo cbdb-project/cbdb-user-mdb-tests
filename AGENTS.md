@@ -584,8 +584,11 @@ CBDB grows over time.  The "top entry code" today may not be top in
 six months.  Plus new addresses / dynasties / status codes can
 appear.  Stale `test_inputs.json` defeats the whole point.
 
-`tests/conftest.py` should auto-run discovery if `test_inputs.json`
-is older than `data/CBDB_BJ_User.mdb` (TODO — see Issues below).
+`tests/conftest.py` auto-runs discovery if `test_inputs.json` is
+older than `data/CBDB_BJ_User.mdb` (or, when uniquely resolvable,
+`data/CBDB_*_DATA.mdb`).  Disable with `--no-discover-inputs`.
+The decision logic lives in `_refresh_decision` and is unit-tested
+in `tests/test_infra_refresh_decision.py`.
 
 ## Standard workflow after a `.mdb` update
 
@@ -624,7 +627,12 @@ python -m pytest tests/test_vba_*.py -W ignore -p no:cacheprovider
    (Status / Texts / Associations / Office / Place / Kinship +
    LookAtEntry separately in `test_vba_matrix.py`)
 2. ✅ DONE — `test_vba_export.py` real CmdGIS export, byte-level diff
-3. Auto-run `discover_test_inputs.py` from conftest if json is stale
+3. ✅ DONE — `tests/conftest.py::pytest_configure` auto-runs
+   `discover_test_inputs.py` when `analysis/dump/test_inputs.json`
+   is missing or older than `data/CBDB_BJ_User.mdb` (and the
+   uniquely-resolvable `data/CBDB_*_DATA.mdb` when present).
+   Decision logic in `_refresh_decision`; unit-tested in
+   `tests/test_infra_refresh_decision.py`.
 4. Three forms still skipped in matrix (need smaller fixtures + lower
    distance constraints to avoid recursive expansion timeout):
    - LookAtAssociationPairs (CmdQuery times out — TxtID1+TxtID2 set
