@@ -8,11 +8,18 @@
 
 Conclusion: **`still_needs_better_fixture`**
 
-CmdUCINet was never able to fire: every probe iteration on this dump shows that the second COM call (set_form_tag for CmdUCINet) raises `com_error('The RPC server is unavailable.')` AFTER the CmdQuery timer either completes or times out. This is a *driver-CmdQuery interaction issue on the Place form*, not a Place CmdUCINet bug — Place CmdUCINet's runtime behaviour is still unobserved.
+**Place CmdUCINet runtime behaviour remains unobserved.** Every probe iteration on this dump ended with the second `set_form_tag` call (for CmdUCINet) raising `com_error('The RPC server is unavailable.')`, before any CmdUCINet code path could execute.
 
-Picker size / checkbox state / synthetic-row injection are NOT the root cause: the same failure mode reproduced across (a) Kaifeng addr 100658 with default checkbox state, (b) Kaifeng with ChkKin+ChkAssocPlace enabled, (c) synthetic-row inject bypassing CmdQuery, (d) Chenliu addr 3089 (3 BIOG_ADDR_DATA rows). The common factor is that CmdQuery on the Place form holds Access in a state where the next set_form_tag call fails.
+Honest framing of the failure: this is **post-form-work COM bridge instability in the current Place probe shape**.  The narrower claim 'CmdQuery on the Place form is the trigger' is NOT supported by the evidence: iteration 3 deliberately bypassed CmdQuery (synthetic-row injection via pyodbc) and the next `set_form_tag` STILL failed RPC-unavailable after a separately-failed direct-COM Requery attempt.  So whether CmdQuery is necessary to trigger the instability is unresolved; what we CAN say is that under the current probe shape, the COM bridge becomes unavailable after the form-side work that precedes the CmdUCINet fire (CmdQuery in iters 1/2/4, a failed Requery in iter 3).
 
-The brief explicitly forbids driver changes in this PR, so this probe cannot complete CmdUCINet's runtime characterization. A follow-up needs either (a) a driver-side change so CmdQuery's completion releases the COM bridge cleanly (separate maintainer brief), OR (b) a different probe shape that fires CmdUCINet via a path that doesn't go through click_via_timer (e.g. pywinauto UI click on the Access window — but VbaSession.click_button currently expects a visible form, and headless Access may not support it). The static prediction (ADO Stream + UTF-8, 3-section file shape, FSO path commented out) remains the only available characterization of Place CmdUCINet's writer.
+**Bucket label caveat: `still_needs_better_fixture` is an imperfect fit.**  The brief's fixed bucket vocabulary forces this label, but the actual blocker is NOT fixture insufficiency — it is unresolved probe-shape / COM instability.  Picker size, checkbox state, and synthetic-row injection were all tried; none of them is the root cause.  Reading this bucket as 'try a different fixture and Place will be characterized' would be a misread.
+
+What this PR's evidence DOES support:
+  - Place CmdUCINet runtime still unobserved.
+  - The current probe shape hits unresolved COM/RPC instability after form-side work.
+  - The static prediction (ADO Stream + UTF-8, 3-section file shape, FSO path commented out) remains the only available characterization of Place CmdUCINet's writer.
+
+What a follow-up would need (out of scope for this PR's brief boundary): either (a) a driver-side change targeted at the post-form-work instability, after a separate investigation localizes which form-side operation actually triggers it, OR (b) a different probe shape that fires CmdUCINet via a path that doesn't go through `click_via_timer` (e.g. pywinauto UI click on the Access window — but `VbaSession.click_button` currently expects a visible form, and headless Access may not support it).
 
 ---
 
@@ -89,22 +96,29 @@ These are CONCLUSIONS drawn from the probe + static evidence, NOT additional pro
 
 **Conclusion bucket: `still_needs_better_fixture`**
 
-CmdUCINet was never able to fire: every probe iteration on this dump shows that the second COM call (set_form_tag for CmdUCINet) raises `com_error('The RPC server is unavailable.')` AFTER the CmdQuery timer either completes or times out. This is a *driver-CmdQuery interaction issue on the Place form*, not a Place CmdUCINet bug — Place CmdUCINet's runtime behaviour is still unobserved.
+**Place CmdUCINet runtime behaviour remains unobserved.** Every probe iteration on this dump ended with the second `set_form_tag` call (for CmdUCINet) raising `com_error('The RPC server is unavailable.')`, before any CmdUCINet code path could execute.
 
-Picker size / checkbox state / synthetic-row injection are NOT the root cause: the same failure mode reproduced across (a) Kaifeng addr 100658 with default checkbox state, (b) Kaifeng with ChkKin+ChkAssocPlace enabled, (c) synthetic-row inject bypassing CmdQuery, (d) Chenliu addr 3089 (3 BIOG_ADDR_DATA rows). The common factor is that CmdQuery on the Place form holds Access in a state where the next set_form_tag call fails.
+Honest framing of the failure: this is **post-form-work COM bridge instability in the current Place probe shape**.  The narrower claim 'CmdQuery on the Place form is the trigger' is NOT supported by the evidence: iteration 3 deliberately bypassed CmdQuery (synthetic-row injection via pyodbc) and the next `set_form_tag` STILL failed RPC-unavailable after a separately-failed direct-COM Requery attempt.  So whether CmdQuery is necessary to trigger the instability is unresolved; what we CAN say is that under the current probe shape, the COM bridge becomes unavailable after the form-side work that precedes the CmdUCINet fire (CmdQuery in iters 1/2/4, a failed Requery in iter 3).
 
-The brief explicitly forbids driver changes in this PR, so this probe cannot complete CmdUCINet's runtime characterization. A follow-up needs either (a) a driver-side change so CmdQuery's completion releases the COM bridge cleanly (separate maintainer brief), OR (b) a different probe shape that fires CmdUCINet via a path that doesn't go through click_via_timer (e.g. pywinauto UI click on the Access window — but VbaSession.click_button currently expects a visible form, and headless Access may not support it). The static prediction (ADO Stream + UTF-8, 3-section file shape, FSO path commented out) remains the only available characterization of Place CmdUCINet's writer.
+**Bucket label caveat: `still_needs_better_fixture` is an imperfect fit.**  The brief's fixed bucket vocabulary forces this label, but the actual blocker is NOT fixture insufficiency — it is unresolved probe-shape / COM instability.  Picker size, checkbox state, and synthetic-row injection were all tried; none of them is the root cause.  Reading this bucket as 'try a different fixture and Place will be characterized' would be a misread.
+
+What this PR's evidence DOES support:
+  - Place CmdUCINet runtime still unobserved.
+  - The current probe shape hits unresolved COM/RPC instability after form-side work.
+  - The static prediction (ADO Stream + UTF-8, 3-section file shape, FSO path commented out) remains the only available characterization of Place CmdUCINet's writer.
+
+What a follow-up would need (out of scope for this PR's brief boundary): either (a) a driver-side change targeted at the post-form-work instability, after a separate investigation localizes which form-side operation actually triggers it, OR (b) a different probe shape that fires CmdUCINet via a path that doesn't go through `click_via_timer` (e.g. pywinauto UI click on the Access window — but `VbaSession.click_button` currently expects a visible form, and headless Access may not support it).
 
 ### Iteration history (for the probe author's future self)
 
-This probe was run in four iterations before the current configuration. None of them produced a runtime characterization of CmdUCINet's writer; all of them showed the SAME failure mode (`com_error('The RPC server is unavailable.')` on the second set_form_tag call after CmdQuery). Iterations recorded so future probe authors don't re-run the same dead ends:
+This probe was run in four iterations before the current configuration. None of them produced a runtime characterization of CmdUCINet's writer; all of them showed the SAME terminal failure (`com_error('The RPC server is unavailable.')` on the second `set_form_tag` call, the one that fires CmdUCINet). The form-side work that preceded that failure differed across iterations — CmdQuery in iters 1/2/4, a failed direct-COM Requery in iter 3 — so CmdQuery is *not* a proven common cause; see closing paragraph for the narrowest claim the evidence supports. Iterations recorded so future probe authors don't re-run the same dead ends:
 
 1. **Kaifeng (100658), default checkboxes.** CmdQuery returned 2208 rows in 187s — all `Biography` / `Office Place` / `Entry`, zero `Kinship` / `Associate Place`. CmdUCINet would have bailed at its 'no networks' guard even if the COM bridge had stayed alive (which it did not).
 2. **Kaifeng + ChkKin + ChkAssocPlace enabled.** CmdQuery returned 8370 rows in 240s (incl. 6159 `Kinship`); ChkAssocPlace contributed 0 rows on Kaifeng, suggesting that source needs more than just the checkbox toggle. COM bridge died immediately after CmdQuery.
-3. **Synthetic-row injection bypassing CmdQuery** (open form, INSERT 4 Kinship rows directly, Requery the subform). The subform Requery via `sess.app.Forms('LookAtPlace').Controls('frmZZZ_PLACE').Form.Requery()` raised `AttributeError('Access.Application.Forms')`; the next set_form_tag failed with RPC unavailable.
+3. **Synthetic-row injection bypassing CmdQuery** (open form, INSERT 4 Kinship rows directly via pyodbc, then attempt subform Requery via direct COM). CmdQuery was NOT fired in this iteration. The subform Requery via `sess.app.Forms('LookAtPlace').Controls('frmZZZ_PLACE').Form.Requery()` raised `AttributeError('Access.Application.Forms')`; the next set_form_tag still failed with RPC unavailable. NB: this iteration shows that CmdQuery is NOT a necessary precondition for the post-form-work COM failure — a failed direct-COM Requery is also enough to leave the bridge unavailable.
 4. **Chenliu (3089) + ChkKin (current run).** Smallest realistic picker (3 BIOG_ADDR_DATA rows, 3 KIN_DATA links per pyodbc scan of `data/CBDB_*_DATA.mdb`). CmdQuery still timed out at 120s and returned 3 rows (all `Biography` — ChkKin's filter wants people whose *kin's* address is in the picker, not people whose own address is). COM bridge died immediately after.
 
-Common factor: every iteration that reached the second set_form_tag call (for CmdUCINet) failed the same way. The instability is NOT picker-size, NOT checkbox-state, NOT row-count dependent — it is a *driver-CmdQuery interaction on the Place form*.
+Common factor: every iteration that reached the second `set_form_tag` call (for CmdUCINet) failed the same way. The instability is NOT picker-size, NOT checkbox-state, NOT row-count dependent. The narrowest claim the evidence supports is **post-form-work COM bridge instability in the current Place probe shape** — the COM bridge becomes unavailable after the form-side work that precedes the CmdUCINet fire (CmdQuery in iters 1/2/4, a failed Requery in iter 3). Whether CmdQuery specifically is necessary to trigger the instability is unresolved.
 
 ### Why Place should NOT be folded into Issue #22 regardless of this probe's outcome
 
