@@ -37,6 +37,7 @@
       {
         "rank": 1,
         "cell": "LookAtGroupData × CmdNeo4j",
+        "_SUPERSEDED_BY": "refresh_2026_05_05_later (see below).  This rank-1 entry was written BEFORE probe/groupdata-cmdneo4j (4ace85b) and investigate/groupdata-cmdneo4j-tail (3bfcba8) ran.  Those probes confirmed mid-chain LookAtGroupData:ERR No current record. (DAO 3021), bucket-A new bug candidate.  GroupData × CmdNeo4j is now investigation-first, NOT a coverage candidate; see refresh_2026_05_05_later.cheapest_next_after_this_refresh for the current (empty) ranking.",
         "current_bucket": "C_blocked_by_form_query_timeout",
         "why_cheaper_than_others": "The just-merged GroupData × CmdGIS PR proved person_1 small fixture drives CmdRun + a multi-file export chain end-to-end inside the standard 180s watcher.  That dispels the matrix-CmdRun-timeout half of this cell's bucket-C blocker.  All other remaining gaps require either a driver patch (AssocPairs, Networks), the Networks Form_Open scaffold, or a CmdUCINet family-level design + probe pass first.  None of those is cheap.",
         "transferable_assets_from_groupdata_cmdgis_pr": [
@@ -73,12 +74,23 @@
       {"pr": "note/assocpairs-cmdgis-not-cheap-next", "commit": "(this note)", "status": "in flight", "outcome": "reclassifies CmdGIS as not-cheap; removes from candidate list"}
     ],
     "cheapest_next_after_this_refresh": {
-      "cell": "LookAtGroupData x CmdNeo4j",
-      "rank": 1,
-      "approach": "probe-first per the prior refresh's recommendation",
-      "no_rank_2_or_3": "Every other remaining gap continues to fall into the brief's exclusion zones (AssocPairs other cells, Networks driver-meta, CmdUCINet new family)."
+      "list_is_empty": true,
+      "_correction_note": "An earlier draft of this field listed LookAtGroupData x CmdNeo4j as rank-1 cheapest-next.  That was stale: probe/groupdata-cmdneo4j (4ace85b) and investigate/groupdata-cmdneo4j-tail (3bfcba8) had already merged and confirmed mid-chain LookAtGroupData:ERR No current record. (DAO 3021).  Bug #21 was filed for this in PR chore/file-issue-21 (934f220, awaiting review).  GroupData x CmdNeo4j is now investigation-first / bug-candidate, NOT a coverage candidate.",
+      "current_state_of_remaining_gaps": {
+        "LookAtAssociationPairs x CmdGIS": "bucket B + this refresh's not-cheap negative finding (analysis/assocpairs_cmdgis_note.md)",
+        "LookAtAssociationPairs x CmdNeo4j": "bucket B + brief exclusion (AssocPairs)",
+        "LookAtAssociationPairs x CmdUCINet": "bucket B + brief exclusion (CmdUCINet new family)",
+        "LookAtNetworks x CmdGIS": "bucket B + brief exclusion (Networks driver-meta)",
+        "LookAtNetworks x CmdPajek": "bucket B + brief exclusion (Networks driver-meta)",
+        "LookAtNetworks x CmdUCINet": "bucket B + brief exclusion (Networks driver-meta + CmdUCINet)",
+        "LookAtAssociations x CmdUCINet": "bucket D + brief exclusion (CmdUCINet new family)",
+        "LookAtPlace x CmdUCINet": "bucket D + brief exclusion (CmdUCINet new family)",
+        "LookAtKinship x CmdUCINet": "bucket D + brief exclusion (CmdUCINet new family)",
+        "LookAtGroupData x CmdNeo4j": "investigation-first / bug-candidate (probe + tail probe merged; Bug #21 filed in chore/file-issue-21 awaiting review)"
+      },
+      "_no_cell_is_autopilot_safe_today": "None of the 10 remaining gaps qualifies as cheap-next under the standing brief (no AssocPairs, no Networks driver-meta, no CmdUCINet new family, no investigation-first cells without a fresh brief).  The cheapest-next list is genuinely empty."
     },
-    "successor_recommendation": "The AssociationPairs line of work has produced its high-value PRs.  Successor direction should be AWAY from AssociationPairs, not deeper.  A fresh export-gap triage refresh after this lands is probably the right next step rather than picking another specific cell."
+    "successor_recommendation": "The AssociationPairs line of work has produced its high-value PRs.  Combined with the GroupData CmdNeo4j tail probe's bug-candidate finding, NO remaining export-gap cell qualifies as cheap-next under the standing brief.  Two natural next directions (NOT framed as 'pick another cell'): (1) GroupData CmdNeo4j tail / empty-recordset-guard investigation -- review/merge Bug #21 (chore/file-issue-21, 934f220) and either coordinate an upstream CBDB fix or write a per-block bugfix verification probe; OR (2) a fresh whole-triage refresh that re-baselines the export-gap queue from scratch given two cells have moved out of the cheap-next zone since the original 2026-05-04 plan.  Explicitly NOT recommended: 'continue closing the next cheapest cell' -- there is no next cheapest cell on this dump under the standing brief today."
   },
   "buckets": {
     "A_small_candidate": {

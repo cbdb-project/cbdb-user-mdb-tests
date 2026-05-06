@@ -48,7 +48,17 @@ CmdUCINet new family):
 
 | Rank | Cell | Why it is cheaper than every other remaining cell |
 |---|---|---|
-| 1 | **LookAtGroupData × CmdNeo4j** | The just-merged PR proved the person_1 small fixture drives GroupData CmdRun + a multi-file export chain end-to-end inside the standard 180s watcher.  That dispels the "matrix CmdRun timeout" half of this cell's bucket-C blocker.  The all-`Chk*`-reset pattern from the GroupData CmdGIS test directly transfers (Issue #6 avoidance).  Only one unknown remains: whether the CmdNeo4j chain's own SaveAs count fits the 180s watcher on person_1 (cheaper to settle than any other remaining cell, all of which need either a driver patch or a new export-family design pass first). |
+| 1 | ~~**LookAtGroupData × CmdNeo4j**~~ — **SUPERSEDED** by probe results, see "Refresh 2026-05-05 (later)" below | (original rationale, kept for history): The just-merged PR proved the person_1 small fixture drives GroupData CmdRun + a multi-file export chain end-to-end inside the standard 180s watcher.  That dispels the "matrix CmdRun timeout" half of this cell's bucket-C blocker.  The all-`Chk*`-reset pattern from the GroupData CmdGIS test directly transfers (Issue #6 avoidance).  Only one unknown remains: whether the CmdNeo4j chain's own SaveAs count fits the 180s watcher on person_1 (cheaper to settle than any other remaining cell, all of which need either a driver patch or a new export-family design pass first). |
+
+> **Update (post-probe, 2026-05-05 later):** the rank-1
+> candidate above was probed (`probe/groupdata-cmdneo4j` and
+> `investigate/groupdata-cmdneo4j-tail`, both merged to main).
+> The probe found mid-chain `LookAtGroupData:ERR No current
+> record.` — same pattern Bug #21 captures.  GroupData ×
+> CmdNeo4j is now an investigation-first / bug-candidate
+> cell, NOT a coverage candidate.  See the "Refresh
+> 2026-05-05 (later)" section below for the current ranking
+> (which is empty).
 
 There is no rank 2 or rank 3 under the brief's exclusions —
 **every other gap requires a driver patch, the Networks Form_Open
@@ -130,12 +140,66 @@ the brief's authorized scope; reviewer chose option (c) accept
   populate the subform's RecordCount the way Place / Kinship's
   do.  Neither is justified on cost-benefit today.
 
-**Cheapest-next ranking after this refresh:** still
-LookAtGroupData × CmdNeo4j (probe-first per the prior
-refresh's recommendation), and that's the only candidate.
-Every other remaining gap continues to fall into the brief's
-exclusion zones (AssocPairs, Networks driver-meta, CmdUCINet
-new family).
+**Cheapest-next ranking after this refresh: EMPTY.**
+
+The earlier 2026-05-05 refresh (above) named LookAtGroupData ×
+CmdNeo4j as the rank-1 cheapest-next candidate.  That is now
+**SUPERSEDED** by the actual probe results that have since
+landed on main:
+
+- `probe/groupdata-cmdneo4j` (commit `4ace85b`) — chain runs
+  in 2.5 s and produces 8 of 11 expected files, but emits
+  mid-chain `LookAtGroupData:ERR No current record.` (DAO
+  3021) before the Entry-related tail blocks fire.  Verdict:
+  **`do_not_open_coverage_pr_mid_chain_err`**.
+- `investigate/groupdata-cmdneo4j-tail` (commit `3bfcba8`) —
+  per-block isolation probe confirmed the bug class:
+  **`A_new_bug_candidate_empty_recordset_guard`** (PeopleEntry
+  / EntryCode blocks unguarded `.MoveFirst` on empty
+  `ZZ_SCRATCH_ENTRY`; distinct from Issue #6's column-typo
+  family).  Bug #21 was filed for this in PR
+  `chore/file-issue-21` (commit `934f220`, awaiting review).
+
+So GroupData × CmdNeo4j has moved from "probe-first cheapest-
+next coverage candidate" to **"investigation-first / bug-
+candidate confirmed; not a coverage candidate"**.  It belongs
+in the same not-cheap class as AssociationPairs × CmdGIS — both
+have a confirmed downstream blocker that a coverage PR alone
+won't address.
+
+**Therefore the cheapest-next list is now empty.**  Every
+remaining gap is one of:
+
+- AssociationPairs × CmdGIS — bucket B + this refresh's not-
+  cheap negative finding
+- AssociationPairs × CmdNeo4j / CmdUCINet — bucket B + brief
+  exclusions
+- Networks × {CmdGIS, CmdPajek, CmdUCINet} — driver/meta-PR
+- {Associations, Place, Kinship} × CmdUCINet — CmdUCINet new
+  family
+- GroupData × CmdNeo4j — investigation-first per the tail
+  probe's bug-candidate finding (this refresh)
+
+None of these is autopilot-safe under the standing brief
+(no AssocPairs, no Networks driver-meta, no CmdUCINet new
+family, no investigation-first cells without a fresh brief).
+
+**Successor recommendation (revised):** rather than picking
+a "next cell" by ranking, the natural next step is one of:
+
+1. **GroupData CmdNeo4j tail / empty-recordset-guard
+   investigation** — turn the tail probe's bug-candidate into
+   either Bug #21 review/merge + a per-block bugfix
+   verification probe, OR an upstream-fix coordination with
+   the CBDB maintainer.
+2. **A fresh whole-triage refresh** — re-baseline the export-
+   gap queue from scratch given that two cells (AssocPairs ×
+   CmdGIS and GroupData × CmdNeo4j) have moved out of the
+   cheap-next zone since the original 2026-05-04 plan.
+
+What this refresh deliberately does NOT recommend:
+"continue closing the next cheapest cell" — there is no next
+cheapest cell on this dump, under the standing brief, today.
 
 **AssociationPairs line of work — final state per this
 refresh:**

@@ -155,10 +155,39 @@ high-value PRs:
 2. CmdPajek + CmdGephi coverage (`cover/assocpairs-pajek-gephi-1x3`)
 3. CmdGIS proven NOT cheap (this note)
 
-Next direction should be **away from AssociationPairs**, not
-deeper into it.  The maintainer's standing brief excludes
-CmdNeo4j / CmdUCINet / Networks; combined with this note, the
-remaining cheap-next candidates after the AssociationPairs
-line are vanishingly few.  A fresh export-gap triage refresh
-is probably the right next step rather than picking another
-specific cell.
+**Cheapest-next candidates after this note: none.**
+
+Originally one might have expected `LookAtGroupData × CmdNeo4j`
+to remain the cheap-next candidate after AssocPairs × CmdGIS
+was ruled out.  But that's stale too: `probe/groupdata-
+cmdneo4j` (commit `4ace85b`) and `investigate/groupdata-
+cmdneo4j-tail` (commit `3bfcba8`) — both already merged to
+main — confirmed mid-chain `LookAtGroupData:ERR No current
+record.` (DAO 3021, an unguarded `.MoveFirst` on empty
+recordset).  Bug #21 was filed for that in PR
+`chore/file-issue-21` (commit `934f220`, awaiting review).
+GroupData × CmdNeo4j is now investigation-first / bug-
+candidate, NOT a coverage candidate.
+
+So on the current dump, under the standing brief (no
+AssocPairs, no Networks driver-meta, no CmdUCINet new family,
+no investigation-first cells without a fresh brief), **no
+remaining export-gap cell qualifies as cheap-next.**  The
+cheapest-next list is genuinely empty.
+
+Two natural next directions (NOT framed as "pick another
+cell"):
+
+1. **GroupData CmdNeo4j tail / empty-recordset-guard
+   investigation** — review/merge Bug #21
+   (`chore/file-issue-21`) and either coordinate an upstream
+   CBDB fix or write a per-block bugfix verification probe.
+2. **A fresh whole-triage refresh** — re-baseline the
+   export-gap queue from scratch given that two cells
+   (AssocPairs × CmdGIS and GroupData × CmdNeo4j) have moved
+   out of the cheap-next zone since the original 2026-05-04
+   plan.
+
+Explicitly NOT recommended: "continue closing the next
+cheapest cell" — there is no next cheapest cell on this
+dump under the standing brief today.
