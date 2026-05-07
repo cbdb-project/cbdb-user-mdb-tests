@@ -21,7 +21,18 @@ Skips:
   via minimal injection — see tests/test_vba_networks_small_fixture.py.
 - LookAtStatus: chain interaction with CmdQuery cleanup-rebind
   (same root family as Pajek/Gephi Status skip).
-- LookAtAssociationPairs / LookAtGroupData: matrix CmdQuery skipped.
+- LookAtGroupData: matrix CmdQuery skipped.
+
+LookAtAssociationPairs (newly covered): the prior matrix CmdQuery
+skip + the CmdNeo4j-specific debug-MsgBox blocker have both been
+resolved.  CmdQuery is unblocked by the AssociationPairs SetFocus
+driver patch (commits 3bb69ef + 0c0eaf1, on main as of PR AV).
+CmdNeo4j is unblocked by the AssociationPairs CmdNeo4j_Click
+debug-MsgBox suppress driver patch (PR #109,
+`_suppress_assocpairs_cmdneo4j_debug_msgbox`).  Hosted here using
+the same 1×3 known-edged person pair as the Pajek/Gephi
+cross-form test — see `_assocpairs_1x3_fixture()` in that file
+(re-exported via import).
 
 Per-form minimum file count is conservative: many of the dialog
 blocks sit inside `If <flag>.Value Then` branches we don't enter.
@@ -36,6 +47,7 @@ import pytest
 
 from cbdb_driver.vba_session import VbaSession, make_fixture
 from test_vba_matrix_all_forms import _all_fixtures, CrossFixture, SRC
+from test_vba_pajek_gephi_cross_form import _assocpairs_1x3_fixture
 
 WORK = Path(__file__).resolve().parent.parent / "analysis" / "_cmdneo4j_test_copy.mdb"
 
@@ -67,10 +79,25 @@ _SPECS: tuple[Spec, ...] = (
     Spec("LookAtPlace",        min_files=4),
     Spec("LookAtKinship",      min_files=4),
     Spec("LookAtStatus",       min_files=4),
+    # AssociationPairs × CmdNeo4j on the 1×3 known-edged pair
+    # produces exactly 6 files (People, Places, PeoplePlaces,
+    # PeopleAssociations, AssociationCodes, KinshipCodes) — see
+    # `_assert_lookatassociationpairs_neo4j_shape` for the
+    # per-shape pinning.  Verified end-to-end by PR #109's
+    # verification probe (chain_elapsed = 5.53 s,
+    # msgboxes_observed = 0, ZZ_TEST_DEBUG = [ENTER, DONE]).
+    Spec("LookAtAssociationPairs", min_files=6),
 )
 
 
 def _fixture_for(form: str) -> CrossFixture | None:
+    # AssociationPairs uses the same custom 1×3 known-edged
+    # fixture as `test_vba_pajek_gephi_cross_form.py`; the matrix
+    # default 4×5 pair shares 0 first-order edges and would leave
+    # ZZ_SOCIAL_NETWORK empty (chained CmdNeo4j would bail on
+    # RecordCount=0).
+    if form == "LookAtAssociationPairs":
+        return _assocpairs_1x3_fixture()
     for fx in _all_fixtures():
         if fx.spec.name == form:
             return fx
@@ -184,6 +211,9 @@ def test_cmd_neo4j_produces_files(vba: VbaSession, spec: Spec, tmp_path):
     # ---- Per-form structural assertions ------------------------
     if fspec.name == "LookAtEntry":
         _assert_lookatentry_neo4j_shape(fspec.name, files)
+    if fspec.name == "LookAtAssociationPairs":
+        _assert_lookatassociationpairs_neo4j_shape(
+            fspec.name, files, vba)
 
 
 def _assert_lookatentry_neo4j_shape(form_name: str,
@@ -288,6 +318,133 @@ def _assert_lookatentry_neo4j_shape(form_name: str,
     )
 
 
+def _assert_lookatassociationpairs_neo4j_shape(
+        form_name: str,
+        files: list[Path],
+        vba: VbaSession,
+) -> None:
+    """LookAtAssociationPairs × CmdNeo4j on the 1×3 known-edged
+    fixture (TxtID1=1, TxtID2=3, FrameFilterYears=1, ChkKinship=0,
+    Chk2Nodes=0) produces exactly 6 files with these first-column
+    shapes:
+
+      People               — `nameID,nameHZ,namePY,…`
+      Places               — `placeID,placePY,placeHZ,…`
+      PeoplePlaces         — `nameID,placeID,personPlaceCode,…`
+      PeopleAssociations   — `Person1_ID,Person2_ID,Association_Code,…`
+      AssociationCodes     — `AssociationCode,AssociationTrans,AssociationHZ`
+      KinshipCodes         — `KinshipCode,KinshipTrans,KinshipHZ`
+
+    The two `nameID`-headed files (People, PeoplePlaces) are
+    disambiguated by their second column via
+    `_NEO4J_SHAPES_BY_TWO_COLS` — same pattern as LookAtEntry.
+
+    Conspicuously ABSENT on this fixture:
+      KinshipRelations     — gated by `ChkKinship.Value` (off here)
+      LiteraryGenreCodes   — gated by `tRecDeleted > 0` (= 0 on
+                             this fixture's ZZ_SOCIAL_NETWORK)
+      InstitutionCodes     — same gate
+      OccasionCodes        — same gate
+      TopicCodes           — same gate
+
+    Provenance: PR #109's verification probe ran this exact
+    fixture with the MsgBox-suppress driver patch active and
+    observed the 6-file set in 5.53 s with zero MsgBox dialogs
+    and `ZZ_TEST_DEBUG = [LookAtAssociationPairs:ENTER,
+    LookAtAssociationPairs:DONE]`.  See
+    `reports/probe_assocpairs_cmdneo4j_after_msgbox_patch.json`
+    in PR #109.
+
+    A `:ERR` marker in `ZZ_TEST_DEBUG` would mean the chain hit
+    the error trap mid-run (either the original VBA `On Error
+    GoTo Err_<sub>` body, or our generic `MsgBox Err.Description`
+    rewrite).  This assertion fails on either.
+
+    `ZZ_KIN_LIST_TMP` carries 132 rows after this run with
+    ChkKinship=0 (the DELETE at Form_LookAtAssociationPairs.vb
+    line 900 is gated by `ChkKinship.Value`).  Per PR AX's probe
+    that's an OBSERVATION, not a confirmed blocker — the
+    KinshipCodes file (96 rows in this run) is asserted present
+    + non-empty by the per-shape depth check above; this helper
+    intentionally does NOT escalate the carry-over to a finding
+    unless the file's contents are independently shown wrong.
+    """
+    headers_first_col: list[str] = []
+    for f in files:
+        raw = f.read_bytes()
+        text = raw.decode("utf-8", errors="replace").lstrip("﻿")
+        first_line = text.split("\n", 1)[0].strip()
+        first_col = first_line.split(",", 1)[0]
+        headers_first_col.append(first_col)
+
+    expected_first_cols = {
+        "nameID",          # People AND PeoplePlaces (disambiguated
+                           # downstream by 2-col classifier)
+        "placeID",         # Places
+        "Person1_ID",      # PeopleAssociations
+        "AssociationCode", # AssociationCodes
+        "KinshipCode",     # KinshipCodes
+    }
+    seen = set(headers_first_col)
+    missing = expected_first_cols - seen
+    extra = seen - expected_first_cols
+    assert not missing, (
+        f"[{form_name}] CmdNeo4j missing expected file shapes "
+        f"(by header first-column): missing={sorted(missing)}; "
+        f"saw={sorted(seen)}.  Headers per file: "
+        f"{list(zip([f.name for f in files], headers_first_col))}"
+    )
+    assert not extra, (
+        f"[{form_name}] CmdNeo4j produced unexpected file shape(s) "
+        f"(by header first-column): extra={sorted(extra)}; "
+        f"expected exactly {sorted(expected_first_cols)}.  Headers "
+        f"per file: "
+        f"{list(zip([f.name for f in files], headers_first_col))}.  "
+        f"This usually means a previously-gated optional block "
+        f"(KinshipRelations / LiteraryGenreCodes / InstitutionCodes "
+        f"/ OccasionCodes / TopicCodes) became reachable on the "
+        f"current dump — see Form_LookAtAssociationPairs.vb gate "
+        f"conditions and update the expected set OR the fixture."
+    )
+
+    # Exactly 6 files (per PR #109 verification probe baseline on
+    # this fixture).  Two `nameID` files (People, PeoplePlaces)
+    # share a first column → 5 distinct first-column shapes.
+    assert len(files) == 6, (
+        f"[{form_name}] CmdNeo4j produced {len(files)} files; "
+        f"expected exactly 6 on the 1×3 known-edged fixture.  "
+        f"Headers per file: "
+        f"{list(zip([f.name for f in files], headers_first_col))}"
+    )
+    assert len(seen) == len(expected_first_cols), (
+        f"[{form_name}] expected {len(expected_first_cols)} "
+        f"distinct file-shape first-columns "
+        f"({sorted(expected_first_cols)}); saw {len(seen)} "
+        f"({sorted(seen)})."
+    )
+
+    # Chain-completion + no-error markers in ZZ_TEST_DEBUG.  The
+    # generic Err.Description rewrite in the driver writes
+    # `<short>:ERR …` rows; a clean run only contains
+    # `<short>:ENTER` and `<short>:DONE`.
+    cur = vba.conn.cursor()
+    cur.execute(
+        "SELECT msg FROM ZZ_TEST_DEBUG ORDER BY id")
+    debug_msgs = [r[0] for r in cur.fetchall()]
+    cur.close()
+    assert any(m.endswith(":DONE") for m in debug_msgs), (
+        f"[{form_name}] ZZ_TEST_DEBUG never reached :DONE — "
+        f"chain block did not complete.  Markers seen: "
+        f"{debug_msgs}"
+    )
+    err_rows = [m for m in debug_msgs if ":ERR" in m]
+    assert not err_rows, (
+        f"[{form_name}] ZZ_TEST_DEBUG contains runtime :ERR "
+        f"markers (chain hit the error trap): {err_rows}.  "
+        f"All markers: {debug_msgs}"
+    )
+
+
 # ----------------------------------------------------------------------
 # PR Q: per-shape Neo4j export depth manifest
 # ----------------------------------------------------------------------
@@ -371,6 +528,37 @@ _NEO4J_SHAPES: dict[str, tuple[str, list[str], list[str]]] = {
                    ["OfficeCode", "OfficeTrans", "OfficePinyin",
                     "OfficeHZ"],
                    ["OfficeCode"]),
+    # Added 2026-05-07 to cover LookAtAssociationPairs's CmdNeo4j
+    # output (3 new header families that PR AX's probe surfaced;
+    # PR #109's MsgBox-suppress patch made the chain reachable
+    # unattended).  None of these shapes overlap by first-column
+    # with existing entries so no two-column disambiguator needed.
+    #
+    # Person1_ID — PeopleAssociations.  13-col edge table from
+    # Form_LookAtAssociationPairs.vb:766 SaveAs block.  Keys are
+    # integer person ids, never blank — use the strict bad-id
+    # check (don't add to skip set).
+    "Person1_ID": ("PeopleAssociations",
+                   ["Person1_ID", "Person2_ID",
+                    "Association_Code"],
+                   ["Person1_ID"]),
+    # AssociationCode — AssociationCodes.  3-col code table from
+    # Form_LookAtAssociationPairs.vb:974.  Distinct from the
+    # existing `AssocCode -> AssocCodes` shape used by other
+    # forms (different header literal).  Code-table — see
+    # bad-id skip set additions below.
+    "AssociationCode": ("AssociationCodes-AssocPairs",
+                        ["AssociationCode", "AssociationTrans",
+                         "AssociationHZ"],
+                        ["AssociationCode"]),
+    # KinshipCode — KinshipCodes.  3-col code table from
+    # Form_LookAtAssociationPairs.vb:1072.  Distinct from the
+    # existing `KinCode -> KinshipCodes` shape (different
+    # header literal).  Code-table.
+    "KinshipCode": ("KinshipCodes-AssocPairs",
+                    ["KinshipCode", "KinshipTrans",
+                     "KinshipHZ"],
+                    ["KinshipCode"]),
 }
 
 # Two-column-prefix disambiguation for shapes whose first column
@@ -551,7 +739,13 @@ def _assert_neo4j_export_depth(form_name: str,
                 # OfficeCodes — same code-table family; office
                 # code can legitimately be 0 / blank for unmapped
                 # offices.
-                "OfficeCodes"):
+                "OfficeCodes",
+                # AssociationCodes-AssocPairs / KinshipCodes-
+                # AssocPairs — same code-table family from
+                # AssocPairs's CmdNeo4j output; first cell can
+                # legitimately be 0 / blank for unmapped codes.
+                "AssociationCodes-AssocPairs",
+                "KinshipCodes-AssocPairs"):
             # Code-table shapes can legitimately start with 0.
             raise AssertionError(
                 f"[{form_name}] {f.name} has rows whose first cell "
