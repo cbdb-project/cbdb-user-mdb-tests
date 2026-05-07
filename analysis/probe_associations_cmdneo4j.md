@@ -6,20 +6,20 @@ Per `analysis/export_gap_triage_plan.md` § Refresh 2026-05-07, this is the rank
 
 ## Static pre-analysis
 
-`Form_LookAtAssociations.vb::CmdNeo4j_Click` (lines 480-1565) contains an early-bail at lines 517-520:
+`Form_LookAtAssociations.vb::CmdNeo4j_Click` (lines 959-3132 in the current dump) contains an early-bail at lines 1033-1037:
 
 ```vb
-If Me.ZZ_SCRATCH_P_ASSOC.Form.Recordset.RecordCount = 0 Then
-    MsgBox "There are no records to save."  ' line 518
-    GoTo Exit_CmdNeo4j_Click                 ' line 519
+If Me.ZZ_SCRATCH_P_ASSOC.Form.Recordset.RecordCount = 0 Then  ' line 1033
+    MsgBox "There are no records to save."                    ' line 1035
+    GoTo Exit_CmdNeo4j_Click                                  ' line 1037
 End If
 ```
 
-`Dim dlgSaveAs As FileDialog` is declared at line 524 — i.e. **AFTER** the bail.  A hit on the bail therefore produces 0 files (no SaveAs dialog ever opens).
+`Dim dlgSaveAs As FileDialog` is declared at line 1047 — i.e. **AFTER** the bail.  A hit on the bail therefore produces 0 files (no SaveAs dialog ever opens).  The first `dlgSaveAs.Show` (the People-block SaveAs) is at line 1107.  The INSERT that builds `ZZ_SCRATCH_PEOPLE` and references `BIOG_MAIN.c_index_addr_type_code` is at lines 1287-1299.  (Line numbers are 1-based against the current dump, file size 168048 bytes, 7954 total lines, verified via Python `splitlines()` with cp1252.)
 
 Driver context: `LookAtAssociations` is **NOT** in `_SUBFORMS_TO_REQUERY` (see `tests/cbdb_driver/vba_session.py` line 603).  Sibling forms `Place` and `Kinship` are in that dict because their subforms cache a saved-query recordset that stays stale after CmdQuery's INSERTs into the underlying table.  Candidate hypothesis (this probe tests it): Associations has the same staleness on `ZZ_SCRATCH_P_ASSOC.Form.Recordset` — CmdGIS / CmdPajek / CmdGephi don't trip it because they read different scratch tables.
 
-The driver's generic `MsgBox "<lit>"` neutralizer rewrites the bail-MsgBox at line 518 into `CurrentDb.Execute INSERT INTO ZZ_TEST_DEBUG VALUES ('LookAtAssociations:MSGBOX')`, so a hit on the bail leaves a direct `LookAtAssociations:MSGBOX` row in `ZZ_TEST_DEBUG` — that is the direct evidence chain for the 0-file mode.
+The driver's generic `MsgBox "<lit>"` neutralizer rewrites the bail-MsgBox at line 1035 into `CurrentDb.Execute INSERT INTO ZZ_TEST_DEBUG VALUES ('LookAtAssociations:MSGBOX')`, so a hit on the bail leaves a direct `LookAtAssociations:MSGBOX` row in `ZZ_TEST_DEBUG` — that is the direct evidence chain for the 0-file mode.
 
 ## Setup
 
@@ -76,9 +76,9 @@ Strict gate evaluation (the four buckets are mutually exclusive; the first match
 **Q2 — 0-file mode evidence chain:**
 
 - file_count = 0
-- **zero_file_path_classification:** `runtime_ERR_after_first_SaveAs_show — chain advanced PAST the line-554 dlgSaveAs.Show (SaveAs captured a filename via FILEDIALOG_PATCH v8) and INTO the True branch at lines 555-1559. The :ERR marker means the JET / VBA runtime error fired BEFORE gStream.WriteText flushed any data to the captured filename. SaveAs dialog 'fired' logically but no disk file resulted. Direct evidence chain: ZZ_TEST_DEBUG :ERR marker -> error trap (Err_CmdNeo4j_Click) -> Exit_CmdNeo4j_Click -> 0 files on disk.`
+- **zero_file_path_classification:** `runtime_ERR_after_first_SaveAs_show — chain advanced PAST the first dlgSaveAs.Show (the People-block SaveAs near line 1107 in the current dump; SaveAs captured a filename via FILEDIALOG_PATCH v8) and INTO the True branch. The :ERR marker means the JET / VBA runtime error fired BEFORE gStream.WriteText flushed any data to the captured filename. SaveAs dialog 'fired' logically but no disk file resulted. Direct evidence chain: ZZ_TEST_DEBUG :ERR marker -> error trap (Err_CmdNeo4j_Click) -> Exit_CmdNeo4j_Click -> 0 files on disk.`
 - **bailed_before_any_saveas_filedialog_stage:** `False`
-- ZZ_TEST_DEBUG contains `LookAtAssociations:MSGBOX` (the line-518 bail-MsgBox marker): **False**
+- ZZ_TEST_DEBUG contains `LookAtAssociations:MSGBOX` (the line-1035 bail-MsgBox marker): **False**
 - ZZ_TEST_DEBUG contains `:ERR` marker: **True**
 - `:ERR` marker text:
     - `LookAtAssociations:ERR The INSERT INTO statement contains the following unknown field name: 'c_index_addr_type_code'. Make sure you have typed the name correctly, and try the operation again.`
@@ -101,8 +101,8 @@ AssocPairs CmdNeo4j writes >=1 files BEFORE its blocker (debug-MsgBox layer) fir
 ZZ_TEST_DEBUG contains :ERR marker(s): ["LookAtAssociations:ERR The INSERT INTO statement contains the following unknown field name: 'c_index_addr_type_code'. Make sure you have typed the name correctly, and try the operation again."].  file_count = 0.
 
 What this confirms (direct from runtime + static):
-  - CmdQuery completed cleanly (click_via_timer returned 11867); scratch tables ZZ_SCRATCH_ASSOC / ZZ_SCRATCH_P_ASSOC are populated. So this is NOT the static-suspected line-517 RecordCount=0 bail (which would have left ZZ_SCRATCH_P_ASSOC empty AND a 'LookAtAssociations:MSGBOX' marker).
-  - The :ERR fires INSIDE CmdNeo4j_Click body, AFTER the line-554 dlgSaveAs.Show True branch is entered. The error message ('unknown field name "c_index_addr_type_code"') traces to the INSERT at Form_LookAtAssociations.vb:644-647, which references 'BIOG_MAIN.c_index_addr_type_code'.
+  - CmdQuery completed cleanly (click_via_timer returned 11867); scratch tables ZZ_SCRATCH_ASSOC / ZZ_SCRATCH_P_ASSOC are populated. So this is NOT the static-suspected `Me.ZZ_SCRATCH_P_ASSOC.Form.Recordset.RecordCount = 0` bail (near line 1033 in the current dump) — that path would have left ZZ_SCRATCH_P_ASSOC empty AND a 'LookAtAssociations:MSGBOX' marker.
+  - The :ERR fires INSIDE CmdNeo4j_Click body, AFTER the first dlgSaveAs.Show True branch (the People block, near line 1107 in the current dump) is entered. The error message ('unknown field name "c_index_addr_type_code"') traces to the INSERT that builds ZZ_SCRATCH_PEOPLE and references BIOG_MAIN.c_index_addr_type_code (near lines 1287-1299 in the current dump).
   - This is a JET 3061 column-not-found family (same shape as Issue #6 LookAtGroupData CmdGIS queryEntry typo, but on a different form / different target column).
 
 What this does NOT yet confirm:

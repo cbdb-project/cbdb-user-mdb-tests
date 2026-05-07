@@ -7,20 +7,38 @@ PR.  The cell has been skipped in
 reason "produces 0 files in directory mode — needs investigation
 alongside Place"; this probe characterises *why*.
 
-Static pre-analysis (Form_LookAtAssociations.vb):
+Static pre-analysis (Form_LookAtAssociations.vb, current dump):
 
-  Private Sub CmdNeo4j_Click()                           ' line 480
+  Private Sub CmdNeo4j_Click()                           ' line 959
       ...
-      If Me.ZZ_SCRATCH_P_ASSOC.Form.Recordset.RecordCount = 0 Then
-          MsgBox "There are no records to save."          ' line 518
-          GoTo Exit_CmdNeo4j_Click                        ' line 519
+      If Me.ZZ_SCRATCH_P_ASSOC.Form.Recordset.RecordCount = 0 Then  ' line 1033
+          MsgBox "There are no records to save."                    ' line 1035
+          GoTo Exit_CmdNeo4j_Click                                  ' line 1037
       End If
       ...
-      Dim dlgSaveAs As FileDialog                         ' line 524 (only AFTER bail)
+      Dim dlgSaveAs As FileDialog                        ' line 1047 (only AFTER bail)
+      ...
+      If dlgSaveAs.Show = -1 Then                        ' line 1107 (first SaveAs, People block)
+          ...
+          tQueryStr = "INSERT INTO ZZ_SCRATCH_PEOPLE ( c_person_id, ...,
+              c_index_addr_type_code, c_female ) " + _              ' line 1287
+                      "SELECT DISTINCT ZZ_SCRATCH_P_TEXT.c_person_id, ...,
+                       BIOG_MAIN.c_index_addr_type_code, ..." + _   ' line 1291
+                      "FROM ZZ_SCRATCH_P_TEXT INNER JOIN BIOG_MAIN ON ..."
+          cmdSQL.Execute tRecDeleted                                ' line 1299
 
-The bail at line 517-520 fires BEFORE any `dlgSaveAs` is
-allocated, so a hit on this branch produces **0 files** as the
+The bail at line 1033-1037 fires BEFORE `Dim dlgSaveAs` (line
+1047), so a hit on this branch produces **0 files** as the
 existing skip-reason describes.
+
+(Line numbers above are 1-based, against the current
+`analysis/dump/vba/Form_LookAtAssociations.vb` (file size 168048
+bytes, total 7954 lines), verified via Python `splitlines()`
+read with cp1252.  An earlier draft of this probe used a stale
+set of numbers; if the dump is regenerated and these shift
+again, prefer the fragment-based anchors used elsewhere in this
+file -- "the INSERT that builds ZZ_SCRATCH_PEOPLE and references
+BIOG_MAIN.c_index_addr_type_code", etc.)
 
 Driver context: `LookAtAssociations` is NOT in
 `_SUBFORMS_TO_REQUERY` (per `tests/cbdb_driver/vba_session.py`
@@ -34,7 +52,7 @@ CmdGIS / CmdPajek / CmdGephi don't trip it because they read
 `ZZ_SCRATCH_P_ASSOC`.
 
 The driver's generic `MsgBox "<lit>"` neutralizer rewrites the
-bail-MsgBox at line 518 into
+bail-MsgBox at line 1035 into
 `CurrentDb.Execute INSERT INTO ZZ_TEST_DEBUG VALUES
 ('LookAtAssociations:MSGBOX')`, so a hit on the bail leaves a
 direct `LookAtAssociations:MSGBOX` row in `ZZ_TEST_DEBUG` —
@@ -160,7 +178,7 @@ def _classify_outcome(result: dict) -> str:
       - probe_hit_existing_known_failure_family:
           file_count == 0 AND ZZ_TEST_DEBUG contains
           'LookAtAssociations:MSGBOX' (the neutralized bail-MsgBox
-          from line 518; direct evidence the RecordCount=0 bail
+          from line 1035; direct evidence the RecordCount=0 bail
           fired).
       - probe_found_new_runtime_bug_candidate:
           ZZ_TEST_DEBUG contains any ':ERR' marker (driver's
@@ -318,7 +336,7 @@ def _run_probe(out_dir: Path) -> dict:
                 result["exception"] = repr(e)
 
             # File-count stability poll.  CmdNeo4j_Click writes
-            # files only AFTER the line-517 RecordCount check
+            # files only AFTER the line-1033 RecordCount check
             # passes; if the bail fires, file count stays 0.
             chain_observed_done = False
             stable_count = 0
@@ -472,22 +490,26 @@ def _verdict_for_brief(result: dict) -> dict:
     if n_files == 0:
         if has_assoc_msgbox:
             zero_file_path = (
-                "static_suspected_bail_path_FIRED — line 517-520 "
-                "RecordCount=0 bail; SaveAs/filedialog stage never "
-                "reached (dlgSaveAs allocated at line 524, after "
+                "static_suspected_bail_path_FIRED — the "
+                "RecordCount=0 bail (the `If Me.ZZ_SCRATCH_P_ASSOC."
+                "Form.Recordset.RecordCount = 0 Then GoTo "
+                "Exit_CmdNeo4j_Click` block, near line 1033 in the "
+                "current dump) fired; SaveAs/filedialog stage never "
+                "reached (Dim dlgSaveAs is at ~line 1047, after "
                 "the bail). Direct evidence chain: ZZ_TEST_DEBUG "
                 "contains 'LookAtAssociations:MSGBOX' (neutralized "
-                "line 518 MsgBox) -> bail branch -> GoTo "
+                "bail-MsgBox) -> bail branch -> GoTo "
                 "Exit_CmdNeo4j_Click -> 0 files written."
             )
             bailed_before_saveas = True
         elif has_err:
             zero_file_path = (
                 "runtime_ERR_after_first_SaveAs_show — chain "
-                "advanced PAST the line-554 dlgSaveAs.Show (SaveAs "
-                "captured a filename via FILEDIALOG_PATCH v8) and "
-                "INTO the True branch at lines 555-1559. The "
-                ":ERR marker means the JET / VBA runtime error "
+                "advanced PAST the first dlgSaveAs.Show (the "
+                "People-block SaveAs near line 1107 in the current "
+                "dump; SaveAs captured a filename via "
+                "FILEDIALOG_PATCH v8) and INTO the True branch. "
+                "The :ERR marker means the JET / VBA runtime error "
                 "fired BEFORE gStream.WriteText flushed any data "
                 "to the captured filename. SaveAs dialog 'fired' "
                 "logically but no disk file resulted. Direct "
@@ -582,15 +604,18 @@ def _verdict_for_brief(result: dict) -> dict:
             f"returned {result.get('click_via_timer_returned')}); "
             f"scratch tables ZZ_SCRATCH_ASSOC / ZZ_SCRATCH_P_ASSOC "
             f"are populated. So this is NOT the static-suspected "
-            f"line-517 RecordCount=0 bail (which would have left "
-            f"ZZ_SCRATCH_P_ASSOC empty AND a "
-            f"'LookAtAssociations:MSGBOX' marker).\n"
+            f"`Me.ZZ_SCRATCH_P_ASSOC.Form.Recordset.RecordCount = 0` "
+            f"bail (near line 1033 in the current dump) — that "
+            f"path would have left ZZ_SCRATCH_P_ASSOC empty AND a "
+            f"'LookAtAssociations:MSGBOX' marker.\n"
             f"  - The :ERR fires INSIDE CmdNeo4j_Click body, AFTER "
-            f"the line-554 dlgSaveAs.Show True branch is entered. "
-            f"The error message ('unknown field name "
-            f"\"c_index_addr_type_code\"') traces to the INSERT at "
-            f"Form_LookAtAssociations.vb:644-647, which references "
-            f"'BIOG_MAIN.c_index_addr_type_code'.\n"
+            f"the first dlgSaveAs.Show True branch (the People "
+            f"block, near line 1107 in the current dump) is "
+            f"entered. The error message ('unknown field name "
+            f"\"c_index_addr_type_code\"') traces to the INSERT "
+            f"that builds ZZ_SCRATCH_PEOPLE and references "
+            f"BIOG_MAIN.c_index_addr_type_code (near lines "
+            f"1287-1299 in the current dump).\n"
             f"  - This is a JET 3061 column-not-found family "
             f"(same shape as Issue #6 LookAtGroupData CmdGIS "
             f"queryEntry typo, but on a different form / different "
@@ -625,8 +650,8 @@ def _verdict_for_brief(result: dict) -> dict:
             f"0-file mode CONFIRMED via direct ZZ_TEST_DEBUG "
             f"marker.  file_count = {n_files}.  ZZ_TEST_DEBUG "
             f"contains 'LookAtAssociations:MSGBOX' (the neutralized "
-            f"bail-MsgBox at Form_LookAtAssociations.vb:518).  This "
-            f"means the early-bail at line 517-520 fired: "
+            f"bail-MsgBox at Form_LookAtAssociations.vb:1035).  This "
+            f"means the early-bail at lines 1033-1037 fired: "
             f"`If Me.ZZ_SCRATCH_P_ASSOC.Form.Recordset.RecordCount "
             f"= 0 Then GoTo Exit_CmdNeo4j_Click`.  Most likely "
             f"same root family as the subform-recordset staleness "
@@ -703,19 +728,26 @@ def _write_md(result: dict, verdict: dict) -> None:
     md.append("")
     md.append(
         "`Form_LookAtAssociations.vb::CmdNeo4j_Click` (lines "
-        "480-1565) contains an early-bail at lines 517-520:")
+        "959-3132 in the current dump) contains an early-bail "
+        "at lines 1033-1037:")
     md.append("")
     md.append("```vb")
-    md.append("If Me.ZZ_SCRATCH_P_ASSOC.Form.Recordset.RecordCount = 0 Then")
-    md.append("    MsgBox \"There are no records to save.\"  ' line 518")
-    md.append("    GoTo Exit_CmdNeo4j_Click                 ' line 519")
+    md.append("If Me.ZZ_SCRATCH_P_ASSOC.Form.Recordset.RecordCount = 0 Then  ' line 1033")
+    md.append("    MsgBox \"There are no records to save.\"                    ' line 1035")
+    md.append("    GoTo Exit_CmdNeo4j_Click                                  ' line 1037")
     md.append("End If")
     md.append("```")
     md.append("")
     md.append(
-        "`Dim dlgSaveAs As FileDialog` is declared at line 524 — "
+        "`Dim dlgSaveAs As FileDialog` is declared at line 1047 — "
         "i.e. **AFTER** the bail.  A hit on the bail therefore "
-        "produces 0 files (no SaveAs dialog ever opens).")
+        "produces 0 files (no SaveAs dialog ever opens).  The "
+        "first `dlgSaveAs.Show` (the People-block SaveAs) is at "
+        "line 1107.  The INSERT that builds `ZZ_SCRATCH_PEOPLE` "
+        "and references `BIOG_MAIN.c_index_addr_type_code` is at "
+        "lines 1287-1299.  (Line numbers are 1-based against the "
+        "current dump, file size 168048 bytes, 7954 total lines, "
+        "verified via Python `splitlines()` with cp1252.)")
     md.append("")
     md.append(
         "Driver context: `LookAtAssociations` is **NOT** in "
@@ -731,7 +763,7 @@ def _write_md(result: dict, verdict: dict) -> None:
     md.append("")
     md.append(
         "The driver's generic `MsgBox \"<lit>\"` neutralizer "
-        "rewrites the bail-MsgBox at line 518 into "
+        "rewrites the bail-MsgBox at line 1035 into "
         "`CurrentDb.Execute INSERT INTO ZZ_TEST_DEBUG VALUES "
         "('LookAtAssociations:MSGBOX')`, so a hit on the bail "
         "leaves a direct `LookAtAssociations:MSGBOX` row in "
@@ -877,7 +909,7 @@ def _write_md(result: dict, verdict: dict) -> None:
             f"`{q2['bailed_before_any_saveas_filedialog_stage']}`")
         md.append(
             f"- ZZ_TEST_DEBUG contains "
-            f"`LookAtAssociations:MSGBOX` (the line-518 "
+            f"`LookAtAssociations:MSGBOX` (the line-1035 "
             f"bail-MsgBox marker): "
             f"**{q2['zz_test_debug_contains_LookAtAssociations_MSGBOX']}**")
         md.append(
@@ -966,19 +998,42 @@ def _write_outputs(result: dict, verdict: dict) -> None:
         "form": "LookAtAssociations",
         "static_pre_analysis": {
             "sub": "CmdNeo4j_Click",
-            "sub_line_range": [480, 1565],
+            "sub_line_range": [959, 3132],
+            "_line_numbers_calibration_note": (
+                "All line numbers are 1-based against the current "
+                "analysis/dump/vba/Form_LookAtAssociations.vb "
+                "(file size 168048 bytes, 7954 total lines), "
+                "verified via Python splitlines() with cp1252.  "
+                "An earlier draft of this probe used a stale set "
+                "(517 / 524 / 554 / 644-647); reviewer flagged "
+                "the offset and this commit calibrates."
+            ),
             "early_bail": {
-                "lines": [517, 520],
+                "lines": [1033, 1037],
                 "condition": (
                     "Me.ZZ_SCRATCH_P_ASSOC.Form.Recordset."
                     "RecordCount = 0"
                 ),
                 "msgbox_text": "There are no records to save.",
                 "exit_target": "Exit_CmdNeo4j_Click",
-                "dlg_save_as_dim_line": 524,
+                "dim_dlg_save_as_line": 1047,
+                "first_dlg_save_as_show_line": 1107,
                 "implication": (
-                    "bail fires BEFORE any dlgSaveAs is allocated; "
-                    "0 files written if branch hit"
+                    "bail fires BEFORE Dim dlgSaveAs (line 1047) "
+                    "and before the first dlgSaveAs.Show (line "
+                    "1107); 0 files written if branch hit"
+                )
+            },
+            "offending_insert": {
+                "lines": [1287, 1299],
+                "target_table": "ZZ_SCRATCH_PEOPLE",
+                "source_table": "BIOG_MAIN",
+                "missing_field": "c_index_addr_type_code",
+                "structural_anchor": (
+                    "the INSERT that builds ZZ_SCRATCH_PEOPLE and "
+                    "references BIOG_MAIN.c_index_addr_type_code "
+                    "(prefer this fragment-based reference over "
+                    "the line numbers if the dump is regenerated)"
                 )
             },
             "driver_subform_requery_status": {
@@ -997,7 +1052,7 @@ def _write_outputs(result: dict, verdict: dict) -> None:
             "expected_evidence_chain_for_zero_file_mode": (
                 "ZZ_TEST_DEBUG contains 'LookAtAssociations:MSGBOX' "
                 "(driver's generic literal-MsgBox neutralizer rewrites "
-                "the bail-MsgBox at line 518 into an INSERT INTO "
+                "the bail-MsgBox at line 1035 into an INSERT INTO "
                 "ZZ_TEST_DEBUG row); file_count == 0; no further "
                 "subset markers from any SaveAs block"
             )

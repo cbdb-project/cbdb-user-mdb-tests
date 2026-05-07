@@ -7,19 +7,31 @@
   "static_pre_analysis": {
     "sub": "CmdNeo4j_Click",
     "sub_line_range": [
-      480,
-      1565
+      959,
+      3132
     ],
+    "_line_numbers_calibration_note": "All line numbers are 1-based against the current analysis/dump/vba/Form_LookAtAssociations.vb (file size 168048 bytes, 7954 total lines), verified via Python splitlines() with cp1252.  An earlier draft of this probe used a stale set (517 / 524 / 554 / 644-647); reviewer flagged the offset and this commit calibrates.",
     "early_bail": {
       "lines": [
-        517,
-        520
+        1033,
+        1037
       ],
       "condition": "Me.ZZ_SCRATCH_P_ASSOC.Form.Recordset.RecordCount = 0",
       "msgbox_text": "There are no records to save.",
       "exit_target": "Exit_CmdNeo4j_Click",
-      "dlg_save_as_dim_line": 524,
-      "implication": "bail fires BEFORE any dlgSaveAs is allocated; 0 files written if branch hit"
+      "dim_dlg_save_as_line": 1047,
+      "first_dlg_save_as_show_line": 1107,
+      "implication": "bail fires BEFORE Dim dlgSaveAs (line 1047) and before the first dlgSaveAs.Show (line 1107); 0 files written if branch hit"
+    },
+    "offending_insert": {
+      "lines": [
+        1287,
+        1299
+      ],
+      "target_table": "ZZ_SCRATCH_PEOPLE",
+      "source_table": "BIOG_MAIN",
+      "missing_field": "c_index_addr_type_code",
+      "structural_anchor": "the INSERT that builds ZZ_SCRATCH_PEOPLE and references BIOG_MAIN.c_index_addr_type_code (prefer this fragment-based reference over the line numbers if the dump is regenerated)"
     },
     "driver_subform_requery_status": {
       "form_in_subforms_to_requery_dict": false,
@@ -29,7 +41,7 @@
       ],
       "candidate_hypothesis": "ZZ_SCRATCH_P_ASSOC subform recordset may be stale after CmdQuery INSERTs (same family as Place/Kinship); CmdGIS/Pajek/Gephi work because they read different scratch tables"
     },
-    "expected_evidence_chain_for_zero_file_mode": "ZZ_TEST_DEBUG contains 'LookAtAssociations:MSGBOX' (driver's generic literal-MsgBox neutralizer rewrites the bail-MsgBox at line 518 into an INSERT INTO ZZ_TEST_DEBUG row); file_count == 0; no further subset markers from any SaveAs block"
+    "expected_evidence_chain_for_zero_file_mode": "ZZ_TEST_DEBUG contains 'LookAtAssociations:MSGBOX' (driver's generic literal-MsgBox neutralizer rewrites the bail-MsgBox at line 1035 into an INSERT INTO ZZ_TEST_DEBUG row); file_count == 0; no further subset markers from any SaveAs block"
   },
   "config": {
     "click_via_timer_timeout_sec": 180,
@@ -133,12 +145,12 @@
     ]
   },
   "verdict": "probe_found_new_runtime_bug_candidate",
-  "verdict_note": "ZZ_TEST_DEBUG contains :ERR marker(s): [\"LookAtAssociations:ERR The INSERT INTO statement contains the following unknown field name: 'c_index_addr_type_code'. Make sure you have typed the name correctly, and try the operation again.\"].  file_count = 0.\n\nWhat this confirms (direct from runtime + static):\n  - CmdQuery completed cleanly (click_via_timer returned 11867); scratch tables ZZ_SCRATCH_ASSOC / ZZ_SCRATCH_P_ASSOC are populated. So this is NOT the static-suspected line-517 RecordCount=0 bail (which would have left ZZ_SCRATCH_P_ASSOC empty AND a 'LookAtAssociations:MSGBOX' marker).\n  - The :ERR fires INSIDE CmdNeo4j_Click body, AFTER the line-554 dlgSaveAs.Show True branch is entered. The error message ('unknown field name \"c_index_addr_type_code\"') traces to the INSERT at Form_LookAtAssociations.vb:644-647, which references 'BIOG_MAIN.c_index_addr_type_code'.\n  - This is a JET 3061 column-not-found family (same shape as Issue #6 LookAtGroupData CmdGIS queryEntry typo, but on a different form / different target column).\n\nWhat this does NOT yet confirm:\n  - whether 'c_index_addr_type_code' is missing on BIOG_MAIN (source side) or on ZZ_SCRATCH_PEOPLE (target side) — needs a schema check that this probe intentionally does not perform (out of scope).\n  - whether the bug existed in older dumps or is introduced by current dump's schema drift.\n\nFailure class (Q3): DISTINCT from AssociationPairs × CmdNeo4j. AssocPairs writes >=1 files, then hits a debug-MsgBox layer (now suppressed by PR #109's driver patch). Associations writes 0 files because of a JET column-not-found error fired BEFORE any gStream.WriteText. The two failures are in different VBA error families and at different chain depths.\n\nRecommend opening a new investigation line via a separate maintainer brief: (a) confirm whether the missing column is BIOG_MAIN side (schema drift) or ZZ_SCRATCH_PEOPLE side (table-schema typo in CBDB), (b) decide whether to file a new canonical Issue, (c) decide whether a driver-side per-form patch (à la _PER_FORM_CMDGIS_PATCHES Issue #4 / #5 fixes) is appropriate. NOT a coverage candidate; NOT yet a canonical issue.",
+  "verdict_note": "ZZ_TEST_DEBUG contains :ERR marker(s): [\"LookAtAssociations:ERR The INSERT INTO statement contains the following unknown field name: 'c_index_addr_type_code'. Make sure you have typed the name correctly, and try the operation again.\"].  file_count = 0.\n\nWhat this confirms (direct from runtime + static):\n  - CmdQuery completed cleanly (click_via_timer returned 11867); scratch tables ZZ_SCRATCH_ASSOC / ZZ_SCRATCH_P_ASSOC are populated. So this is NOT the static-suspected `Me.ZZ_SCRATCH_P_ASSOC.Form.Recordset.RecordCount = 0` bail (near line 1033 in the current dump) — that path would have left ZZ_SCRATCH_P_ASSOC empty AND a 'LookAtAssociations:MSGBOX' marker.\n  - The :ERR fires INSIDE CmdNeo4j_Click body, AFTER the first dlgSaveAs.Show True branch (the People block, near line 1107 in the current dump) is entered. The error message ('unknown field name \"c_index_addr_type_code\"') traces to the INSERT that builds ZZ_SCRATCH_PEOPLE and references BIOG_MAIN.c_index_addr_type_code (near lines 1287-1299 in the current dump).\n  - This is a JET 3061 column-not-found family (same shape as Issue #6 LookAtGroupData CmdGIS queryEntry typo, but on a different form / different target column).\n\nWhat this does NOT yet confirm:\n  - whether 'c_index_addr_type_code' is missing on BIOG_MAIN (source side) or on ZZ_SCRATCH_PEOPLE (target side) — needs a schema check that this probe intentionally does not perform (out of scope).\n  - whether the bug existed in older dumps or is introduced by current dump's schema drift.\n\nFailure class (Q3): DISTINCT from AssociationPairs × CmdNeo4j. AssocPairs writes >=1 files, then hits a debug-MsgBox layer (now suppressed by PR #109's driver patch). Associations writes 0 files because of a JET column-not-found error fired BEFORE any gStream.WriteText. The two failures are in different VBA error families and at different chain depths.\n\nRecommend opening a new investigation line via a separate maintainer brief: (a) confirm whether the missing column is BIOG_MAIN side (schema drift) or ZZ_SCRATCH_PEOPLE side (table-schema typo in CBDB), (b) decide whether to file a new canonical Issue, (c) decide whether a driver-side per-form patch (à la _PER_FORM_CMDGIS_PATCHES Issue #4 / #5 fixes) is appropriate. NOT a coverage candidate; NOT yet a canonical issue.",
   "answers": {
     "Q1_chain_outcome": "runtime_ERR_zero_files",
     "Q2_zero_file_mode_evidence_chain": {
       "file_count": 0,
-      "zero_file_path_classification": "runtime_ERR_after_first_SaveAs_show — chain advanced PAST the line-554 dlgSaveAs.Show (SaveAs captured a filename via FILEDIALOG_PATCH v8) and INTO the True branch at lines 555-1559. The :ERR marker means the JET / VBA runtime error fired BEFORE gStream.WriteText flushed any data to the captured filename. SaveAs dialog 'fired' logically but no disk file resulted. Direct evidence chain: ZZ_TEST_DEBUG :ERR marker -> error trap (Err_CmdNeo4j_Click) -> Exit_CmdNeo4j_Click -> 0 files on disk.",
+      "zero_file_path_classification": "runtime_ERR_after_first_SaveAs_show — chain advanced PAST the first dlgSaveAs.Show (the People-block SaveAs near line 1107 in the current dump; SaveAs captured a filename via FILEDIALOG_PATCH v8) and INTO the True branch. The :ERR marker means the JET / VBA runtime error fired BEFORE gStream.WriteText flushed any data to the captured filename. SaveAs dialog 'fired' logically but no disk file resulted. Direct evidence chain: ZZ_TEST_DEBUG :ERR marker -> error trap (Err_CmdNeo4j_Click) -> Exit_CmdNeo4j_Click -> 0 files on disk.",
       "bailed_before_any_saveas_filedialog_stage": false,
       "zz_test_debug_contains_LookAtAssociations_MSGBOX": false,
       "zz_test_debug_contains_ERR_marker": true,
