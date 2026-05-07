@@ -58,7 +58,7 @@ If has_jet_3061_marker is False, the patch successfully prevented the JET 3061 '
 - chain_observed_done = True
 - chain_elapsed_sec = 10.04
 
-PR #112 observed 0 files; this probe expects file_count >= 1 if the rewrite took effect AND the rest of the chain runs cleanly.
+PR #112 observed 0 files; this probe expects file_count >= 1 if the rewrite took effect AND the rest of the chain runs to its natural end.
 
 **Q3 — file shape:**
 
@@ -75,15 +75,45 @@ PR #112 observed 0 files; this probe expects file_count >= 1 if the rewrite took
 
 **Q4 — next blocker exposed?**
 
-- outcome_bucket = `patch_verified_chain_clean`
+- outcome_bucket = `patch_resolved_issue23_but_exposed_msgbox_blocker`
 - other_err_markers = `[]`
-- msgbox_observed_count = 5
+- msgbox_watchdog_count = 5  (REAL pop-up dialogs the driver's literal-only generic neutralizer could not catch; each one would block unattended coverage)
+- zz_test_debug_msgbox_marker_count = 1  (generic-neutralizer footprints for literal `MsgBox "<lit>"` lines; NOT pop-up dialogs)
 
-If outcome == patch_verified_chain_clean: no next blocker on this fixture.  If outcome == patch_partial_jet_3061_still_observed: rewrite did not take effect.  If outcome == next_blocker_exposed_different_err: rewrite worked but a different runtime error appeared.  If outcome == patch_resolved_jet_3061_but_zero_files: rewrite worked but no file got written for some other reason.
+**The two MsgBox signal layers are distinct:**
 
-## Verdict: `patch_verified_chain_clean`
+- *Watchdog-dismissed dialogs:* REAL pop-up dialogs that the driver's generic literal-only `MsgBox "<lit>"` neutralizer could not catch — typically concat-form `MsgBox "<lit>" + Trim(Str(...))` calls.  Watchdog dismisses them so the probe does not hang, but for unattended coverage a dialog is a hard blocker.
 
-Patch verified.  Chain produced 8 files in 10.04s with no :ERR markers in ZZ_TEST_DEBUG (specifically no JET 3061 'c_index_addr_type_code' marker).  This is the strongest available signal that the target-column rewrite is the only blocker on this fixture for LookAtAssociations × CmdNeo4j.  Note: this probe does NOT open a coverage PR; the next step is a separate coverage PR brief.
+- *ZZ_TEST_DEBUG :MSGBOX markers:* INSERT rows the driver's generic literal neutralizer wrote BEFORE the runtime would see the original `MsgBox "<lit>"` line as a dialog.  These do NOT correspond to dialogs that ever popped — they are the neutralizer's footprint, not a blocker.  Distinct from the line-1035 early-bail marker (which would only appear if the RecordCount=0 bail fired; on this fixture it does not, so the :MSGBOX marker present here is the terminal `MsgBox "Finished saving to Neo4j"` neutralizer footprint, indicating the chain reached its end).
+
+Bucket meanings (mutually exclusive, first match wins):
+  - patch_verified_chain_clean: file_count >= 1 AND no :ERR AND zero watchdog dialogs.  Strict.
+  - patch_resolved_issue23_but_exposed_msgbox_blocker: file_count >= 1 AND no :ERR BUT >= 1 watchdog dialog dismissed.  Issue #23 JET 3061 is gone, but a downstream debug-MsgBox layer is exposed and would block unattended coverage.
+  - patch_partial_jet_3061_still_observed: JET 3061 :ERR still present.
+  - next_blocker_exposed_different_err: a :ERR from a different class.
+  - patch_resolved_jet_3061_but_zero_files: no :ERR but no files either.
+
+## Verdict: `patch_resolved_issue23_but_exposed_msgbox_blocker`
+
+**Two-layer outcome.**
+
+Layer 1 (resolved): the Issue #23 JET 3061 target-column mismatch ('unknown field name: c_index_addr_type_code') has been neutralized by the narrow per-form rewrite.  Direct evidence:
+  - 0 :ERR markers in ZZ_TEST_DEBUG (no `LookAtAssociations:ERR ... c_index_addr_type_code` row).
+  - file_count = 8 (was 0 in PR #112's pre-patch probe).
+  - ZZ_SCRATCH_PEOPLE populated by the INSERT that previously failed.
+  - Chain reached its natural end (chain_observed_done = True).
+
+Layer 2 (newly exposed): a downstream debug-MsgBox layer is now live and would block unattended coverage.  Direct evidence:
+  - watchdog dismissed 5 dialog(s) during the chain run.  Sample: ['Kinship code records = 1', 'Literary genre code records = 0', 'Institution code records = 0', 'Occasion code records = 6', 'Topic code records = 2']
+  - These are concat-form `MsgBox "<lit>" + Trim(Str(...))` calls inside CmdNeo4j_Click that the driver's literal-only generic neutralizer cannot match.  Same shape as the AssocPairs CmdNeo4j debug-MsgBox layer that PR #109 suppressed via `_suppress_assocpairs_cmdneo4j_debug_msgbox` — but in a different form, so PR #109's per-form patch does NOT cover it.
+
+This is a NEW per-host observation that PR #112's pre-patch probe could not surface, because that probe's chain bailed at the JET 3061 BEFORE reaching the debug-MsgBox lines.
+
+**Implication for next step:** coverage PR is NOT directly unblocked by this rewrite alone.  For unattended coverage, one of two paths is required (each its own brief, NOT this PR):
+  (a) extend `_PER_FORM_CMDGIS_PATCHES` with a `Form_LookAtAssociations.CmdNeo4j_Click` debug-MsgBox suppress (mirror of PR #109's AssocPairs-side patch); OR
+  (b) the cross-form coverage test inlines a watchdog dismisser (this probe demonstrates the watchdog approach works in principle).
+
+Note on the single ZZ_TEST_DEBUG `:MSGBOX` marker present here: that row was written by the driver's generic literal-only MsgBox neutralizer when it rewrote the terminal `MsgBox "Finished saving to Neo4j"` line (literal form, neutralizable) BEFORE the runtime would see it.  It is NOT the line-1035 RecordCount=0 early-bail marker (which would only appear if the bail fired; on this fixture it does not — ZZ_SCRATCH_P_ASSOC has 8087 rows).  The :MSGBOX marker is a clean-end signal, NOT a blocker — distinct layer from the watchdog dismissals above.
 
 ## Markers (timeline, 14 entries)
 
