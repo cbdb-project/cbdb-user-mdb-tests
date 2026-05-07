@@ -25,18 +25,32 @@ These are debug artifacts left in the production VBA — not behind any `If` con
 - **Chain:** `CmdQuery,CmdNeo4j` via Form.Tag, directory mode (trailing backslash → `f<n>.out.csv` per Show call)
 - **MsgBox dismisser:** background thread (pywinauto win32 backend) auto-clicks OK on Access `#32770` class dialogs
 - **click_via_timer cap:** 120 s  ·  **outer cap:** 300 s
-- **Promote threshold:** chain elapsed ≤ 120 s + all files produced + `Finished saving to Neo4j` MsgBox seen
+- **Promote threshold (strict):** chain_elapsed ≤ 120 s **AND** file_count > 0 **AND** `Finished saving to Neo4j` MsgBox observed and dismissed. All three required; none may be substituted.
 
-## Outcome
+## Raw observed facts
 
-- **per-probe outcome:** `clean_probe_promote_to_coverage_candidate`
-- **chain elapsed:** 12.54 s
-- **files produced:** 6
-- **chain done observed:** True
-- **Finished Neo4j MsgBox seen:** False
-- **MsgBoxes auto-dismissed:** 5
-- **click_via_timer returned:** 5
-- **total wall elapsed:** 21.37 s
+(These are the unprocessed facts captured during the probe run.  Classification is derived from them in the next section.)
+
+- **chain_elapsed_sec:** 12.54
+- **file_count:** 6
+- **chain_observed_done:** True
+- **finished_msgbox_seen:** False
+- **msgbox_dismissed_count:** 5
+- **static_unconditional_msgboxes_in_vba:** 6
+- **click_via_timer_returned:** 5
+- **total_wall_elapsed_sec:** 21.37
+
+## Classification
+
+Strict gate evaluation against the promote threshold:
+
+| Gate | Required | Observed | Pass |
+|---|---|---|---|
+| chain_elapsed ≤ 120 s | True | 12.54 s | ✅ |
+| file_count > 0 | True | 6 | ✅ |
+| finished_msgbox_seen | True | False | ❌ |
+
+**Per-probe outcome:** `confirmed_blocking_msgbox_layer_needs_decision_before_coverage`
 
 ## Answers to brief Q1-Q5
 
@@ -44,11 +58,40 @@ These are debug artifacts left in the production VBA — not behind any `If` con
 - **Q2** — Chain elapsed ≤ 120 s?  **True** (12.54 s)
 - **Q3** — Files produced: **6**.  Headers: `['Person1_ID', 'AssociationCode', 'KinshipCode', 'nameID', 'placeID', 'nameID']`
 - **Q4** — Blocking symptoms: MsgBox auto-dismissed count = **5**; Finished-Neo4j MsgBox seen = **False**; Static VBA MsgBox count = **6**
-- **Q5** — Same family as LookAtAssociations 0-file mode?  different — LookAtAssociations CmdNeo4j produces 0 files in directory mode (likely bails before any SaveAs); AssocPairs CmdNeo4j uses ZZ_SOCIAL_NETWORK (populated by CmdQuery on the 1x3 fixture) and can proceed to write multiple files before hitting the blocking MsgBox chain. The failure class is blocking_debug_msgbox, not 0-file mode.
+- **Q5** — Same family as LookAtAssociations 0-file mode?  Three observations, kept separate because the probe does not have evidence to collapse them into a single exclusive failure class:
+  (a) different from LookAtAssociations × CmdNeo4j 0-file mode — LookAtAssociations produces 0 files in directory mode (likely bails before any SaveAs), whereas AssocPairs CmdNeo4j uses ZZ_SOCIAL_NETWORK (populated by CmdQuery on the 1x3 fixture) and produced 6 files in this run.
+  (b) confirmed blocking MsgBox layer exists in CmdNeo4j_Click — static analysis lists 6 unconditional debug MsgBox calls, and 5 of them were observed and dismissed by the probe's pywinauto auto-dismisser at runtime. Unattended coverage would be blocked by this layer.
+  (c) post-MsgBox terminal behavior remains only partially observed because the final 'Finished saving to Neo4j' MsgBox (line 1470) was not seen within the polling window. The probe therefore cannot claim that 'blocking_debug_msgbox' is the exclusive failure class after MsgBox removal.
 
-## Verdict: `clean_probe_promote_to_coverage_candidate`
+## Verdict: `confirmed_blocking_msgbox_layer_needs_decision_before_coverage`
 
-Chain completed (12.54s, ≤120s), produced 6 files, finished_neo4j MsgBox dismissed. Note: coverage PR will require either (a) removing the 6 blocking debug MsgBox calls from the upstream VBA, or (b) handling them in the test driver. Per the triage brief, do NOT auto-promote — report first.
+Chain produced 6 files in 12.54s and 5 of the 6 unconditional debug MsgBox calls were observed and dismissed by the probe's auto-dismisser. The terminal 'Finished saving to Neo4j' MsgBox (line 1470) was NOT observed within the polling window, so post-MsgBox terminal behavior is only partially observed.
+
+What this confirms:
+  - a blocking debug MsgBox layer exists in CmdNeo4j_Click and would prevent unattended coverage.
+  - this is NOT the same as LookAtAssociations × CmdNeo4j 0-file mode.
+
+What this does NOT confirm:
+  - that the debug MsgBox layer is the only failure class after removal.
+  - the full terminal completion path of CmdNeo4j on this fixture.
+
+Decision required from maintainer/reviewer before any coverage PR is opened: (a) remove the 6 unconditional MsgBox calls from upstream VBA, or (b) handle them in the test driver. NOT a coverage candidate yet.
+
+## Reviewer / maintainer decision points
+
+1. **Unconditional debug MsgBox calls in CmdNeo4j_Click (confirmed runtime blocker for unattended coverage).**  Static analysis identifies 6 unconditional `MsgBox` calls in `Form_LookAtAssociationPairs.vb` at lines 1069, 1151, 1234, 1317, 1400, 1470.  The probe observed and dismissed 5 of them at runtime.  Decision required before any coverage PR is opened: (a) remove these calls from upstream VBA, or (b) handle them in the test driver.  This probe does not presume which option is correct.
+
+## Future coverage-implementation tasks (not blockers)
+
+The following items would only matter if and when a coverage PR is opened.  They are NOT blockers to this probe and do NOT block reviewer decision on the MsgBox question above.
+
+- New file-shape headers observed in this run that are not yet in `_NEO4J_SHAPES` / `_NEO4J_SHAPES_BY_TWO_COLS` in `tests/test_vba_cmdneo4j_cross_form.py`: `Person1_ID` (PeopleAssociations, 13-col), `AssociationCode` (3-col), `KinshipCode` (3-col).  Adding these is a coverage-implementation task, not a probe finding.
+
+## Observations / possible follow-up questions (not blockers)
+
+These are noted only for completeness.  This probe does NOT have evidence sufficient to elevate them to confirmed blockers.
+
+- `ZZ_KIN_LIST_TMP` post-chain row count = `132` with ChkKinship=0 in the fixture.  The DELETE at Form_LookAtAssociationPairs.vb line 900 is gated by `ChkKinship.Value`, so a non-zero count here is consistent with carry-over from prior sessions, but the probe did NOT verify whether the KinshipCodes file contents (96 rows in this run) reflect stale data vs. the current fixture's expected output.  Treat as an observation, not a confirmed blocker, until either (i) a future probe seeds and verifies the table state, or (ii) a fixture isolation gap is independently demonstrated.
 
 ## MsgBox dismissal log
 

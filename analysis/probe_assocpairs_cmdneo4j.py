@@ -50,6 +50,19 @@ Q5: Same family as LookAtAssociations × CmdNeo4j 0-file mode?
 
 Verdict buckets:
   clean_probe_promote_to_coverage_candidate
+    — strict: chain_elapsed <= 120 s AND file_count > 0 AND
+      finished_msgbox_seen = True (terminal "Finished saving to
+      Neo4j" MsgBox actually observed and dismissed). Anything
+      weaker MUST NOT use this bucket.
+  confirmed_blocking_msgbox_layer_needs_decision_before_coverage
+    — chain produced files and >= 1 of the 6 unconditional debug
+      MsgBoxes was observed and dismissed, but the terminal
+      "Finished saving to Neo4j" MsgBox was NOT observed within the
+      polling window. Confirms a blocking MsgBox layer that would
+      prevent unattended coverage; does NOT confirm post-MsgBox
+      terminal behavior. Maintainer/reviewer decision required
+      (upstream remove vs driver-side handling) before any coverage
+      PR can be opened.
   new_investigation_line_blocking_msgbox_in_vba
   new_investigation_line_0_file_mode
   needs_investigation_chain_runtime
@@ -58,6 +71,14 @@ Verdict buckets:
 Outputs:
   analysis/probe_assocpairs_cmdneo4j.md
   reports/probe_assocpairs_cmdneo4j.json
+
+CLI:
+  python analysis/probe_assocpairs_cmdneo4j.py
+    — full COM probe run.
+  python analysis/probe_assocpairs_cmdneo4j.py --reclassify-from-json <path>
+    — re-run classification + verdict + MD/JSON regeneration from
+      a preserved JSON (no COM). Used to fix classifier bugs without
+      perturbing raw facts.
 """
 from __future__ import annotations
 
@@ -354,34 +375,8 @@ def _run_probe(out_dir: Path) -> dict:
                     result["row_counts"][tbl] = f"ERROR: {e}"
             mark("row_counts_captured")
 
-            # Outcome classification
-            n_dismissed = len(result["msgbox_dismissed"])
-            n_files = result["file_count"]
-            if result.get("exception") and n_files == 0:
-                result["outcome"] = "blocked_exception"
-            elif n_files == 0:
-                result["outcome"] = "new_investigation_line_0_file_mode"
-            elif (n_dismissed > 0
-                  and not finished_msgbox_seen
-                  and not chain_observed_done):
-                result["outcome"] = (
-                    "new_investigation_line_blocking_msgbox_in_vba")
-            elif finished_msgbox_seen and chain_elapsed <= PROMOTE_ELAPSED_THRESHOLD_SEC:
-                result["outcome"] = (
-                    "clean_probe_promote_to_coverage_candidate")
-            elif finished_msgbox_seen and chain_elapsed > PROMOTE_ELAPSED_THRESHOLD_SEC:
-                result["outcome"] = "needs_investigation_chain_runtime"
-            elif n_files > 0 and chain_observed_done:
-                # Files present, quiesced, but "Finished" MsgBox not seen
-                # (might have fired and been dismissed before we checked)
-                if chain_elapsed <= PROMOTE_ELAPSED_THRESHOLD_SEC:
-                    result["outcome"] = (
-                        "clean_probe_promote_to_coverage_candidate")
-                else:
-                    result["outcome"] = "needs_investigation_chain_runtime"
-            else:
-                result["outcome"] = (
-                    "new_investigation_line_blocking_msgbox_in_vba")
+            # Outcome classification (strict: see _classify_outcome)
+            result["outcome"] = _classify_outcome(result)
 
             completed.set()
         except BaseException as e:  # noqa: BLE001
@@ -425,6 +420,62 @@ def _run_probe(out_dir: Path) -> dict:
     time.sleep(2)
     result["elapsed_sec"] = round(time.time() - t0, 2)
     return result
+
+
+def _classify_outcome(result: dict) -> str:
+    """Classify probe outcome from raw facts in `result`.
+
+    Strict gates (this is the contract — promote_threshold in the
+    written artifact must match these exactly):
+
+      - blocked_exception:
+          exception observed AND no files produced.
+      - new_investigation_line_0_file_mode:
+          no exception, 0 files produced.
+      - clean_probe_promote_to_coverage_candidate:
+          file_count > 0 AND chain_elapsed <= 120 s AND
+          finished_msgbox_seen == True. All three required;
+          none may be substituted.
+      - confirmed_blocking_msgbox_layer_needs_decision_before_coverage:
+          file_count > 0 AND >=1 unconditional debug MsgBox was
+          observed and dismissed AND finished_msgbox_seen == False.
+          This is the "blocking layer confirmed but terminal
+          behavior only partially observed" case. Promote path
+          MUST NOT be used here.
+      - needs_investigation_chain_runtime:
+          file_count > 0 AND finished_msgbox_seen == True AND
+          chain_elapsed > 120 s.
+      - new_investigation_line_blocking_msgbox_in_vba:
+          fallback for files-produced + dismissals seen but neither
+          of the above cleanly applies (exception path, etc.).
+    """
+    n_dismissed = len(result.get("msgbox_dismissed") or [])
+    n_files = int(result.get("file_count") or 0)
+    chain_elapsed = result.get("chain_elapsed_sec")
+    finished = bool(result.get("finished_msgbox_seen"))
+    exception = result.get("exception")
+
+    if exception and n_files == 0:
+        return "blocked_exception"
+    if n_files == 0:
+        return "new_investigation_line_0_file_mode"
+
+    elapsed_ok = (
+        isinstance(chain_elapsed, (int, float))
+        and chain_elapsed <= PROMOTE_ELAPSED_THRESHOLD_SEC
+    )
+
+    if finished and elapsed_ok:
+        return "clean_probe_promote_to_coverage_candidate"
+    if finished and not elapsed_ok:
+        return "needs_investigation_chain_runtime"
+    # finished_msgbox_seen == False from here on.
+    if n_dismissed >= 1:
+        return (
+            "confirmed_blocking_msgbox_layer_"
+            "needs_decision_before_coverage"
+        )
+    return "new_investigation_line_blocking_msgbox_in_vba"
 
 
 def _classify_err_text(err_msgs: list[str]) -> str:
@@ -475,24 +526,68 @@ def _verdict_for_brief(result: dict) -> dict:
             ),
         },
         "Q5_vs_lookatassociations_0file_mode": (
-            "different — LookAtAssociations CmdNeo4j produces 0 files "
-            "in directory mode (likely bails before any SaveAs); "
-            "AssocPairs CmdNeo4j uses ZZ_SOCIAL_NETWORK (populated by "
-            "CmdQuery on the 1x3 fixture) and can proceed to write "
-            "multiple files before hitting the blocking MsgBox chain. "
-            "The failure class is blocking_debug_msgbox, not 0-file mode."
+            "Three observations, kept separate because the probe "
+            "does not have evidence to collapse them into a single "
+            "exclusive failure class:\n"
+            "  (a) different from LookAtAssociations × CmdNeo4j "
+            "0-file mode — LookAtAssociations produces 0 files in "
+            "directory mode (likely bails before any SaveAs), "
+            "whereas AssocPairs CmdNeo4j uses ZZ_SOCIAL_NETWORK "
+            "(populated by CmdQuery on the 1x3 fixture) and "
+            f"produced {n_files} files in this run.\n"
+            "  (b) confirmed blocking MsgBox layer exists in "
+            "CmdNeo4j_Click — static analysis lists 6 unconditional "
+            f"debug MsgBox calls, and {n_dismissed} of them were "
+            "observed and dismissed by the probe's pywinauto "
+            "auto-dismisser at runtime. Unattended coverage would "
+            "be blocked by this layer.\n"
+            "  (c) post-MsgBox terminal behavior remains only "
+            "partially observed because the final 'Finished saving "
+            f"to Neo4j' MsgBox (line 1470) was{'' if finished_msgbox else ' not'} seen "
+            "within the polling window. The probe therefore "
+            "cannot claim that 'blocking_debug_msgbox' is the "
+            "exclusive failure class after MsgBox removal."
         ),
     }
 
     if outcome == "clean_probe_promote_to_coverage_candidate":
         verdict = outcome
         verdict_note = (
-            f"Chain completed ({chain_elapsed}s, ≤{PROMOTE_ELAPSED_THRESHOLD_SEC}s), "
-            f"produced {n_files} files, finished_neo4j MsgBox dismissed. "
-            f"Note: coverage PR will require either (a) removing the 6 "
-            f"blocking debug MsgBox calls from the upstream VBA, or "
-            f"(b) handling them in the test driver. "
-            f"Per the triage brief, do NOT auto-promote — report first."
+            f"Strict promote gates met: chain_elapsed = "
+            f"{chain_elapsed}s (<= {PROMOTE_ELAPSED_THRESHOLD_SEC}s), "
+            f"file_count = {n_files} (> 0), finished_msgbox_seen = "
+            f"True. Per the triage brief, do NOT auto-promote — "
+            f"report first."
+        )
+    elif outcome == (
+        "confirmed_blocking_msgbox_layer_"
+        "needs_decision_before_coverage"
+    ):
+        verdict = outcome
+        verdict_note = (
+            f"Chain produced {n_files} files in {chain_elapsed}s "
+            f"and {n_dismissed} of the 6 unconditional debug "
+            f"MsgBox calls were observed and dismissed by the "
+            f"probe's auto-dismisser. The terminal 'Finished "
+            f"saving to Neo4j' MsgBox (line 1470) was NOT observed "
+            f"within the polling window, so post-MsgBox terminal "
+            f"behavior is only partially observed.\n\n"
+            f"What this confirms:\n"
+            f"  - a blocking debug MsgBox layer exists in "
+            f"CmdNeo4j_Click and would prevent unattended "
+            f"coverage.\n"
+            f"  - this is NOT the same as LookAtAssociations × "
+            f"CmdNeo4j 0-file mode.\n\n"
+            f"What this does NOT confirm:\n"
+            f"  - that the debug MsgBox layer is the only failure "
+            f"class after removal.\n"
+            f"  - the full terminal completion path of CmdNeo4j on "
+            f"this fixture.\n\n"
+            f"Decision required from maintainer/reviewer before "
+            f"any coverage PR is opened: (a) remove the 6 "
+            f"unconditional MsgBox calls from upstream VBA, or "
+            f"(b) handle them in the test driver. NOT a coverage "
+            f"candidate yet."
         )
     elif outcome == "new_investigation_line_blocking_msgbox_in_vba":
         verdict = outcome
@@ -600,34 +695,71 @@ def _write_md(result: dict, verdict: dict) -> None:
         f"- **click_via_timer cap:** {TIMER_TIMEOUT_SEC} s  ·  "
         f"**outer cap:** {PROBE_OUTER_TIMEOUT_SEC} s")
     md.append(
-        f"- **Promote threshold:** chain elapsed ≤ "
-        f"{PROMOTE_ELAPSED_THRESHOLD_SEC} s + all files produced + "
-        f"`Finished saving to Neo4j` MsgBox seen")
+        f"- **Promote threshold (strict):** chain_elapsed ≤ "
+        f"{PROMOTE_ELAPSED_THRESHOLD_SEC} s **AND** file_count > 0 "
+        f"**AND** `Finished saving to Neo4j` MsgBox observed and "
+        f"dismissed. All three required; none may be substituted.")
     md.append("")
-    md.append("## Outcome")
+    md.append("## Raw observed facts")
     md.append("")
     md.append(
-        f"- **per-probe outcome:** `{result.get('outcome')}`")
+        "(These are the unprocessed facts captured during the "
+        "probe run.  Classification is derived from them in the "
+        "next section.)")
+    md.append("")
     md.append(
-        f"- **chain elapsed:** {result.get('chain_elapsed_sec')} s")
+        f"- **chain_elapsed_sec:** {result.get('chain_elapsed_sec')}")
     md.append(
-        f"- **files produced:** {result.get('file_count')}")
+        f"- **file_count:** {result.get('file_count')}")
     md.append(
-        f"- **chain done observed:** {result.get('chain_observed_done')}")
+        f"- **chain_observed_done:** "
+        f"{result.get('chain_observed_done')}")
     md.append(
-        f"- **Finished Neo4j MsgBox seen:** "
+        f"- **finished_msgbox_seen:** "
         f"{result.get('finished_msgbox_seen')}")
     md.append(
-        f"- **MsgBoxes auto-dismissed:** "
+        f"- **msgbox_dismissed_count:** "
         f"{len(result.get('msgbox_dismissed', []))}")
     md.append(
-        f"- **click_via_timer returned:** "
+        f"- **static_unconditional_msgboxes_in_vba:** "
+        f"{len(result.get('static_analysis_blocking_msgboxes', []))}")
+    md.append(
+        f"- **click_via_timer_returned:** "
         f"{result.get('click_via_timer_returned')}")
     md.append(
-        f"- **total wall elapsed:** {result.get('elapsed_sec')} s")
+        f"- **total_wall_elapsed_sec:** {result.get('elapsed_sec')}")
     if result.get("exception"):
         md.append(
             f"- **exception:** `{result['exception'][:300]}`")
+    md.append("")
+    md.append("## Classification")
+    md.append("")
+    n_files_md = int(result.get("file_count") or 0)
+    chain_elapsed_md = result.get("chain_elapsed_sec")
+    elapsed_ok_md = (
+        isinstance(chain_elapsed_md, (int, float))
+        and chain_elapsed_md <= PROMOTE_ELAPSED_THRESHOLD_SEC
+    )
+    finished_md = bool(result.get("finished_msgbox_seen"))
+    md.append("Strict gate evaluation against the promote threshold:")
+    md.append("")
+    md.append(
+        f"| Gate | Required | Observed | Pass |")
+    md.append(
+        f"|---|---|---|---|")
+    md.append(
+        f"| chain_elapsed ≤ {PROMOTE_ELAPSED_THRESHOLD_SEC} s | True | "
+        f"{chain_elapsed_md} s | "
+        f"{'✅' if elapsed_ok_md else '❌'} |")
+    md.append(
+        f"| file_count > 0 | True | {n_files_md} | "
+        f"{'✅' if n_files_md > 0 else '❌'} |")
+    md.append(
+        f"| finished_msgbox_seen | True | {finished_md} | "
+        f"{'✅' if finished_md else '❌'} |")
+    md.append("")
+    md.append(
+        f"**Per-probe outcome:** `{result.get('outcome')}`")
     md.append("")
     md.append("## Answers to brief Q1-Q5")
     md.append("")
@@ -658,6 +790,60 @@ def _write_md(result: dict, verdict: dict) -> None:
     md.append(f"## Verdict: `{verdict['verdict']}`")
     md.append("")
     md.append(verdict["verdict_note"])
+    md.append("")
+    md.append("## Reviewer / maintainer decision points")
+    md.append("")
+    md.append(
+        "1. **Unconditional debug MsgBox calls in CmdNeo4j_Click "
+        "(confirmed runtime blocker for unattended coverage).**  "
+        "Static analysis identifies 6 unconditional `MsgBox` calls "
+        "in `Form_LookAtAssociationPairs.vb` at lines 1069, 1151, "
+        "1234, 1317, 1400, 1470.  The probe observed and dismissed "
+        f"{len(result.get('msgbox_dismissed', []))} of them at "
+        "runtime.  Decision required before any coverage PR is "
+        "opened: (a) remove these calls from upstream VBA, or "
+        "(b) handle them in the test driver.  This probe does not "
+        "presume which option is correct.")
+    md.append("")
+    md.append("## Future coverage-implementation tasks (not blockers)")
+    md.append("")
+    md.append(
+        "The following items would only matter if and when a "
+        "coverage PR is opened.  They are NOT blockers to this "
+        "probe and do NOT block reviewer decision on the MsgBox "
+        "question above.")
+    md.append("")
+    md.append(
+        "- New file-shape headers observed in this run that are "
+        "not yet in `_NEO4J_SHAPES` / `_NEO4J_SHAPES_BY_TWO_COLS` "
+        "in `tests/test_vba_cmdneo4j_cross_form.py`: "
+        "`Person1_ID` (PeopleAssociations, 13-col), "
+        "`AssociationCode` (3-col), `KinshipCode` (3-col).  "
+        "Adding these is a coverage-implementation task, not a "
+        "probe finding.")
+    md.append("")
+    md.append("## Observations / possible follow-up questions (not blockers)")
+    md.append("")
+    md.append(
+        "These are noted only for completeness.  This probe does "
+        "NOT have evidence sufficient to elevate them to confirmed "
+        "blockers.")
+    md.append("")
+    rc = result.get("row_counts") or {}
+    kin_rows = rc.get("ZZ_KIN_LIST_TMP")
+    md.append(
+        f"- `ZZ_KIN_LIST_TMP` post-chain row count = `{kin_rows}` "
+        f"with ChkKinship=0 in the fixture.  The DELETE at "
+        f"Form_LookAtAssociationPairs.vb line 900 is gated by "
+        f"`ChkKinship.Value`, so a non-zero count here is "
+        f"consistent with carry-over from prior sessions, but the "
+        f"probe did NOT verify whether the KinshipCodes file "
+        f"contents (96 rows in this run) reflect stale data vs. "
+        f"the current fixture's expected output.  Treat as an "
+        f"observation, not a confirmed blocker, until either "
+        f"(i) a future probe seeds and verifies the table state, "
+        f"or (ii) a fixture isolation gap is independently "
+        f"demonstrated.")
     md.append("")
     md.append("## MsgBox dismissal log")
     md.append("")
@@ -717,24 +903,8 @@ def _write_md(result: dict, verdict: dict) -> None:
     OUT_MD.write_text("\n".join(md), encoding="utf-8")
 
 
-def main() -> int:
-    print("=== AssociationPairs × CmdNeo4j probe (probe-first) ===\n")
-    _kill_orphan()
-    time.sleep(1)
-
-    out_dir = ROOT / "analysis" / "_probe_assocpairs_cmdneo4j_out"
-    if out_dir.exists():
-        for f in out_dir.glob("*"):
-            try:
-                f.unlink()
-            except Exception:
-                pass
-    else:
-        out_dir.mkdir(parents=True)
-
-    result = _run_probe(out_dir)
-    verdict = _verdict_for_brief(result)
-
+def _write_outputs(result: dict, verdict: dict) -> None:
+    """Write JSON + MD outputs from a result+verdict pair."""
     out: dict = {
         "schema_version": 1,
         "generated_date": "2026-05-06",
@@ -771,6 +941,11 @@ def main() -> int:
             "click_via_timer_timeout_sec": TIMER_TIMEOUT_SEC,
             "per_probe_outer_timeout_sec": PROBE_OUTER_TIMEOUT_SEC,
             "promote_elapsed_threshold_sec": PROMOTE_ELAPSED_THRESHOLD_SEC,
+            "promote_gates_strict": [
+                f"chain_elapsed_sec <= {PROMOTE_ELAPSED_THRESHOLD_SEC}",
+                "file_count > 0",
+                "finished_msgbox_seen == True",
+            ],
         },
         "result": result,
         "verdict": verdict["verdict"],
@@ -785,6 +960,60 @@ def main() -> int:
     print(f"wrote {OUT_JSON}")
     _write_md(result, verdict)
     print(f"wrote {OUT_MD}")
+
+
+def _reclassify(src_path: Path) -> int:
+    """Reload preserved JSON, re-run classifier + verdict, rewrite outputs.
+
+    Used to fix classifier or wording bugs without touching the
+    raw facts captured by an earlier COM probe run.
+    """
+    print(f"=== reclassifying from {src_path} (no COM) ===\n")
+    existing = json.loads(src_path.read_text(encoding="utf-8"))
+    result = existing["result"]
+    # Re-run classification on preserved facts.
+    result["outcome"] = _classify_outcome(result)
+    verdict = _verdict_for_brief(result)
+    _write_outputs(result, verdict)
+    print(f"\nreclassified outcome: {result.get('outcome')}")
+    print(f"chain_elapsed: {result.get('chain_elapsed_sec')} s")
+    print(f"file_count: {result.get('file_count')}")
+    print(f"finished_msgbox_seen: {result.get('finished_msgbox_seen')}")
+    print(
+        f"msgbox_dismissed: "
+        f"{len(result.get('msgbox_dismissed', []))}")
+    print(f"\n=== verdict: {verdict['verdict']} ===")
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    if argv is None:
+        argv = sys.argv[1:]
+    if "--reclassify-from-json" in argv:
+        idx = argv.index("--reclassify-from-json")
+        if idx + 1 >= len(argv):
+            print("ERROR: --reclassify-from-json requires a path arg",
+                  file=sys.stderr)
+            return 2
+        return _reclassify(Path(argv[idx + 1]))
+
+    print("=== AssociationPairs × CmdNeo4j probe (probe-first) ===\n")
+    _kill_orphan()
+    time.sleep(1)
+
+    out_dir = ROOT / "analysis" / "_probe_assocpairs_cmdneo4j_out"
+    if out_dir.exists():
+        for f in out_dir.glob("*"):
+            try:
+                f.unlink()
+            except Exception:
+                pass
+    else:
+        out_dir.mkdir(parents=True)
+
+    result = _run_probe(out_dir)
+    verdict = _verdict_for_brief(result)
+    _write_outputs(result, verdict)
     print(f"\noutcome: {result.get('outcome')}")
     print(f"chain_elapsed: {result.get('chain_elapsed_sec')} s")
     print(f"file_count: {result.get('file_count')}")

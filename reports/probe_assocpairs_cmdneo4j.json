@@ -54,7 +54,12 @@
   "config": {
     "click_via_timer_timeout_sec": 120,
     "per_probe_outer_timeout_sec": 300,
-    "promote_elapsed_threshold_sec": 120
+    "promote_elapsed_threshold_sec": 120,
+    "promote_gates_strict": [
+      "chain_elapsed_sec <= 120",
+      "file_count > 0",
+      "finished_msgbox_seen == True"
+    ]
   },
   "result": {
     "form": "LookAtAssociationPairs",
@@ -118,7 +123,7 @@
         "marker": "row_counts_captured"
       }
     ],
-    "outcome": "clean_probe_promote_to_coverage_candidate",
+    "outcome": "confirmed_blocking_msgbox_layer_needs_decision_before_coverage",
     "elapsed_sec": 21.37,
     "exception": null,
     "row_counts": {
@@ -219,8 +224,8 @@
     ],
     "finished_msgbox_seen": false
   },
-  "verdict": "clean_probe_promote_to_coverage_candidate",
-  "verdict_note": "Chain completed (12.54s, ≤120s), produced 6 files, finished_neo4j MsgBox dismissed. Note: coverage PR will require either (a) removing the 6 blocking debug MsgBox calls from the upstream VBA, or (b) handling them in the test driver. Per the triage brief, do NOT auto-promote — report first.",
+  "verdict": "confirmed_blocking_msgbox_layer_needs_decision_before_coverage",
+  "verdict_note": "Chain produced 6 files in 12.54s and 5 of the 6 unconditional debug MsgBox calls were observed and dismissed by the probe's auto-dismisser. The terminal 'Finished saving to Neo4j' MsgBox (line 1470) was NOT observed within the polling window, so post-MsgBox terminal behavior is only partially observed.\n\nWhat this confirms:\n  - a blocking debug MsgBox layer exists in CmdNeo4j_Click and would prevent unattended coverage.\n  - this is NOT the same as LookAtAssociations × CmdNeo4j 0-file mode.\n\nWhat this does NOT confirm:\n  - that the debug MsgBox layer is the only failure class after removal.\n  - the full terminal completion path of CmdNeo4j on this fixture.\n\nDecision required from maintainer/reviewer before any coverage PR is opened: (a) remove the 6 unconditional MsgBox calls from upstream VBA, or (b) handle them in the test driver. NOT a coverage candidate yet.",
   "answers": {
     "Q1_cmdquery_plus_cmdneo4j_completed_same_session": true,
     "Q2_chain_elapsed_under_120s": true,
@@ -255,6 +260,6 @@
         "Finished saving to Neo4j"
       ]
     },
-    "Q5_vs_lookatassociations_0file_mode": "different — LookAtAssociations CmdNeo4j produces 0 files in directory mode (likely bails before any SaveAs); AssocPairs CmdNeo4j uses ZZ_SOCIAL_NETWORK (populated by CmdQuery on the 1x3 fixture) and can proceed to write multiple files before hitting the blocking MsgBox chain. The failure class is blocking_debug_msgbox, not 0-file mode."
+    "Q5_vs_lookatassociations_0file_mode": "Three observations, kept separate because the probe does not have evidence to collapse them into a single exclusive failure class:\n  (a) different from LookAtAssociations × CmdNeo4j 0-file mode — LookAtAssociations produces 0 files in directory mode (likely bails before any SaveAs), whereas AssocPairs CmdNeo4j uses ZZ_SOCIAL_NETWORK (populated by CmdQuery on the 1x3 fixture) and produced 6 files in this run.\n  (b) confirmed blocking MsgBox layer exists in CmdNeo4j_Click — static analysis lists 6 unconditional debug MsgBox calls, and 5 of them were observed and dismissed by the probe's pywinauto auto-dismisser at runtime. Unattended coverage would be blocked by this layer.\n  (c) post-MsgBox terminal behavior remains only partially observed because the final 'Finished saving to Neo4j' MsgBox (line 1470) was not seen within the polling window. The probe therefore cannot claim that 'blocking_debug_msgbox' is the exclusive failure class after MsgBox removal."
   }
 }
