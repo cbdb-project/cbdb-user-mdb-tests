@@ -154,6 +154,53 @@ _ASSOCPAIRS_CMDNEO4J_DEBUG_MSGBOX_TARGETS: tuple[str, ...] = (
 )
 
 
+# Form_LookAtAssociations.CmdNeo4j_Click rewrites a target-column
+# typo flagged as canonical Issue #23 (P1_visible_crash) in
+# `reports/generate_report.py::ISSUES`.  The failing INSERT
+# (target list = `c_person_id, c_name, ..., c_addr_id,
+# c_index_addr_type_code, c_female`) references a target column
+# `c_index_addr_type_code` that does not exist on
+# ZZ_SCRATCH_PEOPLE on the current dump (verified by static
+# investigation in PR #114, runtime in PR #112).  The natural
+# rename target is `c_addr_type` (which DOES exist on
+# ZZ_SCRATCH_PEOPLE and is exactly what the next-statement UPDATE
+# joins on against BIOG_ADDR_CODES — see Issue #23's `fix_en` for
+# the full rationale).
+#
+# Anchor: the substring `c_index_addr_type_code, c_female` is
+# **unique** to the failing INSERT target list inside
+# `Form_LookAtAssociations.CmdNeo4j_Click` (verified by
+# whole-module count: 1 occurrence here, 0 occurrences of the
+# qualified-source form `BIOG_MAIN.c_index_addr_type_code,
+# c_female`).  The qualified `BIOG_MAIN.c_index_addr_type_code`
+# in the SELECT projection is correct and is NOT touched by this
+# rewrite — that source-side reference is fine because BIOG_MAIN
+# DOES have the column.
+#
+# Per-form, per-sub, single-literal rewrite — NOT a generic SQL
+# text rewriter and NOT an attempt to fix CBDB upstream.  The
+# canonical Issue #23 still tracks the underlying source-side
+# defect; this is purely a test-driver workaround so the chain
+# can be exercised headlessly.
+_ASSOCIATIONS_CMDNEO4J_TARGET_COLUMN_REWRITE_ANCHOR = (
+    "c_index_addr_type_code, c_female",
+    "c_addr_type, c_female",
+)
+
+
+def _rewrite_associations_cmdneo4j_target_column(match) -> str:
+    """Rewrite the single Issue #23 anchor inside the matched
+    `Private Sub CmdNeo4j_Click() ... End Sub` body.  Outer pattern
+    is the per-sub regex (registered in
+    `_PER_FORM_CMDGIS_PATCHES["Form_LookAtAssociations"]`); this
+    callable runs `.replace()` only on the matched body, so the
+    rewrite is doubly scoped (per-form key + per-sub regex).
+    """
+    sub_body = match.group(0)
+    old, new = _ASSOCIATIONS_CMDNEO4J_TARGET_COLUMN_REWRITE_ANCHOR
+    return sub_body.replace(old, new)
+
+
 def _suppress_assocpairs_cmdneo4j_debug_msgbox(match) -> str:
     """Comment out the 6 unconditional debug MsgBox calls inside
     `Private Sub CmdNeo4j_Click()`.  `match.group(0)` is the entire
@@ -589,6 +636,33 @@ class VbaSession:
             # trap) are intentionally left untouched.
             (r"Private Sub CmdNeo4j_Click\(\)[\s\S]*?\nEnd Sub",
              _suppress_assocpairs_cmdneo4j_debug_msgbox),
+        ],
+
+        # Issue #23 (P1_visible_crash, canonical on main since
+        # PR #115 commit 97ff1d8): the INSERT inside
+        # Form_LookAtAssociations.CmdNeo4j_Click that builds
+        # ZZ_SCRATCH_PEOPLE references a target column
+        # `c_index_addr_type_code` which does not exist on
+        # ZZ_SCRATCH_PEOPLE (the actual address-type column is
+        # `c_addr_type`, which the next-statement UPDATE LEFT
+        # JOINs on).  Without this rewrite the chain bails with
+        # JET 3061 "unknown field name: c_index_addr_type_code"
+        # and produces 0 files — see PR #112 probe + PR #114
+        # static investigation.  Inline patch, scoped to:
+        #   - Form_LookAtAssociations only (per-form dict key)
+        #   - CmdNeo4j_Click only (sub-body regex)
+        #   - the target-column-list literal only (callable
+        #     `_rewrite_associations_cmdneo4j_target_column`
+        #     does a single `.replace()` on the unique anchor
+        #     `c_index_addr_type_code, c_female` -> `c_addr_type,
+        #     c_female`).
+        # The qualified SELECT projection
+        # `BIOG_MAIN.c_index_addr_type_code` is NOT touched and
+        # remains correct.  Other CmdNeo4j_Click MsgBoxes /
+        # error traps in this form are also untouched.
+        "Form_LookAtAssociations": [
+            (r"Private Sub CmdNeo4j_Click\(\)[\s\S]*?\nEnd Sub",
+             _rewrite_associations_cmdneo4j_target_column),
         ],
     }
 

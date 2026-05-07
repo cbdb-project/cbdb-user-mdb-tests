@@ -1,0 +1,271 @@
+{
+  "schema_version": 1,
+  "generated_date": "2026-05-07",
+  "probe_branch": "driver/associations-cmdneo4j-c-addr-type-rewrite",
+  "fixture": "associations_matrix_first_fixture",
+  "config": {
+    "click_via_timer_timeout_sec": 180,
+    "per_probe_outer_timeout_sec": 300
+  },
+  "result": {
+    "form": "LookAtAssociations",
+    "fixture_name": "assoc_437_unfiltered",
+    "fixture_picker_ids": [
+      437
+    ],
+    "fixture_controls": {
+      "FrameFilterYears": 1
+    },
+    "markers": [
+      {
+        "t": 0.0,
+        "marker": "constructing_session"
+      },
+      {
+        "t": 5.44,
+        "marker": "session_opened_attempt_1"
+      },
+      {
+        "t": 5.79,
+        "marker": "filedialog_patched"
+      },
+      {
+        "t": 6.53,
+        "marker": "form_opened"
+      },
+      {
+        "t": 6.54,
+        "marker": "picker_seeded_1_codes"
+      },
+      {
+        "t": 6.54,
+        "marker": "fixture_seeded"
+      },
+      {
+        "t": 6.54,
+        "marker": "form_tag_set_chain_CmdQuery_CmdNeo4j"
+      },
+      {
+        "t": 6.54,
+        "marker": "chain_fire_t_start"
+      },
+      {
+        "t": 11.58,
+        "marker": "click_via_timer_returned_11867"
+      },
+      {
+        "t": 16.58,
+        "marker": "chain_quiescent_files_8_stable_for_5s"
+      },
+      {
+        "t": 16.58,
+        "marker": "chain_elapsed_10.04s"
+      },
+      {
+        "t": 16.6,
+        "marker": "files_inventoried_8"
+      },
+      {
+        "t": 16.6,
+        "marker": "row_counts_captured"
+      },
+      {
+        "t": 16.6,
+        "marker": "zz_test_debug_captured"
+      }
+    ],
+    "outcome": "patch_verified_chain_clean",
+    "elapsed_sec": 19.03,
+    "exception": null,
+    "row_counts": {
+      "ZZ_SCRATCH_ASSOC": 11867,
+      "ZZ_SCRATCH_P_ASSOC": 8087,
+      "ZZ_SCRATCH_PEOPLE": 8088,
+      "ZZ_TEST_DEBUG": 3
+    },
+    "files": [
+      {
+        "name": "f12.out.csv",
+        "size": 692366,
+        "header_first_col": "Person1_ID",
+        "header_n_cols": 13,
+        "header_preview": "Person1_ID,Person2_ID,Association_Code,Kin_ID,Kin_Code,AssocKin_ID,AssocKin_Code,LiteraryGenreCode,OccasionCode,TopicCode,InstitutionCode,TextTitle,AssociationClaimer_ID",
+        "data_row_count": 11867
+      },
+      {
+        "name": "f15.out.csv",
+        "size": 134,
+        "header_first_col": "AssociationCode",
+        "header_n_cols": 4,
+        "header_preview": "AssociationCode,AssociationTypeID,AssociationTrans,AssociationHZ",
+        "data_row_count": 1
+      },
+      {
+        "name": "f18.out.csv",
+        "size": 51,
+        "header_first_col": "KinshipCode",
+        "header_n_cols": 3,
+        "header_preview": "KinshipCode,KinshipTrans,KinshipHZ",
+        "data_row_count": 1
+      },
+      {
+        "name": "f21.out.csv",
+        "size": 148,
+        "header_first_col": "OccasionCode",
+        "header_n_cols": 3,
+        "header_preview": "OccasionCode,OccasionTrans,OccasionHZ",
+        "data_row_count": 4
+      },
+      {
+        "name": "f24.out.csv",
+        "size": 47,
+        "header_first_col": "TopicCode",
+        "header_n_cols": 3,
+        "header_preview": "TopicCode,TopicTrans,TopicHZ",
+        "data_row_count": 1
+      },
+      {
+        "name": "f3.out.csv",
+        "size": 309113,
+        "header_first_col": "nameID",
+        "header_n_cols": 6,
+        "header_preview": "nameID,nameHZ,namePY,indexyear,dynasty,sex",
+        "data_row_count": 8088
+      },
+      {
+        "name": "f6.out.csv",
+        "size": 59462,
+        "header_first_col": "placeID",
+        "header_n_cols": 5,
+        "header_preview": "placeID,placePY,placeHZ,placeX,placeY",
+        "data_row_count": 1263
+      },
+      {
+        "name": "f9.out.csv",
+        "size": 46975,
+        "header_first_col": "nameID",
+        "header_n_cols": 4,
+        "header_preview": "nameID,placeID,personPlaceTrans,personPlaceHZ",
+        "data_row_count": 3102
+      }
+    ],
+    "file_count": 8,
+    "click_via_timer_returned": 11867,
+    "chain_elapsed_sec": 10.04,
+    "chain_observed_done": true,
+    "msgbox_observed": [
+      {
+        "t": 9.53,
+        "hwnd": 29754652,
+        "msg_text": "Kinship code records = 1"
+      },
+      {
+        "t": 9.94,
+        "hwnd": 29820188,
+        "msg_text": "Literary genre code records = 0"
+      },
+      {
+        "t": 10.36,
+        "hwnd": 29885724,
+        "msg_text": "Institution code records = 0"
+      },
+      {
+        "t": 10.78,
+        "hwnd": 29951260,
+        "msg_text": "Occasion code records = 6"
+      },
+      {
+        "t": 11.19,
+        "hwnd": 30016796,
+        "msg_text": "Topic code records = 2"
+      }
+    ],
+    "zz_test_debug_msgs": [
+      "LookAtAssociations:ENTER",
+      "LookAtAssociations:MSGBOX",
+      "LookAtAssociations:DONE"
+    ]
+  },
+  "verdict": "patch_verified_chain_clean",
+  "verdict_note": "Patch verified.  Chain produced 8 files in 10.04s with no :ERR markers in ZZ_TEST_DEBUG (specifically no JET 3061 'c_index_addr_type_code' marker).  This is the strongest available signal that the target-column rewrite is the only blocker on this fixture for LookAtAssociations × CmdNeo4j.  Note: this probe does NOT open a coverage PR; the next step is a separate coverage PR brief.",
+  "answers": {
+    "Q1_jet_3061_disappeared": {
+      "has_jet_3061_marker": false,
+      "all_err_markers_observed": [],
+      "interpretation": "If has_jet_3061_marker is False, the patch successfully prevented the JET 3061 'unknown field name: c_index_addr_type_code' that PR #112's probe observed.  If True, the rewrite did not take effect (anchor mismatch / scoping bug / etc.) and the patch needs investigation."
+    },
+    "Q2_chain_writes_files": {
+      "file_count": 8,
+      "chain_observed_done": true,
+      "chain_elapsed_sec": 10.04,
+      "interpretation": "PR #112 observed 0 files; this probe expects file_count >= 1 if the rewrite took effect AND the rest of the chain runs cleanly."
+    },
+    "Q3_file_shape": {
+      "file_count": 8,
+      "files": [
+        {
+          "name": "f12.out.csv",
+          "size": 692366,
+          "n_cols": 13,
+          "first_col": "Person1_ID",
+          "data_rows": 11867
+        },
+        {
+          "name": "f15.out.csv",
+          "size": 134,
+          "n_cols": 4,
+          "first_col": "AssociationCode",
+          "data_rows": 1
+        },
+        {
+          "name": "f18.out.csv",
+          "size": 51,
+          "n_cols": 3,
+          "first_col": "KinshipCode",
+          "data_rows": 1
+        },
+        {
+          "name": "f21.out.csv",
+          "size": 148,
+          "n_cols": 3,
+          "first_col": "OccasionCode",
+          "data_rows": 4
+        },
+        {
+          "name": "f24.out.csv",
+          "size": 47,
+          "n_cols": 3,
+          "first_col": "TopicCode",
+          "data_rows": 1
+        },
+        {
+          "name": "f3.out.csv",
+          "size": 309113,
+          "n_cols": 6,
+          "first_col": "nameID",
+          "data_rows": 8088
+        },
+        {
+          "name": "f6.out.csv",
+          "size": 59462,
+          "n_cols": 5,
+          "first_col": "placeID",
+          "data_rows": 1263
+        },
+        {
+          "name": "f9.out.csv",
+          "size": 46975,
+          "n_cols": 4,
+          "first_col": "nameID",
+          "data_rows": 3102
+        }
+      ]
+    },
+    "Q4_next_blocker_exposed": {
+      "outcome_bucket": "patch_verified_chain_clean",
+      "other_err_markers": [],
+      "msgbox_observed_count": 5,
+      "interpretation": "If outcome == patch_verified_chain_clean: no next blocker on this fixture.  If outcome == patch_partial_jet_3061_still_observed: rewrite did not take effect.  If outcome == next_blocker_exposed_different_err: rewrite worked but a different runtime error appeared.  If outcome == patch_resolved_jet_3061_but_zero_files: rewrite worked but no file got written for some other reason."
+    }
+  }
+}
