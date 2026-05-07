@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_date": "2026-05-04",
-  "refreshed_date": "2026-05-06",
+  "refreshed_date": "2026-05-07",
   "source_inventory": "reports/export_coverage_inventory.json",
   "scope": "read-only triage of the export-coverage gap cells; no Access COM, no test changes, no reports/issues/README touched",
   "refresh_2026_05_05": {
@@ -428,6 +428,158 @@
       "source_of_truth_sync": "MD section <-> this JSON block carry the same 3-cell state, ranked list, Place static finding, and do-not-touch list; 3-cell state itself was checked against canonical truth on main (Issue #22 entry in reports/generate_report.py, manifest entry in analysis/inventory_export_coverage.py, static + runtime markers in tests/test_known_bugs.py and tests/test_vba_bug_behaviors.py, README coverage table + roadmap-8 lines, Kinship coverage test docstring); no source-of-truth file changed",
       "evidence_vs_claim": "Place's UTF-8 signal grounded in a verifiable static read (grep on Form_LookAtPlace.vb reproduced in commit message); 'probable outcome' for proposed Place probe explicitly hedged; no claim about Place's runtime behavior beyond what static analysis supports; Issue #22 / Kinship / Associations state reported as-of 14099a7 and cited to canonical files",
       "residual_risk": "advisory error only — ranking Place above maintainer-line work could be wrong if user's priority is upstream coordination; mitigated by explicit Rank-2 maintainer-line entry and explicit 'leave CmdUCINet line entirely' alternative; no code path or test altered, so no runtime regression risk"
+    }
+  },
+  "refresh_2026_05_07": {
+    "trigger_prs": [
+      {"pr": 109, "branch": "driver/assocpairs-cmdneo4j-msgbox-suppress", "commit": "b695a92", "summary": "narrow scoped driver patch _suppress_assocpairs_cmdneo4j_debug_msgbox comments out the 6 unconditional debug MsgBox calls in Form_LookAtAssociationPairs.CmdNeo4j_Click (lines 1069 / 1151 / 1234 / 1317 / 1400 / 1470)"},
+      {"pr": 110, "branch": "test/assocpairs-cmdneo4j-coverage", "commit": "f0e7594", "summary": "coverage test for LookAtAssociationPairs x CmdNeo4j on the 1x3 known-edged fixture; 3 new shape entries in _NEO4J_SHAPES (Person1_ID / AssociationCode / KinshipCode); 6-file set pinned exactly"}
+    ],
+    "main_commit_at_refresh": "f0e7594",
+    "scope": "read-only analysis only; no Access COM; no tests / driver / README / canonical-report changes; only this JSON and analysis/export_gap_triage_plan.md updated",
+    "current_truth_deltas": {
+      "LookAtAssociationPairs x CmdNeo4j": {
+        "before": "gap (bucket B; SetFocus + 6-MsgBox blockers)",
+        "after": "covered",
+        "evidence": "PR #110 (commit f0e7594); 1x3 known-edged fixture; exact 6-file set (People, Places, PeoplePlaces, PeopleAssociations, AssociationCodes, KinshipCodes); ZZ_TEST_DEBUG ENTER+DONE; no :ERR markers"
+      },
+      "LookAtAssociationPairs x CmdPajek": {
+        "before": "gap in cells-array; covered in fact",
+        "after": "covered (acknowledged)",
+        "evidence": "cover/assocpairs-pajek-gephi-1x3 already on main since commit 4b8a927"
+      },
+      "LookAtAssociationPairs x CmdGephi": {
+        "before": "gap in cells-array; covered in fact",
+        "after": "covered (acknowledged)",
+        "evidence": "same PR as CmdPajek (commit 4b8a927)"
+      },
+      "LookAtAssociationPairs x CmdUCINet": {
+        "before": "D + B stacked",
+        "after": "D-only (CmdUCINet new family)",
+        "evidence": "the inner B (SetFocus / debug-MsgBox) is now removed by the AssocPairs SetFocus patch (3bb69ef + 0c0eaf1 on main since PR AV) plus PR #109's debug-MsgBox suppress (b695a92); only the CmdUCINet family blocker remains"
+      },
+      "LookAtPlace x CmdUCINet": {
+        "before": "D, rank-1 probe-first candidate per refresh_2026_05_06",
+        "after": "D, paused on timeout-path-correlated COM bridge instability",
+        "evidence": "user-side standing constraint; structurally a separate driver/meta concern, not an export-coverage concern; not investigated further in this refresh per brief"
+      },
+      "LookAtAssociations x CmdNeo4j": {
+        "before": "skipped sibling, open question per AssocPairs CmdNeo4j entry",
+        "after": "still separate skipped / investigation line",
+        "evidence": "PR AX Q5 confirms different failure class (0-file mode, likely bails before any SaveAs) vs AssocPairs CmdNeo4j (writes files then hits MsgBox layer); not unlocked by PR #109's driver patch; skip reason still in tests/test_vba_cmdneo4j_cross_form.py::_spec_skip_marks"
+      }
+    },
+    "bucket_distribution_after_refresh": {
+      "A_small_candidate": {"count": 0, "cells": []},
+      "B_blocked_by_known_driver_issue": {
+        "count": 3,
+        "count_was": 5,
+        "cells": ["LookAtAssociationPairs x CmdGIS", "LookAtNetworks x CmdGIS", "LookAtNetworks x CmdPajek"],
+        "removed_this_refresh": ["LookAtAssociationPairs x CmdNeo4j (covered via PR #110)", "LookAtAssociationPairs x CmdPajek (covered, acknowledged)", "LookAtAssociationPairs x CmdGephi (covered, acknowledged)"]
+      },
+      "C_blocked_by_form_query_timeout": {
+        "count": 1,
+        "cells": ["LookAtGroupData x CmdNeo4j (now investigation line, Issue #21 canonical)"]
+      },
+      "D_new_export_family_needs_design": {
+        "count": 4,
+        "count_was": 3,
+        "cells": ["LookAtAssociations x CmdUCINet", "LookAtPlace x CmdUCINet", "LookAtKinship x CmdUCINet", "LookAtAssociationPairs x CmdUCINet"],
+        "added_this_refresh": ["LookAtAssociationPairs x CmdUCINet (was D + B stacked; inner B blocker resolved)"]
+      },
+      "D_plus_B_stacked": {
+        "count": 1,
+        "count_was": 2,
+        "cells": ["LookAtNetworks x CmdUCINet"],
+        "removed_this_refresh": ["LookAtAssociationPairs x CmdUCINet (now D-only)"]
+      },
+      "E_low_value_or_duplicate": {"count": 0}
+    },
+    "remaining_gaps_count": 9,
+    "remaining_gaps_count_was": 12,
+    "remaining_gaps_count_drop_explanation": "3-cell drop since refresh_2026_05_06: AssocPairs x CmdNeo4j newly covered (PR #110) plus implicit acknowledgement of AssocPairs x CmdPajek + CmdGephi as covered (already on main since 4b8a927; previously listed in cells-array as bucket B but no longer in any rank)",
+    "next_work_items_ranked": [
+      {
+        "rank": 1,
+        "category": "coverage_hardening",
+        "cell": "LookAtKinship x CmdUCINet",
+        "item": "Kinship CmdUCINet runtime :ERR pin (Invalid procedure call or argument)",
+        "shape": "one new test_bug22_lookatkinship_cmducinet_fires_invalid_procedure_call mirroring the existing test_bug22_associations_cmducinet_fires_invalid_procedure_call in tests/test_vba_bug_behaviors.py; uses already-known fixture pid 140733 (He Mou 取 U+53D6) from probe 154bb4b",
+        "changes_coverage_state": false,
+        "why_rank_1": "smallest scope of any actionable item today; no driver dependency, no new fixture design, no new investigation; mechanical mirror of an already-merged Associations runtime pin; closes a known deferred item",
+        "risk": "low",
+        "is_local_pr": true
+      },
+      {
+        "rank": 2,
+        "category": "probe_first_investigation",
+        "cell": "LookAtAssociations x CmdNeo4j",
+        "item": "Probe characterizing the 0-file mode in directory-mode CmdNeo4j export",
+        "shape": "read-only probe MD + JSON only; same shape as PR AX (probe/assocpairs-cmdneo4j artifacts); static read of Form_LookAtAssociations.vb::CmdNeo4j_Click + one COM run on a small fixture used by Associations CmdGIS / CmdPajek tests; NOT a coverage PR; NOT a driver PR",
+        "changes_coverage_state": false,
+        "expected_outcome_branches": [
+          "(a) clean probe -> coverage candidate (own brief)",
+          "(b) confirmed runtime blocker -> new investigation line",
+          "(c) different bug class -> canonical issue candidate"
+        ],
+        "why_rank_2": "PR AX Q5 confirms this is a different failure class from AssocPairs CmdNeo4j; PR #109's driver patch does NOT address it; cell remains skipped in _spec_skip_marks; this refresh proposes the probe finally happen, scoped strictly to characterizing why 0-file mode triggers; strictly bigger than the Kinship pin and one step further from any maintainer decision",
+        "risk": "low",
+        "is_local_pr": true
+      },
+      {
+        "rank": 3,
+        "category": "maintainer_line",
+        "item": "Issue #22 upstream-fix coordination",
+        "shape": "out-of-band; not a PR action in this repo; reach CBDB maintainer to land CreateTextFile(..., True, True) fix on upstream .mdb (with downstream-acceptance hedge)",
+        "changes_coverage_state": "potentially yes (would change LookAtAssociations x CmdUCINet and the related Kinship sibling fragility, IF downstream accepts)",
+        "is_local_pr": false
+      }
+    ],
+    "rank_1_change_from_previous_refresh": {
+      "did_rank_1_change": true,
+      "previous_rank_1": "LookAtPlace x CmdUCINet probe-first investigation (per refresh_2026_05_06)",
+      "previous_rank_1_status": "paused on timeout-path-correlated COM bridge instability — separate driver/meta concern, not an export-coverage concern",
+      "new_rank_1": "LookAtKinship x CmdUCINet runtime :ERR pin (coverage hardening)",
+      "reasons_for_new_rank_1": [
+        "smallest actionable item left on the queue",
+        "no driver dependency, no new fixture design, no new investigation",
+        "purely mechanical mirror of an already-merged Associations runtime pin",
+        "produces concrete repo-side evidence improvement on a known fixture-fragile cell without requiring the Place probe to land first",
+        "does NOT extrapolate beyond what is already canonical (Issue #22 with the sibling-form runtime confirmation)"
+      ]
+    },
+    "do_not_touch_until_briefed_otherwise": [
+      {
+        "item": "Reopen LookAtAssociationPairs x CmdNeo4j",
+        "reason": "covered as of PR #110, scope locked to the 1x3 fixture; broader coverage of this cell is a separate brief"
+      },
+      {
+        "item": "Mix LookAtAssociations x CmdNeo4j with LookAtAssociationPairs x CmdNeo4j",
+        "reason": "different failure classes per PR AX Q5; merging into one investigation conflates the 0-file-mode root cause with the (now-fixed) MsgBox layer"
+      },
+      {
+        "item": "Continue dissecting the LookAtPlace x CmdUCINet COM bridge instability inside this triage line",
+        "reason": "needs its own driver/meta brief; timeout-path-correlated COM bridge issues are a different repo concern from export coverage"
+      },
+      {
+        "item": "Promote LookAtAssociationPairs x CmdUCINet to coverage now that it is D-only",
+        "reason": "CmdUCINet family infra still does not exist; the inner B blocker being resolved doesn't make the family blocker go away"
+      },
+      {
+        "item": "Re-promote LookAtGroupData x CmdNeo4j",
+        "reason": "Issue #21 canonical, on the maintainer line"
+      },
+      {
+        "item": "Assert AssocPairs x CmdNeo4j coverage on fixtures other than the 1x3 known-edged pair",
+        "reason": "PR #110 deliberately scoped to that fixture; the per-shape pin will fail if a new fixture is added without a fresh brief"
+      }
+    ],
+    "self_review_per_template": {
+      "template": "docs/skills/programmer-self-review-template.md",
+      "branch_shape": "branch refresh/queue-after-assocpairs-cmdneo4j-covered cut from clean main f0e7594; only two files touched (this JSON + analysis/export_gap_triage_plan.md); no tests / driver / README / canonical reports / issue severity changes",
+      "source_of_truth_sync": "MD section <-> this JSON block carry the same truth deltas, bucket distribution, ranked list, brief Q-A, and do-not-touch list; truth-delta items checked against canonical truth on main (PR #109 + PR #110 merged via b695a92 and f0e7594; AssocPairs CmdPajek/Gephi covered state in README cross-form table line 238 + tests/test_vba_pajek_gephi_cross_form.py::_assocpairs_1x3_fixture; LookAtAssociations x CmdNeo4j skip reason in tests/test_vba_cmdneo4j_cross_form.py::_spec_skip_marks; PR AX Q5 in reports/probe_assocpairs_cmdneo4j.json); no source-of-truth file changed",
+      "evidence_vs_claim": "truth deltas cite specific commit SHAs (b695a92, f0e7594, 4b8a927) and PR numbers (#109, #110); Place pause reported as user-side standing instruction not as a finding this refresh produced; Rank-1 'purely mechanical' framing grounded in existence of matching Associations runtime pin to mirror, not an inference Kinship will pass; Rank-2 probe-first hedged with three explicit outcome branches none of which is pre-claimed",
+      "residual_risk": "triage-document refresh, not an implementation; residual risk is purely advisory: (1) ranking Kinship pin above Associations CmdNeo4j probe could be wrong if user wants Neo4j coverage broader before tightening Kinship - mitigated by stating trade-off explicitly in Rank 1's 'why not Rank 1' parenthetical on the probe; (2) Place pause assumes COM bridge instability is a current-session standing constraint - if resolved, Place returns to rank-1 candidate via a separate refresh, not silently. No code path or test altered, so no runtime regression risk."
     }
   }
 }
