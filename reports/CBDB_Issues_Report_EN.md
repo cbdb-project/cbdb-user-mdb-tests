@@ -19,6 +19,7 @@ The issues are ordered by severity (P0 highest). Each entry includes a concise d
   - [Issue #13 — BIOG_MAIN_2 Subform tries to open a picker form (frmPickNIAN_HAO) that doesn't exist](#issue-13--biog_main_2-subform-tries-to-open-a-picker-form-frmpicknian_hao-that-doesnt-exist)
   - [Issue #21 — LookAtGroupData.CmdNeo4j crashes with 'No current record' on empty sections](#issue-21--lookatgroupdatacmdneo4j-crashes-with-no-current-record-on-empty-sections)
   - [Issue #22 — LookAtAssociations.CmdUCINet crashes with 'Invalid procedure call or argument' on networks containing CJK Han characters in c_name](#issue-22--lookatassociationscmducinet-crashes-with-invalid-procedure-call-or-argument-on-networks-containing-cjk-han-characters-in-c_name)
+  - [Issue #23 — LookAtAssociations.CmdNeo4j INSERT references non-existent target column ZZ_SCRATCH_PEOPLE.c_index_addr_type_code (likely intended c_addr_type)](#issue-23--lookatassociationscmdneo4j-insert-references-non-existent-target-column-zz_scratch_peoplec_index_addr_type_code-likely-intended-c_addr_type)
 - [P2 — Silent display](#p2--silent-display)
   - [Issue #10 — EVENT_ADDR_2 Subform address columns silently render blank (wrong ControlSource)](#issue-10--event_addr_2-subform-address-columns-silently-render-blank-wrong-controlsource)
 - [P3 — Missing UI](#p3--missing-ui)
@@ -315,6 +316,54 @@ This should make `tVNA.WriteLine` write all characters as UTF-16LE and prevent t
 Alternative (less recommended): strip / transliterate non-cp1252 chars from `c_name` before the `WriteLine` call.  Loses real data from the export and is more code; the Unicode flag is the right fix.
 
 Same one-line fix (with the same 3rd-arg addition) is also required for `Form_LookAtKinship.CmdUCINet_Click` (line ~2510) — see the Affected-forms section above.  Kinship is a runtime-confirmed sibling form of THIS issue (same root cause, same failure class, different host form / fixture trigger), so a single upstream patch should add the Unicode flag to BOTH CreateTextFile call sites in the same change.  Place (LookAtPlace.CmdUCINet) is NOT in scope for this issue — it uses ADO Stream rather than FSO and would need its own per-form probe before any same-bug-family claim or fix coordination.
+
+### Issue #23 — LookAtAssociations.CmdNeo4j INSERT references non-existent target column ZZ_SCRATCH_PEOPLE.c_index_addr_type_code (likely intended c_addr_type)
+
+**Affected sub:** `Form_LookAtAssociations.CmdNeo4j_Click`
+
+**Severity:** P1 — Visible crash on a normal user click (any LookAtAssociations CmdNeo4j export with a non-empty associations result; the JET 3061 fires deterministically on the matrix Associations fixture per PR #112's runtime probe and the static schema evidence per PR #114)
+
+#### Description
+
+`Form_LookAtAssociations.CmdNeo4j_Click` builds the `ZZ_SCRATCH_PEOPLE` working table via an `INSERT INTO ZZ_SCRATCH_PEOPLE ( c_person_id, c_name, c_name_chn, c_index_year, c_index_year_type_code, c_dy, c_addr_id, c_index_addr_type_code, c_female ) SELECT DISTINCT … BIOG_MAIN.c_index_addr_type_code, BIOG_MAIN.c_female …`. The INSERT target list references **c_index_addr_type_code** as a target column on `ZZ_SCRATCH_PEOPLE`, but `ZZ_SCRATCH_PEOPLE` has no such column on the current dump (22 columns total; canonical column names in `analysis/dump/tables.json`).  JET reports this as **3061 'The INSERT INTO statement contains the following unknown field name: c_index_addr_type_code'** and the entire Neo4j export aborts mid-body, BEFORE any disk file is written — even though `dlgSaveAs.Show` did fire and the chain entered the People-block True branch.
+
+Static schema cross-check: the source side `BIOG_MAIN` DOES have `c_index_addr_type_code` (55 columns total; this column is one of `tests/test_schema.py`'s REQUIRED_COLUMNS so a passing schema test confirms it independently). So the unknown field is on the **target** table, not the source.
+
+Strong static inference about author intent: the follow-up `UPDATE` (next statement after the failing INSERT) LEFT JOINs on `ZZ_SCRATCH_PEOPLE.c_addr_type = BIOG_ADDR_CODES.c_addr_type` and SETs descriptive address columns from `[BIOG_ADDR_CODES]`. Target table DOES have `c_addr_type`, but the failing INSERT never populates `c_addr_type` — and `c_addr_type` is the natural rename target for the source's `BIOG_MAIN.c_index_addr_type_code` (the same INSERT already does the analogous rename in the previous column position: `BIOG_MAIN.c_index_addr_id ↦ ZZ_SCRATCH_PEOPLE.c_addr_id`). The author appears to have copied the source column name verbatim into the INSERT target list when they meant to rename it to `c_addr_type`. Same per-form column-name typo class as Bugs #4 / #5 / #6.
+
+**Distinct from Issue #22 (LookAtAssociations × CmdUCINet).** That issue is the FSO `CreateTextFile` missing-Unicode-arg crash on CJK Han characters via ANSI cp1252 encoder; this issue is a SQL JET 3061 column-not-found in `CmdNeo4j_Click` that fires before any export-encoder runs.  Different sub, different VBA error family, different fix path.
+
+**Distinct from AssociationPairs × CmdNeo4j blocking-MsgBox layer** (canonical evidence: PR #109 driver patch + PR #110 coverage on main).  AssocPairs's CmdNeo4j writes ≥1 files first and is then blocked by a UI debug-MsgBox layer (now driver-suppressed). Associations writes 0 files and is blocked by the SQL schema mismatch above.  Different chain depths, different VBA error families, no shared fix path — they should NOT be filed as the same issue.
+
+#### Steps to reproduce
+
+1. Open **LookAtAssociations**.
+2. Pick a substantive **association code** (any single code with ≥ a few hundred associated persons works; the matrix `_make_assoc_fixtures` first fixture, `assoc_<top_code>_unfiltered`, gives ZZ_SCRATCH_ASSOC ≈ 11,867 rows + ZZ_SCRATCH_P_ASSOC ≈ 8,087 rows on the current dump — same fixture used by the existing Associations × CmdGIS / CmdPajek / CmdGephi tests).
+3. Leave **FrameFilterYears** at its default (no year filter).  Do NOT tick any checkbox that gates an unrelated query branch.
+4. Click **Run Query** — CmdQuery completes cleanly; the underlying scratch tables are populated.
+5. Click **Neo4j** (the export button).
+6. A **Run-time error 3061 — The INSERT INTO statement contains the following unknown field name: c_index_addr_type_code** popup appears (or in the headless / driver-instrumented run, the equivalent ZZ_TEST_DEBUG marker `LookAtAssociations:ERR ...` is written).  The Neo4j export produces **0 CSV files** — no `People_*.csv`, no `Places_*.csv`, nothing.
+
+Verified end-to-end via the probe at `analysis/probe_associations_cmdneo4j.py` (PR #112, merged commit `1145219`); root cause confirmed via the static investigation at `analysis/investigate_associations_cmdneo4j_c_index_addr_type_code.{py,md}` (PR #114, merged commit `68cfa9b`).
+
+#### Suggested fix
+
+**Recommended upstream CBDB fix:** rename the INSERT target column from `c_index_addr_type_code` to `c_addr_type`. The follow-up UPDATE later joins on `ZZ_SCRATCH_PEOPLE.c_addr_type = BIOG_ADDR_CODES.c_addr_type`, so this rename has the side benefit of populating the join key the UPDATE already requires (today the join key is never populated, so even a hypothetical 'just remove the extra column' patch would leave the UPDATE silently joining on NULL).
+
+Suggested shape (rename one identifier; SELECT side unchanged because the source column name is correct):
+
+```vb
+tQueryStr = "INSERT INTO ZZ_SCRATCH_PEOPLE ( " & _
+    "c_person_id, c_name, c_name_chn, c_index_year, " & _
+    "c_index_year_type_code, c_dy, c_addr_id, " & _
+    "c_addr_type, c_female ) " & _
+    "SELECT DISTINCT ZZ_SCRATCH_P_TEXT.c_person_id, BIOG_MAIN.c_name, ... " & _
+    "BIOG_MAIN.c_dy, BIOG_MAIN.c_index_addr_id, " & _
+    "BIOG_MAIN.c_index_addr_type_code, BIOG_MAIN.c_female " & _
+    "FROM ZZ_SCRATCH_P_TEXT INNER JOIN BIOG_MAIN ON ..."
+```
+
+**Driver-side workaround option** (separate brief; NOT part of this issue): mirror the `_PER_FORM_CMDGIS_PATCHES` Issue #4 (`GISFrame → CodeFrame`) and Issue #5 (`ChkIDs → False`) workarounds with a per-form rewrite mapping the literal `c_index_addr_type_code` → `c_addr_type` inside `Form_LookAtAssociations`'s CmdNeo4j_Click only.  This would unblock the test suite without requiring a CBDB-side fix.
 
 ## P2 — Silent display
 

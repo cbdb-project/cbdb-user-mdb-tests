@@ -663,6 +663,160 @@ def test_bugs_15_to_19_orphan_export_handlers():
         )
 
 
+def test_bug23_associations_cmdneo4j_target_column_mismatch():
+    """Bug #23 (reports/CBDB_Issues_Report_EN.md) —
+    `Form_LookAtAssociations.CmdNeo4j_Click` builds the
+    `ZZ_SCRATCH_PEOPLE` working table via an INSERT whose target
+    column list references `c_index_addr_type_code`, but
+    `ZZ_SCRATCH_PEOPLE` does not have that column on the current
+    dump (22 columns total; the actual address-type column on the
+    target is `c_addr_type`).  JET reports this as 3061 'unknown
+    field name: c_index_addr_type_code' and the entire Neo4j
+    export aborts mid-body before any disk file is written.
+
+    Distinct from Issue #22 (LookAtAssociations × CmdUCINet, FSO
+    ANSI cp1252 crash) — different sub, different VBA error
+    family.  Distinct from AssociationPairs × CmdNeo4j (UI
+    debug-MsgBox layer, suppressed by PR #109) — different chain
+    depth, different VBA error family.
+
+    Four anchored static markers (any one stops reproducing →
+    FAIL → maintainer must investigate before flipping):
+
+      (a) source-side:  BIOG_MAIN.c_index_addr_type_code present
+      (b) target-side:  ZZ_SCRATCH_PEOPLE.c_index_addr_type_code
+                        absent (and c_addr_type present)
+      (c) VBA INSERT:   target column list still references
+                        c_index_addr_type_code inside
+                        Form_LookAtAssociations.CmdNeo4j_Click
+      (d) VBA UPDATE:   the next statement after the failing
+                        INSERT LEFT JOINs on
+                        ZZ_SCRATCH_PEOPLE.c_addr_type =
+                        BIOG_ADDR_CODES.c_addr_type
+                        (i.e. the join key the INSERT *should*
+                        have populated under the c_addr_type
+                        rename hypothesis)
+
+    Anchors (a) and (b) come from analysis/dump/tables.json —
+    independent of the VBA dump's exact line numbers, so they
+    survive any re-formatting of the form.  (c) and (d) are
+    fragment-anchored on unique substrings of the failing INSERT
+    and the immediately-following UPDATE, scoped via the unique
+    `Sub CmdNeo4j_Click` start in the VBA dump.
+
+    See `analysis/probe_associations_cmdneo4j.py` (PR #112) for
+    runtime evidence and
+    `analysis/investigate_associations_cmdneo4j_c_index_addr_type_code.py`
+    (PR #114) for the static schema cross-check.
+    """
+    # ----- Markers (a) + (b): schema, from tables.json -----
+    tables_json = REPO / "analysis" / "dump" / "tables.json"
+    data = json.loads(tables_json.read_text(encoding="utf-8"))
+    tables = {t["name"]: {c["name"] for c in t["columns"]}
+              for t in data}
+
+    src_cols = tables.get("BIOG_MAIN", set())
+    tgt_cols = tables.get("ZZ_SCRATCH_PEOPLE", set())
+    assert "c_index_addr_type_code" in src_cols, (
+        "Bug #23 marker no longer reproduces (investigate "
+        "upstream fix vs. fixture/driver change vs. "
+        "misclassification before flipping) — source-side anchor "
+        "(a) failed: BIOG_MAIN no longer has "
+        "`c_index_addr_type_code`.  This is unusual because "
+        "tests/test_schema.py::REQUIRED_COLUMNS also requires it; "
+        "if the schema test still passes, the metadata dump may "
+        "be stale — re-run analysis/dump_metadata.py first."
+    )
+    assert "c_index_addr_type_code" not in tgt_cols, (
+        "Bug #23 marker no longer reproduces (investigate "
+        "upstream fix vs. fixture/driver change vs. "
+        "misclassification before flipping) — target-side anchor "
+        "(b) failed: ZZ_SCRATCH_PEOPLE now has "
+        "`c_index_addr_type_code`.  Either CBDB added the column "
+        "to the working table (one valid fix path) or the "
+        "metadata dump is stale.  If real, the INSERT in "
+        "Form_LookAtAssociations.CmdNeo4j_Click should now "
+        "succeed and Bug #23 in reports/generate_report.py needs "
+        "to be marked fixed."
+    )
+    assert "c_addr_type" in tgt_cols, (
+        "Bug #23 marker no longer reproduces (investigate "
+        "upstream fix vs. fixture/driver change vs. "
+        "misclassification before flipping) — target-side "
+        "supporting fact failed: ZZ_SCRATCH_PEOPLE no longer has "
+        "`c_addr_type`.  The Issue #23 'rename to c_addr_type' "
+        "fix recommendation assumes this column exists on the "
+        "target; if it has been removed, update the issue's "
+        "fix_en/fix_zh."
+    )
+
+    # ----- Markers (c) + (d): VBA fragment anchors -----
+    vba_path = (REPO / "analysis" / "dump" / "vba"
+                / "Form_LookAtAssociations.vb")
+    body = vba_path.read_bytes().decode("cp1252")
+
+    sub_marker = "Private Sub CmdNeo4j_Click()"
+    sub_start = body.find(sub_marker)
+    assert sub_start >= 0, (
+        "Bug #23 marker no longer reproduces — anchor "
+        f"`{sub_marker}` not found in Form_LookAtAssociations.vb. "
+        "The form's CmdNeo4j_Click sub was likely refactored or "
+        "renamed.  Update this test to assert the corrected "
+        "form, and update Issue #23 in "
+        "reports/generate_report.py accordingly."
+    )
+    # Cap the search to the next `Private Sub` to keep markers
+    # scoped strictly inside CmdNeo4j_Click.
+    next_sub = body.find("Private Sub ", sub_start + len(sub_marker))
+    sub_body = body[sub_start: next_sub if next_sub > sub_start
+                    else len(body)]
+
+    # (c) The failing INSERT target list literal.  Anchor on the
+    # exact identifier sequence that includes c_index_addr_type_code
+    # as a target-list column (i.e. NOT the SELECT projection,
+    # which uses BIOG_MAIN.c_index_addr_type_code with the table
+    # qualifier — distinct substring).  We use the unqualified
+    # identifier wrapped in spaces and a comma, which only the
+    # INSERT target column list produces.
+    insert_target_anchor = "c_index_addr_type_code, c_female"
+    assert insert_target_anchor in sub_body, (
+        "Bug #23 marker no longer reproduces (investigate "
+        "upstream fix vs. fixture/driver change vs. "
+        "misclassification before flipping) — INSERT target "
+        f"anchor (c) `{insert_target_anchor}` not found inside "
+        "Form_LookAtAssociations.CmdNeo4j_Click.  This pattern is "
+        "the unqualified identifier sequence from the INSERT "
+        "target column list (the SELECT projection has the "
+        "table-qualified form `BIOG_MAIN.c_index_addr_type_code`)."
+        "  If this anchor is gone, the INSERT was probably "
+        "rewritten — likely to use the recommended "
+        "`c_addr_type` rename, which is the upstream fix.  "
+        "Update Issue #23 in reports/generate_report.py."
+    )
+
+    # (d) The follow-up UPDATE LEFT JOIN that requires
+    # ZZ_SCRATCH_PEOPLE.c_addr_type populated.  This anchor is
+    # what makes the rename-to-c_addr_type fix recommendation a
+    # specific direction rather than a guess: the form's own
+    # downstream code already expects c_addr_type to be the
+    # populated column.
+    update_join_anchor = (
+        "ZZ_SCRATCH_PEOPLE.c_addr_type = "
+        "BIOG_ADDR_CODES.c_addr_type")
+    assert update_join_anchor in sub_body, (
+        "Bug #23 marker no longer reproduces (investigate "
+        "upstream fix vs. fixture/driver change vs. "
+        "misclassification before flipping) — UPDATE join "
+        f"anchor (d) `{update_join_anchor}` not found inside "
+        "Form_LookAtAssociations.CmdNeo4j_Click.  This anchor "
+        "is what supports Issue #23's 'rename to c_addr_type' "
+        "intent inference; if the UPDATE no longer joins on "
+        "`c_addr_type`, the fix recommendation needs to be "
+        "rewritten.  Update Issue #23 in "
+        "reports/generate_report.py."
+    )
+
+
 def test_bug_dao_reference_broken_in_user_mdb():
     """The shipped .mdb references DAO 3.6 (C:\\Program Files\\Common
     Files\\Microsoft Shared\\DAO\\dao360.dll) which is not installed on
