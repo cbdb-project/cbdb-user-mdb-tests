@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "generated_date": "2026-05-07",
+  "probe_branch": "driver/assocpairs-cmdneo4j-msgbox-suppress",
+  "fixture": "assocpairs_1x3_known_edged",
+  "config": {
+    "click_via_timer_timeout_sec": 120,
+    "per_probe_outer_timeout_sec": 240
+  },
+  "result": {
+    "form": "LookAtAssociationPairs",
+    "fixture": "1x3_known_edged",
+    "fixture_controls": {
+      "TxtID1": 1,
+      "TxtID2": 3,
+      "TxtPerson1": "1",
+      "TxtPerson2": "3",
+      "FrameFilterYears": 1,
+      "Chk2Nodes": 0,
+      "ChkKinship": 0
+    },
+    "markers": [
+      {
+        "t": 0.0,
+        "marker": "constructing_session"
+      },
+      {
+        "t": 6.26,
+        "marker": "session_opened_attempt_1"
+      },
+      {
+        "t": 6.63,
+        "marker": "filedialog_patched"
+      },
+      {
+        "t": 7.3,
+        "marker": "form_opened"
+      },
+      {
+        "t": 7.37,
+        "marker": "fixture_controls_set"
+      },
+      {
+        "t": 7.38,
+        "marker": "form_tag_set_chain_CmdQuery_CmdNeo4j"
+      },
+      {
+        "t": 7.38,
+        "marker": "chain_fire_t_start"
+      },
+      {
+        "t": 7.91,
+        "marker": "click_via_timer_returned_5"
+      },
+      {
+        "t": 12.91,
+        "marker": "chain_quiescent_files_6_stable_for_5s"
+      },
+      {
+        "t": 12.91,
+        "marker": "chain_elapsed_5.53s"
+      },
+      {
+        "t": 12.91,
+        "marker": "files_inventoried_6"
+      },
+      {
+        "t": 12.91,
+        "marker": "row_counts_captured"
+      },
+      {
+        "t": 12.91,
+        "marker": "zz_test_debug_captured"
+      }
+    ],
+    "outcome": "patch_verified_chain_clean",
+    "elapsed_sec": 15.46,
+    "exception": null,
+    "row_counts": {
+      "ZZ_SOCIAL_NETWORK": 5,
+      "ZZ_SCRATCH_PEOPLE": 3,
+      "ZZ_SCRATCH_P_ASSOC": 4,
+      "ZZ_KIN_LIST_TMP": 132,
+      "ZZ_TEST_DEBUG": 2
+    },
+    "files": [
+      {
+        "name": "f12.out.csv",
+        "size": 490,
+        "header_first_col": "Person1_ID",
+        "header_n_cols": 13,
+        "header_preview": "Person1_ID,Person2_ID,Association_Code,Kin_ID,Kin_Code,AssocKin_ID,AssocKin_Code,LiteraryGenreCode,OccasionCode,TopicCode,InstitutionCode,TextTitle,AssociationClaimer_ID",
+        "data_row_count": 5
+      },
+      {
+        "name": "f15.out.csv",
+        "size": 186,
+        "header_first_col": "AssociationCode",
+        "header_n_cols": 3,
+        "header_preview": "AssociationCode,AssociationTrans,AssociationHZ",
+        "data_row_count": 5
+      },
+      {
+        "name": "f18.out.csv",
+        "size": 1322,
+        "header_first_col": "KinshipCode",
+        "header_n_cols": 3,
+        "header_preview": "KinshipCode,KinshipTrans,KinshipHZ",
+        "data_row_count": 96
+      },
+      {
+        "name": "f3.out.csv",
+        "size": 164,
+        "header_first_col": "nameID",
+        "header_n_cols": 6,
+        "header_preview": "nameID,nameHZ,namePY,indexyear,dynasty,sex",
+        "data_row_count": 4
+      },
+      {
+        "name": "f6.out.csv",
+        "size": 180,
+        "header_first_col": "placeID",
+        "header_n_cols": 5,
+        "header_preview": "placeID,placePY,placeHZ,placeX,placeY",
+        "data_row_count": 3
+      },
+      {
+        "name": "f9.out.csv",
+        "size": 220,
+        "header_first_col": "nameID",
+        "header_n_cols": 5,
+        "header_preview": "nameID,placeID,personPlaceCode,personPlaceTrans,personPlaceHZ",
+        "data_row_count": 3
+      }
+    ],
+    "file_count": 6,
+    "click_via_timer_returned": 5,
+    "chain_elapsed_sec": 5.53,
+    "chain_observed_done": true,
+    "msgboxes_observed": [],
+    "msgboxes_observed_count": 0,
+    "zz_test_debug_msgs": [
+      "LookAtAssociationPairs:ENTER",
+      "LookAtAssociationPairs:DONE"
+    ]
+  },
+  "verdict": "patch_verified_chain_clean",
+  "verdict_note": "Patch verified.  Chain produced 6 files in 5.53s with zero MsgBox dialogs observed.  This is the strongest available signal that the 6 unconditional debug MsgBox calls are the only blocker for unattended coverage on this fixture.  Note: this probe does NOT open a coverage PR; the next step is a separate coverage PR brief.",
+  "answers": {
+    "Q1_terminal_finished_saving_path_observable": {
+      "msgboxes_observed_count": 0,
+      "chain_observed_done": true,
+      "chain_elapsed_sec": 5.53,
+      "exception": null,
+      "interpretation": "With all 6 unconditional MsgBoxes commented out, the terminal MsgBox is no longer the observable signal — chain quiescence (file count stable >= 5s) AND zero MsgBox dialogs observed AND no runtime exception are the new completeness criteria.  All three present means the terminal path is fully reached."
+    },
+    "Q2_file_set_stable": {
+      "file_count": 6,
+      "names": [
+        "f12.out.csv",
+        "f15.out.csv",
+        "f18.out.csv",
+        "f3.out.csv",
+        "f6.out.csv",
+        "f9.out.csv"
+      ],
+      "interpretation": "Probe expects file_count >= 6 (matching the previous probe's observed set); observed = 6."
+    },
+    "Q3_next_blocker_exposed": {
+      "outcome_bucket": "patch_verified_chain_clean",
+      "interpretation": "If outcome == patch_verified_chain_clean, no next blocker exposed by this fixture.  If outcome == patch_partial_msgbox_still_observed, the scoped patch missed one of the 6 — see msgboxes_observed list.  If outcome == next_blocker_exposed_no_msgbox_but_chain_unhealthy, MsgBox layer is gone but a NEW blocker shows up (empty file set, slow chain, exception)."
+    }
+  }
+}

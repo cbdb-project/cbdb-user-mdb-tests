@@ -118,6 +118,67 @@ def _suppress_assocpairs_link2ndorder_setfocus(match) -> str:
         match, _ASSOCPAIRS_SETFOCUS_TARGETS_BY_SUB["Link2ndOrder"])
 
 
+# Form_LookAtAssociationPairs.CmdNeo4j_Click contains 6 unconditional
+# debug MsgBox calls left in production VBA — see
+# `analysis/probe_assocpairs_cmdneo4j.md` and
+# `reports/probe_assocpairs_cmdneo4j.json` for the runtime
+# confirmation that these block headless coverage.
+#
+# Five of the six (lines 1069, 1151, 1234, 1317, 1400) are
+# concatenation-form like
+#   MsgBox "Kinship code records = " + Trim(Str(tTempLong))
+# so the generic literal-only `MsgBox "<lit>"` neutralizer in
+# `_inject_autodetect()` (the regex at the bottom of that method)
+# does NOT catch them.  The sixth (line 1470,
+# `MsgBox "Finished saving to Neo4j"`) IS pure-literal and would
+# already be caught by the generic neutralizer; it is included
+# here as defense-in-depth so the scoped patch is complete on its
+# own and survives any future change to the generic regex.
+#
+# Each target is matched line-anchored by exact message-prefix
+# string.  The 6 prefixes are unique, so the other MsgBox calls
+# inside `CmdNeo4j_Click` — `MsgBox "Bad file Name."` (lines
+# 923 / 985 / 1083 / 1165 / 1248 / 1331 / 1414, file-save error
+# paths) and `MsgBox Err.Description` (line 1479, error trap) —
+# are NOT touched.  `MsgBox Err.Description` is independently
+# rewritten upstream by the generic `MsgBox Err.Description`
+# neutralizer; the `Bad file Name.` calls are kept live because
+# they are runtime errors that should still surface.
+_ASSOCPAIRS_CMDNEO4J_DEBUG_MSGBOX_TARGETS: tuple[str, ...] = (
+    'MsgBox "Kinship code records = "',
+    'MsgBox "Literary genre code records = "',
+    'MsgBox "Institution code records = "',
+    'MsgBox "Occasion code records = "',
+    'MsgBox "Topic code records = "',
+    'MsgBox "Finished saving to Neo4j"',
+)
+
+
+def _suppress_assocpairs_cmdneo4j_debug_msgbox(match) -> str:
+    """Comment out the 6 unconditional debug MsgBox calls inside
+    `Private Sub CmdNeo4j_Click()`.  `match.group(0)` is the entire
+    sub body; each target is matched line-anchored on its exact
+    message-prefix string and the rest of the line (any
+    `+ Trim(Str(...))` continuation for the 5 concat-form calls)
+    is consumed too.  The replacement preserves the original
+    leading indentation so the surrounding control flow is
+    structurally unchanged.
+    """
+    sub_body = match.group(0)
+    for target in _ASSOCPAIRS_CMDNEO4J_DEBUG_MSGBOX_TARGETS:
+        line_pat = re.compile(
+            r"(?m)^([ \t]+)"
+            + re.escape(target)
+            + r"[^\r\n]*(?=\r?$)"
+        )
+        sub_body = line_pat.sub(
+            r"\1' MsgBox suppressed (driver patch — headless "
+            "AssociationPairs CmdNeo4j_Click debug): " + target,
+            sub_body,
+        )
+    return sub_body
+
+
 def _pid_for_access_app(app) -> int | None:
     """PID of an Access.Application COM object via its main HWND."""
     try:
@@ -512,6 +573,22 @@ class VbaSession:
              _suppress_assocpairs_link1storder_setfocus),
             (r"Private Sub Link2ndOrder\([^\)]*\)[\s\S]*?\nEnd Sub",
              _suppress_assocpairs_link2ndorder_setfocus),
+            # AssociationPairs × CmdNeo4j: 6 unconditional debug
+            # MsgBox calls (lines 1069 / 1151 / 1234 / 1317 / 1400 /
+            # 1470) confirmed at runtime as blockers for unattended
+            # coverage by PR AX's probe (see
+            # `reports/probe_assocpairs_cmdneo4j.json`,
+            # outcome = confirmed_blocking_msgbox_layer_…).
+            # Inline patch, NOT a generic auto-dismiss policy: the
+            # callable below is scoped to the
+            # `Private Sub CmdNeo4j_Click() … End Sub` block and
+            # only rewrites lines that begin with one of the 6
+            # known debug-message prefixes.  Other MsgBoxes in the
+            # same sub (`MsgBox "Bad file Name."` on the file-save
+            # error paths, `MsgBox Err.Description` on the error
+            # trap) are intentionally left untouched.
+            (r"Private Sub CmdNeo4j_Click\(\)[\s\S]*?\nEnd Sub",
+             _suppress_assocpairs_cmdneo4j_debug_msgbox),
         ],
     }
 
