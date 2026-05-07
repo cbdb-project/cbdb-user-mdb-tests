@@ -803,41 +803,47 @@ driver / canonical reports / issue severity changes.
 
 **Remaining gaps: 9** *(was 12 on 2026-05-05; was 10 implied by earlier refreshes' running tallies after the Pajek/Gephi pair landed)*. The 3-cell drop since `refresh_2026_05_06` is: AssocPairs × CmdNeo4j (this refresh, just merged) plus implicit acknowledgement of AssocPairs × CmdPajek and CmdGephi as covered (no longer in any rank).
 
+### Already-landed context observed during this refresh (NOT next work)
+
+Two prior-refresh "future" items were checked and found already on `main` as of `f0e7594` — they are **NOT** in the ranked list below:
+
+- **Kinship × CmdUCINet runtime `:ERR` pin** — already landed at `tests/test_vba_bug_behaviors.py::test_bug22_kinship_cmducinet_sibling_form_fires_invalid_procedure_call` (line 631). Pins `LookAtKinship:ERR Invalid procedure call or argument` on the He-Mou-取 (U+53D6) fixture; documents the sibling-form pattern under Issue #22; states inventory status unchanged. The `refresh_2026_05_06` "Rank 3 — coverage hardening" entry is therefore **completed**, not deferred.
+
+This refresh is therefore restricted to ranking *only* genuinely unfinished work.
+
 ### Next work, ranked (max 3)
 
-#### Rank 1 — coverage hardening: Kinship × CmdUCINet runtime `:ERR` pin
+#### Rank 1 — probe-first investigation: `LookAtAssociations × CmdNeo4j`
 
-- **Category:** coverage hardening (does NOT change any cell's coverage state)
-- **Why:** smallest scope of any actionable item today. The previous Issue #22 alignment PR explicitly deferred adding a runtime `:ERR Invalid procedure call or argument` pin for Kinship in `tests/test_vba_bug_behaviors.py` (the analog of the existing Associations one). The fixture pid 140733 (He Mou 取 U+53D6) is already known to reproduce the failure (probe `154bb4b`); writing the pin is mechanical. No new investigation, no new fixture, no driver dependency.
-- **Shape:** one new `test_bug22_lookatkinship_cmducinet_fires_invalid_procedure_call` mirroring the existing `test_bug22_associations_cmducinet_fires_invalid_procedure_call`. Single test file change.
-- **Risk:** low.
-
-#### Rank 2 — probe-first investigation: `LookAtAssociations × CmdNeo4j`
-
-- **Category:** probe-first investigation (NOT coverage PR, NOT canonical issue yet)
-- **Why:** PR AX's Q5 confirmed this is a *different failure class* from AssocPairs × CmdNeo4j (0-file mode, likely bails before any SaveAs — vs AssocPairs which writes files then hits MsgBox layer). PR #109's driver patch does NOT address it. The cell remains skipped in `_spec_skip_marks` with reason "produces 0 files in directory mode — needs investigation alongside Place." This refresh proposes the probe finally happen, scoped strictly to characterizing why the 0-file mode triggers (static read of `Form_LookAtAssociations.vb::CmdNeo4j_Click` + one COM run on the same kind of small fixture used by Associations CmdGIS / CmdPajek tests).
+- **Category:** probe-first investigation (NOT coverage PR, NOT canonical issue yet).
+- **Why:** PR AX's Q5 confirmed this is a *different failure class* from AssocPairs × CmdNeo4j (0-file mode, likely bails before any SaveAs — vs AssocPairs which writes files then hits MsgBox layer). PR #109's driver patch does NOT address it. The cell remains skipped in `tests/test_vba_cmdneo4j_cross_form.py::_spec_skip_marks` with reason "produces 0 files in directory mode — needs investigation alongside Place." This refresh proposes the probe finally happen, scoped strictly to characterizing why the 0-file mode triggers (static read of `Form_LookAtAssociations.vb::CmdNeo4j_Click` + one COM run on the same kind of small fixture used by Associations CmdGIS / CmdPajek tests).
 - **Shape:** read-only probe MD + JSON only; same shape as PR AX (`probe/assocpairs-cmdneo4j` artifacts). NOT a coverage PR; NOT a driver PR.
 - **Risk:** low; outcome is one of (a) clean probe → coverage candidate, (b) confirmed blocker → new investigation line, (c) different bug class → canonical issue candidate.
-- **Why not Rank 1:** strictly bigger than the Kinship pin and one step further from any maintainer decision; both are valuable but the Kinship pin is closer to "done".
 
-#### Rank 3 — maintainer-line: Issue #22 upstream-fix coordination
+#### Rank 2 — maintainer-line: Issue #22 upstream-fix coordination
 
-- **Category:** maintainer-line (out-of-band; NOT a PR action in this repo)
-- **Why:** Issue #22 is filed P1 and has a recommended fix (`CreateTextFile(..., True, True)` for the 3rd Unicode arg, with the downstream-acceptance hedge). Reaching the CBDB maintainer to land the fix on the upstream `.mdb` is the next forward step that meaningfully changes the cell-state of `LookAtAssociations × CmdUCINet` (and the related Kinship sibling fragility). Not a local PR.
+- **Category:** maintainer-line (out-of-band; NOT a PR action in this repo).
+- **Why:** Issue #22 is filed P1 and has a recommended fix (`CreateTextFile(..., True, True)` for the 3rd Unicode arg, with the downstream-acceptance hedge). Reaching the CBDB maintainer to land the fix on the upstream `.mdb` is the next forward step that would meaningfully change the cell-state of `LookAtAssociations × CmdUCINet` and the Kinship sibling fragility. Not a local PR.
+- **Shape:** out-of-band coordination; no repo file touched.
+
+#### Rank 3 — maintainer-line: Issue #21 upstream-fix coordination
+
+- **Category:** maintainer-line (out-of-band; NOT a PR action in this repo).
+- **Why:** Issue #21 is the canonical P1 for `LookAtGroupData × CmdNeo4j`'s mid-chain `:ERR No current record.` (DAO 3021, unguarded `.MoveFirst` on empty recordset in blocks #9 and #10). Same shape as Rank 2 — a forward step that lives on the CBDB upstream side rather than this repo. Listed here because both Issue #21 and Issue #22 maintainer-lines are genuinely unfinished and either could be the next forward step depending on the maintainer's priority.
 - **Shape:** out-of-band coordination; no repo file touched.
 
 ### Direct answers to the brief
 
 **Q: After AssocPairs × CmdNeo4j merge, has rank-1 changed?**
 
-**Yes — rank-1 has changed.** `refresh_2026_05_06`'s rank-1 was `LookAtPlace × CmdUCINet` probe-first investigation. That candidate is **paused** as of this refresh on a timeout-path-correlated COM bridge instability that is structurally a separate driver/meta concern, not an export-coverage concern. The new rank-1 is the **Kinship × CmdUCINet runtime `:ERR` pin** (coverage hardening), chosen because:
+**Yes — rank-1 has changed.** `refresh_2026_05_06`'s rank-1 was `LookAtPlace × CmdUCINet` probe-first investigation. That candidate is **paused** as of this refresh on a timeout-path-correlated COM bridge instability that is structurally a separate driver/meta concern, not an export-coverage concern. The new rank-1 is the **`LookAtAssociations × CmdNeo4j` probe-first investigation**, chosen because:
 
-1. It is the smallest actionable item left on the queue.
-2. It has no driver dependency, no new fixture design, no new investigation — purely mechanical mirror of an already-merged Associations runtime pin.
-3. It produces concrete repo-side evidence improvement on a known fixture-fragile cell, without requiring the Place probe to land first.
-4. It does NOT extrapolate beyond what is already canonical (Issue #22 with the sibling-form runtime confirmation).
+1. It is the cheapest genuinely-unfinished local PR available today.
+2. PR AX explicitly declined to bundle it with the AssocPairs probe (different failure class per Q5); now is the natural moment to take the sibling probe given the AssocPairs CmdNeo4j coverage just merged.
+3. It has no driver dependency and no new fixture design — same shape as PR AX, scoped strictly to characterizing the 0-file mode.
+4. The two maintainer-line items below it (Issue #22, Issue #21) are out-of-band; the Associations CmdNeo4j probe is the only ranked item that is a local PR.
 
-The `LookAtAssociations × CmdNeo4j` probe (rank 2) is the cheapest *new investigation* still available; it deliberately is NOT bundled with the Kinship pin because they are different categories (coverage hardening vs probe-first investigation) and the brief asks for category-labelled ranks.
+(An earlier draft of this refresh proposed `Kinship × CmdUCINet runtime :ERR pin` as rank-1. That was a stale-premise error: the pin is already on `main` at `tests/test_vba_bug_behaviors.py::test_bug22_kinship_cmducinet_sibling_form_fires_invalid_procedure_call` line 631, completing what `refresh_2026_05_06` Rank 3 had proposed. The corrected ranking only contains genuinely unfinished work.)
 
 ### Explicitly NOT to do (this refresh + onward, until briefed otherwise)
 
@@ -854,6 +860,8 @@ The `LookAtAssociations × CmdNeo4j` probe (rank 2) is the cheapest *new investi
 
 **B. Source-of-truth sync.** This MD section ↔ the new JSON `refresh_2026_05_07` block carry the same truth deltas, the same bucket distribution, the same ranked list, the same brief Q-A, and the same do-not-touch list. The five truth-delta items were checked against canonical truth on `main`: PR #109 + PR #110 are merged (verified via `git log` `b695a92` and `f0e7594`); the AssocPairs CmdPajek/Gephi covered state is in the README cross-form table at line 238 and in `tests/test_vba_pajek_gephi_cross_form.py::_assocpairs_1x3_fixture`; `LookAtAssociations × CmdNeo4j` skip reason is in `tests/test_vba_cmdneo4j_cross_form.py::_spec_skip_marks` and PR AX's Q5 in `reports/probe_assocpairs_cmdneo4j.json`. No source-of-truth file is being changed by this refresh.
 
-**C. Evidence vs claim.** Truth deltas cite specific commit SHAs (`b695a92`, `f0e7594`, `4b8a927`) and PR numbers (#109, #110). The "Place paused on COM bridge instability" item is reported as the user's standing instruction, not as a finding this refresh produced — no claim about Place's runtime state is added. Rank-1's "purely mechanical" framing is grounded in the existence of the matching Associations runtime pin to mirror — not an inference that Kinship will pass. The probe-first rank-2 is hedged with three explicit outcome branches, none of which is pre-claimed.
+**C. Evidence vs claim.** Truth deltas cite specific commit SHAs (`b695a92`, `f0e7594`, `4b8a927`) and PR numbers (#109, #110). The "Place paused on COM bridge instability" item is reported as the user's standing instruction, not as a finding this refresh produced — no claim about Place's runtime state is added. Rank-1 (`LookAtAssociations × CmdNeo4j` probe-first) is hedged with three explicit outcome branches, none of which is pre-claimed. The Kinship-pin-already-landed observation is grounded in a verifiable file read (`tests/test_vba_bug_behaviors.py` line 631) and recorded under the "Already-landed context observed during this refresh" section, not silently dropped.
 
-**D. Residual risk.** Triage-document refresh, not an implementation; residual risk is purely advisory. Specifically: (1) ranking the Kinship pin above the Associations CmdNeo4j probe could be wrong if the user wants to push Neo4j coverage broader before tightening Kinship — mitigated by stating the trade-off explicitly in Rank 1's "Why not Rank 1" parenthetical on the probe; (2) Place pause assumes the COM bridge instability is a current-session standing constraint — if that's resolved, Place returns to rank-1 candidate via a separate refresh, not silently. No code path or test altered, so no runtime regression risk.
+**D. Residual risk.** Triage-document refresh, not an implementation; residual risk is purely advisory. Specifically: (1) Place pause assumes the COM bridge instability is a current-session standing constraint — if that's resolved, Place returns to rank-1 candidate via a separate refresh, not silently. (2) The corrected ranking ranks two maintainer-line items at Rank 2 and Rank 3; if the maintainer priority is "ship more local coverage first", the Associations CmdNeo4j probe at Rank 1 is the only local PR available — there is no honest Rank-2 local PR today (every other unfinished cell needs driver/meta or family-design work first). No code path or test altered, so no runtime regression risk.
+
+**Correction tracking.** An earlier draft of this refresh proposed `LookAtKinship × CmdUCINet runtime :ERR pin` as Rank 1. Reviewer correctly flagged it as a stale-premise error: the pin is already on `main` at `tests/test_vba_bug_behaviors.py::test_bug22_kinship_cmducinet_sibling_form_fires_invalid_procedure_call` line 631 — completing what `refresh_2026_05_06` Rank 3 had proposed. The corrected ranking removes the Kinship pin from `next_work_items_ranked`, records it under `already_landed_observed_during_refresh` for honesty, and re-ranks only genuinely unfinished work. Same correction applies to the MD `### Already-landed context observed during this refresh (NOT next work)` section above and the JSON `already_landed_observed_during_refresh` block.
