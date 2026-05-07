@@ -226,6 +226,78 @@ def _suppress_assocpairs_cmdneo4j_debug_msgbox(match) -> str:
     return sub_body
 
 
+# Form_LookAtAssociations.CmdNeo4j_Click — debug MsgBox layer
+# surfaced by the post-target-rewrite verification probe (PR #116
+# `analysis/probe_associations_cmdneo4j_after_target_patch.*`).
+# That probe observed file_count = 8 and zero :ERR after the
+# Issue #23 c_addr_type rewrite — but the watchdog dismissed 5
+# concat-form `MsgBox "<lit>" + Trim(Str(tRecDeleted))` dialogs
+# during the chain.  Each of those dialogs would block unattended
+# coverage, so this patch suppresses exactly those 5 lines.
+#
+# Same mechanism as the AssocPairs-side
+# `_ASSOCPAIRS_CMDNEO4J_DEBUG_MSGBOX_TARGETS`: line-anchored
+# exact message-prefix matches, scoped to a single per-sub regex,
+# scoped to a single per-form dict key.
+#
+# Five concat-form prefixes (lines 1130 / 1232 / 1315 / 1398 /
+# 1481 in the current dump):
+#   MsgBox "Kinship code records = " + Trim(Str(tRecDeleted))
+#   MsgBox "Literary genre code records = " + Trim(Str(tRecDeleted))
+#   MsgBox "Institution code records = " + Trim(Str(tRecDeleted))
+#   MsgBox "Occasion code records = " + Trim(Str(tRecDeleted))
+#   MsgBox "Topic code records = " + Trim(Str(tRecDeleted))
+#
+# Deliberately NOT included in the target set:
+#   - `MsgBox "Finished saving to Neo4j"` — already neutralized
+#     by the generic literal-only `MsgBox "<lit>"` rewriter in
+#     `_inject_autodetect`; PR #116's verification probe
+#     observed it as the single ZZ_TEST_DEBUG :MSGBOX clean-end
+#     marker (footprint, not dialog).
+#   - `MsgBox "Bad file Name."` (multiple SaveAs error paths) —
+#     genuine runtime error MsgBox.  Should still surface as a
+#     dialog if a SaveAs ever fails.  Not a blocker on the
+#     happy-path fixture this probe used.
+#   - `MsgBox Err.Description` (error trap) — independently
+#     rewritten by the generic `MsgBox Err.Description`
+#     neutralizer in `_inject_autodetect`; tested in production
+#     for years on other forms.
+_ASSOCIATIONS_CMDNEO4J_DEBUG_MSGBOX_TARGETS: tuple[str, ...] = (
+    'MsgBox "Kinship code records = "',
+    'MsgBox "Literary genre code records = "',
+    'MsgBox "Institution code records = "',
+    'MsgBox "Occasion code records = "',
+    'MsgBox "Topic code records = "',
+)
+
+
+def _suppress_associations_cmdneo4j_debug_msgbox(match) -> str:
+    """Comment out the 5 concat-form debug MsgBox calls inside
+    `Form_LookAtAssociations.CmdNeo4j_Click`.  `match.group(0)` is
+    the entire sub body; each target is matched line-anchored on
+    its exact message-prefix string and the rest of the line
+    (the `+ Trim(Str(tRecDeleted))` continuation) is consumed too.
+    The replacement preserves the original leading indentation so
+    surrounding control flow is structurally unchanged.
+
+    Mirrors `_suppress_assocpairs_cmdneo4j_debug_msgbox` from
+    PR #109 — same shape, different form.
+    """
+    sub_body = match.group(0)
+    for target in _ASSOCIATIONS_CMDNEO4J_DEBUG_MSGBOX_TARGETS:
+        line_pat = re.compile(
+            r"(?m)^([ \t]+)"
+            + re.escape(target)
+            + r"[^\r\n]*(?=\r?$)"
+        )
+        sub_body = line_pat.sub(
+            r"\1' MsgBox suppressed (driver patch — headless "
+            "Associations CmdNeo4j_Click debug): " + target,
+            sub_body,
+        )
+    return sub_body
+
+
 def _pid_for_access_app(app) -> int | None:
     """PID of an Access.Application COM object via its main HWND."""
     try:
@@ -663,6 +735,22 @@ class VbaSession:
         "Form_LookAtAssociations": [
             (r"Private Sub CmdNeo4j_Click\(\)[\s\S]*?\nEnd Sub",
              _rewrite_associations_cmdneo4j_target_column),
+            # Debug-MsgBox layer surfaced by PR #116's
+            # post-c_addr_type-rewrite verification probe (see
+            # `reports/probe_associations_cmdneo4j_after_target_patch.json`,
+            # outcome =
+            # patch_resolved_issue23_but_exposed_msgbox_blocker;
+            # 5 watchdog-dismissed concat-form dialogs).  PR
+            # #109's AssocPairs-side patch only covers the
+            # AssociationPairs form; this is the analog for
+            # Form_LookAtAssociations.  Per-form, per-sub,
+            # 5 line-anchored exact prefixes.  Other CmdNeo4j_Click
+            # MsgBoxes (`Bad file Name.` runtime errors,
+            # `Err.Description` error trap, `Finished saving to
+            # Neo4j` already neutralized by the generic
+            # literal-only rewriter) are intentionally untouched.
+            (r"Private Sub CmdNeo4j_Click\(\)[\s\S]*?\nEnd Sub",
+             _suppress_associations_cmdneo4j_debug_msgbox),
         ],
     }
 
