@@ -19,6 +19,7 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
   - [Issue #13 — BIOG_MAIN_2 子表單試圖開啟一個不存在的 picker 表單 (frmPickNIAN_HAO)](#issue-13--biog_main_2-子表單試圖開啟一個不存在的-picker-表單-frmpicknian_hao)
   - [Issue #21 — LookAtGroupData.CmdNeo4j 在匯出空分部時崩潰報「No current record」](#issue-21--lookatgroupdatacmdneo4j-在匯出空分部時崩潰報no-current-record)
   - [Issue #22 — LookAtAssociations.CmdUCINet 在被匯出的人物網路含有 c_name 中帶 CJK 漢字時崩潰報「Invalid procedure call or argument」](#issue-22--lookatassociationscmducinet-在被匯出的人物網路含有-c_name-中帶-cjk-漢字時崩潰報invalid-procedure-call-or-argument)
+  - [Issue #23 — LookAtAssociations.CmdNeo4j 的 INSERT 引用了 ZZ_SCRATCH_PEOPLE 上不存在的目標列 c_index_addr_type_code（疑似本意為 c_addr_type）](#issue-23--lookatassociationscmdneo4j-的-insert-引用了-zz_scratch_people-上不存在的目標列-c_index_addr_type_code疑似本意為-c_addr_type)
 - [P2 — 靜默顯示問題](#p2--靜默顯示問題)
   - [Issue #10 — EVENT_ADDR_2 子表單的地址列默默地顯示為空（ControlSource 寫錯了）](#issue-10--event_addr_2-子表單的地址列默默地顯示為空controlsource-寫錯了)
 - [P3 — 缺失介面](#p3--缺失介面)
@@ -315,6 +316,54 @@ Set tVNA = tFileSystem.CreateTextFile(tFileName, True, True)
 替代方案（不太推薦）：在 `WriteLine` 之前把 `c_name` 裡的非 cp1252 字元剝掉或轉寫。會丟失匯出的真實資料，而且程式碼量更大；Unicode flag 才是正解。
 
 `Form_LookAtKinship.CmdUCINet_Click`（約 line 2510）也需要套用同樣的一行修改 —— 詳見上方「受影響表單」段。Kinship 是本 issue 的 runtime-confirmed sibling form（同 root cause、同 failure class，只是宿主表單與觸發 fixture 不同），所以一次上游修補應同時給兩個 CreateTextFile 加上 Unicode flag。Place （LookAtPlace.CmdUCINet）**不在** 本 issue 的範圍內 —— 它用的是 ADO Stream 而非 FSO，需要單獨的 per-form probe 才能下同 bug-family 的結論或加入修補範圍。
+
+### Issue #23 — LookAtAssociations.CmdNeo4j 的 INSERT 引用了 ZZ_SCRATCH_PEOPLE 上不存在的目標列 c_index_addr_type_code（疑似本意為 c_addr_type）
+
+**涉及位置:** `Form_LookAtAssociations.CmdNeo4j_Click`
+
+**嚴重等級:** P1 — 正常使用者點選下的可見報錯（只要 LookAtAssociations 查詢有非空結果，CmdNeo4j 匯出就會觸發；JET 3061 在 matrix Associations fixture 上穩定復現，runtime 證據在 PR #112 的 probe，靜態 schema 證據在 PR #114 的調查）
+
+#### 問題描述
+
+`Form_LookAtAssociations.CmdNeo4j_Click` 透過 `INSERT INTO ZZ_SCRATCH_PEOPLE ( c_person_id, c_name, c_name_chn, c_index_year, c_index_year_type_code, c_dy, c_addr_id, c_index_addr_type_code, c_female ) SELECT DISTINCT … BIOG_MAIN.c_index_addr_type_code, BIOG_MAIN.c_female …` 來填充 `ZZ_SCRATCH_PEOPLE` 工作表。INSERT 目標列裡把 **c_index_addr_type_code** 當作 `ZZ_SCRATCH_PEOPLE` 上的列引用，但當前 dump 的 `ZZ_SCRATCH_PEOPLE` 共 22 列，並沒有這一列（canonical 列名見 `analysis/dump/tables.json`）。JET 報 **3061「INSERT INTO 語句包含未知的欄位名 c_index_addr_type_code」**，整個 Neo4j 匯出在 body 中途中斷 —— 在任何磁碟檔案被寫出之前 —— 即便 `dlgSaveAs.Show` 已經彈出且鏈條已進入 People-block True 分支。
+
+靜態 schema 互相印證：source 端 `BIOG_MAIN` **有** `c_index_addr_type_code`（共 55 列；該列在 `tests/test_schema.py` 的 REQUIRED_COLUMNS 中，schema 測試透過即獨立證實）。所以缺的是 **target** 表，不是 source。
+
+關於作者意圖的強靜態推斷：失敗 INSERT 之後緊鄰的 `UPDATE` 是 LEFT JOIN `ZZ_SCRATCH_PEOPLE.c_addr_type = BIOG_ADDR_CODES.c_addr_type` 並 SET 一組地址描述列。target 表 **有** `c_addr_type`，但失敗的 INSERT 從未寫入 `c_addr_type` —— 而 `c_addr_type` 正是 source `BIOG_MAIN.c_index_addr_type_code` 的自然 rename 目標（同一 INSERT 在前一列已經做過一模一樣的 rename：`BIOG_MAIN.c_index_addr_id ↦ ZZ_SCRATCH_PEOPLE.c_addr_id`）。看起來作者把 source 列名直接複製到 INSERT 目標列表裡，本意是 rename 成 `c_addr_type`。與 Bug #4 / #5 / #6 同形（per-form column-name typo class）。
+
+**與 Issue #22（LookAtAssociations × CmdUCINet）無關。** Issue #22 是 FSO `CreateTextFile` 缺 Unicode 引數導致 CJK 漢字走 ANSI cp1252 時崩潰；本 issue 是 `CmdNeo4j_Click` 裡 SQL JET 3061 列不存在，在任何 export-encoder 執行之前就觸發。不同 sub、不同 VBA 錯誤族、不同修法。
+
+**與 AssociationPairs × CmdNeo4j 的 blocking-MsgBox 層不同**（canonical 證據：main 上 PR #109 的 driver patch + PR #110 的 coverage）。AssocPairs 的 CmdNeo4j 會先寫出 ≥1 個檔案再被 UI debug-MsgBox 層擋住（現已由 driver suppress）。Associations 的 CmdNeo4j 寫 0 個檔案就被上面的 SQL schema 不匹配擋住。兩者鏈條深度不同、VBA 錯誤族不同、修法路徑無重疊 —— 不應合併為同一 issue。
+
+#### 復現步驟
+
+1. 開啟 **LookAtAssociations**。
+2. 選一個有實質資料的 **association code**（任一關聯人數上百的 code 都可以；matrix `_make_assoc_fixtures` 第一條 fixture `assoc_<top_code>_unfiltered` 在當前 dump 上能讓 ZZ_SCRATCH_ASSOC 約 11,867 行、ZZ_SCRATCH_P_ASSOC 約 8,087 行 —— 同 Associations × CmdGIS / CmdPajek / CmdGephi 測試用的是同一條 fixture）。
+3. **FrameFilterYears** 保持預設（不篩年）。不要勾任何與本次查詢無關的子分支。
+4. 點 **Run Query** —— CmdQuery 順利完成，底層 scratch 表被填充。
+5. 點 **Neo4j**（匯出按鈕）。
+6. 彈出 **執行時錯誤 3061 —— INSERT INTO 語句包含未知的欄位名 c_index_addr_type_code** 對話方塊（或 headless ／driver-instrumented 跑法下，對應的 `LookAtAssociations:ERR ...` ZZ_TEST_DEBUG marker 被寫入）。Neo4j 匯出產出 **0 份 CSV** —— 沒有 `People_*.csv`、沒有 `Places_*.csv`，什麼都沒有。
+
+已透過 probe `analysis/probe_associations_cmdneo4j.py` 端到端驗證（PR #112，已 merge `1145219`）；根因經靜態調查 `analysis/investigate_associations_cmdneo4j_c_index_addr_type_code.{py,md}` 確認（PR #114，已 merge `68cfa9b`）。
+
+#### 建議修復方案
+
+**推薦的上游 CBDB 修復：** 把 INSERT 目標列名從 `c_index_addr_type_code` 改為 `c_addr_type`。緊鄰的 UPDATE 本來就在 `ZZ_SCRATCH_PEOPLE.c_addr_type = BIOG_ADDR_CODES.c_addr_type` 上 LEFT JOIN，這個 rename 順帶還填上 UPDATE 早就需要的 join key（今天該 join key 從未被填充，所以即使只是「把那一列刪掉」的修法也會讓 UPDATE 靜默地在 NULL 上 join）。
+
+建議寫法（只改一個 identifier；SELECT 端不變，因為 source 列名是對的）：
+
+```vb
+tQueryStr = "INSERT INTO ZZ_SCRATCH_PEOPLE ( " & _
+    "c_person_id, c_name, c_name_chn, c_index_year, " & _
+    "c_index_year_type_code, c_dy, c_addr_id, " & _
+    "c_addr_type, c_female ) " & _
+    "SELECT DISTINCT ZZ_SCRATCH_P_TEXT.c_person_id, BIOG_MAIN.c_name, ... " & _
+    "BIOG_MAIN.c_dy, BIOG_MAIN.c_index_addr_id, " & _
+    "BIOG_MAIN.c_index_addr_type_code, BIOG_MAIN.c_female " & _
+    "FROM ZZ_SCRATCH_P_TEXT INNER JOIN BIOG_MAIN ON ..."
+```
+
+**Driver-side workaround 選項**（另一份 brief；本 issue 不包含）：仿照 `_PER_FORM_CMDGIS_PATCHES` 裡 Issue #4（`GISFrame → CodeFrame`）和 Issue #5（`ChkIDs → False`）的寫法，在僅限於 `Form_LookAtAssociations` 的 CmdNeo4j_Click 內做一個把字面量 `c_index_addr_type_code` 改寫為 `c_addr_type` 的 per-form rewrite。這能讓測試套不依賴上游修復就跑通。
 
 ## P2 — 靜默顯示問題
 
