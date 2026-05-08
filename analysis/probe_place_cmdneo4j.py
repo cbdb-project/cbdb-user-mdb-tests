@@ -160,6 +160,44 @@ def _msgbox_watchdog(
         time.sleep(0.3)
 
 
+# Existing canonical issue families on `main` as of d288d0c.
+# `probe_hit_existing_known_failure_family` means the probe's
+# :ERR text matches one of these — i.e. the cell is already
+# canonicalized via an open Issue with a documented signature.
+# Reproducing the documented skip-reason text alone does NOT
+# qualify; the skip reason is just what the cross-form test was
+# avoiding, not necessarily a canonical issue.
+_EXISTING_CANONICAL_ERR_SIGNATURES: tuple[tuple[str, str], ...] = (
+    # Issue #21 (P1) — DAO 3021 'No current record' on empty
+    # recordset .MoveFirst in Form_LookAtGroupData.CmdNeo4j_Click
+    # blocks #9 / #10.  Signature: contains both "No current
+    # record" and a LookAtGroupData prefix.  We match on the
+    # error text alone here because the LookAtPlace probe writes
+    # `LookAtPlace:ERR` prefixes — the family is identified by
+    # the JET / DAO error text, not the form prefix.
+    ("Issue_21_DAO_3021_no_current_record", "No current record"),
+    # Issue #23 (P1) — JET 3061 'unknown field name in INSERT'
+    # in Form_LookAtAssociations.CmdNeo4j_Click.  Signature:
+    # "INSERT INTO statement contains the following unknown
+    # field name".
+    ("Issue_23_JET_3061_unknown_field_name",
+     "INSERT INTO statement contains the following unknown field name"),
+    # Issue #6 (P1) — JET column-or-param family in
+    # Form_LookAtGroupData.queryEntry.  Signature variations
+    # depend on the Office build.
+    ("Issue_6_JET_column_or_param", "No such field"),
+)
+
+
+def _matches_existing_canonical_family(err_text: str) -> str | None:
+    """Return the canonical issue identifier if `err_text` matches
+    a known signature; None otherwise."""
+    for label, signature in _EXISTING_CANONICAL_ERR_SIGNATURES:
+        if signature in err_text:
+            return label
+    return None
+
+
 def _classify_outcome(result: dict) -> str:
     """Strict gate evaluation; first match wins.
 
@@ -168,16 +206,20 @@ def _classify_outcome(result: dict) -> str:
 
       - probe_hit_existing_known_failure_family:
           ZZ_TEST_DEBUG contains a :ERR row whose text matches
-          the documented skip reason
-          ("Item not found in this collection") — i.e. the probe
-          reproduces the exact failure the cross-form test was
-          skipping for.  This is the JET 3265 family.
+          one of the existing canonical issue signatures
+          (Issue #21 DAO 3021 / Issue #23 JET 3061 / Issue #6
+          JET column-or-param).  Matching the documented
+          *skip reason text* alone does NOT qualify — the
+          bucket means "already canonicalized via an open
+          Issue", not "the test driver was skipping this".
       - probe_found_new_runtime_bug_candidate:
-          ZZ_TEST_DEBUG contains a :ERR row that is NOT the
-          item-not-found skip reason — the probe reproduces a
-          different runtime bug (e.g. JET 3061-family like
-          Issue #23, or DAO 3021 like Issue #21, or any other
-          :ERR class).
+          ZZ_TEST_DEBUG contains a :ERR row that does NOT
+          match any existing canonical signature — i.e. the
+          probe reproduces a runtime bug not yet canonicalized
+          (a candidate for a new Issue filing).  This bucket
+          covers both (a) the documented skip-reason text when
+          that text isn't an existing canonical signature, and
+          (b) any other unrecognized :ERR text.
       - clean_probe_promote_to_coverage_candidate:
           file_count >= 1 AND no :ERR markers AND chain
           quiesced AND chain_elapsed <= 120 s.
@@ -191,18 +233,20 @@ def _classify_outcome(result: dict) -> str:
     debug_msgs = result.get("zz_test_debug_msgs") or []
 
     err_msgs = [m for m in debug_msgs if ":ERR" in m]
-    has_skip_reason_err = any(
-        SKIP_REASON_PHRASE in m for m in err_msgs)
-    has_other_err = any(
-        SKIP_REASON_PHRASE not in m for m in err_msgs)
+    matches_canonical = any(
+        _matches_existing_canonical_family(m) is not None
+        for m in err_msgs)
+    has_unmatched_err = any(
+        _matches_existing_canonical_family(m) is None
+        for m in err_msgs)
     elapsed_ok = (
         isinstance(chain_elapsed, (int, float))
         and chain_elapsed <= PROMOTE_ELAPSED_THRESHOLD_SEC
     )
 
-    if has_skip_reason_err:
+    if matches_canonical:
         return "probe_hit_existing_known_failure_family"
-    if has_other_err:
+    if has_unmatched_err:
         return "probe_found_new_runtime_bug_candidate"
     if (n_files >= 1
             and elapsed_ok
@@ -485,11 +529,32 @@ def _verdict(result: dict) -> dict:
     chain_elapsed = result.get("chain_elapsed_sec")
     debug_msgs = result.get("zz_test_debug_msgs") or []
     err_markers = [m for m in debug_msgs if ":ERR" in m]
-    skip_reason_err = [
-        m for m in err_markers if SKIP_REASON_PHRASE in m]
-    other_err = [
-        m for m in err_markers if SKIP_REASON_PHRASE not in m]
+    matched_canonical = [
+        (label, m) for m in err_markers
+        for label in [_matches_existing_canonical_family(m)]
+        if label is not None
+    ]
+    unmatched_err = [
+        m for m in err_markers
+        if _matches_existing_canonical_family(m) is None
+    ]
     n_watchdog = len(result.get("msgbox_observed") or [])
+
+    # Pre-chain noise observation: the matrix Place fixture has
+    # ChkAssoc / ChkPosting in its controls dict (per
+    # `_make_place_fixtures` in test_vba_matrix_all_forms.py),
+    # but Form_LookAtPlace does NOT have those controls.  The
+    # `set_control` calls fail with "can't find the field
+    # ChkAssoc / ChkPosting referred to in your expression".
+    # This is a fixture-vs-form mismatch, not a CmdNeo4j_Click
+    # failure.  It is preserved here as an observation so the
+    # reader doesn't assume the probe path was free of
+    # pre-chain noise.
+    set_control_failures = [
+        m["marker"] for m in (result.get("markers") or [])
+        if m.get("marker", "").startswith("set_control_")
+        and "_fail" in m.get("marker", "")
+    ]
 
     answers = {
         "Q1_chain_outcome": _q1_label(
@@ -497,8 +562,11 @@ def _verdict(result: dict) -> dict:
             result.get("exception")),
         "Q2_item_not_found_evidence": {
             "skip_reason_phrase": SKIP_REASON_PHRASE,
-            "appears_in_zz_test_debug": bool(skip_reason_err),
-            "matching_err_markers": skip_reason_err,
+            "appears_in_zz_test_debug": any(
+                SKIP_REASON_PHRASE in m for m in err_markers),
+            "matching_err_markers": [
+                m for m in err_markers
+                if SKIP_REASON_PHRASE in m],
             "appears_in_watchdog_dialogs": any(
                 SKIP_REASON_PHRASE in d.get("msg_text", "")
                 for d in (result.get("msgbox_observed") or [])
@@ -506,71 +574,102 @@ def _verdict(result: dict) -> dict:
             "file_count_at_failure": n_files,
             "interpretation": (
                 "If appears_in_zz_test_debug is True, the "
-                "documented skip-reason error reproduced — JET "
-                "3265 fired mid-body and the driver's generic "
-                "Err.Description neutralizer captured it as a "
-                "ZZ_TEST_DEBUG :ERR row.  The chain stage "
-                "(before/after any SaveAs) is inferred from "
-                "file_count: 0 means before any disk write; > 0 "
-                "means at least one SaveAs block completed before "
-                "the error fired."
+                "documented skip-reason error reproduced at "
+                "runtime — JET 3265 fired mid-body and the "
+                "driver's generic Err.Description neutralizer "
+                "captured it as a ZZ_TEST_DEBUG :ERR row.  The "
+                "chain stage (before/after any SaveAs) is "
+                "inferred from file_count: 0 means before any "
+                "disk write; > 0 means at least one SaveAs "
+                "block completed before the error fired.  Note: "
+                "reproducing the skip-reason TEXT does NOT by "
+                "itself classify the cell as 'already known "
+                "failure family' — that bucket is reserved for "
+                ":ERR text that matches an existing canonical "
+                "Issue signature (Issue #21 / #23 / #6).  See "
+                "Q5 for the family judgement against existing "
+                "canonical issues."
             ),
         },
         "Q3_zz_test_debug_markers": debug_msgs,
         "Q4_scratch_row_counts": result.get("row_counts", {}),
         "Q5_vs_issue_23_family": _q5_family_assessment(
-            skip_reason_err, other_err),
+            err_markers, matched_canonical, unmatched_err),
         "Q6_outcome_bucket": outcome,
         "watchdog_dialogs_observed": n_watchdog,
         "watchdog_dialog_texts": [
             d.get("msg_text", "?")[:120]
             for d in (result.get("msgbox_observed") or [])
         ],
+        "pre_chain_observations": {
+            "set_control_failures": set_control_failures,
+            "interpretation": (
+                "These are pre-chain failures caused by the "
+                "matrix `_make_place_fixtures` controls dict "
+                "containing `ChkAssoc` and `ChkPosting`, "
+                "which are NOT controls on Form_LookAtPlace.  "
+                "The probe surfaces them as an observation (NOT "
+                "silently swallowed) so the reader knows the "
+                "probe path was not free of pre-chain noise.  "
+                "They do NOT cause the JET 3265 :ERR — that "
+                "fires later inside CmdNeo4j_Click body, after "
+                "CmdQuery completed cleanly with 5962 rows.  "
+                "Fixing the fixture (or filtering controls "
+                "against the form's actual control set) is "
+                "out-of-scope for this probe."
+            ),
+        },
     }
 
     if outcome == "probe_hit_existing_known_failure_family":
+        canon_summary = ", ".join(
+            f"{label} ({m[:80]!r})"
+            for label, m in matched_canonical[:3]
+        )
         verdict_note = (
-            f"**Documented skip reason reproduced.**  "
-            f"ZZ_TEST_DEBUG contains the JET 3265 \"Item not "
-            f"found in this collection.\" :ERR row(s): "
-            f"{[m[:120] for m in skip_reason_err][:3]}.  "
+            f"**Matches an existing canonical issue family.**  "
+            f"ZZ_TEST_DEBUG contains :ERR row(s) matching one "
+            f"of the canonical signatures: {canon_summary}.  "
             f"file_count = {n_files}.\n\n"
-            f"This is the **JET 3265 family** — a "
-            f"`Recordset!field` or `Recordset.Fields(\"name\")` "
-            f"reference at the VBA layer fails because the field "
-            f"isn't in the recordset's runtime field collection.  "
-            f"DIFFERENT family from Issue #23 (JET 3061 unknown "
-            f"field name in INSERT statement) and from Issue #21 "
-            f"(DAO 3021 'No current record' on empty recordset "
-            f".MoveFirst).  Same surface symptom (missing/renamed "
-            f"column) but different trigger surface (DAO field "
-            f"lookup vs SQL parser).\n\n"
+            f"Recommended next step: attach to the existing "
+            f"canonical issue (e.g. extend its scope or add a "
+            f"sibling-form runtime pin) — NOT a new issue "
+            f"filing."
+        )
+    elif outcome == "probe_found_new_runtime_bug_candidate":
+        verdict_note = (
+            f"**New runtime bug candidate.**  ZZ_TEST_DEBUG "
+            f"contains :ERR row(s) that do NOT match any "
+            f"existing canonical issue signature (Issue #21 "
+            f"DAO 3021 / Issue #23 JET 3061 / Issue #6 JET "
+            f"column-or-param).  Observed :ERR text: "
+            f"{[m[:120] for m in err_markers][:3]}.  "
+            f"file_count = {n_files}.\n\n"
+            f"Per the brief's bucket vocabulary, this means: "
+            f"the probe reproduces a runtime bug that is **not "
+            f"yet canonicalized**.  The documented skip reason "
+            f"(\"Item not found in this collection.\") IS the "
+            f":ERR text observed here, but that string is not "
+            f"itself a canonical issue signature on `main` — "
+            f"it is a JET 3265 (DAO field-collection lookup) "
+            f"surface symptom, structurally distinct from "
+            f"Issue #23's JET 3061 (SQL parser) and Issue "
+            f"#21's DAO 3021 (empty recordset .MoveFirst).  "
+            f"Same SURFACE root-cause class (CBDB-side renamed/"
+            f"missing column) but DIFFERENT trigger surface, "
+            f"and no per-form workaround exists today for the "
+            f"`!c_<col>` identifier-rewrite shape.\n\n"
             f"Recommended next step (separate brief, NOT this "
             f"PR): static investigation analogous to PR #114 — "
             f"locate the specific `!c_<col>` reference inside "
             f"CmdNeo4j_Click that fails (54 candidates per the "
-            f"static pre-analysis), determine whether the source "
-            f"recordset's column has been renamed or removed, "
-            f"then file as a new canonical Issue (analogous to "
-            f"Issue #23 filing in PR #115).  The driver-side "
-            f"workaround would mirror PR #116's `.replace()` "
-            f"shape but on the `!c_<col>` identifier rather than "
-            f"the INSERT target column."
-        )
-    elif outcome == "probe_found_new_runtime_bug_candidate":
-        verdict_note = (
-            f"**Different :ERR class than the documented skip "
-            f"reason.**  ZZ_TEST_DEBUG contains :ERR row(s) NOT "
-            f"matching \"Item not found in this collection.\": "
-            f"{[m[:120] for m in other_err][:3]}.  "
-            f"file_count = {n_files}.\n\n"
-            f"This means the static skip-reason note may be "
-            f"stale, OR the chain hits a different bug first now.  "
-            f"Recommended next step: characterize this new :ERR "
-            f"class (compare error text against Issue #21 "
-            f"DAO 3021 / Issue #23 JET 3061 / others) and decide "
-            f"whether it's a new canonical Issue candidate or an "
-            f"existing-issue match."
+            f"static pre-analysis), determine whether the "
+            f"source recordset's column has been renamed or "
+            f"removed, then file as a new canonical Issue "
+            f"(analogous to Issue #23 filing in PR #115).  The "
+            f"driver-side workaround would mirror PR #116's "
+            f"`.replace()` shape but on the `!c_<col>` "
+            f"identifier rather than the INSERT target column."
         )
     elif outcome == "clean_probe_promote_to_coverage_candidate":
         verdict_note = (
@@ -631,27 +730,46 @@ def _q1_label(n_files, chain_elapsed, err_markers,
     return "partial_or_slow"
 
 
-def _q5_family_assessment(skip_reason_err: list,
-                          other_err: list) -> dict:
-    if skip_reason_err:
+def _q5_family_assessment(err_markers: list,
+                          matched_canonical: list,
+                          unmatched_err: list) -> dict:
+    if matched_canonical:
+        return {
+            "verdict": "MATCHES_existing_canonical_family",
+            "matched_signatures": [
+                {"canonical_label": label,
+                 "err_text": m[:200]}
+                for label, m in matched_canonical
+            ],
+            "rationale": (
+                "At least one :ERR row matches an existing "
+                "canonical issue signature.  Bucket: "
+                "probe_hit_existing_known_failure_family."
+            ),
+        }
+    if unmatched_err:
         return {
             "verdict": (
-                "DIFFERENT_FAMILY_from_Issue_23 — "
-                "JET_3265_recordset_field_lookup"),
+                "DIFFERENT_FAMILY_from_canonical_Issue_23 — "
+                "JET_3265_recordset_field_lookup_NOT_yet_canonicalized"),
             "rationale": (
-                "Skip reason reproduces.  JET 3265 fires when a "
+                "Observed :ERR text does NOT match any existing "
+                "canonical issue signature (Issue #21 DAO 3021 "
+                "/ Issue #23 JET 3061 / Issue #6 JET column-or-"
+                "param).  JET 3265 fires when a "
                 "`Recordset!field` (or `Recordset.Fields(name)`) "
-                "lookup fails at the VBA / DAO layer because the "
-                "field isn't in the recordset's runtime field "
-                "collection.  Issue #23 (JET 3061) fires from "
-                "the SQL parser when an INSERT/SELECT/UPDATE "
-                "field name doesn't exist on the named target/"
-                "source table.  Same SURFACE SYMPTOM (CBDB-side "
-                "missing/renamed column) but DIFFERENT TRIGGER "
-                "SURFACE (DAO field lookup vs SQL parser).  "
-                "Per-form workaround would also differ: this "
-                "would rewrite a `!c_<col>` identifier, not an "
-                "INSERT target column literal."
+                "lookup fails at the VBA / DAO layer because "
+                "the field isn't in the recordset's runtime "
+                "field collection.  Issue #23 (JET 3061) fires "
+                "from the SQL parser when an INSERT/SELECT/"
+                "UPDATE field name doesn't exist on the named "
+                "target/source table.  Same SURFACE SYMPTOM "
+                "(CBDB-side missing/renamed column) but "
+                "DIFFERENT TRIGGER SURFACE (DAO field lookup vs "
+                "SQL parser).  Per-form workaround would also "
+                "differ: this would rewrite a `!c_<col>` "
+                "identifier, not an INSERT target column "
+                "literal."
             ),
             "comparison": {
                 "issue_23_associations_x_cmdneo4j": (
@@ -659,24 +777,28 @@ def _q5_family_assessment(skip_reason_err: list,
                     "INSERT INTO ZZ_SCRATCH_PEOPLE references "
                     "non-existent target column "
                     "c_index_addr_type_code"),
+                "issue_21_groupdata_x_cmdneo4j": (
+                    "DAO 3021 'No current record' on unguarded "
+                    ".MoveFirst against empty ZZ_SCRATCH_ENTRY "
+                    "in blocks #9 / #10"),
                 "this_probe_place_x_cmdneo4j": (
                     "JET 3265 'Item not found in this "
-                    "collection.': a Recordset!c_<col> reference "
-                    "in CmdNeo4j_Click body fails to find the "
-                    "field on the open recordset"),
+                    "collection.': a Recordset!c_<col> "
+                    "reference in CmdNeo4j_Click body fails to "
+                    "find the field on the open recordset; "
+                    "NOT yet canonicalized as a separate "
+                    "Issue"),
             },
-        }
-    if other_err:
-        return {
-            "verdict": "INDETERMINATE_different_err_class",
-            "rationale": (
-                "Skip reason did NOT reproduce; a different :ERR "
-                "class did.  Compare against existing canonical "
-                "issues (Issue #21 DAO 3021 / Issue #23 JET "
-                "3061 / Issue #6 JET column-or-param) before "
-                "calling this same/different family."
+            "implication_for_outcome_bucket": (
+                "Bucket: probe_found_new_runtime_bug_candidate "
+                "(NOT probe_hit_existing_known_failure_family) "
+                "— the failure is real and reproducible, but "
+                "it does not match any existing canonical "
+                "issue, so it is a candidate for a new Issue "
+                "filing rather than an attachment to an open "
+                "one."
             ),
-            "comparison": {"err_text_observed": other_err[:3]},
+            "observed_err_text": unmatched_err[:3],
         }
     return {
         "verdict": "NOT_APPLICABLE_no_err_observed",
@@ -859,10 +981,15 @@ def _write_md(result: dict, verdict: dict) -> None:
               "Raw observed facts → Scratch row counts section "
               "above.")
     md.append("")
-    md.append("**Q5 — same family as Issue #23?**")
+    md.append("**Q5 — same family as Issue #23 / existing canonical?**")
     md.append("")
     q5 = a["Q5_vs_issue_23_family"]
     md.append(f"- verdict: **`{q5['verdict']}`**")
+    if "matched_signatures" in q5:
+        md.append(f"- matched canonical signatures:")
+        for ms in q5["matched_signatures"]:
+            md.append(f"    - `{ms['canonical_label']}`: "
+                      f"`{ms['err_text']}`")
     md.append(f"- rationale:")
     md.append("")
     md.append(q5["rationale"])
@@ -871,6 +998,28 @@ def _write_md(result: dict, verdict: dict) -> None:
         md.append(f"- comparison:")
         for k, v in q5["comparison"].items():
             md.append(f"    - `{k}`: {v}")
+    if "implication_for_outcome_bucket" in q5:
+        md.append("")
+        md.append(f"- implication_for_outcome_bucket: "
+                  f"{q5['implication_for_outcome_bucket']}")
+    if "observed_err_text" in q5:
+        md.append("")
+        md.append(f"- observed_err_text:")
+        for et in q5["observed_err_text"]:
+            md.append(f"    - `{et}`")
+    md.append("")
+    md.append("**Pre-chain observations (preserved, not silenced):**")
+    md.append("")
+    pco = a["pre_chain_observations"]
+    if pco["set_control_failures"]:
+        md.append(f"- set_control failures during fixture seeding "
+                  f"({len(pco['set_control_failures'])} entries):")
+        for sf in pco["set_control_failures"]:
+            md.append(f"    - `{sf}`")
+    else:
+        md.append("- (none observed)")
+    md.append("")
+    md.append(pco["interpretation"])
     md.append("")
     md.append(f"**Q6 — Outcome bucket:** `{a['Q6_outcome_bucket']}`")
     md.append("")

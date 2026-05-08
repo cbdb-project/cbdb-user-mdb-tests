@@ -68,30 +68,44 @@ Per `analysis/export_gap_triage_plan.md` § Refresh 2026-05-07 (later), this is 
 - appears in watchdog-dismissed dialogs? `False`
 - file_count at failure: `0` (0 = before any disk write; >0 = at least one SaveAs block completed before the error fired)
 
-If appears_in_zz_test_debug is True, the documented skip-reason error reproduced — JET 3265 fired mid-body and the driver's generic Err.Description neutralizer captured it as a ZZ_TEST_DEBUG :ERR row.  The chain stage (before/after any SaveAs) is inferred from file_count: 0 means before any disk write; > 0 means at least one SaveAs block completed before the error fired.
+If appears_in_zz_test_debug is True, the documented skip-reason error reproduced at runtime — JET 3265 fired mid-body and the driver's generic Err.Description neutralizer captured it as a ZZ_TEST_DEBUG :ERR row.  The chain stage (before/after any SaveAs) is inferred from file_count: 0 means before any disk write; > 0 means at least one SaveAs block completed before the error fired.  Note: reproducing the skip-reason TEXT does NOT by itself classify the cell as 'already known failure family' — that bucket is reserved for :ERR text that matches an existing canonical Issue signature (Issue #21 / #23 / #6).  See Q5 for the family judgement against existing canonical issues.
 
 **Q3 — ZZ_TEST_DEBUG markers:** see Raw observed facts → ZZ_TEST_DEBUG content section above.
 
 **Q4 — ZZ_SCRATCH_* row counts at failure:** see Raw observed facts → Scratch row counts section above.
 
-**Q5 — same family as Issue #23?**
+**Q5 — same family as Issue #23 / existing canonical?**
 
-- verdict: **`DIFFERENT_FAMILY_from_Issue_23 — JET_3265_recordset_field_lookup`**
+- verdict: **`DIFFERENT_FAMILY_from_canonical_Issue_23 — JET_3265_recordset_field_lookup_NOT_yet_canonicalized`**
 - rationale:
 
-Skip reason reproduces.  JET 3265 fires when a `Recordset!field` (or `Recordset.Fields(name)`) lookup fails at the VBA / DAO layer because the field isn't in the recordset's runtime field collection.  Issue #23 (JET 3061) fires from the SQL parser when an INSERT/SELECT/UPDATE field name doesn't exist on the named target/source table.  Same SURFACE SYMPTOM (CBDB-side missing/renamed column) but DIFFERENT TRIGGER SURFACE (DAO field lookup vs SQL parser).  Per-form workaround would also differ: this would rewrite a `!c_<col>` identifier, not an INSERT target column literal.
+Observed :ERR text does NOT match any existing canonical issue signature (Issue #21 DAO 3021 / Issue #23 JET 3061 / Issue #6 JET column-or-param).  JET 3265 fires when a `Recordset!field` (or `Recordset.Fields(name)`) lookup fails at the VBA / DAO layer because the field isn't in the recordset's runtime field collection.  Issue #23 (JET 3061) fires from the SQL parser when an INSERT/SELECT/UPDATE field name doesn't exist on the named target/source table.  Same SURFACE SYMPTOM (CBDB-side missing/renamed column) but DIFFERENT TRIGGER SURFACE (DAO field lookup vs SQL parser).  Per-form workaround would also differ: this would rewrite a `!c_<col>` identifier, not an INSERT target column literal.
 
 - comparison:
     - `issue_23_associations_x_cmdneo4j`: JET 3061 'unknown field name in INSERT': INSERT INTO ZZ_SCRATCH_PEOPLE references non-existent target column c_index_addr_type_code
-    - `this_probe_place_x_cmdneo4j`: JET 3265 'Item not found in this collection.': a Recordset!c_<col> reference in CmdNeo4j_Click body fails to find the field on the open recordset
+    - `issue_21_groupdata_x_cmdneo4j`: DAO 3021 'No current record' on unguarded .MoveFirst against empty ZZ_SCRATCH_ENTRY in blocks #9 / #10
+    - `this_probe_place_x_cmdneo4j`: JET 3265 'Item not found in this collection.': a Recordset!c_<col> reference in CmdNeo4j_Click body fails to find the field on the open recordset; NOT yet canonicalized as a separate Issue
 
-**Q6 — Outcome bucket:** `probe_hit_existing_known_failure_family`
+- implication_for_outcome_bucket: Bucket: probe_found_new_runtime_bug_candidate (NOT probe_hit_existing_known_failure_family) — the failure is real and reproducible, but it does not match any existing canonical issue, so it is a candidate for a new Issue filing rather than an attachment to an open one.
 
-## Verdict: `probe_hit_existing_known_failure_family`
+- observed_err_text:
+    - `LookAtPlace:ERR Item not found in this collection.`
 
-**Documented skip reason reproduced.**  ZZ_TEST_DEBUG contains the JET 3265 "Item not found in this collection." :ERR row(s): ['LookAtPlace:ERR Item not found in this collection.'].  file_count = 0.
+**Pre-chain observations (preserved, not silenced):**
 
-This is the **JET 3265 family** — a `Recordset!field` or `Recordset.Fields("name")` reference at the VBA layer fails because the field isn't in the recordset's runtime field collection.  DIFFERENT family from Issue #23 (JET 3061 unknown field name in INSERT statement) and from Issue #21 (DAO 3021 'No current record' on empty recordset .MoveFirst).  Same surface symptom (missing/renamed column) but different trigger surface (DAO field lookup vs SQL parser).
+- set_control failures during fixture seeding (2 entries):
+    - `set_control_ChkAssoc_fail: com_error(-2147352567, 'Exception occurred.', (0, None, "Welcome to CBDB! can't find the field 'ChkAssoc' referred to in your expression.", 'acmain11.chm', 11730, -2146825823), None)`
+    - `set_control_ChkPosting_fail: com_error(-2147352567, 'Exception occurred.', (0, None, "Welcome to CBDB! can't find the field 'ChkPosting' referred to in your expression.", 'acmain11.chm', 11730, -2146825823), None)`
+
+These are pre-chain failures caused by the matrix `_make_place_fixtures` controls dict containing `ChkAssoc` and `ChkPosting`, which are NOT controls on Form_LookAtPlace.  The probe surfaces them as an observation (NOT silently swallowed) so the reader knows the probe path was not free of pre-chain noise.  They do NOT cause the JET 3265 :ERR — that fires later inside CmdNeo4j_Click body, after CmdQuery completed cleanly with 5962 rows.  Fixing the fixture (or filtering controls against the form's actual control set) is out-of-scope for this probe.
+
+**Q6 — Outcome bucket:** `probe_found_new_runtime_bug_candidate`
+
+## Verdict: `probe_found_new_runtime_bug_candidate`
+
+**New runtime bug candidate.**  ZZ_TEST_DEBUG contains :ERR row(s) that do NOT match any existing canonical issue signature (Issue #21 DAO 3021 / Issue #23 JET 3061 / Issue #6 JET column-or-param).  Observed :ERR text: ['LookAtPlace:ERR Item not found in this collection.'].  file_count = 0.
+
+Per the brief's bucket vocabulary, this means: the probe reproduces a runtime bug that is **not yet canonicalized**.  The documented skip reason ("Item not found in this collection.") IS the :ERR text observed here, but that string is not itself a canonical issue signature on `main` — it is a JET 3265 (DAO field-collection lookup) surface symptom, structurally distinct from Issue #23's JET 3061 (SQL parser) and Issue #21's DAO 3021 (empty recordset .MoveFirst).  Same SURFACE root-cause class (CBDB-side renamed/missing column) but DIFFERENT trigger surface, and no per-form workaround exists today for the `!c_<col>` identifier-rewrite shape.
 
 Recommended next step (separate brief, NOT this PR): static investigation analogous to PR #114 — locate the specific `!c_<col>` reference inside CmdNeo4j_Click that fails (54 candidates per the static pre-analysis), determine whether the source recordset's column has been renamed or removed, then file as a new canonical Issue (analogous to Issue #23 filing in PR #115).  The driver-side workaround would mirror PR #116's `.replace()` shape but on the `!c_<col>` identifier rather than the INSERT target column.
 
