@@ -20,6 +20,7 @@ The issues are ordered by severity (P0 highest). Each entry includes a concise d
   - [Issue #21 — LookAtGroupData.CmdNeo4j crashes with 'No current record' on empty sections](#issue-21--lookatgroupdatacmdneo4j-crashes-with-no-current-record-on-empty-sections)
   - [Issue #22 — LookAtAssociations.CmdUCINet crashes with 'Invalid procedure call or argument' on networks containing CJK Han characters in c_name](#issue-22--lookatassociationscmducinet-crashes-with-invalid-procedure-call-or-argument-on-networks-containing-cjk-han-characters-in-c_name)
   - [Issue #23 — LookAtAssociations.CmdNeo4j INSERT references non-existent target column ZZ_SCRATCH_PEOPLE.c_index_addr_type_code (likely intended c_addr_type)](#issue-23--lookatassociationscmdneo4j-insert-references-non-existent-target-column-zz_scratch_peoplec_index_addr_type_code-likely-intended-c_addr_type)
+  - [Issue #24 — LookAtPlace.CmdNeo4j tRstPeople SELECT projection lacks c_dynasty / c_dynasty_chn / c_female; downstream loop reads them and crashes JET 3265 'Item not found in this collection'](#issue-24--lookatplacecmdneo4j-trstpeople-select-projection-lacks-c_dynasty--c_dynasty_chn--c_female-downstream-loop-reads-them-and-crashes-jet-3265-item-not-found-in-this-collection)
 - [P2 — Silent display](#p2--silent-display)
   - [Issue #10 — EVENT_ADDR_2 Subform address columns silently render blank (wrong ControlSource)](#issue-10--event_addr_2-subform-address-columns-silently-render-blank-wrong-controlsource)
 - [P3 — Missing UI](#p3--missing-ui)
@@ -364,6 +365,78 @@ tQueryStr = "INSERT INTO ZZ_SCRATCH_PEOPLE ( " & _
 ```
 
 **Driver-side workaround option** (separate brief; NOT part of this issue): mirror the `_PER_FORM_CMDGIS_PATCHES` Issue #4 (`GISFrame → CodeFrame`) and Issue #5 (`ChkIDs → False`) workarounds with a per-form rewrite mapping the literal `c_index_addr_type_code` → `c_addr_type` inside `Form_LookAtAssociations`'s CmdNeo4j_Click only.  This would unblock the test suite without requiring a CBDB-side fix.
+
+### Issue #24 — LookAtPlace.CmdNeo4j tRstPeople SELECT projection lacks c_dynasty / c_dynasty_chn / c_female; downstream loop reads them and crashes JET 3265 'Item not found in this collection'
+
+**Affected sub:** `Form_LookAtPlace.CmdNeo4j_Click`
+
+**Severity:** P1 — Visible crash on a normal user click (any LookAtPlace CmdNeo4j export with a non-empty place-people result; the JET 3265 fires deterministically at line 757's `!c_dynasty` read on the matrix Place fixture per PR #120's runtime probe and the static investigation per PR #121)
+
+#### Description
+
+`Form_LookAtPlace.CmdNeo4j_Click` opens a recordset into `tRstPeople` via `Set tRstPeople = CurrentDb.OpenRecordset(tQueryStr, dbOpenDynaset)` (line 651).  The bound SQL (lines 643-647) projects only **four** columns from `ZZ_SCRATCH_P_TEXT`:
+
+```
+SELECT DISTINCT
+    ZZ_SCRATCH_P_TEXT.c_person_id,
+    ZZ_SCRATCH_P_TEXT.c_name,
+    ZZ_SCRATCH_P_TEXT.c_name_chn,
+    ZZ_SCRATCH_P_TEXT.c_index_year
+FROM ZZ_SCRATCH_P_TEXT INNER JOIN
+     ( DYNASTIES RIGHT JOIN BIOG_MAIN ON
+       DYNASTIES.c_dy = BIOG_MAIN.c_dy )
+ON ZZ_SCRATCH_P_TEXT.c_person_id = BIOG_MAIN.c_personid
+```
+
+The `INNER JOIN` brings `DYNASTIES` and `BIOG_MAIN` into scope, but the SELECT clause does not project any of their columns.  DAO's `Recordset.Fields` collection contains only the SELECT-projected columns; the JOIN is for filtering / row-shaping, NOT for field access.
+
+Despite this, the loop body (lines 689-783) reads **three columns from the JOINed tables that are NOT in the SELECT projection**:
+
+  - `tRstPeople!c_dynasty`     (line 757; expected from `DYNASTIES`)
+  - `tRstPeople!c_dynasty_chn` (line 769; expected from `DYNASTIES`)
+  - `tRstPeople!c_female`      (line 777, also 783; expected from `BIOG_MAIN`)
+
+JET reports this as **3265 'Item not found in this collection.'** on the FIRST such read (`!c_dynasty` at line 757).  The error trap routes to `Exit_CmdNeo4j_Click` BEFORE the chain's `gStream.WriteText` flushes any disk file, so the user sees a popup AND the export produces **0 CSV files** — even though the line-545 `dlgSaveAs.Show` already fired and captured a filename.
+
+Static schema cross-check (verified against `analysis/dump/tables.json`): `DYNASTIES` DOES have `c_dynasty` and `c_dynasty_chn`; `BIOG_MAIN` DOES have `c_female` (also in `tests/test_schema.py::REQUIRED_COLUMNS`).  So this is NOT source-side column rename / removal — the columns exist on the source tables, the SELECT just doesn't project them.  Pure recordset projection mismatch.
+
+**Distinct from Issue #23** (LookAtAssociations × CmdNeo4j target-column mismatch).  Issue #23 is JET 3061 (SQL parser): an INSERT statement's target column list references a non-existent target table column.  This is JET 3265 (DAO field-collection lookup): a `Recordset!field` reference at the VBA layer can't find the field in the runtime field collection.  Same SURFACE root cause class (a missing column reference) but **different trigger surface** (DAO field lookup vs SQL parser) and **different fix surface** (the SELECT projection vs the INSERT target list).  Should not be merged into Issue #23.
+
+**Distinct from Issue #21** (LookAtGroupData × CmdNeo4j unguarded `.MoveFirst` on empty recordset).  Issue #21 is DAO 3021 'No current record' — a state-machine error on an empty but valid recordset.  This is a field-existence error on a non-empty recordset that simply doesn't expose the field.  Different DAO error code, different fix path.
+
+#### Steps to reproduce
+
+1. Open **LookAtPlace**.
+2. Pick a substantive **address** in the address picker (any single c_addr_id with substantial associated biography data; the matrix `_make_place_fixtures` first fixture, `place_addr_<top_addr_by_indexed_persons>`, gives ZZ_SCRATCH_PLACE_PEOPLE ≈ 5,764 rows on the current dump and is the same fixture the existing Place × CmdGIS / CmdPajek tests use).
+3. On the form, set the tab to **Places** (TabPlaces=0; the current cross-form CmdNeo4j test handles this in `_seed_query_inputs`).  Tick **ChkIndividual** and leave **ChkOffice / ChkAssoc / ChkPosting / ChkEntry** unchecked.
+4. Click **Run Query** — CmdQuery completes cleanly; scratch tables are populated (ZZ_SCRATCH_PEOPLE, ZZ_SCRATCH_PLACE_PEOPLE, ZZ_SCRATCH_PLACE_AGG all non-empty).
+5. Click **Neo4j** (the export button).
+6. A **Run-time error 3265 — Item not found in this collection.** popup appears (or in the headless / driver-instrumented run, the equivalent ZZ_TEST_DEBUG marker `LookAtPlace:ERR Item not found in this collection.` is written).  The Neo4j export produces **0 CSV files** — no `People_*.csv`, no `Places_*.csv`, nothing.
+
+Verified end-to-end via the probe at `analysis/probe_place_cmdneo4j.py` (PR #120, merged commit `8f94276`); chain-order-first failing reference identified by the static investigation at `analysis/investigate_place_cmdneo4j_item_not_found.{py,md}` (PR #121, merged commit `97e1162`).
+
+#### Suggested fix
+
+**Recommended upstream CBDB fix:** extend the SELECT projection in `Form_LookAtPlace.vb:643-647` to include the three columns the loop reads:
+
+```vb
+tQueryStr = "SELECT DISTINCT " & _
+    "ZZ_SCRATCH_P_TEXT.c_person_id, " & _
+    "ZZ_SCRATCH_P_TEXT.c_name, " & _
+    "ZZ_SCRATCH_P_TEXT.c_name_chn, " & _
+    "ZZ_SCRATCH_P_TEXT.c_index_year, " & _
+    "DYNASTIES.c_dynasty, " & _
+    "DYNASTIES.c_dynasty_chn, " & _
+    "BIOG_MAIN.c_female " & _
+    "FROM ZZ_SCRATCH_P_TEXT INNER JOIN " & _
+    "( DYNASTIES RIGHT JOIN BIOG_MAIN ON " & _
+    "DYNASTIES.c_dy = BIOG_MAIN.c_dy ) " & _
+    "ON ZZ_SCRATCH_P_TEXT.c_person_id = BIOG_MAIN.c_personid"
+```
+
+The FROM / JOIN structure already brings the source tables into scope; this is purely a missing-from-SELECT issue.  Three columns added; nothing else changes.
+
+**Driver-side workaround option** (separate brief; NOT part of this issue): mirror the `_PER_FORM_CMDGIS_PATCHES` Issue #4 (`GISFrame -> CodeFrame`), Issue #5 (`ChkIDs -> False`), and Issue #23 (`c_index_addr_type_code -> c_addr_type` INSERT target rewrite) workaround patterns with a per-form rewrite that extends the SELECT projection literal inside `Form_LookAtPlace`'s CmdNeo4j_Click only.  This would unblock the test suite without requiring a CBDB-side fix.
 
 ## P2 — Silent display
 
