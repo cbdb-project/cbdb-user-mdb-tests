@@ -1,0 +1,310 @@
+{
+  "schema_version": 1,
+  "generated_date": "2026-05-08",
+  "probe_branch": "driver/status-cleanup-rebind-requery",
+  "main_at_probe": "22667eb",
+  "form": "LookAtStatus",
+  "buttons_probed": [
+    "CmdPajek",
+    "CmdGephi"
+  ],
+  "patch_under_test": {
+    "candidate": "(a) Set→Requery",
+    "driver_helper": "_rewrite_status_cmdquery_cleanup_rebind_to_requery",
+    "patch_anchor_pair": [
+      [
+        "Set ZZ_SCRATCH_STATUS.Form.Recordset = tRstStatus",
+        "ZZ_SCRATCH_STATUS.Form.Requery"
+      ],
+      [
+        "Set ZZ_SCRATCH_P_STATUS.Form.Recordset = gRstPeople",
+        "ZZ_SCRATCH_P_STATUS.Form.Requery"
+      ]
+    ],
+    "form_lookatstatus_vb_lines_affected": [
+      1457,
+      1460
+    ],
+    "scope_notes": "Triply scoped: per-form key (Form_LookAtStatus only), per-sub regex (CmdQuery_Click body only), per-literal anchor pair.  Setup-time dummy-rebind lines (1176 / 1186) and Form_Open's separate assignments (line 2087 / 2096) are structurally outside the patched region."
+  },
+  "config": {
+    "click_via_timer_timeout_sec": 180,
+    "per_phase_outer_timeout_sec": 240,
+    "object_required_text": "Object required",
+    "no_records_phrase": "There are no records to save",
+    "PR127_baseline_scratch_status": 17023,
+    "PR127_baseline_scratch_p_status": 17022
+  },
+  "total_wall_elapsed_sec": 43.23,
+  "phases": {
+    "CmdPajek": {
+      "phase": {
+        "button": "CmdPajek",
+        "fixture_name": "status_40_unfiltered",
+        "fixture_picker_ids": [
+          40
+        ],
+        "fixture_controls": {
+          "FrameFilterYears": 1
+        },
+        "fixture_expected_min_rows": 1000,
+        "markers": [
+          {
+            "t": 0.0,
+            "marker": "constructing_session"
+          },
+          {
+            "t": 5.32,
+            "marker": "session_opened_attempt_1"
+          },
+          {
+            "t": 5.56,
+            "marker": "filedialog_patched"
+          },
+          {
+            "t": 6.29,
+            "marker": "form_opened"
+          },
+          {
+            "t": 6.31,
+            "marker": "picker_seeded_1_codes"
+          },
+          {
+            "t": 6.31,
+            "marker": "fixture_seeded"
+          },
+          {
+            "t": 6.31,
+            "marker": "form_tag_set_chain_CmdQuery_CmdPajek"
+          },
+          {
+            "t": 6.31,
+            "marker": "chain_fire_t_start"
+          },
+          {
+            "t": 7.84,
+            "marker": "click_via_timer_returned_17023"
+          },
+          {
+            "t": 15.85,
+            "marker": "chain_quiescent_zero_files_stable_for_8s"
+          },
+          {
+            "t": 15.85,
+            "marker": "chain_elapsed_9.54s"
+          },
+          {
+            "t": 15.85,
+            "marker": "files_inventoried_0"
+          },
+          {
+            "t": 15.85,
+            "marker": "row_counts_captured"
+          },
+          {
+            "t": 15.85,
+            "marker": "zz_test_debug_captured"
+          }
+        ],
+        "elapsed_sec": 18.38,
+        "exception": null,
+        "row_counts": {
+          "ZZ_SCRATCH_STATUS": 17023,
+          "ZZ_SCRATCH_P_STATUS": 17022,
+          "ZZ_TEST_DEBUG": 3
+        },
+        "files": [],
+        "file_count": 0,
+        "click_via_timer_returned": 17023,
+        "chain_elapsed_sec": 9.54,
+        "chain_observed_done": true,
+        "msgbox_observed": [],
+        "zz_test_debug_msgs": [
+          "LookAtStatus:ENTER",
+          "LookAtStatus:MSGBOX",
+          "LookAtStatus:DONE"
+        ]
+      },
+      "outcome": "patch_blocked_zero_files_no_err"
+    },
+    "CmdGephi": {
+      "phase": {
+        "button": "CmdGephi",
+        "fixture_name": "status_40_unfiltered",
+        "fixture_picker_ids": [
+          40
+        ],
+        "fixture_controls": {
+          "FrameFilterYears": 1
+        },
+        "fixture_expected_min_rows": 1000,
+        "markers": [
+          {
+            "t": 0.0,
+            "marker": "constructing_session"
+          },
+          {
+            "t": 5.06,
+            "marker": "session_opened_attempt_1"
+          },
+          {
+            "t": 5.3,
+            "marker": "filedialog_patched"
+          },
+          {
+            "t": 6.03,
+            "marker": "form_opened"
+          },
+          {
+            "t": 6.05,
+            "marker": "picker_seeded_1_codes"
+          },
+          {
+            "t": 6.05,
+            "marker": "fixture_seeded"
+          },
+          {
+            "t": 6.05,
+            "marker": "form_tag_set_chain_CmdQuery_CmdGephi"
+          },
+          {
+            "t": 6.05,
+            "marker": "chain_fire_t_start"
+          },
+          {
+            "t": 7.57,
+            "marker": "click_via_timer_returned_17023"
+          },
+          {
+            "t": 15.58,
+            "marker": "chain_quiescent_zero_files_stable_for_8s"
+          },
+          {
+            "t": 15.58,
+            "marker": "chain_elapsed_9.53s"
+          },
+          {
+            "t": 15.58,
+            "marker": "files_inventoried_0"
+          },
+          {
+            "t": 15.59,
+            "marker": "row_counts_captured"
+          },
+          {
+            "t": 15.59,
+            "marker": "zz_test_debug_captured"
+          }
+        ],
+        "elapsed_sec": 18.05,
+        "exception": null,
+        "row_counts": {
+          "ZZ_SCRATCH_STATUS": 17023,
+          "ZZ_SCRATCH_P_STATUS": 17022,
+          "ZZ_TEST_DEBUG": 3
+        },
+        "files": [],
+        "file_count": 0,
+        "click_via_timer_returned": 17023,
+        "chain_elapsed_sec": 9.53,
+        "chain_observed_done": true,
+        "msgbox_observed": [],
+        "zz_test_debug_msgs": [
+          "LookAtStatus:ENTER",
+          "LookAtStatus:MSGBOX",
+          "LookAtStatus:DONE"
+        ]
+      },
+      "outcome": "patch_blocked_zero_files_no_err"
+    }
+  },
+  "verdict": "patch_did_not_unblock",
+  "verdict_note": "**Useful negative evidence — candidate (a) tested, NOT being landed as a driver workaround.**  The Set→Requery helper was added to `tests/cbdb_driver/vba_session.py` ONCE on this investigation branch to capture the evidence below, then REVERTED before this PR was opened for review.  The probe artifacts (this script + paired MD + paired JSON) are what ships; the driver code is not.\n\n**What candidate (a) achieved (4 of 5 gates):**\n  - `Object required` :ERR is GONE on both phases (the local-var lifetime issue PR #127 pinned IS resolved by Set→Requery).\n  - Watchdog dialogs = 0 on both phases (the driver's literal-only neutralizer caught the bail `MsgBox`).\n  - `ZZ_TEST_DEBUG` = [ENTER, MSGBOX, DONE] with no `:ERR` rows on both phases (the `:MSGBOX` is the neutralized `MsgBox \"There are no records to save.\"` from the bail path).\n  - `ZZ_SCRATCH_STATUS / ZZ_SCRATCH_P_STATUS` row counts MATCH PR #127's pre-patch baseline (17023 / 17022) on both phases — CmdQuery cleanup intent PRESERVED.\n\n**What candidate (a) did NOT achieve (1 of 5 gates):**\n  - `file_count = 0` on both phases — the buttons bailed at their `If <subform>.Form.Recordset.RecordCount = 0 Then` check.  The failure shape *shifted* (Object required → legitimately-zero RecordCount) but did NOT disappear.\n\n**Why this means candidate (a) does NOT belong in `vba_session.py`.**  Per repo convention, driver-side workarounds are landed only when they unblock the cell they target — partial fixes that resolve a symptom without enabling file production accumulate as dead weight.  Candidate (a) eliminates PR #127's Object-required symptom AND preserves CmdQuery cleanup intent, but neither CmdPajek nor CmdGephi produces files post-patch.  The patch is insufficient.\n\n**Interpretation of the file-write blocker.**  Set→Requery successfully removed the Nothing-recordset symptom, but Requery re-executes the subform's *design-time RecordSource* — which apparently does NOT see the populated ZZ_SCRATCH_STATUS / ZZ_SCRATCH_P_STATUS data after CmdQuery body finished its INSERTs.  Most likely the design-time RecordSource is an empty saved query, OR a stale binding to the original (now-replaced) recordset.  Confirming this would need a static read of the form's design-time RecordSource setting (out of scope for this PR).\n\n**Per the brief: NOT silently switching to candidate (b) or (c).**  Documenting the shifted-symptom shape.  The next brief decides whether to:\n  - try candidate (b) (Set + MoveFirst): structurally less promising now that (a) confirmed the local-var lifetime issue is real and is resolvable — (b) preserves the same Set + dynaset shape that (a) replaced.\n  - try candidate (c) (drop rebind): leaves the subform bound to `tRstDummy` (Z_SCRATCH_DUMMY_SC, not ZZ_SCRATCH_STATUS); fails the cleanup-intent gate by definition.\n  - try a candidate (d) NEW (surfaced by this probe): combine Requery with an EXPLICIT `Set <subform>.Form.RecordSource = \"ZZ_SCRATCH_STATUS\"` BEFORE the Requery, forcing the design-time RecordSource to point at the populated table.  Closer to the actual fix surface.\n  - escalate to canonical issue filing: the subform design-time RecordSource not seeing the populated scratch data may be a CBDB source-level binding bug; warrants its own static investigation.\n\n**Bottom line.**  Candidate (a) is verifiably INSUFFICIENT: it removes one symptom layer (local-var lifetime) but exposes a second (design-time RecordSource binding).  The next attempt needs to address the second layer, not the first.  This evidence narrows the next-brief candidate space — that's the value this PR delivers.",
+  "answers": {
+    "Q1_object_required_disappeared_per_button": {
+      "CmdPajek": true,
+      "CmdGephi": true,
+      "both": true
+    },
+    "Q2_files_written_per_button": {
+      "CmdPajek": false,
+      "CmdGephi": false,
+      "CmdPajek_count": 0,
+      "CmdGephi_count": 0,
+      "both_started_writing": false
+    },
+    "Q3_watchdog_dialogs_zero_per_button": {
+      "CmdPajek": true,
+      "CmdGephi": true,
+      "both_zero": true
+    },
+    "Q4_zz_test_debug_well_formed_per_button": {
+      "CmdPajek": true,
+      "CmdGephi": true,
+      "CmdPajek_msgs": [
+        "LookAtStatus:ENTER",
+        "LookAtStatus:MSGBOX",
+        "LookAtStatus:DONE"
+      ],
+      "CmdGephi_msgs": [
+        "LookAtStatus:ENTER",
+        "LookAtStatus:MSGBOX",
+        "LookAtStatus:DONE"
+      ],
+      "both_well_formed": true
+    },
+    "Q5_cmdquery_cleanup_intent_preserved": {
+      "scratch_status_per_button": {
+        "CmdPajek": 17023,
+        "CmdGephi": 17023,
+        "PR127_baseline": 17023
+      },
+      "scratch_p_status_per_button": {
+        "CmdPajek": 17022,
+        "CmdGephi": 17022,
+        "PR127_baseline": 17022
+      },
+      "both_match_baseline": true,
+      "interpretation": "If both_match_baseline is True, the Set→Requery patch did not regress CmdQuery body's INSERT outcome — same scratch population as the PR #127 unpatched baseline.  This is the primary 'no broken cleanup intent' check."
+    },
+    "per_phase_signatures": {
+      "CmdPajek": {
+        "outcome": "patch_blocked_zero_files_no_err",
+        "file_count": 0,
+        "chain_elapsed_sec": 9.54,
+        "watchdog_dialog_count": 0,
+        "watchdog_dialog_texts_sample": [],
+        "zz_test_debug_msgs": [
+          "LookAtStatus:ENTER",
+          "LookAtStatus:MSGBOX",
+          "LookAtStatus:DONE"
+        ],
+        "zz_test_debug_err_texts": [],
+        "object_required_observed": false,
+        "no_records_dialog_observed": false,
+        "scratch_status": 17023,
+        "scratch_p_status": 17022,
+        "click_via_timer_returned": 17023
+      },
+      "CmdGephi": {
+        "outcome": "patch_blocked_zero_files_no_err",
+        "file_count": 0,
+        "chain_elapsed_sec": 9.53,
+        "watchdog_dialog_count": 0,
+        "watchdog_dialog_texts_sample": [],
+        "zz_test_debug_msgs": [
+          "LookAtStatus:ENTER",
+          "LookAtStatus:MSGBOX",
+          "LookAtStatus:DONE"
+        ],
+        "zz_test_debug_err_texts": [],
+        "object_required_observed": false,
+        "no_records_dialog_observed": false,
+        "scratch_status": 17023,
+        "scratch_p_status": 17022,
+        "click_via_timer_returned": 17023
+      }
+    },
+    "family_bucket": "patch_did_not_unblock"
+  }
+}
