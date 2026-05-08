@@ -1,6 +1,6 @@
 # Export coverage gap triage plan
 
-**Date:** 2026-05-04 · **Refreshed:** 2026-05-07 (post AssociationPairs × CmdNeo4j coverage merge)
+**Date:** 2026-05-04 · **Refreshed:** 2026-05-07 (later — post LookAtAssociations × CmdNeo4j coverage merge via PR #118)
 **Branch:** `plan/export-gap-triage` (off main `434168a`); refresh on `refresh/export-gap-triage-after-groupdata`
 **Source data (read-only):**
 - `reports/export_coverage_inventory.json` — **12 `gap` cells** (was 13; GroupData × CmdGIS landed in PR `cover/groupdata-cmdgis-clean-branches` commit `294cbda`)
@@ -865,3 +865,118 @@ This refresh is therefore restricted to ranking *only* genuinely unfinished work
 **D. Residual risk.** Triage-document refresh, not an implementation; residual risk is purely advisory. Specifically: (1) Place pause assumes the COM bridge instability is a current-session standing constraint — if that's resolved, Place returns to rank-1 candidate via a separate refresh, not silently. (2) The corrected ranking ranks two maintainer-line items at Rank 2 and Rank 3; if the maintainer priority is "ship more local coverage first", the Associations CmdNeo4j probe at Rank 1 is the only local PR available — there is no honest Rank-2 local PR today (every other unfinished cell needs driver/meta or family-design work first). No code path or test altered, so no runtime regression risk.
 
 **Correction tracking.** An earlier draft of this refresh proposed `LookAtKinship × CmdUCINet runtime :ERR pin` as Rank 1. Reviewer correctly flagged it as a stale-premise error: the pin is already on `main` at `tests/test_vba_bug_behaviors.py::test_bug22_kinship_cmducinet_sibling_form_fires_invalid_procedure_call` line 631 — completing what `refresh_2026_05_06` Rank 3 had proposed. The corrected ranking removes the Kinship pin from `next_work_items_ranked`, records it under `already_landed_observed_during_refresh` for honesty, and re-ranks only genuinely unfinished work. Same correction applies to the MD `### Already-landed context observed during this refresh (NOT next work)` section above and the JSON `already_landed_observed_during_refresh` block.
+
+---
+
+## Refresh 2026-05-07 (later) — post LookAtAssociations × CmdNeo4j coverage merge
+
+Triggering events (the full Associations × CmdNeo4j unblock chain, all on `main`):
+
+- PR #112 (`probe/associations-cmdneo4j`, commit `1145219`) — runtime probe; observed JET 3061 + 0 files; verdict `probe_found_new_runtime_bug_candidate`.
+- PR #114 (`investigate/associations-cmdneo4j-c-index-addr-type-code`, commit `68cfa9b`) — static investigation; pinned target-side schema mismatch on `ZZ_SCRATCH_PEOPLE.c_index_addr_type_code`.
+- PR #115 (`issue/file-associations-cmdneo4j-target-column-mismatch`, commit `97ff1d8`) — canonical Issue #23 filed (P1_visible_crash); 4 anchored static markers in `tests/test_known_bugs.py`.
+- PR #116 (`driver/associations-cmdneo4j-c-addr-type-rewrite`, commit `9040daa`) — narrow driver patch `_rewrite_associations_cmdneo4j_target_column` rewrites `c_index_addr_type_code, c_female` → `c_addr_type, c_female`; verification probe `patch_resolved_issue23_but_exposed_msgbox_blocker` (8 files, 5 watchdog dialogs).
+- PR #117 (`driver/associations-cmdneo4j-debug-msgbox-suppress`, commit `fed8734`) — narrow driver patch `_suppress_associations_cmdneo4j_debug_msgbox` suppresses the 5 concat-form debug MsgBox prefixes; verification probe `patch_verified_chain_clean` (8 files, 0 watchdog dialogs, 0 :ERR).
+- PR #118 (`test/associations-cmdneo4j-coverage`, commit `7741059`) — coverage test on the matrix `assoc_<top_code>_unfiltered` fixture; per-shape pin `_assert_lookatassociations_neo4j_shape` rules `len(files) == 8` exactly with no missing / no extra header first-cols; classifier gained `OccasionCode`, `TopicCode`, and a 4-col `(AssociationCode, AssociationTypeID)` 2-col disambiguator.
+
+Read-only refresh on top of `main = 7741059`. No COM, no tests / driver / canonical reports / issue severity changes.
+
+### Current truth deltas (vs `refresh_2026_05_07` earlier)
+
+| Cell | Before this refresh | After this refresh |
+|---|---|---|
+| `LookAtAssociations × CmdNeo4j` | rank-1 probe-first candidate (still skipped / investigation line) | **covered via repo-local driver workarounds** (PR #116 + #117 driver patches + PR #118 coverage test); the canonical Issue #23 **stays P1** — the upstream `.mdb` defect is NOT fixed, only the test driver's in-memory VBA is rewritten so the chain runs |
+| `LookAtAssociationPairs × CmdNeo4j` | covered (PR #110) | covered (no change) |
+| `LookAtPlace × CmdNeo4j` | skipped in `tests/test_vba_cmdneo4j_cross_form.py::_spec_skip_marks` with reason "Item not found in this collection. mid-body — looks like a real CBDB bug" | still skipped / investigation line (no change this refresh; rank-1 candidate this refresh — see below) |
+| `LookAtStatus × CmdNeo4j` | skipped with reason "chain post-cleanup invalidates the subform recordset rebind; downstream CmdNeo4j reads RecordCount=0; same root family as Pajek/Gephi Status skip" | still skipped / investigation line (no change this refresh; deferred — see "Place vs Status" below) |
+| `Issue #23` (canonical P1) | open, P1_visible_crash | **open, P1_visible_crash (UNCHANGED)** — coverage via local workaround does NOT silently downgrade or close the canonical issue |
+
+### Coverage-via-local-workaround vs upstream-fixed (a hedge that must not slip)
+
+**Coverage landed ≠ upstream fixed.** This is the most important clarification of this refresh:
+
+- The Associations × CmdNeo4j cell can now be exercised by the test suite end-to-end.  This is achieved via **two driver-side workarounds in `tests/cbdb_driver/vba_session.py`** that rewrite the in-memory VBA at test time:
+  - `_rewrite_associations_cmdneo4j_target_column` (PR #116) — fixes the JET 3061 column-not-found INSERT
+  - `_suppress_associations_cmdneo4j_debug_msgbox` (PR #117) — suppresses the 5 concat-form debug MsgBox dialogs
+- A real CBDB end user opening the un-patched `.mdb` would **still hit the JET 3061** when clicking CmdNeo4j on Associations.  The user-visible defect is unchanged.
+- The canonical Issue #23 in `reports/generate_report.py::ISSUES` therefore stays at `P1_visible_crash`.  Its 4 static markers in `tests/test_known_bugs.py::test_bug23_associations_cmdneo4j_target_column_mismatch` still reproduce against the unpatched VBA dump on disk; the marker test will fire only when the upstream `.mdb` is actually fixed.
+- `triage should not silently drop Issue #23 because the test now passes under driver patching` — this refresh explicitly preserves the canonical issue and the static-marker test.  Both states are coherent: the cell IS test-covered AND the upstream defect IS open; they are independent assertions on the same underlying source.
+
+### Bucket distribution after this refresh
+
+| Bucket | Count | Cells |
+|---|---:|---|
+| A small_candidate | 0 | — |
+| B blocked_by_known_driver_issue | 3 *(unchanged)* | AssocPairs CmdGIS; Networks CmdGIS / CmdPajek |
+| C blocked_by_form_query_timeout | 1 *(unchanged)* | GroupData × CmdNeo4j *(investigation line, Issue #21 canonical)* |
+| D new_export_family_needs_design | 4 *(unchanged)* | Associations / Place / Kinship / AssociationPairs × CmdUCINet |
+| D + B stacked | 1 *(unchanged)* | Networks × CmdUCINet |
+
+**Remaining gaps: 8** *(was 9 in `refresh_2026_05_07` earlier)*. The 1-cell drop is `LookAtAssociations × CmdNeo4j` (this refresh, just merged via PR #118).
+
+Note: the bucket categories above only cover cells that are *gaps in the cross-form Neo4j coverage*. The Place / Status × CmdNeo4j skips were already in the `refresh_2026_05_07` ledger as "investigation line" cells, parallel to GroupData × CmdNeo4j (Issue #21).
+
+### Next work, ranked (max 3)
+
+#### Rank 1 — probe-first investigation: `LookAtPlace × CmdNeo4j`
+
+- **Category:** probe-first investigation (NOT coverage PR, NOT canonical issue yet).
+- **Why:** the cheapest genuinely-unfinished local PR available today. `tests/test_vba_cmdneo4j_cross_form.py::_spec_skip_marks` describes the cell as "fires `Item not found in this collection.` mid-body — looks like a real CBDB bug (SQL or recordset field reference against a renamed/missing column)". That is a **JET 3061 column-not-found family**, structurally identical to Issue #23's symptom. The end-to-end methodology that worked for Associations CmdNeo4j (#112 probe → #114 static investigation → #115 canonical issue → #116 driver rewrite → #117 MsgBox suppress → #118 coverage) directly transfers as a playbook.
+- **Shape:** read-only probe MD + JSON only; same shape as PR #112 (`probe/associations-cmdneo4j` artifacts). NOT a coverage PR; NOT a driver PR.
+- **Risk:** low; outcome buckets identical to PR #112's scheme — `clean_probe_promote_to_coverage_candidate` / `probe_found_new_runtime_bug_candidate` / `probe_hit_existing_known_failure_family` / `still_not_cheap_needs_deeper_investigation`.
+
+#### Rank 2 — maintainer-line: Issue #22 upstream-fix coordination
+
+- **Category:** maintainer-line (out-of-band; NOT a PR action in this repo).
+- **Why:** Issue #22 (P1) is `LookAtAssociations.CmdUCINet`'s FSO `CreateTextFile` missing-Unicode-arg crash on CJK Han characters; recommended fix is `CreateTextFile(..., True, True)`.  Reaching the CBDB maintainer to land the fix on the upstream `.mdb` is the next forward step that meaningfully changes the cell-state of `LookAtAssociations × CmdUCINet` and the Kinship sibling fragility.  Not a local PR.
+- **Shape:** out-of-band coordination; no repo file touched.
+
+#### Rank 3 — maintainer-line: Issue #21 + Issue #23 upstream-fix coordination
+
+- **Category:** maintainer-line (out-of-band; NOT a PR action in this repo).
+- **Why bundled:** both are `Form_LookAt*.CmdNeo4j_Click` source-level defects with concrete fix recommendations in their canonical entries; both have driver-side workarounds already in place (Issue #21 has no workaround yet but is canonically tracked; Issue #23 was just unblocked by PR #116 + #117).  Reaching the maintainer with these alongside Issue #22 keeps the upstream-fix line coherent.
+- **Shape:** out-of-band coordination; no repo file touched.
+- **Note:** Issue #23 specifically — the driver workarounds in PR #116/#117 are repo-local; they do NOT remove the need for an upstream fix.  When the upstream fix lands, the static markers in `tests/test_known_bugs.py::test_bug23_associations_cmdneo4j_target_column_mismatch` will fire (signal that the canonical issue can be marked fixed AND the driver workarounds can be removed).
+
+### Direct answers to the brief
+
+**Q1: After Associations × CmdNeo4j covered, what is the new rank-1?**
+
+**`LookAtPlace × CmdNeo4j` probe-first investigation.** The previous refresh's rank-1 (`LookAtAssociations × CmdNeo4j` probe-first) is now done end-to-end (chain through PR #118).  Place inherits the rank-1 slot because it has the strongest fit with the just-proven methodology.
+
+**Q2: Why is Place better than continuing to tighten assertions on already-covered Neo4j forms?**
+
+The 6 already-covered Neo4j forms (Entry / Texts / Office / Kinship / AssociationPairs / Associations) all have per-shape pinning today (`_assert_lookatentry_neo4j_shape`, etc., or 1-shape-per-host equivalent).  Tighter pinning would catch more regressions but does NOT expand the coverage surface.  Promoting Place from skip → covered moves the family from 6/8 → 7/8 covered — a much higher leverage move.  Per the brief's `不顺手处理别的 Neo4j hosts` boundary, the choice is between Place and Status, not "tighter pinning on covered forms".
+
+**Q3: Place vs Status for CmdNeo4j next — which one, or neither?**
+
+**Place is more valuable to do first.  Status should NOT be the next probe.**
+
+| | LookAtPlace × CmdNeo4j | LookAtStatus × CmdNeo4j |
+|---|---|---|
+| skip reason | "Item not found in this collection. mid-body — looks like a real CBDB bug (SQL or recordset field reference against a renamed/missing column)" | "chain post-cleanup invalidates the subform recordset rebind; downstream CmdNeo4j reads RecordCount=0; same root family as Pajek/Gephi Status skip" |
+| failure family | likely **JET 3061 column-not-found** (same as Issue #23) | **CmdQuery cleanup-rebind architectural issue** affecting multiple chains — different family |
+| methodology fit | high — directly mirrors the Associations chain (#112 → #118) | low — Status's CmdQuery cleanup section is the root cause and it would need driver/meta-level work, not per-form column rewrite |
+| likely outcome of probe | one of the four PR #112-style buckets, with high probability of `probe_found_new_runtime_bug_candidate` (reproducing Issue #23-shape canonicalization) | likely a confirmed pre-existing architectural issue family with no per-form workaround playbook |
+
+Status is also explicitly skipped on the Pajek / Gephi cross-form tests for the same root cause; tackling Status × CmdNeo4j without first tackling the broader CmdQuery-cleanup issue would be premature.
+
+### Explicitly NOT to do (this refresh + onward)
+
+- ❌ Do NOT reopen the Associations × CmdNeo4j or AssocPairs × CmdNeo4j Neo4j probes — both are covered, scope locked.
+- ❌ Do NOT downgrade or close Issue #23 just because Associations × CmdNeo4j is now test-covered.  Coverage via local workaround ≠ upstream fixed; the canonical entry stays `P1_visible_crash` and the static markers stay live.
+- ❌ Do NOT write the workaround-covered cell as upstream-fixed in any artifact.  The README cross-form table row for LookAtAssociations × CmdNeo4j (updated in PR #118) explicitly cites "Issue #23 stays P1 canonical, the workarounds make the cell *testable* on the existing source, not *fixed* upstream" — that hedge must not slip.
+- ❌ Do NOT touch README / canonical reports / issue severity in this triage refresh.
+- ❌ Do NOT promote `LookAtStatus × CmdNeo4j` ahead of Place — different failure family, requires driver/meta work, premature.
+- ❌ Do NOT promote `LookAtAssociationPairs × CmdUCINet` to coverage — still D-only (CmdUCINet family infra still does not exist).
+- ❌ Do NOT continue dissecting `LookAtPlace × CmdUCINet` COM bridge instability — it needs its own driver/meta brief, separate from the CmdNeo4j line.
+
+### Self-review (per `docs/skills/programmer-self-review-template.md`)
+
+**A. Branch shape.** Branch `refresh/queue-after-associations-cmdneo4j-covered` cut from clean `main = 7741059`. Only the two triage files touched (this MD + paired JSON). No tests, driver, README, canonical reports, issue severity, or other artifacts changed — matches the brief's `read-only analysis only` boundary exactly.
+
+**B. Source-of-truth sync.** This MD section ↔ the new JSON `refresh_2026_05_07_later` block carry the same truth deltas, bucket distribution, ranked list, brief Q-A, do-not-touch list, and coverage-vs-upstream-fixed hedge. Truth-delta items checked against canonical truth on `main`: all six unblock-chain PRs (#112 / #114 / #115 / #116 / #117 / #118) merged with verified commit SHAs; `Issue #23` confirmed `tier = P1_visible_crash` via direct read of `reports/generate_report.py::ISSUES`; static marker test still in `tests/test_known_bugs.py`. No source-of-truth file is being changed by this refresh.
+
+**C. Evidence vs claim.** All truth-delta items cite specific commit SHAs (`1145219` / `68cfa9b` / `97ff1d8` / `9040daa` / `fed8734` / `7741059`) and PR numbers (#112 / #114 / #115 / #116 / #117 / #118). The "Issue #23 stays P1" claim is grounded in a direct read of `ISSUES`, not paraphrased. The "Place is better than Status" judgement is grounded in a 4-row comparison table; "Place's skip reason is JET 3061-family" is hedged with "likely" because no probe has run yet. No claim that Place's probe will succeed; only that the methodology fit is strong.
+
+**D. Residual risk.** Triage-document refresh, not an implementation; residual risk is purely advisory. Specifically: (1) Place's actual probe outcome is not yet known — if the probe surfaces a structural issue more like Status's cleanup-rebind class than Issue #23's column typo, the rank-1 framing may need correcting via a follow-up refresh.  (2) Bundling Issue #23 into the maintainer-line at Rank 3 is a judgement call — if maintainer prioritizes the upstream-fix coordination differently, ranks 2 and 3 can be reordered.  No code path or test altered, so no runtime regression risk.
