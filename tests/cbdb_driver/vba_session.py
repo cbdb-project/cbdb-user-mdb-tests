@@ -201,6 +201,66 @@ def _rewrite_associations_cmdneo4j_target_column(match) -> str:
     return sub_body.replace(old, new)
 
 
+# Form_LookAtPlace.CmdNeo4j_Click rewrites a recordset projection
+# mismatch flagged as canonical Issue #24 (P1_visible_crash) in
+# `reports/generate_report.py::ISSUES`.  The `tRstPeople` recordset
+# (binding at line 651 of the dump) is opened from a SELECT that
+# projects only 4 ZZ_SCRATCH_P_TEXT columns:
+#   c_person_id, c_name, c_name_chn, c_index_year
+# but the loop body (lines 757 / 769 / 777 / 783) reads
+# `!c_dynasty`, `!c_dynasty_chn`, `!c_female` from the JOINed
+# DYNASTIES / BIOG_MAIN tables — which are NOT in the SELECT
+# projection.  DAO `Recordset.Fields` only contains projected
+# columns; the first such read (line 757 `!c_dynasty`) raises
+# JET 3265 "Item not found in this collection." and the chain
+# bails before any disk file is written.
+#
+# The 3 missing columns DO exist on their source tables (per
+# analysis/dump/tables.json — verified by PR #121 static
+# investigation): DYNASTIES has c_dynasty + c_dynasty_chn,
+# BIOG_MAIN has c_female.  So the natural fix is to extend the
+# SELECT projection to include them.  The FROM/JOIN structure
+# already brings the source tables into scope — only the SELECT
+# clause changes.
+#
+# Anchor: the substring `ZZ_SCRATCH_P_TEXT.c_index_year ` (with
+# trailing space, locked to the position right before the
+# `" + _` line continuation in the SELECT clause) is **unique**
+# whole-module on the current dump (verified count=1).  The
+# rewrite splices the 3 missing columns between c_index_year
+# and the trailing space, preserving the rest of the multi-line
+# tQueryStr build verbatim.
+#
+# Per-form, per-sub, single-literal rewrite — NOT a generic SQL
+# rewriter and NOT an attempt to fix CBDB upstream.  The
+# canonical Issue #24 still tracks the underlying source-side
+# defect; this is purely a test-driver workaround so the chain
+# can be exercised headlessly.
+_PLACE_CMDNEO4J_TRSTPEOPLE_PROJECTION_REWRITE_ANCHOR = (
+    "ZZ_SCRATCH_P_TEXT.c_index_year ",
+    "ZZ_SCRATCH_P_TEXT.c_index_year, "
+    "DYNASTIES.c_dynasty, DYNASTIES.c_dynasty_chn, "
+    "BIOG_MAIN.c_female ",
+)
+
+
+def _rewrite_place_cmdneo4j_trstpeople_projection(match) -> str:
+    """Rewrite the single Issue #24 anchor inside the matched
+    `Private Sub CmdNeo4j_Click() ... End Sub` body of
+    Form_LookAtPlace.  Outer pattern is the per-sub regex
+    (registered in `_PER_FORM_CMDGIS_PATCHES["Form_LookAtPlace"]`);
+    this callable runs `.replace()` only on the matched body,
+    so the rewrite is doubly scoped (per-form key + per-sub
+    regex).  Same shape as `_rewrite_associations_cmdneo4j_target_column`
+    (PR #116) — different form, different anchor, different fix
+    direction (SELECT projection extension vs INSERT target
+    rename).
+    """
+    sub_body = match.group(0)
+    old, new = _PLACE_CMDNEO4J_TRSTPEOPLE_PROJECTION_REWRITE_ANCHOR
+    return sub_body.replace(old, new)
+
+
 def _suppress_assocpairs_cmdneo4j_debug_msgbox(match) -> str:
     """Comment out the 6 unconditional debug MsgBox calls inside
     `Private Sub CmdNeo4j_Click()`.  `match.group(0)` is the entire
@@ -593,7 +653,37 @@ class VbaSession:
         # Place is `CodeFrame` (used correctly by every other export
         # sub on the same form).  Without this rewrite CmdGIS bails
         # with "Object required" the moment it executes.
-        "Form_LookAtPlace": [(r"\bGISFrame\.Value\b", "CodeFrame.Value")],
+        "Form_LookAtPlace": [
+            (r"\bGISFrame\.Value\b", "CodeFrame.Value"),
+            # Issue #24 (P1_visible_crash, canonical on main since
+            # PR #122 commit aaffa4b): the tRstPeople SELECT in
+            # Form_LookAtPlace.CmdNeo4j_Click projects only 4
+            # ZZ_SCRATCH_P_TEXT cols, but the loop body reads
+            # !c_dynasty / !c_dynasty_chn / !c_female from the
+            # JOINed tables — JET 3265 fires at line 757's
+            # !c_dynasty.  The 3 missing cols DO exist on the
+            # JOINed source tables (per PR #121's static
+            # investigation); the natural fix is to extend the
+            # SELECT projection.  Inline patch, scoped to:
+            #   - Form_LookAtPlace only (per-form dict key)
+            #   - CmdNeo4j_Click only (sub-body regex)
+            #   - the SELECT projection literal only (callable
+            #     `_rewrite_place_cmdneo4j_trstpeople_projection`
+            #     does a single `.replace()` on the unique
+            #     anchor `ZZ_SCRATCH_P_TEXT.c_index_year ` →
+            #     `ZZ_SCRATCH_P_TEXT.c_index_year,
+            #     DYNASTIES.c_dynasty,
+            #     DYNASTIES.c_dynasty_chn,
+            #     BIOG_MAIN.c_female `).
+            # Other tRstPlace / tRstPeoplePlace bindings inside
+            # the same sub are NOT touched — they may have their
+            # own projection-mismatch issues (per PR #121 raw
+            # facts), but those would only be reachable AFTER
+            # this issue is unblocked, and each would need its
+            # own brief.
+            (r"Private Sub CmdNeo4j_Click\(\)[\s\S]*?\nEnd Sub",
+             _rewrite_place_cmdneo4j_trstpeople_projection),
+        ],
 
         # Bug #5 (reports/CBDB_Issues_Report_EN.md): Form_LookAtStatus.CmdPajek_Click
         # references a non-existent `ChkIDs` control.  Other forms
