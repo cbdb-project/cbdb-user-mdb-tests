@@ -1,6 +1,6 @@
 # Export coverage gap triage plan
 
-**Date:** 2026-05-04 · **Refreshed:** 2026-05-08 (post LookAtPlace × CmdNeo4j coverage merge via PR #124)
+**Date:** 2026-05-04 · **Refreshed:** 2026-05-08 (later — post Status × CmdPajek/Gephi local-workaround line exhaustion: PR #127 + #129 → #137; CmdNeo4j family fully closed at 8/0)
 **Branch:** `plan/export-gap-triage` (off main `434168a`); refresh on `refresh/export-gap-triage-after-groupdata`
 **Source data (read-only):**
 - `reports/export_coverage_inventory.json` — **12 `gap` cells** (was 13; GroupData × CmdGIS landed in PR `cover/groupdata-cmdgis-clean-branches` commit `294cbda`)
@@ -1128,3 +1128,156 @@ The shared-root-cause observation thus elevates Status work from "ignore until a
 **C. Evidence vs claim.** All five unblock-chain PRs cited with explicit commit SHAs (`dd2ed37` / `97e1162` / `aaffa4b` / `dbd0236` / `a38d353`) and PR numbers (#120 / #121 / #122 / #123 / #124). The "Issue #24 stays P1" claim is grounded in a direct read of `ISSUES`, not paraphrased.  The "Status shares root cause with CmdPajek + CmdGephi" claim is grounded in a direct cross-reference between `_spec_skip_marks` (CmdNeo4j) and `tests/test_vba_pajek_gephi_cross_form.py` skip reasons — not invented.  Rank-2 (Status driver/meta investigation) is hedged with the AssocPairs CmdGIS analog ("may find no narrow fix"); no claim that the investigation will succeed, only that the leverage justifies attempting it.  Rank-3 (Place × CmdUCINet resume) is explicitly hedged as `subject to a maintainer brief` — not authorizing resumption, only ranking it.
 
 **D. Residual risk.** Triage-document refresh, not an implementation; residual risk is purely advisory. Specifically: (1) Rank-1 being a maintainer-line item means the queue's top item is intentionally out-of-band; if no maintainer interaction happens, ranks 2 and 3 are the next local PR candidates.  (2) Rank-2 (Status driver/meta investigation) may conclude no narrow fix exists, in which case Status × CmdNeo4j stays skipped and the next refresh would re-rank.  (3) Bundling Issues #21 + #23 + #24 into a single maintainer-line item is a judgement call — if the maintainer prefers issue-by-issue handoff, the bundle decomposes naturally; nothing in this refresh prevents that.  (4) Rank-3's unpause is conditional; if the COM bridge instability is still considered active, rank-3 stays parked.  No code path or test altered, so no runtime regression risk.
+
+---
+
+## Refresh 2026-05-08 (later) — post Status × CmdPajek/Gephi local-workaround line exhaustion
+
+Triggering events (the full Status × CmdPajek/Gephi local-workaround investigation chain, all on `main`):
+
+- PR #127 (`investigate/status-cleanup-rebind-family`, commit `9461472`) — driver/meta probe; pinned `Object required` on Pajek/Gephi to subform Recordset Nothing post-CmdQuery cleanup; CmdNeo4j unaffected.
+- PR #128 (`coverage/status-cmdneo4j-real-vba`, commit `22667eb`) — CmdNeo4j unskip (false-positive skip removed; no driver patch needed).
+- PR #129 (`investigate/status-cleanup-rebind-set-to-requery`, commit `a783b72`) — candidate (a) Set→Requery tested; removed Object required but exposed RecordCount=0; driver REVERTED.
+- PR #130 (`investigate/status-subform-recordsource-binding`, commit `5f100b4`) — static investigation of subform RecordSource binding; surfaced ZZ_SCRATCH_P_STATUS form's c_dynasty Filter as candidate; needed runtime confirmation.
+- PR #131 (`investigate/status-p-status-runtime-microcheck`, commit not pinned) — runtime micro-check (3 reads); decisive `H_chain_timing_supported`: Q1 c_dynasty='unknown' = 7/17022 (filter immaterial); Q2 FilterOn=False (filter dormant); Q3 RecordCount = 17023/17022 with explicit Requery + 1.5 s sleep.
+- PR #132 (`driver/chain-dispatcher-settle`, commit not pinned) — VBA-side 250 ms DoEvents settle in chain dispatcher; Object required reappeared; driver REVERTED.
+- PR #133 (`investigate/status-explicit-requery-variant`, commit not pinned) — explicit `Form.Requery` + DoEvents only (no sleep); Object required reappeared; driver REVERTED.
+- PR #134 (`investigate/status-settle-bisect`, commit not pinned) — VBA-side settle bisect 500/750/1000 ms; ALL failed → `no_value_up_to_1000ms_unblocks`; identified VBA-side DoEvents ≠ COM-side `time.sleep` mechanism boundary; driver REVERTED.
+- PR #135 (`investigate/status-com-split-dispatch`, commit not pinned) — COM-side split dispatch (two separate `click_via_timer` calls with Python `time.sleep(1.5)` between); Phase B's sub didn't run (Phase B `ZZ_TEST_DEBUG` empty) → infrastructure limitation surfaced.
+- PR #136 (`investigate/status-direct-invoke`, commit `948978d`) — direct invoke via `Application.Run` + Public-wrapper trick; rejected by Access (form/class-module subs not addressable from external `Application.Run`); boundary finding.
+- PR #137 (`investigate/click-via-timer-second-dispatch`, commit `7b76c8e`) — raw-COM `Form_Timer` instrumentation + `acCmdCompileAndSaveAllModules` force-compile fix attempt; force-compile succeeded but timer body STILL did not dispatch; verdict pinned the layer at Access form-class-instance event-binding cache.
+
+Read-only refresh on top of `main = 7b76c8e`. **No COM, no tests / driver / canonical reports / issue severity / README changes.**
+
+### Current truth deltas (vs `refresh_2026_05_08`)
+
+| Cell | Before this refresh | After this refresh |
+|---|---|---|
+| `LookAtStatus × CmdNeo4j` | rank-2 driver/meta investigation candidate (still skipped) | **covered** since PR #128 (no driver patch needed; the prior skip was a false-positive copy-paste from the Pajek/Gephi cross-form Status skip — PR #127's Q3 directly refuted "same root family"; CmdNeo4j opens fresh `dbOpenDynaset` on the underlying scratch tables and bypasses the subform recordset entirely) |
+| `LookAtStatus × CmdPajek` | skipped (cross-form Pajek/Gephi test) | **still skipped** — local test-driver workaround line EXHAUSTED across PR #127 + #129/#132/#133/#134/#135/#136/#137 (7 mechanism / sleep / dispatcher / direct-invoke / infra layers all tested; all failed); next forward step is maintainer-line / upstream-fix coordination |
+| `LookAtStatus × CmdGephi` | skipped (cross-form Pajek/Gephi test) | **still skipped** — same as CmdPajek (sibling cell, identical failure shape across all 7 attempts) |
+| **CmdNeo4j family snapshot** | 7 covered / 1 skipped | **8 covered / 0 skipped** ✓ |
+| Issue #21 / #23 / #24 (canonical P1 each) | open, P1_visible_crash | open, P1_visible_crash (UNCHANGED) — no test-driver coverage state change is allowed to silently downgrade these |
+
+### Why CmdNeo4j was a false-positive skip and is now covered
+
+Pre-PR #127 the test `tests/test_vba_cmdneo4j_cross_form.py::_spec_skip_marks` skipped `LookAtStatus × CmdNeo4j` with reason *"chain post-cleanup invalidates the subform recordset rebind; downstream CmdNeo4j reads RecordCount=0; same root family as Pajek/Gephi Status skip"*.  PR #127's 3-phase driver/meta probe RAN CmdNeo4j on the same fixture as Pajek + Gephi.  Result: CmdNeo4j produced 6 files in 11.04 s with `[ENTER, MSGBOX, DONE]` markers AND no `:ERR`; Pajek + Gephi failed with `Object required`.
+
+Static reading of `Form_LookAtStatus.vb` confirmed CmdNeo4j is structurally distinct: at lines 527+528 it opens fresh `dbOpenDynaset` directly on the underlying scratch tables (`ZZ_SCRATCH_STATUS` / `ZZ_SCRATCH_P_STATUS`), bypassing the subform recordset entirely.  The cleanup-rebind issue at `Form_LookAtStatus.vb:1457+1460` (which leaves the subform recordset in an Object-Required state and breaks Pajek/Gephi) does not affect CmdNeo4j AT ALL.
+
+The "same root family" claim in the original skip-reason text was a copy-paste from the Pajek/Gephi skip without verification.  PR #128 directly unskipped CmdNeo4j with per-shape pinning of the 6-file output and chain-completion gates; no driver patch was needed.
+
+### Why Status × CmdPajek/Gephi remain blocked
+
+Both cells read `<subform>.Form.Recordset.RecordCount` upfront in their `_Click` handlers:
+- CmdPajek lines 2156 + 2161
+- CmdGephi lines 45 + 50
+
+After CmdQuery's cleanup section runs `Set <subform>.Form.Recordset = <Dim'd-local-recordset>` (lines 1457+1460), the subform's Recordset reads as Nothing in any subsequent test-driver-driven access → VBA error 424 'Object required' → bail.  This is the same observable across all 7 test-driver-side attempts.
+
+The sibling cell distinction is real and structural — CmdNeo4j bypasses the subform recordset; Pajek/Gephi don't.  Coverage state cannot be aligned across the family because the underlying CBDB code paths are different.
+
+### Why the recent 7-probe chain changes the ranking/disposition
+
+The local-workaround line tested across PR #127 + #129 → #137 covered each plausible test-driver-side intervention layer:
+
+| Layer | PR(s) tested | Result |
+|---|---|---|
+| Per-form VBA literal rewrite (Set→Requery) | #129 | Removes Object required but exposes RecordCount=0 (refuted) |
+| VBA-side DoEvents settle window | #132 (250ms generic), #133 (0ms explicit), #134 (500/750/1000ms bisect) | All failed; mechanism boundary identified (VBA-side ≠ COM-side) |
+| COM-side sleep + sequential dispatch | #135 | Phase B sub didn't even run (infra limitation surfaced) |
+| Direct invoke via `Application.Run` | #136 | Rejected by Access (class-module subs not addressable) |
+| Raw-COM `Form_Timer` re-injection + force-compile | #137 | Timer-binding cache pinned; force-compile insufficient |
+
+7 consecutive negative results across mechanism / sleep / dispatcher / direct-invoke / infra layers.  Test-driver-side attempts are exhausted in the realistic sense — the remaining theoretical candidates (close+reopen form between dispatches, standard-module Form_Timer redirect, pywinauto button click) each carry significant implementation cost AND uncertain outcome.
+
+The realistic next forward step is **maintainer-line / upstream-fix coordination** — fix the underlying CBDB pattern (Dim'd-local `Set <subform>.Form.Recordset` rebind in CmdQuery cleanup) at the source level, not work around it at the test-driver level.
+
+### Bucket distribution after this refresh
+
+Unchanged from `refresh_2026_05_08`: 8 remaining gaps in the cells-array.  Status × CmdPajek/Gephi are NOT in the cells-array (they're not gaps in cross-form CmdNeo4j coverage — they live on the cross-form Pajek/Gephi test); they remain in the parallel investigation-line category.
+
+| Bucket | Count | Cells |
+|---|---:|---|
+| A small_candidate | 0 | — |
+| B blocked_by_known_driver_issue | 3 | AssocPairs CmdGIS; Networks CmdGIS / CmdPajek |
+| C blocked_by_form_query_timeout | 1 | GroupData × CmdNeo4j (investigation line, Issue #21 canonical) |
+| D new_export_family_needs_design | 4 | Associations / Place / Kinship / AssociationPairs × CmdUCINet |
+| D + B stacked | 1 | Networks × CmdUCINet |
+
+**Investigation-line cells (separate ledger):**
+
+| Cell | State | Disposition |
+|---|---|---|
+| LookAtGroupData × CmdNeo4j | skipped | Issue #21 P1 canonical; maintainer-line |
+| LookAtAssociations × CmdNeo4j | covered (driver workaround PR #116/#117) | Issue #23 P1 canonical (workaround, not upstream fix) |
+| LookAtPlace × CmdNeo4j | covered (driver workaround PR #123) | Issue #24 P1 canonical (workaround, not upstream fix) |
+| LookAtStatus × CmdNeo4j | covered | NO canonical issue (false-positive skip; cell ran clean all along) |
+| **LookAtStatus × CmdPajek** | **skipped (cross-form Pajek/Gephi test)** | **local test-driver line EXHAUSTED (PR #127 + #129/.../#137); next action is maintainer-line** |
+| **LookAtStatus × CmdGephi** | **skipped (cross-form Pajek/Gephi test)** | **same as CmdPajek (sibling cell)** |
+
+### Next work, ranked (max 3) — with explicit category
+
+#### Rank 1 — maintainer-line: bundled CmdNeo4j-family + Status-Pajek/Gephi-cleanup-rebind upstream-fix coordination
+
+- **Category:** maintainer-line / upstream-fix coordination (out-of-band; NOT a PR action in this repo).
+- **Why rank-1:** three canonical P1 entries on the CmdNeo4j family (#21 + #23 + #24 unchanged) PLUS a now-empirically-pinned Status × CmdPajek/Gephi root cause that's structurally a CBDB-side defect (Dim'd-local `Set` rebind pattern in cleanup section).  Reaching the CBDB maintainer with all four concerns at once is high-leverage:
+  - **Issue #21** (`LookAtGroupData × CmdNeo4j`) — empty-recordset guards on blocks #9/#10
+  - **Issue #23** (`LookAtAssociations × CmdNeo4j`) — INSERT target column rename
+  - **Issue #24** (`LookAtPlace × CmdNeo4j`) — `tRstPeople` SELECT projection extension
+  - **NEW: Status × CmdPajek + CmdGephi cleanup-rebind** — `Form_LookAtStatus.vb:1457+1460` `Set <subform>.Form.Recordset = <Dim'd-local-recordset>` pattern; suggested fix: switch to globals (per `gRstPeople` precedent in line 1184) OR refactor away the rebind entirely.  This last item is NOT yet a canonical Issue — that's a separate decision (whether to file it now or only after maintainer feedback).
+- **Why bundled:** all four share a "cross-form export-button blocker rooted in CBDB source pattern" theme; a single maintainer interaction is more efficient than four sequential ones.  Also: the fix surface for the Status cleanup-rebind is small (10 lines or fewer of VBA).
+- **Shape:** out-of-band coordination; no repo file touched.
+- **Is local PR:** no.
+
+#### Rank 2 — driver/meta investigation: Status × CmdPajek/Gephi close+reopen-form between dispatches (CONDITIONAL)
+
+- **Category:** driver / meta investigation.
+- **Why rank-2 (and conditional):** PR #137's verdict-note ranks "close + reopen form between dispatches" as the most likely remaining test-driver-side fix candidate.  This drops the form's class instance entirely, forcing Access to re-resolve event handlers from the freshly-compiled module on Form_Open — directly addresses the per-instance event-binding cache that PR #137 pinned.
+- **Why conditional:** explicit maintainer guidance is needed before this is opened.  The brief just told us "next local work should stop"; this PR records the candidate but does NOT authorize.  If maintainer says "try one more local thing before maintainer-line", this is the candidate.  Otherwise it stays parked.
+- **Shape:** read-only probe with the form-close + reopen pattern between Phase A and Phase B; no public driver edit at first.  If probe succeeds, separate driver-PR + verification-probe pair lands the public driver change.
+- **Is local PR:** yes (probe + driver), but only if explicitly authorized.
+- **Risk:** medium — Access form close+reopen has its own complications (fixture state may need re-seeding); also requires heavier driver shape change than any prior attempt.
+
+#### Rank 3 — probe-first investigation: `LookAtPlace × CmdUCINet` resume
+
+- **Category:** probe-first investigation (NOT coverage PR, NOT canonical issue).
+- **Why rank-3:** carries forward from `refresh_2026_05_06`/`refresh_2026_05_07_later`; was paused on COM bridge instability concerns; nothing in the past month has changed that calculus.  Listed here only because rank-1 is out-of-band and rank-2 is conditional — if maintainer wants a local PR available, this is the cleanest cheap one.
+- **Shape:** read-only probe MD + JSON only; same shape as the original `refresh_2026_05_06` framing.
+- **Is local PR:** yes (conditional on COM bridge unpause brief).
+- **Risk:** low.
+
+### Direct answers to the brief
+
+**Q1: After CmdNeo4j family closure, what is the new rank-1?**
+
+**Maintainer-line: bundled upstream-fix coordination** for Issues #21 + #23 + #24 + the newly-pinned Status × CmdPajek/Gephi cleanup-rebind root cause.  This is the same rank-1 framing as `refresh_2026_05_08`, now expanded with the Status-Pajek/Gephi addition.
+
+**Q2: Is any local repo PR line still worth pursuing before maintainer-line?**
+
+**Not at rank-1 priority.**  The 7-probe chain produced sufficient negative evidence that further test-driver-side carving has steeply diminishing returns.  The two remaining theoretical candidates (close+reopen, standard-module redirect) carry implementation cost AND uncertain outcomes.
+
+If the maintainer's preference is "try one more local thing before maintainer-line", **rank-2 (close+reopen probe)** is the candidate.  Otherwise, **the realistic next step is rank-1 (maintainer-line) directly**.
+
+**Q3: Should `Status × CmdPajek/Gephi` now be considered parked?**
+
+**Yes, parked at the local-workaround layer.**  Both cells stay skipped; the cross-form Pajek/Gephi test's `_case_skip_marks` retains its existing skip reason without revision in this PR.  The disposition is: **parked pending maintainer-line outcome**.  If maintainer fixes the Set-rebind upstream, the cells become unskippable AND a coverage PR can land.  If maintainer declines and explicitly authorizes more local work, rank-2 (close+reopen) is the candidate.  If nothing happens, both cells stay skipped indefinitely — but with a clean disposition record explaining why.
+
+### Explicitly NOT to do (this refresh + onward)
+
+- ❌ Do NOT continue the local test-driver workaround line for Status × CmdPajek/Gephi.  PR #127 + #129 → #137 inclusive is the exhaustion record; further narrow tweaks in that direction would not produce new evidence.
+- ❌ Do NOT re-open the CmdNeo4j Status / Place / Associations Neo4j probes — all covered, scope locked.
+- ❌ Do NOT downgrade or close Issue #21 / #23 / #24 — coverage via local workaround does NOT silently change canonical issue truth.  Same rule.
+- ❌ Do NOT promote Status × CmdPajek/Gephi to coverage at the cross-form Pajek/Gephi test surface.  They remain skipped pending maintainer-line.
+- ❌ Do NOT touch README / canonical reports / issue severity in this triage refresh.
+- ❌ Do NOT process `analysis/report_screenshot_audit.md` drift.
+
+### Self-review (per `docs/skills/programmer-self-review-template.md`)
+
+**A. Branch shape.** Branch `triage/status-pajek-gephi-disposition` cut from current `main = 7b76c8e` (post PR #137 merge — same baseline as the refresh prose above).  Only the two triage files touched (this MD + paired JSON).  No tests, driver, README, canonical reports, issue severity, or other artifacts changed.  Pre-existing `analysis/report_screenshot_audit.md` drift left alone per standing instruction.
+
+**B. Source-of-truth sync.** This MD section ↔ the new JSON `refresh_2026_05_08_later` block carry the same truth deltas, ranked list, brief Q-A, and do-not-touch list.  The 7-probe chain is cited PR-by-PR (#127 / #128 / #129 / #130 / #131 / #132 / #133 / #134 / #135 / #136 / #137); the CmdNeo4j family closure (8/0) is cited against the actual current state of `tests/test_vba_cmdneo4j_cross_form.py::_spec_skip_marks` (post-PR #128: empty body).  No source-of-truth file is being changed by this refresh.
+
+**C. Evidence vs claim.** Each PR's outcome is summarized factually (the Status family's 7-PR exhaustion table); no claim that maintainer-line will succeed (rank-1 is presented as "the realistic next step", not a guaranteed unblock).  Rank-2 (close+reopen) is explicitly hedged as "conditional" — not a recommendation to open it; the rank-3 carry-forward has the same hedge it had in prior refreshes.  CmdNeo4j family false-positive narrative is grounded in PR #127's runtime evidence + static read of `Form_LookAtStatus.vb:527+528`, not paraphrased.
+
+**D. Residual risk.** Triage refresh, not implementation; residual risk is purely advisory: (1) rank-1 maintainer-line item is intentionally out-of-band — if no maintainer interaction happens, the queue's top item is "wait"; that's a deliberate design, not an oversight.  (2) rank-2 conditional-unpause is a judgement call; maintainer may prefer skipping local work entirely.  (3) the disposition "parked" for Status × CmdPajek/Gephi could be re-considered if a new fundamentally-different mechanism emerges (e.g., Access COM API extension we haven't discovered yet); the refresh leaves this open.  (4) bundling the Status cleanup-rebind into the same maintainer-line as Issues #21/#23/#24 is a packaging decision; the maintainer may want to handle it as a 5th issue with its own canonical entry — that's fine, the refresh doesn't prevent it.  No code path or test altered, so no runtime regression risk.
