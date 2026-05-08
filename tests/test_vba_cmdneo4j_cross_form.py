@@ -19,11 +19,29 @@ Skips:
   full injection Form_Open hits the project-wide auto-compile
   deadlock (PR AR-AX, AGENTS landmine #3.5).  Form_Open is fine
   via minimal injection — see tests/test_vba_networks_small_fixture.py.
-- LookAtStatus: chain interaction with CmdQuery cleanup-rebind
-  (same root family as Pajek/Gephi Status skip).
 - LookAtGroupData: matrix CmdQuery skipped.
 
-LookAtPlace (newly covered, this PR): the prior `Item not found
+LookAtStatus (newly covered, this PR): the prior `LookAtStatus chain
+interaction with CmdQuery cleanup-rebind, same root family as
+Pajek/Gephi Status skip` skip was a **false-positive copy-paste**
+from the Pajek/Gephi Status skip — verified by PR #127's 3-phase
+driver/meta probe (`reports/probe_status_export_cleanup_rebind
+.json`).  CmdNeo4j on Status runs cleanly on the matrix
+`status_<top_code>_unfiltered` fixture: 6 files in 11.74 s,
+0 watchdog dialogs, 0 :ERR markers, ZZ_TEST_DEBUG = [ENTER,
+MSGBOX, DONE] (the :MSGBOX is the terminal "Finished saving to
+Neo4j" generic neutralizer footprint, NOT a popup).
+**Structural reason:** unlike CmdPajek + CmdGephi (which read
+`<subform>.Form.Recordset.RecordCount` upfront and bail with
+'Object required' from the cleanup-rebind, see PR #127 Q3),
+CmdNeo4j opens fresh `dbOpenDynaset` on the underlying scratch
+TABLES directly (`Form_LookAtStatus.vb:527+528`), bypassing the
+subform recordset entirely — so it is not affected by the
+cleanup-rebind issue at all.  No driver patch needed; this is a
+direct unskip.  Issue #21 / #23 / #24 are unrelated to this
+cell.
+
+LookAtPlace (covered): the prior `Item not found
 in this collection.` skip is resolved by a driver-side workaround
 on main: PR #123
 (`_rewrite_place_cmdneo4j_trstpeople_projection`) extends the
@@ -134,7 +152,20 @@ _SPECS: tuple[Spec, ...] = (
     # ZZ_TEST_DEBUG = [ENTER, MSGBOX, DONE]).
     Spec("LookAtPlace",        min_files=6),
     Spec("LookAtKinship",      min_files=4),
-    Spec("LookAtStatus",       min_files=4),
+    # LookAtStatus × CmdNeo4j on the matrix `_make_status_fixtures`
+    # first fixture (`status_<top_code>_unfiltered`) produces
+    # exactly 6 files (People, PeopleStatus, Places, PeoplePlaces,
+    # PersonPlaceCodes, StatusCodes) — see
+    # `_assert_lookatstatus_neo4j_shape` for the per-shape pinning.
+    # Verified end-to-end by PR #127's driver/meta probe
+    # (CmdNeo4j phase: chain_elapsed = 11.74 s, watchdog dialogs
+    # = 0, ZZ_TEST_DEBUG = [ENTER, MSGBOX, DONE], 0 :ERR markers).
+    # **No driver patch needed** — unlike Place / Associations,
+    # CmdNeo4j on Status was a false-positive skip (PR #127 Q3);
+    # it always ran clean.  CmdPajek + CmdGephi on Status remain
+    # blocked by the cleanup-rebind 'Object required' issue
+    # (separate driver/meta brief).
+    Spec("LookAtStatus",       min_files=6),
     # AssociationPairs × CmdNeo4j on the 1×3 known-edged pair
     # produces exactly 6 files (People, Places, PeoplePlaces,
     # PeopleAssociations, AssociationCodes, KinshipCodes) — see
@@ -161,12 +192,6 @@ def _fixture_for(form: str) -> CrossFixture | None:
 
 
 def _spec_skip_marks(s: Spec):
-    if s.form == "LookAtStatus":
-        return pytest.mark.skip(
-            reason="LookAtStatus chain post-cleanup invalidates the "
-                   "subform recordset rebind; downstream CmdNeo4j reads "
-                   "RecordCount=0.  Same root family as Pajek/Gephi skip."
-        )
     return ()
 
 
@@ -262,6 +287,9 @@ def test_cmd_neo4j_produces_files(vba: VbaSession, spec: Spec, tmp_path):
             fspec.name, files, vba)
     if fspec.name == "LookAtPlace":
         _assert_lookatplace_neo4j_shape(
+            fspec.name, files, vba)
+    if fspec.name == "LookAtStatus":
+        _assert_lookatstatus_neo4j_shape(
             fspec.name, files, vba)
 
 
@@ -758,6 +786,134 @@ def _assert_lookatplace_neo4j_shape(
     )
 
 
+def _assert_lookatstatus_neo4j_shape(
+        form_name: str,
+        files: list[Path],
+        vba: VbaSession,
+) -> None:
+    """LookAtStatus × CmdNeo4j on the matrix `_make_status_fixtures`
+    first fixture (`status_<top_code>_unfiltered`,
+    `FrameFilterYears=1` no-year-filter) produces exactly 6 files
+    with these first-column shapes:
+
+      People             — `NameID,NameHZ,NamePY,IndexYear,Dynasty,Sex` (6 cols)
+      PeopleStatus       — `NameID,StatusCode,FirstYear,LastYear`        (4 cols)
+      Places             — `PlaceID,PlacePY,PlaceHZ,PlaceX,PlaceY`       (5 cols)
+      PeoplePlaces       — `NameID,PlaceID,PersonPlaceCode`              (3 cols)
+      PersonPlaceCodes   — `personPlaceCode,personPlaceTrans,personPlaceHZ` (3 cols)
+      StatusCodes        — `StatusCode,StatusDesc,StatusDescHZ`          (3 cols)
+
+    Three of the six files share the `NameID` first-column
+    (People, PeopleStatus, PeoplePlaces); they are disambiguated
+    by their second column via `_NEO4J_SHAPES_BY_TWO_COLS` —
+    `(NameID, NameHZ)` → People, `(NameID, StatusCode)` → PeopleStatus
+    (NEW this PR), `(NameID, PlaceID)` → PeoplePlaces.
+
+    Provenance: PR #127's driver/meta probe ran this exact fixture
+    (CmdNeo4j phase, after CmdPajek + CmdGephi failed with VBA 424
+    'Object required' — see `reports/probe_status_export_cleanup
+    _rebind.json`) and observed:
+      file_count = 6
+      chain_elapsed_sec = 11.74
+      watchdog dialog count = 0
+      ZZ_TEST_DEBUG = [ENTER, MSGBOX, DONE]
+      0 :ERR markers
+      ZZ_SCRATCH_STATUS = 17023 rows
+      ZZ_SCRATCH_P_STATUS = 17022 rows
+
+    The single ZZ_TEST_DEBUG `:MSGBOX` marker is the generic
+    literal-only neutralizer's footprint for the terminal
+    `MsgBox "Finished saving to Neo4j"` line — NOT a dialog,
+    NOT a blocker.
+
+    A `:ERR` marker in `ZZ_TEST_DEBUG` would mean the chain hit
+    the error trap mid-run.  This assertion fails on any `:ERR`
+    row.
+
+    **No canonical issue attached.**  Unlike LookAtAssociations
+    (Issue #23 + PR #116/#117 driver workarounds) and LookAtPlace
+    (Issue #24 + PR #123 driver workaround), this cell needs
+    NO driver patch — it always ran clean.  The prior skip in
+    `_spec_skip_marks` was a false-positive copy-paste from the
+    Pajek/Gephi cross-form Status skip; PR #127's Q3 directly
+    refuted the 'same root family' claim.
+
+    **CmdPajek + CmdGephi on Status remain blocked** by the
+    cleanup-rebind 'Object required' issue at
+    `Form_LookAtStatus.vb:1457+1460` (PR #127 Q1).  This coverage
+    PR explicitly does NOT address those two cells; that's a
+    separate driver/meta workaround verification PR.
+    """
+    headers_first_col: list[str] = []
+    for f in files:
+        raw = f.read_bytes()
+        text = raw.decode("utf-8", errors="replace").lstrip("﻿")
+        first_line = text.split("\n", 1)[0].strip()
+        first_col = first_line.split(",", 1)[0]
+        headers_first_col.append(first_col)
+
+    expected_first_cols = {
+        "NameID",            # People AND PeopleStatus AND PeoplePlaces
+                             # (disambiguated downstream by 2-col classifier)
+        "PlaceID",           # Places
+        "personPlaceCode",   # PersonPlaceCodes
+        "StatusCode",        # StatusCodes
+    }
+    seen = set(headers_first_col)
+    missing = expected_first_cols - seen
+    extra = seen - expected_first_cols
+    assert not missing, (
+        f"[{form_name}] CmdNeo4j missing expected file shapes "
+        f"(by header first-column): missing={sorted(missing)}; "
+        f"saw={sorted(seen)}.  Headers per file: "
+        f"{list(zip([f.name for f in files], headers_first_col))}"
+    )
+    assert not extra, (
+        f"[{form_name}] CmdNeo4j produced unexpected file shape(s) "
+        f"(by header first-column): extra={sorted(extra)}; "
+        f"expected exactly {sorted(expected_first_cols)}.  Headers "
+        f"per file: "
+        f"{list(zip([f.name for f in files], headers_first_col))}.  "
+        f"If a new shape appears here, the upstream Status VBA "
+        f"changed."
+    )
+
+    # Exactly 6 files (per PR #127's CmdNeo4j-phase verification
+    # baseline on this fixture).  Three `NameID` files (People,
+    # PeopleStatus, PeoplePlaces) share a first column → 4 distinct
+    # first-column shapes.
+    assert len(files) == 6, (
+        f"[{form_name}] CmdNeo4j produced {len(files)} files; "
+        f"expected exactly 6 on the matrix Status fixture.  "
+        f"Headers per file: "
+        f"{list(zip([f.name for f in files], headers_first_col))}"
+    )
+    assert len(seen) == len(expected_first_cols), (
+        f"[{form_name}] expected {len(expected_first_cols)} "
+        f"distinct file-shape first-columns "
+        f"({sorted(expected_first_cols)}); saw {len(seen)} "
+        f"({sorted(seen)})."
+    )
+
+    # Chain-completion + no-error markers in ZZ_TEST_DEBUG.
+    cur = vba.conn.cursor()
+    cur.execute(
+        "SELECT msg FROM ZZ_TEST_DEBUG ORDER BY id")
+    debug_msgs = [r[0] for r in cur.fetchall()]
+    cur.close()
+    assert any(m.endswith(":DONE") for m in debug_msgs), (
+        f"[{form_name}] ZZ_TEST_DEBUG never reached :DONE — "
+        f"chain block did not complete.  Markers seen: "
+        f"{debug_msgs}"
+    )
+    err_rows = [m for m in debug_msgs if ":ERR" in m]
+    assert not err_rows, (
+        f"[{form_name}] ZZ_TEST_DEBUG contains runtime :ERR "
+        f"markers (chain hit the error trap): {err_rows}.  "
+        f"All markers: {debug_msgs}"
+    )
+
+
 # ----------------------------------------------------------------------
 # PR Q: per-shape Neo4j export depth manifest
 # ----------------------------------------------------------------------
@@ -925,6 +1081,14 @@ _NEO4J_SHAPES: dict[str, tuple[str, list[str], list[str]]] = {
                            "IndexAddrTypeDesc",
                            "IndexAddrTypeDescHZ"],
                           ["IndexAddrTypeCode"]),
+    # Added 2026-05-08 (this PR) to cover LookAtStatus's CmdNeo4j
+    # output.  3-col code table, header literal at
+    # Form_LookAtStatus.vb (UTF-8 / non-ASCII branch — the default):
+    #   "StatusCode,StatusDesc,StatusDescHZ"
+    # Code-table — see bad-id skip set additions below.
+    "StatusCode": ("StatusCodes",
+                   ["StatusCode", "StatusDesc", "StatusDescHZ"],
+                   ["StatusCode"]),
 }
 
 # Two-column-prefix disambiguation for shapes whose first column
@@ -1023,6 +1187,18 @@ _NEO4J_SHAPES_BY_TWO_COLS: dict[
         ["AssociationCode", "AssociationTypeID",
          "AssociationTrans", "AssociationHZ"],
         ["AssociationCode"]),
+    # Added 2026-05-08 (this PR) to cover LookAtStatus's
+    # PeopleStatus shape.  Header literal:
+    #   "NameID,StatusCode,FirstYear,LastYear"
+    # Without this 2-col entry the file falls through to the
+    # legacy `NameID -> PeopleEntry` single-col lookup, which
+    # requires `EntryCode` -> assertion fires.  Same pattern as
+    # the existing `(NameID, OfficeCode)` -> PeopleOffice
+    # disambiguator added for LookAtOffice.
+    ("NameID", "StatusCode"): ("PeopleStatus",
+                               ["NameID", "StatusCode",
+                                "FirstYear", "LastYear"],
+                               ["NameID"]),
 }
 
 
@@ -1151,14 +1327,19 @@ def _assert_neo4j_export_depth(form_name: str,
                 "AssociationCodes-Associations",
                 "OccasionCodes",
                 "TopicCodes",
-                # Added 2026-05-08 (this PR) for LookAtPlace
+                # Added 2026-05-08 (PR #124) for LookAtPlace
                 # CmdNeo4j: same code-table family, first cell
                 # can legitimately be 0 / blank for unmapped
                 # codes.  PersonPlaceRelations (PersonID first
                 # col, integer person ids) is NOT in this set —
                 # strict bad-id check applies there.
                 "PersonPlaceRelCodes",
-                "IndexAddrTypeCodes"):
+                "IndexAddrTypeCodes",
+                # Added 2026-05-08 (this PR) for LookAtStatus
+                # CmdNeo4j: same code-table family, StatusCode
+                # can legitimately be 0 / blank for unmapped
+                # status values.
+                "StatusCodes"):
             # Code-table shapes can legitimately start with 0.
             raise AssertionError(
                 f"[{form_name}] {f.name} has rows whose first cell "
