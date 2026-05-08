@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "generated_date": "2026-05-08",
+  "probe_branch": "probe/place-cmdneo4j",
+  "main_at_probe": "d288d0c",
+  "form": "LookAtPlace",
+  "static_pre_analysis": {
+    "vba_dump_path": "analysis/dump/vba/Form_LookAtPlace.vb",
+    "vba_dump_total_lines": 6810,
+    "sub": "CmdNeo4j_Click",
+    "sub_line_range": [
+      435,
+      1778
+    ],
+    "dim_dlg_save_as_line": 457,
+    "exit_label_line": 1761,
+    "err_label_line": 1767,
+    "open_recordset_call_lines": [
+      531,
+      651,
+      881,
+      1073,
+      1259,
+      1479,
+      1671
+    ],
+    "dlg_save_as_show_lines": [
+      545,
+      827,
+      959,
+      1205,
+      1427,
+      1591
+    ],
+    "recordset_field_reference_count_in_sub": 54,
+    "no_record_count_zero_bail": true,
+    "no_there_are_no_records_msgbox_literal": true,
+    "no_item_not_found_literal_in_source": true,
+    "skip_reason_text": "fires `Item not found in this collection.` mid-body — looks like a real CBDB bug (SQL or recordset field reference against a renamed/missing column)",
+    "family_hypothesis_pre_runtime": "JET 3265 family — DIFFERENT from Issue #23 (JET 3061 SQL parser) and Issue #21 (DAO 3021 empty recordset MoveFirst).  Same surface symptom (CBDB-side renamed/missing column) but different trigger surface."
+  },
+  "config": {
+    "click_via_timer_timeout_sec": 180,
+    "per_probe_outer_timeout_sec": 300,
+    "promote_elapsed_threshold_sec": 120
+  },
+  "result": {
+    "form": "LookAtPlace",
+    "fixture_name": "place_addr_7213",
+    "fixture_picker_ids": [],
+    "fixture_addr_ids": [
+      7213
+    ],
+    "fixture_controls": {
+      "ChkIndividual": true,
+      "ChkOffice": false,
+      "ChkAssoc": false,
+      "ChkPosting": false,
+      "ChkEntry": false
+    },
+    "fixture_expected_min_rows": 50,
+    "markers": [
+      {
+        "t": 0.0,
+        "marker": "constructing_session"
+      },
+      {
+        "t": 5.81,
+        "marker": "session_opened_attempt_1"
+      },
+      {
+        "t": 6.07,
+        "marker": "filedialog_patched"
+      },
+      {
+        "t": 6.94,
+        "marker": "form_opened"
+      },
+      {
+        "t": 6.95,
+        "marker": "tab_places_set_to_0"
+      },
+      {
+        "t": 6.97,
+        "marker": "set_control_ChkAssoc_fail: com_error(-2147352567, 'Exception occurred.', (0, None, \"Welcome to CBDB! can't find the field 'ChkAssoc' referred to in your expression.\", 'acmain11.chm', 11730, -2146825823), None)"
+      },
+      {
+        "t": 6.98,
+        "marker": "set_control_ChkPosting_fail: com_error(-2147352567, 'Exception occurred.', (0, None, \"Welcome to CBDB! can't find the field 'ChkPosting' referred to in your expression.\", 'acmain11.chm', 11730, -2146825823), None)"
+      },
+      {
+        "t": 6.99,
+        "marker": "addr_picker_seeded_1_codes"
+      },
+      {
+        "t": 6.99,
+        "marker": "fixture_seeded"
+      },
+      {
+        "t": 6.99,
+        "marker": "form_tag_set_chain_CmdQuery_CmdNeo4j"
+      },
+      {
+        "t": 6.99,
+        "marker": "chain_fire_t_start"
+      },
+      {
+        "t": 16.04,
+        "marker": "click_via_timer_returned_5962"
+      },
+      {
+        "t": 24.04,
+        "marker": "chain_quiescent_zero_files_stable_for_8s"
+      },
+      {
+        "t": 24.04,
+        "marker": "chain_elapsed_17.05s"
+      },
+      {
+        "t": 24.04,
+        "marker": "files_inventoried_0"
+      },
+      {
+        "t": 24.05,
+        "marker": "row_counts_captured"
+      },
+      {
+        "t": 24.05,
+        "marker": "zz_test_debug_captured"
+      }
+    ],
+    "outcome": "probe_hit_existing_known_failure_family",
+    "elapsed_sec": 26.51,
+    "exception": null,
+    "row_counts": {
+      "ZZ_SCRATCH_STATUS": 17,
+      "ZZ_SCRATCH_PLACE_PEOPLE": 5764,
+      "ZZ_SCRATCH_PLACE_AGG": 5764,
+      "ZZ_SCRATCH_PEOPLE": 5764,
+      "ZZ_SCRATCH_ADDR": 1,
+      "ZZ_TEST_DEBUG": 3
+    },
+    "files": [],
+    "file_count": 0,
+    "click_via_timer_returned": 5962,
+    "chain_elapsed_sec": 17.05,
+    "chain_observed_done": true,
+    "msgbox_observed": [],
+    "zz_test_debug_msgs": [
+      "LookAtPlace:ENTER",
+      "LookAtPlace:ERR Item not found in this collection.",
+      "LookAtPlace:DONE"
+    ]
+  },
+  "verdict": "probe_hit_existing_known_failure_family",
+  "verdict_note": "**Documented skip reason reproduced.**  ZZ_TEST_DEBUG contains the JET 3265 \"Item not found in this collection.\" :ERR row(s): ['LookAtPlace:ERR Item not found in this collection.'].  file_count = 0.\n\nThis is the **JET 3265 family** — a `Recordset!field` or `Recordset.Fields(\"name\")` reference at the VBA layer fails because the field isn't in the recordset's runtime field collection.  DIFFERENT family from Issue #23 (JET 3061 unknown field name in INSERT statement) and from Issue #21 (DAO 3021 'No current record' on empty recordset .MoveFirst).  Same surface symptom (missing/renamed column) but different trigger surface (DAO field lookup vs SQL parser).\n\nRecommended next step (separate brief, NOT this PR): static investigation analogous to PR #114 — locate the specific `!c_<col>` reference inside CmdNeo4j_Click that fails (54 candidates per the static pre-analysis), determine whether the source recordset's column has been renamed or removed, then file as a new canonical Issue (analogous to Issue #23 filing in PR #115).  The driver-side workaround would mirror PR #116's `.replace()` shape but on the `!c_<col>` identifier rather than the INSERT target column.",
+  "answers": {
+    "Q1_chain_outcome": "runtime_ERR_zero_files",
+    "Q2_item_not_found_evidence": {
+      "skip_reason_phrase": "Item not found in this collection",
+      "appears_in_zz_test_debug": true,
+      "matching_err_markers": [
+        "LookAtPlace:ERR Item not found in this collection."
+      ],
+      "appears_in_watchdog_dialogs": false,
+      "file_count_at_failure": 0,
+      "interpretation": "If appears_in_zz_test_debug is True, the documented skip-reason error reproduced — JET 3265 fired mid-body and the driver's generic Err.Description neutralizer captured it as a ZZ_TEST_DEBUG :ERR row.  The chain stage (before/after any SaveAs) is inferred from file_count: 0 means before any disk write; > 0 means at least one SaveAs block completed before the error fired."
+    },
+    "Q3_zz_test_debug_markers": [
+      "LookAtPlace:ENTER",
+      "LookAtPlace:ERR Item not found in this collection.",
+      "LookAtPlace:DONE"
+    ],
+    "Q4_scratch_row_counts": {
+      "ZZ_SCRATCH_STATUS": 17,
+      "ZZ_SCRATCH_PLACE_PEOPLE": 5764,
+      "ZZ_SCRATCH_PLACE_AGG": 5764,
+      "ZZ_SCRATCH_PEOPLE": 5764,
+      "ZZ_SCRATCH_ADDR": 1,
+      "ZZ_TEST_DEBUG": 3
+    },
+    "Q5_vs_issue_23_family": {
+      "verdict": "DIFFERENT_FAMILY_from_Issue_23 — JET_3265_recordset_field_lookup",
+      "rationale": "Skip reason reproduces.  JET 3265 fires when a `Recordset!field` (or `Recordset.Fields(name)`) lookup fails at the VBA / DAO layer because the field isn't in the recordset's runtime field collection.  Issue #23 (JET 3061) fires from the SQL parser when an INSERT/SELECT/UPDATE field name doesn't exist on the named target/source table.  Same SURFACE SYMPTOM (CBDB-side missing/renamed column) but DIFFERENT TRIGGER SURFACE (DAO field lookup vs SQL parser).  Per-form workaround would also differ: this would rewrite a `!c_<col>` identifier, not an INSERT target column literal.",
+      "comparison": {
+        "issue_23_associations_x_cmdneo4j": "JET 3061 'unknown field name in INSERT': INSERT INTO ZZ_SCRATCH_PEOPLE references non-existent target column c_index_addr_type_code",
+        "this_probe_place_x_cmdneo4j": "JET 3265 'Item not found in this collection.': a Recordset!c_<col> reference in CmdNeo4j_Click body fails to find the field on the open recordset"
+      }
+    },
+    "Q6_outcome_bucket": "probe_hit_existing_known_failure_family",
+    "watchdog_dialogs_observed": 0,
+    "watchdog_dialog_texts": []
+  }
+}
