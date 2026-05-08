@@ -20,6 +20,7 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
   - [Issue #21 — LookAtGroupData.CmdNeo4j 在匯出空分部時崩潰報「No current record」](#issue-21--lookatgroupdatacmdneo4j-在匯出空分部時崩潰報no-current-record)
   - [Issue #22 — LookAtAssociations.CmdUCINet 在被匯出的人物網路含有 c_name 中帶 CJK 漢字時崩潰報「Invalid procedure call or argument」](#issue-22--lookatassociationscmducinet-在被匯出的人物網路含有-c_name-中帶-cjk-漢字時崩潰報invalid-procedure-call-or-argument)
   - [Issue #23 — LookAtAssociations.CmdNeo4j 的 INSERT 引用了 ZZ_SCRATCH_PEOPLE 上不存在的目標列 c_index_addr_type_code（疑似本意為 c_addr_type）](#issue-23--lookatassociationscmdneo4j-的-insert-引用了-zz_scratch_people-上不存在的目標列-c_index_addr_type_code疑似本意為-c_addr_type)
+  - [Issue #24 — LookAtPlace.CmdNeo4j 中 tRstPeople 的 SELECT 投影缺少 c_dynasty / c_dynasty_chn / c_female，下游迴圈仍然讀取這些欄位並崩潰報「Item not found in this collection」（JET 3265）](#issue-24--lookatplacecmdneo4j-中-trstpeople-的-select-投影缺少-c_dynasty--c_dynasty_chn--c_female下游迴圈仍然讀取這些欄位並崩潰報item-not-found-in-this-collectionjet-3265)
 - [P2 — 靜默顯示問題](#p2--靜默顯示問題)
   - [Issue #10 — EVENT_ADDR_2 子表單的地址列默默地顯示為空（ControlSource 寫錯了）](#issue-10--event_addr_2-子表單的地址列默默地顯示為空controlsource-寫錯了)
 - [P3 — 缺失介面](#p3--缺失介面)
@@ -364,6 +365,78 @@ tQueryStr = "INSERT INTO ZZ_SCRATCH_PEOPLE ( " & _
 ```
 
 **Driver-side workaround 選項**（另一份 brief；本 issue 不包含）：仿照 `_PER_FORM_CMDGIS_PATCHES` 裡 Issue #4（`GISFrame → CodeFrame`）和 Issue #5（`ChkIDs → False`）的寫法，在僅限於 `Form_LookAtAssociations` 的 CmdNeo4j_Click 內做一個把字面量 `c_index_addr_type_code` 改寫為 `c_addr_type` 的 per-form rewrite。這能讓測試套不依賴上游修復就跑通。
+
+### Issue #24 — LookAtPlace.CmdNeo4j 中 tRstPeople 的 SELECT 投影缺少 c_dynasty / c_dynasty_chn / c_female，下游迴圈仍然讀取這些欄位並崩潰報「Item not found in this collection」（JET 3265）
+
+**涉及位置:** `Form_LookAtPlace.CmdNeo4j_Click`
+
+**嚴重等級:** P1 — 正常使用者點選下的可見報錯（只要 LookAtPlace 查詢有非空的 place-people 結果，CmdNeo4j 匯出就會觸發；JET 3265 在第 757 行 `!c_dynasty` 讀取上穩定復現，runtime 證據在 PR #120 的 probe，靜態調查在 PR #121）
+
+#### 問題描述
+
+`Form_LookAtPlace.CmdNeo4j_Click` 在第 651 行用 `Set tRstPeople = CurrentDb.OpenRecordset(tQueryStr, dbOpenDynaset)` 開啟一個 recordset。繫結的 SQL（第 643-647 行）只從 `ZZ_SCRATCH_P_TEXT` 投影 **4** 個欄位：
+
+```
+SELECT DISTINCT
+    ZZ_SCRATCH_P_TEXT.c_person_id,
+    ZZ_SCRATCH_P_TEXT.c_name,
+    ZZ_SCRATCH_P_TEXT.c_name_chn,
+    ZZ_SCRATCH_P_TEXT.c_index_year
+FROM ZZ_SCRATCH_P_TEXT INNER JOIN
+     ( DYNASTIES RIGHT JOIN BIOG_MAIN ON
+       DYNASTIES.c_dy = BIOG_MAIN.c_dy )
+ON ZZ_SCRATCH_P_TEXT.c_person_id = BIOG_MAIN.c_personid
+```
+
+`INNER JOIN` 把 `DYNASTIES` 和 `BIOG_MAIN` 帶入範圍，但 SELECT 子句沒投影這兩個表的任何欄位。DAO 的 `Recordset.Fields` 集合只包含 SELECT 投影的欄位；JOIN 用於 filtering / row-shaping，**不**用於欄位存取。
+
+儘管如此，迴圈本體（第 689-783 行）仍然讀取 **3 個來自 JOINed 表但未被 SELECT 投影的欄位**：
+
+  - `tRstPeople!c_dynasty`     （第 757 行；預期來自 `DYNASTIES`）
+  - `tRstPeople!c_dynasty_chn` （第 769 行；預期來自 `DYNASTIES`）
+  - `tRstPeople!c_female`      （第 777、783 行；預期來自 `BIOG_MAIN`）
+
+JET 在第一次此類讀取時報 **3265「Item not found in this collection」**（即第 757 行 `!c_dynasty`）。錯誤處理跳到 `Exit_CmdNeo4j_Click`，**在 `gStream.WriteText` 把任何資料寫入磁碟之前**就退出，所以使用者看到彈窗且匯出產生 **0 個 CSV** —— 即使第 545 行的 `dlgSaveAs.Show` 已經觸發並捕獲了檔名。
+
+靜態 schema 互相印證（基於 `analysis/dump/tables.json`）：`DYNASTIES` **有** `c_dynasty` 與 `c_dynasty_chn`；`BIOG_MAIN` **有** `c_female`（也在 `tests/test_schema.py::REQUIRED_COLUMNS` 之中）。所以這 **不是** source-side 欄位 rename / removal —— 欄位在源表都在，SELECT 只是沒投影。純粹是 recordset projection mismatch。
+
+**與 Issue #23（LookAtAssociations × CmdNeo4j target-column mismatch）不同。** Issue #23 是 JET 3061（SQL parser）：INSERT 目標欄位列表引用了不存在的目標表欄位。本 issue 是 JET 3265（DAO 欄位集合查詢）：VBA 層的 `Recordset!field` 引用在執行期欄位集合中找不到對應欄位。相同的表面根因類別（缺欄位引用）但**不同的觸發面**（DAO 欄位查詢 vs SQL parser）和**不同的修法面**（SELECT 投影 vs INSERT 目標列表）。不應併入 Issue #23。
+
+**與 Issue #21（LookAtGroupData × CmdNeo4j 未保護的 `.MoveFirst`）也不同。** Issue #21 是 DAO 3021「No current record」—— 對空但有效的 recordset 的狀態機錯誤。本 issue 是對非空但欄位集合中不存在某欄位的 recordset 做欄位存取的錯誤。不同 DAO 錯誤碼、不同修法路徑。
+
+#### 復現步驟
+
+1. 開啟 **LookAtPlace**。
+2. 在地址挑選器選一個有實質資料的 **address**（任何關聯了大量傳記資料的 c_addr_id；matrix `_make_place_fixtures` 第一條 fixture `place_addr_<top_addr_by_indexed_persons>` 在當前 dump 上能讓 ZZ_SCRATCH_PLACE_PEOPLE ≈ 5,764 行 —— 與現有 Place × CmdGIS / CmdPajek 測試共用同一條 fixture）。
+3. 在表單上將 tab 設為 **Places**（TabPlaces=0；當前 cross-form CmdNeo4j 測試在 `_seed_query_inputs` 中已處理）。勾 **ChkIndividual**，不勾 **ChkOffice / ChkAssoc / ChkPosting / ChkEntry**。
+4. 點 **Run Query** —— CmdQuery 順利完成；scratch 表都被填充（ZZ_SCRATCH_PEOPLE、ZZ_SCRATCH_PLACE_PEOPLE、ZZ_SCRATCH_PLACE_AGG 都非空）。
+5. 點 **Neo4j**（匯出按鈕）。
+6. 彈出 **執行時錯誤 3265 —— Item not found in this collection.** 對話方塊（或 headless ／ driver-instrumented 跑法下，對應的 `LookAtPlace:ERR Item not found in this collection.` ZZ_TEST_DEBUG marker 被寫入）。Neo4j 匯出產出 **0 份 CSV** —— 沒有 `People_*.csv`、沒有 `Places_*.csv`，什麼都沒有。
+
+已透過 probe `analysis/probe_place_cmdneo4j.py` 端到端驗證（PR #120，已 merge `8f94276`）；具體的失敗引用點由靜態調查 `analysis/investigate_place_cmdneo4j_item_not_found.{py,md}` 確認（PR #121，已 merge `97e1162`）。
+
+#### 建議修復方案
+
+**推薦的上游 CBDB 修復：** 擴充套件 `Form_LookAtPlace.vb:643-647` 的 SELECT 投影，包含迴圈讀取的 3 個欄位：
+
+```vb
+tQueryStr = "SELECT DISTINCT " & _
+    "ZZ_SCRATCH_P_TEXT.c_person_id, " & _
+    "ZZ_SCRATCH_P_TEXT.c_name, " & _
+    "ZZ_SCRATCH_P_TEXT.c_name_chn, " & _
+    "ZZ_SCRATCH_P_TEXT.c_index_year, " & _
+    "DYNASTIES.c_dynasty, " & _
+    "DYNASTIES.c_dynasty_chn, " & _
+    "BIOG_MAIN.c_female " & _
+    "FROM ZZ_SCRATCH_P_TEXT INNER JOIN " & _
+    "( DYNASTIES RIGHT JOIN BIOG_MAIN ON " & _
+    "DYNASTIES.c_dy = BIOG_MAIN.c_dy ) " & _
+    "ON ZZ_SCRATCH_P_TEXT.c_person_id = BIOG_MAIN.c_personid"
+```
+
+FROM / JOIN 結構已經把源表帶進範圍；這純粹是 SELECT 缺欄位的問題。增加 3 個欄位，其他不變。
+
+**Driver-side workaround 選項**（另一份 brief；本 issue 不包含）：仿照 `_PER_FORM_CMDGIS_PATCHES` 裡 Issue #4（`GISFrame -> CodeFrame`）、Issue #5（`ChkIDs -> False`）和 Issue #23（`c_index_addr_type_code -> c_addr_type` INSERT 目標重寫）的寫法，在僅限於 `Form_LookAtPlace` 的 CmdNeo4j_Click 內做一個擴充套件 SELECT 投影字面量的 per-form rewrite。這能讓測試套不依賴上游修復就跑通。
 
 ## P2 — 靜默顯示問題
 

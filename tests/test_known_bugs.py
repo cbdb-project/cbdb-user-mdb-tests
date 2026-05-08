@@ -817,6 +817,210 @@ def test_bug23_associations_cmdneo4j_target_column_mismatch():
     )
 
 
+def test_bug24_place_cmdneo4j_recordset_projection_mismatch():
+    """Bug #24 (reports/CBDB_Issues_Report_EN.md) —
+    `Form_LookAtPlace.CmdNeo4j_Click`'s `tRstPeople` recordset
+    (line 651) is opened from a SELECT that projects only 4
+    columns from `ZZ_SCRATCH_P_TEXT`, but the loop body reads
+    `!c_dynasty`, `!c_dynasty_chn`, `!c_female` from the JOINed
+    DYNASTIES / BIOG_MAIN tables — which are NOT in the
+    SELECT projection.  DAO's `Recordset.Fields` collection
+    contains only SELECT-projected columns; `!c_dynasty`
+    raises JET 3265 'Item not found in this collection.' on
+    line 757 (the chain-order-first read of an unprojected
+    field).  The error trap routes to `Exit_CmdNeo4j_Click`
+    BEFORE any disk file is written → the user sees a popup
+    AND the export produces 0 CSV files.
+
+    Distinct from Issue #23 (LookAtAssociations × CmdNeo4j
+    INSERT target column mismatch) — different DAO error code
+    (3265 vs 3061), different trigger surface (DAO field
+    lookup vs SQL parser), different fix surface (SELECT
+    projection vs INSERT target list).
+
+    Distinct from Issue #21 (LookAtGroupData × CmdNeo4j
+    unguarded `.MoveFirst` on empty recordset) — DAO 3265
+    field-existence error vs DAO 3021 state-machine error.
+
+    Five anchored static markers (any one stops reproducing →
+    FAIL → maintainer must investigate before flipping):
+
+      (a) source-side schema:
+          DYNASTIES.c_dynasty present
+          DYNASTIES.c_dynasty_chn present
+          BIOG_MAIN.c_female present
+          (rules out source column rename/removal)
+      (b) VBA: tRstPeople SELECT projection literal in
+          Form_LookAtPlace.CmdNeo4j_Click contains the four
+          ZZ_SCRATCH_P_TEXT columns BUT does NOT contain any
+          of `DYNASTIES.c_dynasty`, `DYNASTIES.c_dynasty_chn`,
+          `BIOG_MAIN.c_female` projections.
+      (c) VBA: the loop body reads `!c_dynasty` (line 757),
+          `!c_dynasty_chn` (line 769), `!c_female` (lines 777
+          and 783).
+      (d) VBA: the binding statement `Set tRstPeople =
+          CurrentDb.OpenRecordset(tQueryStr, dbOpenDynaset)`
+          exists inside the sub.
+      (e) VBA: the FROM clause references DYNASTIES + BIOG_MAIN
+          via INNER JOIN + RIGHT JOIN — the JOIN already brings
+          source tables into scope so the SELECT could project
+          their columns; this rules out "source table not
+          referenced".
+
+    Anchor (a) comes from analysis/dump/tables.json — independent
+    of VBA dump line numbers, so it survives any reformatting of
+    the form.  Anchors (b)-(e) are fragment-anchored on unique
+    substrings inside the CmdNeo4j_Click body, scoped via the
+    `Private Sub CmdNeo4j_Click()` start.
+
+    See `analysis/probe_place_cmdneo4j.py` (PR #120) for runtime
+    evidence and
+    `analysis/investigate_place_cmdneo4j_item_not_found.py`
+    (PR #121) for the static recordset-projection-mismatch
+    cross-check.
+    """
+    # ----- Marker (a): schema, from tables.json -----
+    tables_json = REPO / "analysis" / "dump" / "tables.json"
+    data = json.loads(tables_json.read_text(encoding="utf-8"))
+    tables = {t["name"]: {c["name"] for c in t["columns"]}
+              for t in data}
+
+    dynasties = tables.get("DYNASTIES", set())
+    biog_main = tables.get("BIOG_MAIN", set())
+    for col, table_name, table_set in [
+        ("c_dynasty", "DYNASTIES", dynasties),
+        ("c_dynasty_chn", "DYNASTIES", dynasties),
+        ("c_female", "BIOG_MAIN", biog_main),
+    ]:
+        assert col in table_set, (
+            f"Bug #24 marker no longer reproduces (investigate "
+            f"upstream fix vs. fixture/driver change vs. "
+            f"misclassification before flipping) — source-side "
+            f"anchor (a) failed: {table_name} no longer has "
+            f"`{col}`.  If the schema dump is current, the "
+            f"upstream MDB has lost the column — that is a "
+            f"different (and more serious) failure than the "
+            f"recordset projection mismatch this issue "
+            f"documents."
+        )
+
+    # ----- Markers (b)-(e): VBA fragment anchors -----
+    vba_path = (REPO / "analysis" / "dump" / "vba"
+                / "Form_LookAtPlace.vb")
+    body = vba_path.read_bytes().decode("cp1252")
+
+    sub_marker = "Private Sub CmdNeo4j_Click()"
+    sub_start = body.find(sub_marker)
+    assert sub_start >= 0, (
+        "Bug #24 marker no longer reproduces — anchor "
+        f"`{sub_marker}` not found in Form_LookAtPlace.vb. "
+        "The form's CmdNeo4j_Click sub was likely refactored or "
+        "renamed.  Update this test to assert the corrected "
+        "form, and update Issue #24 in "
+        "reports/generate_report.py accordingly."
+    )
+    # Cap the search to the next `Private Sub` to keep markers
+    # scoped strictly inside CmdNeo4j_Click.
+    next_sub = body.find("Private Sub ", sub_start + len(sub_marker))
+    sub_body = body[sub_start: next_sub if next_sub > sub_start
+                    else len(body)]
+
+    # (d) The Set tRstPeople = ... OpenRecordset binding line.
+    binding_anchor = (
+        "Set tRstPeople = CurrentDb.OpenRecordset(tQueryStr")
+    assert binding_anchor in sub_body, (
+        "Bug #24 marker no longer reproduces (investigate "
+        "upstream fix vs. fixture/driver change vs. "
+        f"misclassification before flipping) — binding anchor "
+        f"(d) `{binding_anchor}` not found inside "
+        "Form_LookAtPlace.CmdNeo4j_Click.  The tRstPeople "
+        "recordset binding was likely refactored.  Update "
+        "Issue #24 in reports/generate_report.py."
+    )
+
+    # (b) The four projected columns ARE present (verifies the
+    # SELECT clause is the same one the issue documents).
+    select_projected_anchors = [
+        "ZZ_SCRATCH_P_TEXT.c_person_id",
+        "ZZ_SCRATCH_P_TEXT.c_name",
+        "ZZ_SCRATCH_P_TEXT.c_name_chn",
+        "ZZ_SCRATCH_P_TEXT.c_index_year",
+    ]
+    for anchor in select_projected_anchors:
+        assert anchor in sub_body, (
+            f"Bug #24 marker no longer reproduces — projected "
+            f"column anchor (b) `{anchor}` not found inside "
+            f"Form_LookAtPlace.CmdNeo4j_Click.  The tRstPeople "
+            f"SELECT was likely rewritten.  Update Issue #24."
+        )
+
+    # (b) The three NOT-projected qualified columns must be
+    # ABSENT from the sub body.  We check for the qualified
+    # form `DYNASTIES.c_dynasty` etc. — the bug class is
+    # specifically that these qualified-column projections are
+    # missing.  When upstream fixes by extending the SELECT,
+    # these strings would appear and this assertion fires.
+    select_unprojected_anchors = [
+        "DYNASTIES.c_dynasty",      # also matches c_dynasty_chn
+        "BIOG_MAIN.c_female",
+    ]
+    for anchor in select_unprojected_anchors:
+        assert anchor not in sub_body, (
+            f"Bug #24 marker no longer reproduces (investigate "
+            f"upstream fix vs. fixture/driver change vs. "
+            f"misclassification before flipping) — "
+            f"NOT-projected anchor `{anchor}` IS now present "
+            f"inside Form_LookAtPlace.CmdNeo4j_Click.  This "
+            f"likely means upstream extended the SELECT to "
+            f"project the missing column (the recommended "
+            f"fix).  Update this test to assert the corrected "
+            f"form, and update Issue #24 in "
+            f"reports/generate_report.py accordingly (mark "
+            f"fixed, remove this static marker, optionally "
+            f"remove any driver-side workaround if added "
+            f"later)."
+        )
+
+    # (c) The loop body reads `!c_dynasty`, `!c_dynasty_chn`,
+    # `!c_female`.  These are the field references that fire
+    # JET 3265 at runtime.  When upstream fixes by either
+    # extending the SELECT (above) or removing these reads,
+    # this assertion fires.
+    loop_field_read_anchors = [
+        "!c_dynasty",        # fires first at line 757
+        "!c_dynasty_chn",    # line 769
+        "!c_female",         # lines 777 and 783
+    ]
+    for anchor in loop_field_read_anchors:
+        assert anchor in sub_body, (
+            f"Bug #24 marker no longer reproduces (investigate "
+            f"upstream fix vs. fixture/driver change vs. "
+            f"misclassification before flipping) — loop field "
+            f"read anchor (c) `{anchor}` no longer found inside "
+            f"Form_LookAtPlace.CmdNeo4j_Click.  The loop body "
+            f"may have been refactored to remove the reference. "
+            f"Update Issue #24 in reports/generate_report.py."
+        )
+
+    # (e) The FROM clause brings DYNASTIES and BIOG_MAIN into
+    # scope via INNER JOIN + RIGHT JOIN.  Anchors confirm the
+    # join structure matches the issue's documented shape.
+    from_anchor_1 = (
+        "FROM ZZ_SCRATCH_P_TEXT INNER JOIN")
+    from_anchor_2 = (
+        "DYNASTIES RIGHT JOIN BIOG_MAIN ON")
+    for anchor in (from_anchor_1, from_anchor_2):
+        assert anchor in sub_body, (
+            f"Bug #24 marker no longer reproduces — FROM clause "
+            f"anchor (e) `{anchor}` not found inside "
+            f"Form_LookAtPlace.CmdNeo4j_Click.  The query's "
+            f"join structure was likely refactored.  If the "
+            f"refactor removed DYNASTIES / BIOG_MAIN from "
+            f"scope, the SELECT projection is no longer the "
+            f"right fix path; re-investigate Issue #24."
+        )
+
+
 def test_bug_dao_reference_broken_in_user_mdb():
     """The shipped .mdb references DAO 3.6 (C:\\Program Files\\Common
     Files\\Microsoft Shared\\DAO\\dao360.dll) which is not installed on

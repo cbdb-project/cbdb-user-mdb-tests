@@ -1,6 +1,6 @@
 # Report screenshot consistency audit
 
-**Generated:** 2026-05-07T11:48:31+00:00
+**Generated:** 2026-05-08T05:51:49+00:00
 **Generator:** `analysis/audit_report_screenshot_consistency.py`
 **Companion JSON:** `reports/report_screenshot_audit.json`
 
@@ -21,7 +21,7 @@ This audit cross-checks every screenshot caption in `reports/generate_report.py:
 
 | Metric | Value |
 |---|---:|
-| Issues total | 22 |
+| Issues total | 23 |
 | Issues with at least one screenshot | 11 |
 | Screenshots inspected | 14 |
 | Rule A violations (P5) | 0 |
