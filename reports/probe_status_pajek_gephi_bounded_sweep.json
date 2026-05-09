@@ -1,0 +1,179 @@
+{
+  "schema_version": 1,
+  "generated_date": "2026-05-09",
+  "probe_branch": "investigate/status-bounded-sweep",
+  "main_at_probe": "6b06d6a",
+  "form": "LookAtStatus",
+  "buttons_probed": [
+    "CmdPajek",
+    "CmdGephi"
+  ],
+  "candidates_tested": [
+    "A",
+    "E"
+  ],
+  "candidates_excluded": [
+    {
+      "family": "B",
+      "reason": "small variant of Family A"
+    },
+    {
+      "family": "C",
+      "reason": "Form_Open destructively DELETEs scratch tables; close+reopen confounds mechanism with data preservation"
+    },
+    {
+      "family": "D",
+      "reason": "PR #137 pinned failure at form-class-instance event-binding cache, not recordset ownership"
+    }
+  ],
+  "ui_fallback_pywinauto_attempted": false,
+  "ui_fallback_deferred_per_brief": true,
+  "viability_threshold": {
+    "both_buttons_fire": true,
+    "object_required_disappears": true,
+    "file_count_geq_1_both_buttons": true
+  },
+  "total_wall_elapsed_sec": 447.04,
+  "family_results": [
+    {
+      "family": "A",
+      "per_button_results": {
+        "CmdPajek": {
+          "family": "A",
+          "button": "CmdPajek",
+          "patch_ok": true,
+          "patch_msg": "Family A patch applied (injected 6 lines)",
+          "click_via_timer_returned": 17023,
+          "chain_elapsed_sec": 9.54,
+          "zz_test_debug_msgs": [
+            "LookAtStatus:ENTER",
+            "LookAtStatus:ERR Object required",
+            "LookAtStatus:DONE"
+          ],
+          "row_counts": {
+            "ZZ_SCRATCH_STATUS": 17023,
+            "ZZ_SCRATCH_P_STATUS": 17022
+          },
+          "files": [],
+          "file_count": 0,
+          "msgbox_observed": [],
+          "exception": null
+        },
+        "CmdGephi": {
+          "family": "A",
+          "button": "CmdGephi",
+          "patch_ok": true,
+          "patch_msg": "Family A patch applied (injected 6 lines)",
+          "click_via_timer_returned": 17023,
+          "chain_elapsed_sec": 9.54,
+          "zz_test_debug_msgs": [
+            "LookAtStatus:ENTER",
+            "LookAtStatus:ERR Object required",
+            "LookAtStatus:DONE"
+          ],
+          "row_counts": {
+            "ZZ_SCRATCH_STATUS": 17023,
+            "ZZ_SCRATCH_P_STATUS": 17022
+          },
+          "files": [],
+          "file_count": 0,
+          "msgbox_observed": [],
+          "exception": null
+        }
+      },
+      "family_classification": {
+        "family": "A",
+        "per_button_outcomes": {
+          "CmdPajek": "sub_fired_object_required",
+          "CmdGephi": "sub_fired_object_required"
+        },
+        "crosses_viability_threshold": false,
+        "scratch_baseline_preserved": true,
+        "summary": "family=A CmdPajek=sub_fired_object_required CmdGephi=sub_fired_object_required crossed=False scratch_ok=True"
+      }
+    },
+    {
+      "family": "E",
+      "per_button_results": {
+        "CmdPajek": {
+          "family": "E",
+          "button": "CmdPajek",
+          "scaffolding_ok": true,
+          "scaffolding_msg": "Family E scaffolding for Pajek injected",
+          "phase_a_click_via_timer_returned": 17023,
+          "phase_a_zz_test_debug_msgs": [
+            "LookAtStatus:ENTER",
+            "LookAtStatus:DONE"
+          ],
+          "phase_a_row_counts": {
+            "ZZ_SCRATCH_STATUS": 17023,
+            "ZZ_SCRATCH_P_STATUS": 17022
+          },
+          "phase_b_arm_ok": true,
+          "phase_b_arm_msg": "Family E timer armed (OnTimer==>DispatchToCmdPajek(), TimerInterval=100)",
+          "phase_b_dispatch_fired_seen": false,
+          "phase_b_dispatch_fired_wait_sec": 90.39,
+          "phase_b_dispatch_returned_seen": false,
+          "phase_b_dispatch_returned_wait_sec": 90.24,
+          "phase_b_zz_test_debug_msgs": [],
+          "phase_b_row_counts": {
+            "ZZ_SCRATCH_STATUS": 17023,
+            "ZZ_SCRATCH_P_STATUS": 17022
+          },
+          "files": [],
+          "file_count": 0,
+          "msgbox_observed": [],
+          "exception": null
+        },
+        "CmdGephi": {
+          "family": "E",
+          "button": "CmdGephi",
+          "scaffolding_ok": true,
+          "scaffolding_msg": "Family E scaffolding for Gephi injected",
+          "phase_a_click_via_timer_returned": 17023,
+          "phase_a_zz_test_debug_msgs": [
+            "LookAtStatus:ENTER",
+            "LookAtStatus:DONE"
+          ],
+          "phase_a_row_counts": {
+            "ZZ_SCRATCH_STATUS": 17023,
+            "ZZ_SCRATCH_P_STATUS": 17022
+          },
+          "phase_b_arm_ok": true,
+          "phase_b_arm_msg": "Family E timer armed (OnTimer==>DispatchToCmdGephi(), TimerInterval=100)",
+          "phase_b_dispatch_fired_seen": false,
+          "phase_b_dispatch_fired_wait_sec": 90.19,
+          "phase_b_dispatch_returned_seen": false,
+          "phase_b_dispatch_returned_wait_sec": 90.22,
+          "phase_b_zz_test_debug_msgs": [],
+          "phase_b_row_counts": {
+            "ZZ_SCRATCH_STATUS": 17023,
+            "ZZ_SCRATCH_P_STATUS": 17022
+          },
+          "files": [],
+          "file_count": 0,
+          "msgbox_observed": [],
+          "exception": null
+        }
+      },
+      "family_classification": {
+        "family": "E",
+        "per_button_outcomes": {
+          "CmdPajek": "sub_did_not_fire",
+          "CmdGephi": "sub_did_not_fire"
+        },
+        "crosses_viability_threshold": false,
+        "scratch_baseline_preserved": true,
+        "summary": "family=E CmdPajek=sub_did_not_fire CmdGephi=sub_did_not_fire crossed=False scratch_ok=True"
+      }
+    }
+  ],
+  "verdict": {
+    "verdict_bucket": "no_viable_local_candidate",
+    "viable_family": null,
+    "recommendation": "no non-UI candidate crossed the viability threshold; next step is either pywinauto UI fallback or pure maintainer-line; this PR's driver edits should be REVERTED before merge per brief",
+    "recommendation_concrete": "stay with pure maintainer-line posture; do NOT add pywinauto UI fallback; one new piece of evidence from Family E (expression-service OnTimer also blocked) strengthens rather than weakens the maintainer-line case",
+    "driver_state_vs_main": "byte-identical (no revert needed; probe used per-session VBA injection only)",
+    "key_new_evidence": "Family E negative result extends PR 137 pinned layer: form-class-instance Form_Timer binding cache resists not only [Event Procedure] form but also expression-service =StandardModuleFunc() form; cache is at the TimerInterval-arming-event level, not the binding-resolution level"
+  }
+}
