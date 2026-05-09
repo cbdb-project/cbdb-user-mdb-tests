@@ -796,13 +796,23 @@ def _verdict(per_button_cls: dict) -> dict:
                 "the form's design has no UI controls named "
                 "CmdPajek / CmdGephi (verified by recursive "
                 "COM Controls enumeration AND UIA descendants "
-                "scan). The Cmd<X>_Click subs exist as VBA-only "
-                "code with no UI binding. Pywinauto cannot click "
-                "what doesn't exist on the form. Recommend pure "
-                "maintainer-line; the maintainer scope must "
-                "include adding the missing UI buttons "
-                "alongside the cleanup-rebind fix, OR "
-                "documenting these subs as orphaned/legacy."),
+                "scan). This probe runtime-corroborates the "
+                "existing canonical missing-UI issues #16 "
+                "(LookAtStatus is missing its CmdPajek button) "
+                "and #17 (LookAtStatus is missing its CmdGephi "
+                "button); the same shape is also already filed "
+                "as canonical Issue #18 for CmdUCINet. This PR "
+                "does NOT expand canonical scope, does NOT open "
+                "a new issue candidate, and does NOT add the "
+                "missing-UI fix to the existing maintainer-line. "
+                "It supplies runtime corroboration for canonical "
+                "Issues #16/#17 and closes the pywinauto "
+                "fallback line. Next step remains the existing "
+                "pure maintainer-line."),
+            "runtime_corroborates_canonical_issues": [16, 17],
+            "shape_consistent_with_canonical_issues": [18],
+            "expands_canonical_scope": False,
+            "expands_existing_maintainer_line_scope": False,
         }
     return {
         "verdict_bucket": "ui_direct_simulation_infeasible_attempts_failed",
@@ -1041,17 +1051,22 @@ def _write_md(per_button_res, per_button_cls, verdict,
         "lower-level simulation has no remaining surface to "
         "click — but that gap is acknowledged.")
     md.append(
-        "- [x] Next step that should NOT be autopiloted: any "
-        "maintainer scope expansion (e.g. requesting that the "
-        "missing UI buttons be added) is a separately-scoped "
-        "follow-up; this PR records the diagnostic finding "
-        "but does not unilaterally expand the maintainer-line.")
-    md.append(
-        "- [x] If the diagnostic surfaced a new bug-candidate "
-        "(`Form_LookAtStatus.vb` has Cmd<X>_Click subs without "
-        "matching UI controls), it is recorded here; whether it "
-        "becomes a separate canonical issue is for the planner "
-        "to decide, not this probe.")
+        "- [x] Runtime corroboration of existing canonical "
+        "missing-UI issues: this probe's diagnostic enumerations "
+        "(recursive COM `Forms('LookAtStatus').Controls` finding "
+        "16 Cmd* controls but no CmdPajek/CmdGephi; UIA "
+        "descendants scan finding zero matching buttons; grep "
+        "of `analysis/dump/vba/Form_LookAtStatus.vb` finding "
+        "zero `Me.CmdPajek.*` / `Me.CmdGephi.*` / `Me.CmdUCINet.*` "
+        "references) all runtime-confirm the immediate UI "
+        "blocker already captured by canonical Issues #16 "
+        "(`LookAtStatus is missing its CmdPajek button`) and "
+        "#17 (`LookAtStatus is missing its CmdGephi button`); "
+        "the same shape is also already filed for CmdUCINet as "
+        "canonical Issue #18. This PR does NOT discover a new "
+        "finding and does NOT open a candidate for "
+        "canonicalization — it provides runtime evidence for "
+        "issues that are already canonical.")
     md.append(
         "- [x] No downstream-work pre-claim: this PR does NOT "
         "claim UI fallback would unblock any other form/button.")
