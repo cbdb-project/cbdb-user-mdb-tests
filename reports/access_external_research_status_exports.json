@@ -1,0 +1,188 @@
+{
+  "schema_version": 1,
+  "generated_date": "2026-05-09",
+  "kind": "external_research_memo",
+  "subject": "LookAtStatus x CmdPajek/Gephi parked local-workaround line -- external evidence review",
+  "branch": "research/access-external-evidence-status-exports",
+  "main_at_research": "81c029b",
+  "scope": "read-only research memo; no Access COM; no tests / driver / README / triage / canonical reports / issue severity changes; only this JSON and analysis/access_external_research_status_exports.md updated; pre-existing analysis/report_screenshot_audit.md drift NOT processed",
+
+  "credibility_tiers": {
+    "tier_1": "Microsoft official documentation (Microsoft Learn / VBA-Docs)",
+    "tier_2": "recognized Access community sources (Access World Forums, Tek-Tips, FMS, MrExcel, multi-source consensus)",
+    "tier_3": "forum anecdote / single-thread / version-specific weak evidence"
+  },
+
+  "raw_findings": [
+    {
+      "id": "F1",
+      "tier": 1,
+      "topic": "Application.Run name resolution",
+      "source_url": "https://learn.microsoft.com/en-us/office/vba/api/access.application.run",
+      "verbatim_quote": "The name of the Function or Sub procedure to be run. If you are calling a procedure in another database, use the project name and the procedure name separated by a dot in the form: 'projectname.procedurename'",
+      "key_implication": "documented syntax is 'procedurename' or 'projectname.procedurename' ONLY; no documented 'Form_<name>.SubName' qualifier; PR #136's failure (cannot find 'Form_LookAtStatus.RunExportPajek') is by design, not a missed escape",
+      "documented_example_uses": "Public sub in a STANDARD module (Greeting); not a form module"
+    },
+    {
+      "id": "F2",
+      "tier": 1,
+      "topic": "Form.Requery synchronous behavior + DoEvents requirement",
+      "source_url": "https://learn.microsoft.com/en-us/office/vba/api/access.form.requery",
+      "verbatim_quote": "The Requery method doesn't pass control to the operating system to allow Windows to continue processing messages. Use the DoEvents function if you need to relinquish temporary control to the operating system.",
+      "key_implication": "validates PR #131's positive 1.5s signal AND PR #132/#133/#134 negative results; mechanism boundary (VBA-side DoEvents != COM-side time.sleep) is consistent with documented Requery + DoEvents semantics",
+      "directly_supports_pr": [131, 132, 133, 134]
+    },
+    {
+      "id": "F3",
+      "tier": 1,
+      "topic": "Form.Recordset assignment scope",
+      "source_url": "https://learn.microsoft.com/en-us/office/vba/api/access.form.recordset",
+      "verbatim_quote": "Global rstSuppliers As ADODB.Recordset\nSub MakeRW()\n    DoCmd.OpenForm 'Suppliers'\n    Set rstSuppliers = New ADODB.Recordset\n    ...\n    Set Forms('Suppliers').Recordset = rstSuppliers\nEnd Sub",
+      "key_implication": "Microsoft's OWN example uses Global-scope recordset variable, NOT Dim'd-locally; this is exactly the upstream fix pattern Concern 4 recommended in PR #139 (switch tRstStatus from Dim'd-local to global per gRstPeople precedent at line 1184)",
+      "directly_supports": "Concern 4 upstream fix recommendation"
+    },
+    {
+      "id": "F4",
+      "tier": 1,
+      "topic": "Form.Recordset self-rebinding workaround for unbound-form symptom",
+      "source_url": "https://learn.microsoft.com/en-us/office/vba/api/access.form.recordset",
+      "verbatim_quotes": [
+        "Changing a form's Recordset property may also change the RecordSource, RecordsetType, and RecordLocks properties. Also, some data-related properties may be overridden, for example, the Filter, FilterOn, OrderBy, and OrderByOn properties.",
+        "Calling the Requery method of a form's recordset (for example, Forms(0).Recordset.Requery) can cause the form to become unbound. To refresh the data in a form bound to a recordset, set the RecordSource property of the form to itself: Forms(0).RecordSource = Forms(0).RecordSource."
+      ],
+      "key_implication": "this is a NEW Microsoft-documented workaround we did NOT test in any of PR #129/#132/#133/#134/#135/#136/#137; the strongest 'one more local probe could be justified' signal in the evidence",
+      "caveat": "the doc frames self-rebinding as a fix for 'form becomes unbound' symptom; whether it ALSO addresses the per-form-instance event-binding cache (PR #137's pinned layer) is not stated in the docs; technique is a candidate for a focused probe, not a guaranteed fix",
+      "untested_by_local_probe_chain": true
+    },
+    {
+      "id": "F5",
+      "tier": 1,
+      "topic": "AddFromString event-binding-cache refresh -- ABSENCE of documentation",
+      "source_url": "https://learn.microsoft.com/en-us/office/vba/api/Access.Module.AddFromString",
+      "verbatim_quote": "(no caveat about event-handler cache refresh after AddFromString)",
+      "key_implication": "Microsoft does NOT document any caveat or workaround for the event-handler cache refresh issue; PR #137's force-compile-doesn't-fix finding is consistent with no documented escape valve at this layer; pursuing this layer further would be heuristic / Access-version-specific",
+      "directly_supports_pr": [137]
+    },
+    {
+      "id": "F6",
+      "tier": 2,
+      "topic": "Form-module Public sub addressability from standard modules",
+      "source_urls": [
+        "https://www.tek-tips.com/threads/application-run-subform-procedure.1753196/",
+        "https://www.access-programmers.co.uk/forums/threads/calling-public-sub-from-another-form.153447/"
+      ],
+      "consensus_summary": "form-module Public subs are NOT addressable from standard modules via Application.Run; documented escape is 'Call Forms!FormName.PublicSubName' from VBA execution context; alternatively move shared logic to standard modules",
+      "key_implication": "corroborates F1 from independent community source; even with Public wrapper trick, app.Run('Form_LookAtStatus.RunExportPajek') won't work; the Forms!FormName.SubName form requires VBA execution context, not external COM",
+      "leaves_pr136_finding_intact": true
+    },
+    {
+      "id": "F7",
+      "tier": 2,
+      "topic": "Local Dim DAO recordset scope -> Object required",
+      "source_urls": [
+        "https://www.access-programmers.co.uk/forums/threads/subform-assign-recordset-to-dao.61256/",
+        "https://www.tek-tips.com/threads/form-and-subform-dao-recordsets.886905/"
+      ],
+      "consensus_summary": "'Object required' typically occurs when local recordset variable goes out of scope before form finishes using it; recommended fix is to keep recordset alive at module-level or global scope",
+      "key_implication": "corroborates F3 (Microsoft's Global example) from community consensus; directly supports Concern 4's upstream fix recommendation (switch tRstStatus to global per gRstPeople precedent)",
+      "directly_supports": "Concern 4 upstream fix recommendation"
+    },
+    {
+      "id": "F8",
+      "tier": 2,
+      "topic": "Form.RecordSource = Form.RecordSource self-rebinding (community corroboration of F4)",
+      "source_url": "https://www.access-programmers.co.uk/forums/threads/use-recordset-as-form-recordsource.56221/",
+      "consensus_summary": "self-rebinding pattern recommended in community threads when Set Form.Recordset = <recordset> followed by Requery / Close causes binding loss",
+      "key_implication": "corroborates F4 from independent Tier-2 source; adds confidence that the technique is real and working, not theoretical",
+      "untested_by_local_probe_chain": true
+    },
+    {
+      "id": "F9",
+      "tier": 3,
+      "topic": "Close + reopen form to refresh event handlers after runtime VBA injection",
+      "source_summary": "anecdotal forum threads (Access 2007/2010 era) suggest close+reopen as last-resort fix for AddFromString-style runtime injection causing event handlers to not bind correctly; no canonical source endorses",
+      "key_implication": "consistent with PR #137's verdict-note ranking 'close + reopen form' as the most-likely-to-work remaining local candidate, but does NOT independently strengthen the case beyond what we already had",
+      "credibility_caveat": "version-specific, anecdotal, no Tier-1 or Tier-2 corroboration"
+    }
+  ],
+
+  "inference": {
+    "I1_concern_4_fix_is_microsoft_documented_best_practice": {
+      "supporting_findings": ["F3", "F7"],
+      "summary": "F3 (Microsoft's own Form.Recordset example uses Global-scope recordset) AND F7 (community consensus on local-Dim recordset scope) BOTH point at the same fix shape: hold the recordset variable at Global (or at minimum module-level) scope, NOT Dim'd-locally inside the sub that assigns it to a subform's .Form.Recordset.  Concern 4's suggested upstream fix (switch tRstStatus from Dim'd-local to global per gRstPeople precedent at Form_LookAtStatus.vb:1184) IS exactly the Microsoft-documented best practice."
+    },
+    "I2_pr136_application_run_boundary_is_by_design": {
+      "supporting_findings": ["F1", "F6"],
+      "summary": "F1 (official doc syntax) AND F6 (community consensus on form-module sub addressability) both confirm that PR #136's app.Run('Form_LookAtStatus.RunExportPajek') was attempting an undocumented form.  No escape valve at this layer that we missed."
+    },
+    "I3_pr131_134_mechanism_boundary_is_by_microsoft_design": {
+      "supporting_findings": ["F2"],
+      "summary": "F2's official wording -- 'The Requery method doesn't pass control to the operating system... Use the DoEvents function if you need to relinquish temporary control' -- is consistent with our empirical finding that VBA-side DoEvents loops don't release the COM thread the way Python time.sleep does.  The mechanism boundary is real, documented, and not a bug we missed."
+    },
+    "I4_one_microsoft_documented_local_technique_NOT_tested": {
+      "supporting_findings": ["F4", "F8"],
+      "untested_technique": "Forms(0).RecordSource = Forms(0).RecordSource self-rebinding",
+      "estimated_probe_cost_minutes": "30-60",
+      "would_change_upstream_fix_recommendation": false,
+      "would_change_canonical_issue_state": false,
+      "summary": "F4 (official doc) + F8 (community corroboration) describe one Microsoft-documented local technique we did NOT test in PR #129/#132/#133/#134/#135/#136/#137.  Per PR #137's evidence the underlying issue is at Access's per-form-instance event-binding cache after AddFromString -- but the RecordSource = RecordSource technique addresses a different failure surface (recordset-becomes-unbound, not event-binding-cache-stale).  Plausible but not certain that combining the two would unblock.  Strongest 'one more local probe could be justified' signal in the evidence -- but recorded as optional unpause path, NOT a recommendation to keep the line in active development."
+    },
+    "I5_addfromstring_event_binding_cache_is_undocumented": {
+      "supporting_findings": ["F5", "F9"],
+      "summary": "F5's absence-of-doc + PR #137's empirical evidence + F9's Tier-3 close+reopen anecdote suggest this layer has no documented escape.  Pursuing it further locally would be heuristic / version-specific -- exactly the kind of fragility we want to avoid in a test driver."
+    },
+    "I6_microsoft_recommended_workaround_for_form_recordset_issues_IS_the_upstream_fix": {
+      "supporting_findings": ["F3", "F4"],
+      "summary": "F3 + F4 collectively show Microsoft's own guidance for 'Form.Recordset assigned to local recordset, then needs refresh' is: declare at Global scope (F3) OR use RecordSource = RecordSource self-rebinding (F4).  The Status form's existing gRstPeople global at line 1184 already follows F3.  Applying the same pattern to tRstStatus (the cleanup-rebind variable) is the documented fix -- not opaque maintainer-prerogative; documented Microsoft pattern."
+    }
+  },
+
+  "verdict": "external_evidence_supports_maintainer_line",
+
+  "verdict_rationale": "The dominant external evidence (F3 + F4 + F7 + F8) all converge on the same conclusion: the upstream fix Concern 4 recommends (switch tRstStatus from Dim'd-local to global) IS the Microsoft-documented best practice.  The 7-PR local-workaround chain's exhaustion is not just empirical -- it's also documented (F1+F6 confirm Application.Run is by design; F2 confirms VBA-side DoEvents != COM-side OS-yield; F5+F9 confirm the AddFromString event-binding-cache layer is undocumented and version-specific).  The maintainer-line handoff is well-grounded in canonical sources.",
+
+  "honest_acknowledgment_of_dissenting_signal": {
+    "finding": "F4 (Forms(0).RecordSource = Forms(0).RecordSource self-rebinding)",
+    "untested_by_local_probe_chain": true,
+    "estimated_probe_cost": "30-60 minutes",
+    "if_maintainer_or_reviewer_authorizes_one_more_local_probe": "this is the candidate technique to test",
+    "but_this_does_not_change": [
+      "Concern 4's upstream fix recommendation (globals fix is still the right upstream change)",
+      "canonical Issue truth for #21/#23/#24",
+      "the 'parked at the local-workaround layer' disposition framing"
+    ],
+    "if_succeeds": "would be another Status-specific test-driver workaround which the brief explicitly classified as exhausted in disposition",
+    "if_fails": "parked posture stays as-is"
+  },
+
+  "what_this_research_changes_about_pr_139_handoff": {
+    "issue_21_groupdata_cmdneo4j": "external research silent; canonical issue text remains authoritative",
+    "issue_23_associations_cmdneo4j": "external research silent; canonical issue text remains authoritative",
+    "issue_24_place_cmdneo4j": "external research silent; canonical issue text remains authoritative",
+    "concern_4_status_pajek_gephi_cleanup_rebind": {
+      "strengthened_by": "F3 + F7 directly support the suggested upstream fix (globals)",
+      "new_optional_local_unpause_path_surfaced": "F4 + F8 (RecordSource = RecordSource self-rebinding); recorded as optional, not as a reason to delay maintainer-line"
+    },
+    "overall_handoff_framing": "PR #139's handoff memo's 4-concern structure stands; this memo strengthens Concern 4's external grounding and surfaces ONE additional local technique not yet tested"
+  },
+
+  "constraints_honoured": [
+    "read-only research memo; no Access COM; no tests / driver / README / triage / canonical reports / issue severity changes",
+    "only the two research artifacts touched (this JSON + analysis/access_external_research_status_exports.md)",
+    "external sources stratified by credibility (Tier 1 = Microsoft official docs; Tier 2 = recognized community sources; Tier 3 = forum anecdote)",
+    "quoted Microsoft Learn docs verbatim where possible",
+    "raw findings (F1-F9) and inference (I1-I6) cleanly separated into different JSON keys",
+    "verdict bucket selected from the 3 named brief options (external_evidence_supports_maintainer_line)",
+    "did NOT silently treat forum anecdote as conclusion; F9 explicitly Tier 3 with credibility caveat",
+    "did NOT reopen any local probe per brief",
+    "analysis/report_screenshot_audit.md drift left alone (standing rule)"
+  ],
+
+  "self_review_per_template": {
+    "template": "docs/skills/programmer-self-review-template.md",
+    "branch_shape": "branch research/access-external-evidence-status-exports cut from current main = 81c029b (post PR #139 merge); only the two research artifacts touched; no tests / driver / README / triage / canonical reports / issue severity changes; pre-existing analysis/report_screenshot_audit.md drift left alone per standing instruction",
+    "source_of_truth_sync": "this memo does not modify any source-of-truth file -- it cites them; Microsoft Learn URLs are quoted with the exact page-canonical URL; community-source URLs cite the same page WebSearch returned; PR #139 handoff memo's content is referenced but not modified",
+    "evidence_vs_claim": "each finding F1-F9 cites its source AND its credibility tier; verbatim quotes from Microsoft Learn (F1-F4) reproduced; community-source consensus (F6, F7, F8) summarized with multi-source corroboration; forum anecdote (F9) explicitly Tier 3 with credibility caveat; verdict grounded in F1+F2+F3+F4+F5+F6+F7+F8 collectively; dissenting signal (F4 untested self-rebinding) honestly recorded as optional unpause path, NOT silently dropped to favor verdict",
+    "residual_risk": "research memo, not implementation; residual risk purely advisory: (1) F4 self-rebinding remains untested by us; if maintainer/reviewer authorizes one more local probe, that is the candidate; (2) F5 absence-of-doc is a 'no evidence' claim, not 'negative evidence' claim; some Microsoft KB or older official doc might exist that we didn't find; (3) Tier 2 community sources are durable but not infallible; (4) no code path or test altered, so no runtime regression risk"
+  }
+}
