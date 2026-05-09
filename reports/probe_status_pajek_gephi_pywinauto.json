@@ -432,15 +432,6 @@
   "verdict": {
     "verdict_bucket": "ui_direct_simulation_infeasible_no_ui_buttons",
     "next_step": "pure_maintainer_line_only",
-    "recommendation": "UI direct simulation is mechanically impossible for these buttons on the LookAtStatus form: the form's design has no UI controls named CmdPajek / CmdGephi (verified by recursive COM Controls enumeration AND UIA descendants scan). This probe runtime-corroborates the existing canonical missing-UI issues #16 (LookAtStatus is missing its CmdPajek button) and #17 (LookAtStatus is missing its CmdGephi button); the same shape is also already filed as canonical Issue #18 for CmdUCINet. This PR does NOT expand canonical scope, does NOT open a new issue candidate, and does NOT add the missing-UI fix to the existing maintainer-line. It supplies runtime corroboration for canonical Issues #16/#17 and closes the pywinauto fallback line. Next step remains the existing pure maintainer-line.",
-    "runtime_corroborates_canonical_issues": [
-      16,
-      17
-    ],
-    "shape_consistent_with_canonical_issues": [
-      18
-    ],
-    "expands_canonical_scope": false,
-    "expands_existing_maintainer_line_scope": false
+    "recommendation": "UI direct simulation is mechanically impossible for these buttons on the LookAtStatus form: the form's design has no UI controls named CmdPajek / CmdGephi (verified by recursive COM Controls enumeration AND UIA descendants scan). The Cmd<X>_Click subs exist as VBA-only code with no UI binding. Pywinauto cannot click what doesn't exist on the form. Recommend pure maintainer-line; the maintainer scope must include adding the missing UI buttons alongside the cleanup-rebind fix, OR documenting these subs as orphaned/legacy."
   }
 }
