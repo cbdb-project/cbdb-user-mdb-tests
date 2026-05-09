@@ -70,7 +70,7 @@ Family A's negative result is consistent with PR #129/#132/#133/#134's finding t
 - **bucket:** `no_viable_local_candidate`
 - **viable_family:** `None`
 - **recommendation (concrete):** stay with the **pure maintainer-line** posture for Status × CmdPajek / CmdGephi. Reasons:
-    - The maintainer-line is already filed end-to-end (Issue #X — Status cleanup-rebind defect; PR #139 handoff memo; PR #140 external-evidence corroboration).
+    - The maintainer-line for Status × CmdPajek/Gephi cleanup-rebind is a maintainer-line concern packaged in the PR #139 handoff memo and reinforced by PR #140's external-evidence corroboration; it is **not** (yet) a canonical filed issue.
     - The maintainer-line is one localized VBA fix in production (`Form_LookAtStatus.vb:1457` and `:1460`, swap the Dim'd-local pattern for the `gRstPeople`-style global ownership shape already proven on line 1184).
     - A pywinauto UI fallback would add a ~50-second per-session wall cost AND a new dependency on real-time Windows-message timing, AND would still only verify what the maintainer-line shape is supposed to fix — net negative cost/benefit.
     - This sweep added one new piece of evidence (Family E above) that **strengthens** the maintainer-line case rather than weakens it: the timer cache is structural; no in-process workaround on this form-instance is going to restore Form_Timer dispatch after the first use, period.
