@@ -272,7 +272,7 @@ End With
 
 **涉及位置:** `Form_LookAtAssociations.CmdUCINet_Click`
 
-**嚴重等級:** P1 — 正常使用者點選下的可見報錯。任何使用者只要在 `LookAtAssociations × CmdUCINet` 上選的人在當前 dump 的 1 階關聯網路中含有 c_name 帶 CJK 漢字的人，就會遇到 Run-time error 5 對話方塊，匯出全部失敗。當前 dump 上至少 person 437（已驗證 fixture）的 8087 行暫存表會觸發；更大範圍的影響人數取決於 BIOG_MAIN 中 c_name （理論上是 Latin / Pinyin）含漢字的行數 —— 至少 2 行落在 person 437 的網路裡，只要選的人 1 階鄰居含其中任一行都會受影響。
+**嚴重等級:** P1 — 正常使用者點選下的可見報錯。任何使用者只要在 `LookAtAssociations × CmdUCINet` 上發起的查詢結果集中含有 c_name 帶 CJK 漢字的人，就會遇到 Run-time error 5 對話方塊，匯出全部失敗。當前 dump 上至少以 c_assoc_code = 437 為 fixture 驗證的 8087 行暫存表會觸發；更大範圍的影響取決於 BIOG_MAIN 中 c_name（理論上是 Latin / Pinyin）含漢字的行數 —— 至少 2 行落在該查詢結果集裡，只要結果集含其中任一行就會受影響。
 
 #### 問題描述
 
@@ -294,7 +294,7 @@ End With
 
 1. 在 Microsoft Access 裡開啟 CBDB_BJ_User.mdb。
 2. 開啟 **LookAtAssociations** 表單（F11 → 導航窗格 → 表單 → 雙擊 `LookAtAssociations`）。
-3. 用人物 picker 選 **c_personid = 437（賈昭明 Jia Zhaoming）** —— 此人在當前 dump 上的 1 階關聯網路含有 c_name 帶漢字的人（具體是 pid 445395，c_name = `Hu Fa稜`）。
+3. 用關聯程式碼 picker（**CmdPickAssoc**）選取 **c_assoc_code = 437** —— 在當前 dump 上，該程式碼的查詢結果包含 person 445395（c_name = `Hu Fa稜`），其 c_name 含 CJK 漢字（U+7A1C 稜），在 cp1252 碼頁下無法編碼也無 FSO 替代對映。
 4. 點 **Run**（CmdQuery），等它把 ZZ_SCRATCH_ASSOC 和 ZZ_SCRATCH_P_ASSOC 填好。
 5. 點 **UCINet** 匯出按鈕（CmdUCINet），隨便選一個 `.vna` 檔案的存檔位置。
 6. 彈出對話方塊：`Run-time error '5': Invalid procedure call or argument`。匯出中斷，硬碟上只剩殘破的 `.vna` 檔：`*node data` 區段完整，`*node properties` 區段被截斷，`*tie data` 區段完全沒寫 —— UCINET / Visone 都沒法當成 import 檔案使用。

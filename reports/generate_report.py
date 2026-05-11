@@ -1341,12 +1341,12 @@ ISSUES = [
             "Open the **LookAtAssociations** form (F11 → "
             "navigation pane → forms → double-click "
             "`LookAtAssociations`).",
-            "Use the person picker to select **c_personid = "
-            "437 (Jia Zhaoming 賈昭明)** — one of the "
-            "people whose 1st-order association network "
-            "contains a person with a Han ideograph in "
-            "their `c_name` field on the current dump "
-            "(specifically pid 445395, c_name = `Hu Fa稜`).",
+            "Use the association-code picker (**CmdPickAssoc**) "
+            "to select **c_assoc_code = 437** — on the current "
+            "dump this code's result set includes person 445395 "
+            "(c_name = `Hu Fa稜`), whose name contains a CJK "
+            "Han ideograph (U+7A1C 稜) with no cp1252 mapping "
+            "and no FSO substitution.",
             "Click **Run** (CmdQuery) and wait for it to "
             "finish populating ZZ_SCRATCH_ASSOC + "
             "ZZ_SCRATCH_P_ASSOC.",
@@ -1371,10 +1371,11 @@ ISSUES = [
             "在 Microsoft Access 里打开 CBDB_BJ_User.mdb。",
             "打开 **LookAtAssociations** 表单（F11 → 导航窗"
             "格 → 表单 → 双击 `LookAtAssociations`）。",
-            "用人物 picker 选 **c_personid = 437（賈昭明 "
-            "Jia Zhaoming）** —— 此人在当前 dump 上的 1 阶"
-            "关联网络含有 c_name 带汉字的人（具体是 pid "
-            "445395，c_name = `Hu Fa稜`）。",
+            "用关联代码 picker（**CmdPickAssoc**）选取 "
+            "**c_assoc_code = 437** —— 在当前 dump 上，"
+            "该代码的查询结果包含 person 445395（c_name = "
+            "`Hu Fa稜`），其 c_name 含 CJK 汉字（U+7A1C 稜），"
+            "在 cp1252 码页下无法编码也无 FSO 替代映射。",
             "点 **Run**（CmdQuery），等它把 ZZ_SCRATCH_ASSOC "
             "和 ZZ_SCRATCH_P_ASSOC 填好。",
             "点 **UCINet** 汇出按钮（CmdUCINet），随便选一"
@@ -1469,31 +1470,31 @@ ISSUES = [
         "severity_en": (
             "P1 — Visible crash on a normal user click.  "
             "Any user attempting `LookAtAssociations × "
-            "CmdUCINet` whose 1st-order association network "
-            "happens to include a person with a CJK Han "
-            "ideograph in their `c_name` will hit a "
-            "Run-time error 5 popup and lose the export.  "
-            "On the current dump that's at least the "
-            "8087-row scratch table for person 437 (the "
-            "verified fixture); the broader prevalence "
+            "CmdUCINet` will hit a Run-time error 5 popup "
+            "and lose the export whenever their query result "
+            "set includes a person with a CJK Han ideograph "
+            "in `c_name`.  On the current dump that's at "
+            "least the 8087-row scratch table produced by "
+            "the probe fixture verified with "
+            "c_assoc_code = 437; the broader prevalence "
             "across CBDB persons depends on how many "
             "BIOG_MAIN rows have Han ideographs in their "
             "ostensibly-Latin `c_name` field — at minimum 2 "
-            "such rows reach person 437's network, and any "
-            "person with even one such 1st-order neighbour "
-            "is affected."
+            "such rows appear in that result set, and any "
+            "query whose result set contains even one such "
+            "row is affected."
         ),
         "severity_zh": (
             "P1 — 正常用户点击下的可见报错。任何使用者只要"
-            "在 `LookAtAssociations × CmdUCINet` 上选的人"
-            "在当前 dump 的 1 阶关联网络中含有 c_name 带 "
-            "CJK 汉字的人，就会遇到 Run-time error 5 对话"
-            "框，汇出全部失败。当前 dump 上至少 person 437"
-            "（已验证 fixture）的 8087 行暂存表会触发；更"
-            "大范围的影响人数取决于 BIOG_MAIN 中 c_name "
-            "（理论上是 Latin / Pinyin）含汉字的行数 —— "
-            "至少 2 行落在 person 437 的网络里，只要选的"
-            "人 1 阶邻居含其中任一行都会受影响。"
+            "在 `LookAtAssociations × CmdUCINet` 上发起的"
+            "查询结果集中含有 c_name 带 CJK 汉字的人，就会"
+            "遇到 Run-time error 5 对话框，汇出全部失败。"
+            "当前 dump 上至少以 c_assoc_code = 437 为 "
+            "fixture 验证的 8087 行暂存表会触发；更大范围"
+            "的影响取决于 BIOG_MAIN 中 c_name（理论上是 "
+            "Latin / Pinyin）含汉字的行数 —— 至少 2 行落"
+            "在该查询结果集里，只要结果集含其中任一行就"
+            "会受影响。"
         ),
     },
 

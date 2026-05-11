@@ -272,7 +272,7 @@ Defensive scope option (not required to close this issue): adding the same guard
 
 **Affected sub:** `Form_LookAtAssociations.CmdUCINet_Click`
 
-**Severity:** P1 — Visible crash on a normal user click.  Any user attempting `LookAtAssociations × CmdUCINet` whose 1st-order association network happens to include a person with a CJK Han ideograph in their `c_name` will hit a Run-time error 5 popup and lose the export.  On the current dump that's at least the 8087-row scratch table for person 437 (the verified fixture); the broader prevalence across CBDB persons depends on how many BIOG_MAIN rows have Han ideographs in their ostensibly-Latin `c_name` field — at minimum 2 such rows reach person 437's network, and any person with even one such 1st-order neighbour is affected.
+**Severity:** P1 — Visible crash on a normal user click.  Any user attempting `LookAtAssociations × CmdUCINet` will hit a Run-time error 5 popup and lose the export whenever their query result set includes a person with a CJK Han ideograph in `c_name`.  On the current dump that's at least the 8087-row scratch table produced by the probe fixture verified with c_assoc_code = 437; the broader prevalence across CBDB persons depends on how many BIOG_MAIN rows have Han ideographs in their ostensibly-Latin `c_name` field — at minimum 2 such rows appear in that result set, and any query whose result set contains even one such row is affected.
 
 #### Description
 
@@ -294,7 +294,7 @@ User-visible symptom: a Run-time error 5 popup blocks the user; the exported `.v
 
 1. Open CBDB_BJ_User.mdb in Microsoft Access.
 2. Open the **LookAtAssociations** form (F11 → navigation pane → forms → double-click `LookAtAssociations`).
-3. Use the person picker to select **c_personid = 437 (Jia Zhaoming 賈昭明)** — one of the people whose 1st-order association network contains a person with a Han ideograph in their `c_name` field on the current dump (specifically pid 445395, c_name = `Hu Fa稜`).
+3. Use the association-code picker (**CmdPickAssoc**) to select **c_assoc_code = 437** — on the current dump this code's result set includes person 445395 (c_name = `Hu Fa稜`), whose name contains a CJK Han ideograph (U+7A1C 稜) with no cp1252 mapping and no FSO substitution.
 4. Click **Run** (CmdQuery) and wait for it to finish populating ZZ_SCRATCH_ASSOC + ZZ_SCRATCH_P_ASSOC.
 5. Click the **UCINet** export button (CmdUCINet) and choose any save location for the `.vna` file.
 6. A popup appears: `Run-time error '5': Invalid procedure call or argument`.  The export aborts.  The partial `.vna` file on disk has the complete `*node data` section but a truncated `*node properties` section and no `*tie data` section at all — unusable as a UCINET / Visone import.
