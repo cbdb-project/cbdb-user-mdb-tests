@@ -121,11 +121,11 @@ _Reconstructed-in-PIL popup showing the JET 'Item not found in this collection' 
 
 **涉及位置:** `ADDR_CODES + Form_LookAt*.CmdGIS_Click`
 
-**嚴重等級:** P0 — 靜默匯出欄位錯位（數字欄位落到文字欄，所有欄位向右挪一格，結尾多出一欄）
+**嚴重等級:** P0 — 靜默匯出欄位錯位（數字欄位落到文本欄，所有欄位向右挪一格，結尾多出一欄）
 
 #### 問題描述
 
-`ADDR_CODES` 中有 315 行在 `c_name` **和** `c_name_chn` 裡都帶著 `U+FEFF`（BOM）字首，幾乎可以確定是資料匯入時從 UTF-8-with-BOM 文件複製貼上留下的痕跡。當 `LookAtStatus.CmdQuery`（以及其他 LookAt 表單的對應 CmdQuery / CmdRun）把這些行透過 SQL UPDATE/INSERT 複製到自己的 scratch 暫存表時，JET 會先把 BOM 去掉，再把剩下的 UTF-16 LE 位元組重新當成單位元組字元——升回 Unicode 之後值就被破壞了。以 `c_addr_id = 702559`（尉氏）為例，源字串 `﻿尉氏`（UTF-16 位元組 `ff fe 09 5c 0f 6c`）變成了暫存字串 `\t\\\x0fl`（UTF-16 位元組 `09 00 5c 00 0f 00 6c 00`），第 0 位上多了一個**真正的 TAB 字元**。
+`ADDR_CODES` 中有 315 行在 `c_name` **和** `c_name_chn` 裡都帶著 `U+FEFF`（BOM）字首，幾乎可以確定是資料匯入時從 UTF-8-with-BOM 文件複製貼上留下的痕跡。當 `LookAtStatus.CmdQuery`（以及其他 LookAt 表單的對應 CmdQuery / CmdRun）把這些行通過 SQL UPDATE/INSERT 複製到自己的 scratch 暫存表時，JET 會先把 BOM 去掉，再把剩下的 UTF-16 LE 位元組重新當成單位元組字元——升回 Unicode 之後值就被破壞了。以 `c_addr_id = 702559`（尉氏）為例，源字串 `﻿尉氏`（UTF-16 位元組 `ff fe 09 5c 0f 6c`）變成了暫存字串 `\t\\\x0fl`（UTF-16 位元組 `09 00 5c 00 0f 00 6c 00`），第 0 位上多了一個**真正的 TAB 字元**。
 
 隨後 `Form_LookAtStatus.CmdGIS_Click`（第 1554–1636 行）把每個欄位寫成 `tStr + value + tC`，其中 `tC = Chr(9)` （第 1552 行）——完全沒有做任何轉義。這個嵌入的 TAB 就被當作分隔符，把 AddrChn 拆成兩欄，往後所有的欄位都悄無聲息地往右挪一格。使用者在 Excel 裡開啟這份 `.tab` 檔，會看到座標落在錯誤的欄位、還多出一個尾欄。LookAtTexts / LookAtPlace / LookAtAssociations / LookAtOffice / LookAtKinship 的 CmdGIS 都用同樣的 `tStr + value + tC` 模式，所以任何 LookAt 表單只要查詢結果裡碰到這 315 個髒地址裡的任何一個，都會重現同樣的欄位錯位。
 
@@ -138,7 +138,7 @@ _Reconstructed-in-PIL popup showing the JET 'Item not found in this collection' 
 1. 開啟 **LookAtStatus**。在 status picker 裡挑 status code **40**（[為官者：文] / civil office），不要設年份過濾——測試 fixture 裡 `FrameFilterYears = 1`。
 2. 點 **Run Query**。結果網格里大約填進 17 000 行。
 3. 點 **GIS**，把編碼選成 UTF-8（`GISFrame = 1`）。把匯出的 `.tab` 檔存下來。
-4. 在任意支援 tab 的工具（Excel / 帶欄位標尺的文字編輯器）裡開啟這個檔。第 **11476** 行附近（對應人物阮孚，`c_addr_id = 702559` / 尉氏）有一行包含 10 個 tab 欄位、卻對著 9 欄的表頭。AddrChn 是空的、X 欄裡塞了文字，真正的 X / Y 值都往右挪了一欄。
+4. 在任意支援 tab 的工具（Excel / 帶欄位標尺的文本編輯器）裡開啟這個檔。第 **11476** 行附近（對應人物阮孚，`c_addr_id = 702559` / 尉氏）有一行包含 10 個 tab 欄位、卻對著 9 欄的表頭。AddrChn 是空的、X 欄裡塞了文字，真正的 X / Y 值都往右挪了一欄。
 
 #### 建議修復方案
 
@@ -288,7 +288,7 @@ End With
 - **LookAtKinship** — **同 root cause 的 runtime-confirmed sibling form。**`Form_LookAtKinship.CmdUCINet_Click` 在約 line 2510 用同樣的 `CreateTextFile(tFileName, True)` 2-arg 模式。透過 probe `investigate/kinship-cmducinet-sibling-risk`（commit 154bb4b）以 picker = pid 152930（He Jing 何淨，唯一 1-hop kin 是 pid 140733 He Mou 取，U+53D6 = 與 Associations 的 稜 = U+7A1C 同屬 CJK Han ideograph 觸發類）復現。Probe 結果：同樣的 `:ERR Invalid procedure call or argument`，同樣的殘破檔案形狀（`*node data` 完整 + `*node properties` 截斷 + `*tie data` 完全沒寫）。本 PR 已擴充套件靜態 marker `tests/test_known_bugs.py::test_bug22_associations_cmducinet_createtextfile_no_unicode_arg`，讓它同時檢查 `Form_LookAtKinship.vb` 的同樣 2-arg 模式；Kinship 的執行時 pin 暫緩（見下方 Coverage caveat）。
 - **LookAtPlace** — 可能存在的獨立風險；**本 issue 的確認範圍不包含 Place。**`Form_LookAtPlace.CmdUCINet_Click` 用的是 ADO Stream（`tStream.WriteText`），不是 FSO （`tVNA.WriteLine`），編碼行為可能不同，需要單獨的 per-form probe 才能下同 bug-family 的結論。Place CmdUCINet 在 inventory 仍維持 `gap`。
 
-**Coverage caveat：** 現有的 Kinship × CmdUCINet 覆蓋測試（`tests/test_vba_cmducinet_kinship.py`）在 inventory 上仍是 `covered`，但已 **明確標註為 fixture-fragile** —— 它能透過只是因為 matrix 提供的 person 3211 網路剛好沒有 Han 字元 c_name。換成一個網路能觸達Han 名字的 fixture（sibling probe 直接示範了這一點）就會在同一段 .vna 寫出路徑上崩潰。已在測試的 docstring 與 inventory manifest 的 notes 欄位同步備註。
+**Coverage caveat：** 現有的 Kinship × CmdUCINet 覆蓋測試（`tests/test_vba_cmducinet_kinship.py`）在 inventory 上仍是 `covered`，但已 **明確標註為 fixture-fragile** —— 它能通過只是因為 matrix 提供的 person 3211 網路剛好沒有 Han 字元 c_name。換成一個網路能觸達Han 名字的 fixture（sibling probe 直接示範了這一點）就會在同一段 .vna 寫出路徑上崩潰。已在測試的 docstring 與 inventory manifest 的 notes 欄位同步備註。
 
 #### 復現步驟
 
@@ -326,9 +326,9 @@ Set tVNA = tFileSystem.CreateTextFile(tFileName, True, True)
 
 #### 問題描述
 
-`Form_LookAtAssociations.CmdNeo4j_Click` 透過 `INSERT INTO ZZ_SCRATCH_PEOPLE ( c_person_id, c_name, c_name_chn, c_index_year, c_index_year_type_code, c_dy, c_addr_id, c_index_addr_type_code, c_female ) SELECT DISTINCT … BIOG_MAIN.c_index_addr_type_code, BIOG_MAIN.c_female …` 來填充 `ZZ_SCRATCH_PEOPLE` 工作表。INSERT 目標列裡把 **c_index_addr_type_code** 當作 `ZZ_SCRATCH_PEOPLE` 上的列引用，但當前 dump 的 `ZZ_SCRATCH_PEOPLE` 共 22 列，並沒有這一列（canonical 列名見 `analysis/dump/tables.json`）。JET 報 **3061「INSERT INTO 語句包含未知的欄位名 c_index_addr_type_code」**，整個 Neo4j 匯出在 body 中途中斷 —— 在任何磁碟檔案被寫出之前 —— 即便 `dlgSaveAs.Show` 已經彈出且鏈條已進入 People-block True 分支。
+`Form_LookAtAssociations.CmdNeo4j_Click` 通過 `INSERT INTO ZZ_SCRATCH_PEOPLE ( c_person_id, c_name, c_name_chn, c_index_year, c_index_year_type_code, c_dy, c_addr_id, c_index_addr_type_code, c_female ) SELECT DISTINCT … BIOG_MAIN.c_index_addr_type_code, BIOG_MAIN.c_female …` 來填充 `ZZ_SCRATCH_PEOPLE` 工作表。INSERT 目標列裡把 **c_index_addr_type_code** 當作 `ZZ_SCRATCH_PEOPLE` 上的列引用，但當前 dump 的 `ZZ_SCRATCH_PEOPLE` 共 22 列，並沒有這一列（canonical 列名見 `analysis/dump/tables.json`）。JET 報 **3061「INSERT INTO 語句包含未知的欄位名 c_index_addr_type_code」**，整個 Neo4j 匯出在 body 中途中斷 —— 在任何磁碟檔案被寫出之前 —— 即便 `dlgSaveAs.Show` 已經彈出且鏈條已進入 People-block True 分支。
 
-靜態 schema 互相印證：source 端 `BIOG_MAIN` **有** `c_index_addr_type_code`（共 55 列；該列在 `tests/test_schema.py` 的 REQUIRED_COLUMNS 中，schema 測試透過即獨立證實）。所以缺的是 **target** 表，不是 source。
+靜態 schema 互相印證：source 端 `BIOG_MAIN` **有** `c_index_addr_type_code`（共 55 列；該列在 `tests/test_schema.py` 的 REQUIRED_COLUMNS 中，schema 測試通過即獨立證實）。所以缺的是 **target** 表，不是 source。
 
 關於作者意圖的強靜態推斷：失敗 INSERT 之後緊鄰的 `UPDATE` 是 LEFT JOIN `ZZ_SCRATCH_PEOPLE.c_addr_type = BIOG_ADDR_CODES.c_addr_type` 並 SET 一組地址描述列。target 表 **有** `c_addr_type`，但失敗的 INSERT 從未寫入 `c_addr_type` —— 而 `c_addr_type` 正是 source `BIOG_MAIN.c_index_addr_type_code` 的自然 rename 目標（同一 INSERT 在前一列已經做過一模一樣的 rename：`BIOG_MAIN.c_index_addr_id ↦ ZZ_SCRATCH_PEOPLE.c_addr_id`）。看起來作者把 source 列名直接複製到 INSERT 目標列表裡，本意是 rename 成 `c_addr_type`。與 Bug #4 / #5 / #6 同形（per-form column-name typo class）。
 
@@ -345,7 +345,7 @@ Set tVNA = tFileSystem.CreateTextFile(tFileName, True, True)
 5. 點 **Neo4j**（匯出按鈕）。
 6. 彈出 **執行時錯誤 3061 —— INSERT INTO 語句包含未知的欄位名 c_index_addr_type_code** 對話方塊（或 headless ／driver-instrumented 跑法下，對應的 `LookAtAssociations:ERR ...` ZZ_TEST_DEBUG marker 被寫入）。Neo4j 匯出產出 **0 份 CSV** —— 沒有 `People_*.csv`、沒有 `Places_*.csv`，什麼都沒有。
 
-已透過 probe `analysis/probe_associations_cmdneo4j.py` 端到端驗證（PR #112，已 merge `1145219`）；根因經靜態調查 `analysis/investigate_associations_cmdneo4j_c_index_addr_type_code.{py,md}` 確認（PR #114，已 merge `68cfa9b`）。
+已通過 probe `analysis/probe_associations_cmdneo4j.py` 端到端驗證（PR #112，已 merge `1145219`）；根因經靜態調查 `analysis/investigate_associations_cmdneo4j_c_index_addr_type_code.{py,md}` 確認（PR #114，已 merge `68cfa9b`）。
 
 #### 建議修復方案
 
@@ -413,7 +413,7 @@ JET 在第一次此類讀取時報 **3265「Item not found in this collection」
 5. 點 **Neo4j**（匯出按鈕）。
 6. 彈出 **執行時錯誤 3265 —— Item not found in this collection.** 對話方塊（或 headless ／ driver-instrumented 跑法下，對應的 `LookAtPlace:ERR Item not found in this collection.` ZZ_TEST_DEBUG marker 被寫入）。Neo4j 匯出產出 **0 份 CSV** —— 沒有 `People_*.csv`、沒有 `Places_*.csv`，什麼都沒有。
 
-已透過 probe `analysis/probe_place_cmdneo4j.py` 端到端驗證（PR #120，已 merge `8f94276`）；具體的失敗引用點由靜態調查 `analysis/investigate_place_cmdneo4j_item_not_found.{py,md}` 確認（PR #121，已 merge `97e1162`）。
+已通過 probe `analysis/probe_place_cmdneo4j.py` 端到端驗證（PR #120，已 merge `8f94276`）；具體的失敗引用點由靜態調查 `analysis/investigate_place_cmdneo4j_item_not_found.{py,md}` 確認（PR #121，已 merge `97e1162`）。
 
 #### 建議修復方案
 
@@ -843,7 +843,7 @@ _**Hypothetical** popup, reconstructed in PIL.  Users currently CAN'T trigger th
 
 我們把本 .mdb 的 BIOG_MAIN 與 cbdb-online-main-server 每週釋出的 SQLite 快照在 `c_index_year`、`c_index_addr_id` 兩個欄位上做比對，可以看到一小部分人物對不齊。
 
-**兩邊是兩套獨立的實作。**SQLite 快照中的 `c_index_year` 是 cbdb-online-main-server 的 PHP `IndexYearRebuildService.php` 算出來的，`c_index_addr_id` 則是 `IndexAddressRebuildService.php` 算出來的（程式碼都在 <https://github.com/cbdb-project/cbdb-online-main-server>）；User MDB 上對應的這兩個User MDB 那一邊：`c_index_addr_id` 由前端 mdb 裡的 `Form_frmIndexAddr` VBA 重建；`c_index_year` 由連結表後端 `data/CBDB_<YYYYMMDD>_DATA.mdb` 裡 **37 條 `BM IY Rule …` 的 QueryDef** 重建，由 `frmBaseMaintenance` 驅動。兩邊演算法已抽取到 `analysis/dump_data/querydefs_index/*.sql`；form / module 驅動 VBA 仍需 Access SaveAsText 互動式提取。PHP **意圖**映象 VBA，但兩者是兩條獨立的程式路徑。每一行差異**可能**來自下列至少四個原因，光看差異本身分不出來：(1) 源資料快照漂移；(2) PHP 與 VBA 之間的演演算法 / 移植差異；(3) 優先序 / 平手規則不同；(4) null / 預設值處理不同。
+**兩邊是兩套獨立的實作。**SQLite 快照中的 `c_index_year` 是 cbdb-online-main-server 的 PHP `IndexYearRebuildService.php` 算出來的，`c_index_addr_id` 則是 `IndexAddressRebuildService.php` 算出來的（程式碼都在 <https://github.com/cbdb-project/cbdb-online-main-server>）；User MDB 上對應的這兩個User MDB 那一邊：`c_index_addr_id` 由前端 mdb 裡的 `Form_frmIndexAddr` VBA 重建；`c_index_year` 由連結表後端 `data/CBDB_<YYYYMMDD>_DATA.mdb` 裡 **37 條 `BM IY Rule …` 的 QueryDef** 重建，由 `frmBaseMaintenance` 驅動。兩邊演算法已抽取到 `analysis/dump_data/querydefs_index/*.sql`；form / module 驅動 VBA 仍需 Access SaveAsText 互動式提取。PHP **意圖**映象 VBA，但兩者是兩條獨立的程式路徑。每一行差異**可能**來自下列至少四個原因，光看差異本身分不出來：(1) 源資料快照漂移；(2) PHP 與 VBA 之間的演算法 / 移植差異；(3) 優先序 / 平手規則不同；(4) null / 預設值處理不同。
 
 **我們並沒有對目前看到的 ~575 / 657 246 筆差異做完整分類。**下方列舉的樣本（目前共 13 筆、3 種分桶，來自 `reports/index_drift_examples.json`）只是**示範**這些差異**長什麼樣**，並非統計上有代表性，是後續逐筆分類的起點，不是結論。
 
@@ -860,7 +860,7 @@ _**Hypothetical** popup, reconstructed in PIL.  Users currently CAN'T trigger th
 | `index_addr_only_diff` | 478 | 0.073% | 生年/卒年一致，但只有 c_index_addr_id 不同 —— 待追查 |
 | `index_both_diff` | 10 | 0.002% | 生年/卒年一致，但兩個 index 都不同 —— 複合差異最強訊號 |
 
-淨差異：**563** / 657,245（0.086 %）。其中 **16** 筆能明確歸因於 birthyear / deathyear 的源資料漂移；剩下 **547** 筆需要逐筆追查（可能是 PHP↔VBA 演演算法差異，也可能是本分類器沒有比較的 evidence 表（BIOG_ADDR_DATA / ENTRY_DATA / NIAN_HAO 等）裡的漂移）。完整輸出見 `reports/index_drift_classification.json`，演算法來源指標見 `analysis/index_drift_algorithm_notes.md`。
+淨差異：**563** / 657,245（0.086 %）。其中 **16** 筆能明確歸因於 birthyear / deathyear 的源資料漂移；剩下 **547** 筆需要逐筆追查（可能是 PHP↔VBA 演算法差異，也可能是本分類器沒有比較的 evidence 表（BIOG_ADDR_DATA / ENTRY_DATA / NIAN_HAO 等）裡的漂移）。完整輸出見 `reports/index_drift_classification.json`，演算法來源指標見 `analysis/index_drift_algorithm_notes.md`。
 
 ### 年份差異 —— 逐筆 rule 分類
 
@@ -880,13 +880,13 @@ _**Hypothetical** popup, reconstructed in PIL.  Users currently CAN'T trigger th
 
 PR K2 進一步的 triage (`analysis/triage_index_year_drift_groups.py` → `reports/index_year_drift_rule_groups.json`) 把剩下的桶命名清楚：
 
-- `consistent_within_rule` × 14 → 5 個 signature 分組。PR AI + AJ 的逐筆探測推翻了原本的 tie-break 假說：14 筆全是 `source_data_drift_biog_main_or_kin_data_between_sides`（8 筆 BIOG_MAIN birthyear 漂移 + 6 筆 KIN_DATA evidence-pid 漂移）。屬於 PHP-side / SQLite snapshot 的上游資料漂移，並非 CBDB 演演算法差異。
+- `consistent_within_rule` × 14 → 5 個 signature 分組。PR AI + AJ 的逐筆探測推翻了原本的 tie-break 假說：14 筆全是 `source_data_drift_biog_main_or_kin_data_between_sides`（8 筆 BIOG_MAIN birthyear 漂移 + 6 筆 KIN_DATA evidence-pid 漂移）。屬於 PHP-side / SQLite snapshot 的上游資料漂移，並非 CBDB 演算法差異。
 - `unclassified` × 18 → 18 筆已命名，17 筆標為 `blocked_by_runtime_priority_triage_pending`（PR M 已 dump frmBaseMaintenance，原始碼已在 repo；要逐筆判斷哪邊正確仍需走一遍 runtime 的 priority／iteration 順序）。
 - `php_did_not_compute` × 19 → 按 Access tcode 分 6 組；最大的是 `access_tcode='05'` × 7（jinshi 進士類的 `candidate_php_entry_code_mapping_gap`）。
 
 ### c_index_addr_id 差異 —— 逐筆分類
 
-在 **488** 筆 c_index_addr 差異中（PR G 的 478 `index_addr_only_diff` + 10 `index_both_diff`），逐筆把兩邊的 BIOG_ADDR_DATA 代入「rank-priority + MAX(c_sequence)」演演算法重算，與實際儲存值對照分類：
+在 **488** 筆 c_index_addr 差異中（PR G 的 478 `index_addr_only_diff` + 10 `index_both_diff`），逐筆把兩邊的 BIOG_ADDR_DATA 代入「rank-priority + MAX(c_sequence)」演算法重算，與實際儲存值對照分類：
 
 | 分桶 | 筆數 |
 |---|---:|
@@ -898,9 +898,9 @@ PR K2 進一步的 triage (`analysis/triage_index_year_drift_groups.py` → `rep
 | `sqlite_stale_index_addr` | 2 |
 | `mdb_null_php_value` | 1 |
 
-以上沒有任何一筆被視為已確認的 bug。412 筆 `mdb_stale_index_addr` 屬於維護週期差異（User MDB 在下次釋出前需要重跑 frmBaseMaintenance）。10 筆 `same_candidates_diff_winner` 是唯一的候選演演算法差異。逐筆輸出見 `reports/index_addr_drift_classification.json`。
+以上沒有任何一筆被視為已確認的 bug。412 筆 `mdb_stale_index_addr` 屬於維護週期差異（User MDB 在下次釋出前需要重跑 frmBaseMaintenance）。10 筆 `same_candidates_diff_winner` 是唯一的候選演算法差異。逐筆輸出見 `reports/index_addr_drift_classification.json`。
 
-PR M（`analysis/dump_data_mdb_vba.py`）從 DATA mdb 抽出了 `frmBaseMaintenance.CmdIndexAddress_Click`。它**沒有**像 PHP 那樣明確 `MAX(c_sequence)` 聚合 —— 在維護週期差異之外，這還是一個候選演演算法差異。建議的 release checklist 緩解步驟：在 User MDB 出貨前先在 DATA mdb 上跑 `CmdIndexYear`，再跑 `CmdIndexAddress`。詳見 `analysis/index_drift_algorithm_notes.md` 中的 "Maintenance trigger path" 段。
+PR M（`analysis/dump_data_mdb_vba.py`）從 DATA mdb 抽出了 `frmBaseMaintenance.CmdIndexAddress_Click`。它**沒有**像 PHP 那樣明確 `MAX(c_sequence)` 聚合 —— 在維護週期差異之外，這還是一個候選演算法差異。建議的 release checklist 緩解步驟：在 User MDB 出貨前先在 DATA mdb 上跑 `CmdIndexYear`，再跑 `CmdIndexAddress`。詳見 `analysis/index_drift_algorithm_notes.md` 中的 "Maintenance trigger path" 段。
 
 ### 目前能解釋的 drift 原因
 
