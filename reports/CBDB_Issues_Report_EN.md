@@ -294,7 +294,7 @@ User-visible symptom: a Run-time error 5 popup blocks the user; the exported `.v
 
 1. Open CBDB_BJ_User.mdb in Microsoft Access.
 2. Open the **LookAtAssociations** form (F11 → navigation pane → forms → double-click `LookAtAssociations`).
-3. Use the association-code picker (**CmdPickAssoc**) to select **c_assoc_code = 437** — on the current dump this code's result set includes person 445395 (c_name = `Hu Fa稜`), whose name contains a CJK Han ideograph (U+7A1C 稜) with no cp1252 mapping and no FSO substitution.
+3. Use the association-code picker (**CmdPickAssoc**) to select **c_assoc_code = 437 (Presented literary composition as gift to)** — on the current dump this code's result set includes person 445395 (c_name = `Hu Fa稜`), whose name contains a CJK Han ideograph (U+7A1C 稜) with no cp1252 mapping and no FSO substitution.
 4. Click **Run** (CmdQuery) and wait for it to finish populating ZZ_SCRATCH_ASSOC + ZZ_SCRATCH_P_ASSOC.
 5. Click the **UCINet** export button (CmdUCINet) and choose any save location for the `.vna` file.
 6. A popup appears: `Run-time error '5': Invalid procedure call or argument`.  The export aborts.  The partial `.vna` file on disk has the complete `*node data` section but a truncated `*node properties` section and no `*tie data` section at all — unusable as a UCINET / Visone import.

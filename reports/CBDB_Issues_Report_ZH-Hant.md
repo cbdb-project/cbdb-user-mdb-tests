@@ -294,7 +294,7 @@ End With
 
 1. 在 Microsoft Access 裡開啟 CBDB_BJ_User.mdb。
 2. 開啟 **LookAtAssociations** 表單（F11 → 導航窗格 → 表單 → 雙擊 `LookAtAssociations`）。
-3. 用關聯程式碼 picker（**CmdPickAssoc**）選取 **c_assoc_code = 437** —— 在當前 dump 上，該程式碼的查詢結果包含 person 445395（c_name = `Hu Fa稜`），其 c_name 含 CJK 漢字（U+7A1C 稜），在 cp1252 碼頁下無法編碼也無 FSO 替代對映。
+3. 用關聯程式碼 picker（**CmdPickAssoc**）選取 **c_assoc_code = 437（贈詩、文）** —— 在當前 dump 上，該程式碼的查詢結果包含 person 445395（c_name = `Hu Fa稜`），其 c_name 含 CJK 漢字（U+7A1C 稜），在 cp1252 碼頁下無法編碼也無 FSO 替代對映。
 4. 點 **Run**（CmdQuery），等它把 ZZ_SCRATCH_ASSOC 和 ZZ_SCRATCH_P_ASSOC 填好。
 5. 點 **UCINet** 匯出按鈕（CmdUCINet），隨便選一個 `.vna` 檔案的存檔位置。
 6. 彈出對話方塊：`Run-time error '5': Invalid procedure call or argument`。匯出中斷，硬碟上只剩殘破的 `.vna` 檔：`*node data` 區段完整，`*node properties` 區段被截斷，`*tie data` 區段完全沒寫 —— UCINET / Visone 都沒法當成 import 檔案使用。

@@ -14,6 +14,7 @@ off, not a pull request.
 """
 from __future__ import annotations
 
+import json as _json
 from pathlib import Path
 
 from docx import Document
@@ -34,6 +35,20 @@ def t(s: str) -> str:
     return _S2T.convert(s)
 
 REPO = Path(__file__).resolve().parent.parent
+
+_TEST_INPUTS = _json.loads(
+    (REPO / "analysis" / "dump" / "test_inputs.json").read_text(encoding="utf-8")
+)
+
+
+def _assoc_desc(code: int, lang: str = "en") -> str:
+    col = "c_assoc_desc_chn" if lang == "zh" else "c_assoc_desc"
+    for entry in _TEST_INPUTS.get("lookatassociations", {}).get("top_assoc_codes", []):
+        if entry.get("c_assoc_code") == code:
+            return entry.get(col, "")
+    return str(code)
+
+
 SHOT_DIR = REPO / "reports" / "screenshots"
 OUT_EN = REPO / "reports" / "CBDB_Issues_Report_EN.docx"
 OUT_ZH = REPO / "reports" / "CBDB_Issues_Report_ZH-Hant.docx"
@@ -1341,8 +1356,9 @@ ISSUES = [
             "Open the **LookAtAssociations** form (F11 → "
             "navigation pane → forms → double-click "
             "`LookAtAssociations`).",
-            "Use the association-code picker (**CmdPickAssoc**) "
-            "to select **c_assoc_code = 437** — on the current "
+            f"Use the association-code picker (**CmdPickAssoc**) "
+            f"to select **c_assoc_code = 437 "
+            f"({_assoc_desc(437, 'en')})** — on the current "
             "dump this code's result set includes person 445395 "
             "(c_name = `Hu Fa稜`), whose name contains a CJK "
             "Han ideograph (U+7A1C 稜) with no cp1252 mapping "
@@ -1371,11 +1387,12 @@ ISSUES = [
             "在 Microsoft Access 里打开 CBDB_BJ_User.mdb。",
             "打开 **LookAtAssociations** 表单（F11 → 导航窗"
             "格 → 表单 → 双击 `LookAtAssociations`）。",
-            "用关联代码 picker（**CmdPickAssoc**）选取 "
-            "**c_assoc_code = 437** —— 在当前 dump 上，"
-            "该代码的查询结果包含 person 445395（c_name = "
-            "`Hu Fa稜`），其 c_name 含 CJK 汉字（U+7A1C 稜），"
-            "在 cp1252 码页下无法编码也无 FSO 替代映射。",
+            f"用关联代码 picker（**CmdPickAssoc**）选取 "
+            f"**c_assoc_code = 437（{_assoc_desc(437, 'zh')}）** —— "
+            "在当前 dump 上，该代码的查询结果包含 "
+            "person 445395（c_name = `Hu Fa稜`），其 c_name "
+            "含 CJK 汉字（U+7A1C 稜），在 cp1252 码页下无法"
+            "编码也无 FSO 替代映射。",
             "点 **Run**（CmdQuery），等它把 ZZ_SCRATCH_ASSOC "
             "和 ZZ_SCRATCH_P_ASSOC 填好。",
             "点 **UCINet** 汇出按钮（CmdUCINet），随便选一"

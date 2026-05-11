@@ -174,8 +174,8 @@ MANIFEST: list[dict] = [
         "code_value": 437,
         "desc_cols": ["c_assoc_desc", "c_assoc_desc_chn"],
         "expected_labels": {
-            "en": ["c_assoc_code = 437"],
-            "zh": ["c_assoc_code = 437"],
+            "en": ["c_assoc_code = 437", "Presented literary composition as gift to"],
+            "zh": ["c_assoc_code = 437", "贈詩、文"],
         },
         # Pin: must NOT reference a person ID for this issue.
         # LookAtAssociations has no person picker — the query
