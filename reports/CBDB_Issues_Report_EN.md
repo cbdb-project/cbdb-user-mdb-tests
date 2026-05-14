@@ -40,9 +40,9 @@ The issues are ordered by severity (P0 highest). Each entry includes a concise d
   - [Issue #11 — EVENTS_DATA_2's c_event_record_id control bound to a non-existent column — but the control is hidden (LATENT)](#issue-11--events_data_2s-c_event_record_id-control-bound-to-a-non-existent-column--but-the-control-is-hidden-latent)
   - [Issue #12 — POSTED_TO_OFFICE_DATA_2's c_appt_type_code control bound to a non-projected column — but the control is hidden AND the user-facing appointment-type controls work (LATENT)](#issue-12--posted_to_office_data_2s-c_appt_type_code-control-bound-to-a-non-projected-column--but-the-control-is-hidden-and-the-user-facing-appointment-type-controls-work-latent)
 - [Severity legend](#severity-legend)
-- [Appendix — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (differences need per-row classification before being filed as bugs)](#appendix--c_index_year--c_index_addr_id-drift-vs-the-cbdb-online-main-server-snapshot-differences-need-per-row-classification-before-being-filed-as-bugs)
-- [Appendix A — TablesFields: documentation vs. actual structure](#appendix-a--tablesfields-documentation-vs-actual-structure)
-- [Appendix B — ForeignKeys: documentation vs. actual structure](#appendix-b--foreignkeys-documentation-vs-actual-structure)
+- [Appendix A — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (differences need per-row classification before being filed as bugs)](#appendix-a--c_index_year--c_index_addr_id-drift-vs-the-cbdb-online-main-server-snapshot-differences-need-per-row-classification-before-being-filed-as-bugs)
+- [Appendix B — TablesFields: documentation vs. actual structure](#appendix-b--tablesfields-documentation-vs-actual-structure)
+- [Appendix C — ForeignKeys: documentation vs. actual structure](#appendix-c--foreignkeys-documentation-vs-actual-structure)
 - [Closing note](#closing-note)
 
 ## Severity legend
@@ -841,7 +841,7 @@ Open person 2 (安邡, An Fang). The POSTED-TO-OFFICE sub-datasheet shows 1 post
 
 If the hidden control isn't needed, delete it.  If it's an intentional hidden join-key holder, change its ControlSource to a real column (e.g. `c_appt_code`).  Either way the change is invisible to users; this is code-hygiene only.
 
-## Appendix — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (differences need per-row classification before being filed as bugs)
+## Appendix A — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (differences need per-row classification before being filed as bugs)
 
 When we compare BIOG_MAIN's `c_index_year` and `c_index_addr_id` between this User MDB and the weekly cbdb-online-main-server SQLite snapshot, a small fraction of persons disagree.
 
@@ -1056,11 +1056,11 @@ Top suggested next investigations (full list in the cause-analysis md):
 | `c_index_year_type_code` | 01 | 11 |
 | `c_index_year_source_id` |  | 41030 |
 
-## Appendix A — TablesFields: documentation vs. actual structure
+## Appendix B — TablesFields: documentation vs. actual structure
 
 This section compares the contents of the `TablesFields` table in `CBDB_20260430_DATA.mdb` against the database schema reconstructed from ODBC catalog calls by `reports/collect_schema_diffs.py`. Discrepancies indicate the documentation table may be out of date.
 
-Total rows in TablesFields: 875. Reconstructed from DB: 984.
+Total rows in TablesFields: 875. Reconstructed from DB: 996.
 
 ### Rows in TablesFields not found in actual DB (stale)
 
@@ -1072,21 +1072,10 @@ Total rows in TablesFields: 875. Reconstructed from DB: 984.
 | ADMIN_CAT_TYPES | c_admin_type_trans |
 | ENTRY_DATA | c_addr_id |
 | ENTRY_DATA | c_posting_id |
-| KINSHIP_CODES | c_colstep |
-| KINSHIP_CODES | c_dwnstep |
-| KINSHIP_CODES | c_kinrel |
-| KINSHIP_CODES | c_kinrel_alt |
-| KINSHIP_CODES | c_kinrel_chn |
-| KINSHIP_CODES | c_kinrel_simplified |
-| KINSHIP_CODES | c_kin_pair1 |
-| KINSHIP_CODES | c_kin_pair2 |
-| KINSHIP_CODES | c_kin_pair_notes |
-| KINSHIP_CODES | c_marstep |
-| KINSHIP_CODES | c_pick_sorting |
-| KINSHIP_CODES | c_upstep |
 | MERGED_PERSON_DATA | c_merged_to_personid |
 | PersonIDSource | LineNum |
-*… 2 more rows not shown.*
+| PersonIDSource | SourceTable |
+| TMP_ADDR_C | Max_c_belongs_first_year |
 
 ### Columns in actual DB not documented in TablesFields
 
@@ -1138,9 +1127,9 @@ Total rows in TablesFields: 875. Reconstructed from DB: 984.
 | ALTNAME_CODES | c_name_type_code | NULL_allowed | False | True |
 | ALTNAME_CODES | c_name_type_desc | NULL_allowed | False | True |
 | ALTNAME_CODES | c_name_type_desc_chn | NULL_allowed | False | True |
-*… 317 more rows not shown.*
+*… 628 more rows not shown.*
 
-## Appendix B — ForeignKeys: documentation vs. actual structure
+## Appendix C — ForeignKeys: documentation vs. actual structure
 
 This section compares the `ForeignKeys` table against FK relationships derived from ODBC catalog introspection.
 

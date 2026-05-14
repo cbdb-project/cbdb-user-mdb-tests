@@ -2870,11 +2870,11 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
     data = _json.loads(DRIFT_JSON.read_text(encoding="utf-8"))
 
     title = (
-        "Appendix — `c_index_year` / `c_index_addr_id` drift "
+        "Appendix A — `c_index_year` / `c_index_addr_id` drift "
         "vs the cbdb-online-main-server snapshot "
         "(differences need per-row classification before being filed as bugs)"
         if is_en else
-        "附錄 —— `c_index_year` / `c_index_addr_id` 與 "
+        "附錄 A —— `c_index_year` / `c_index_addr_id` 與 "
         "cbdb-online-main-server 快照之間的偏差"
         "（差異需要逐筆分類後才能判定是否為缺陷）"
     )
@@ -3617,7 +3617,7 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
 # ---------------------------------------------------------------------------
 
 def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
-    """Render Appendix A (TablesFields) and Appendix B (ForeignKeys)
+    """Render Appendix B (TablesFields) and Appendix C (ForeignKeys)
     schema-diff sections using the python-docx API.
     Consumes reports/schema_diff.json produced by collect_schema_diffs.py."""
     import json as _json
@@ -3625,7 +3625,7 @@ def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
     def _table_section(data_block: dict, title_a: str, title_b: str,
                         only_cur_hdr: str, only_reg_hdr: str,
                         mismatch_hdr: str) -> None:
-        """Render one appendix section (A or B) for a schema block."""
+        """Render one appendix section (B or C) for a schema block."""
         _h(doc, 1, Z(title_a if is_en else title_b))
 
         intro = (
@@ -3634,7 +3634,7 @@ def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
             "reconstructed from ODBC catalog calls by "
             "`reports/collect_schema_diffs.py`. Discrepancies indicate the "
             "documentation table may be out of date."
-            if title_a.startswith("Appendix A") else
+            if title_a.startswith("Appendix B") else
             "This section compares the `ForeignKeys` table against FK "
             "relationships derived from ODBC catalog introspection."
         )
@@ -3642,7 +3642,7 @@ def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
             "本節將 `CBDB_20260430_DATA.mdb` 中 `TablesFields` 表的內容與"
             "`reports/collect_schema_diffs.py` 透過 ODBC catalog 重建的資料"
             "庫結構進行比對。若存在差異，表示文檔表可能已過時。"
-            if title_a.startswith("Appendix A") else
+            if title_a.startswith("Appendix B") else
             "本節將 `ForeignKeys` 表與透過 ODBC catalog 查詢所得的外鍵關係"
             "進行比對。"
         )
@@ -3660,7 +3660,7 @@ def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
             return
 
         diff = _json.loads(SCHEMA_DIFF_JSON.read_text(encoding="utf-8"))
-        block_key = "tables_fields" if title_a.startswith("Appendix A") else "foreign_keys"
+        block_key = "tables_fields" if title_a.startswith("Appendix B") else "foreign_keys"
         blk = diff[block_key]
 
         # ForeignKeys: check if introspection was available
@@ -3785,11 +3785,11 @@ def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
                 "與實際資料庫結構一致。"
             ))
 
-    # ---- Appendix A ----
+    # ---- Appendix B ----
     _table_section(
         data_block={},
-        title_a="Appendix A — TablesFields: documentation vs. actual structure",
-        title_b="附錄 A —— TablesFields：文檔表與實際資料庫結構對比",
+        title_a="Appendix B — TablesFields: documentation vs. actual structure",
+        title_b="附錄 B —— TablesFields：文檔表與實際資料庫結構對比",
         only_cur_hdr=(
             "Rows in TablesFields not found in actual DB (stale)"
             if is_en else
@@ -3809,11 +3809,11 @@ def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
 
     doc.add_page_break()
 
-    # ---- Appendix B ----
+    # ---- Appendix C ----
     _table_section(
         data_block={},
-        title_a="Appendix B — ForeignKeys: documentation vs. actual structure",
-        title_b="附錄 B —— ForeignKeys：文檔表與實際資料庫結構對比",
+        title_a="Appendix C — ForeignKeys: documentation vs. actual structure",
+        title_b="附錄 C —— ForeignKeys：文檔表與實際資料庫結構對比",
         only_cur_hdr=(
             "Rows in ForeignKeys not found in actual DB (stale)"
             if is_en else
@@ -4164,7 +4164,7 @@ def _build(lang: str, out_path: Path) -> None:
     doc.add_page_break()
     _add_index_drift_appendix(doc, is_en, Z)
 
-    # ---- Appendix A & B: schema diff ----
+    # ---- Appendix B & C: schema diff ----
     doc.add_page_break()
     _add_schema_diff_appendix_docx(doc, is_en, Z)
 
@@ -4206,23 +4206,23 @@ def _add_schema_diff_appendix_md(
     Z,
     _slug,
 ) -> None:
-    """Render one schema-diff appendix section (Appendix A or B) into
+    """Render one schema-diff appendix section (Appendix B or C) into
     the markdown lines list.
 
-    block_key: 'tables_fields' for Appendix A, 'foreign_keys' for Appendix B.
+    block_key: 'tables_fields' for Appendix B, 'foreign_keys' for Appendix C.
     """
     import json as _json
 
     is_tf = (block_key == "tables_fields")
 
     heading = (
-        ("Appendix A — TablesFields: documentation vs. actual structure"
+        ("Appendix B — TablesFields: documentation vs. actual structure"
          if is_tf else
-         "Appendix B — ForeignKeys: documentation vs. actual structure")
+         "Appendix C — ForeignKeys: documentation vs. actual structure")
         if is_en else
-        ("附錄 A —— TablesFields：文檔表與實際資料庫結構對比"
+        ("附錄 B —— TablesFields：文檔表與實際資料庫結構對比"
          if is_tf else
-         "附錄 B —— ForeignKeys：文檔表與實際資料庫結構對比")
+         "附錄 C —— ForeignKeys：文檔表與實際資料庫結構對比")
     )
     lines.append(f"## {Z(heading)}")
     lines.append("")
@@ -4507,11 +4507,11 @@ def _build_md(lang: str, out_path: Path) -> None:
         f"(#{_slug(Z('Severity legend' if is_en else '严重等级说明'))})"
     )
     appendix_title = (
-        "Appendix — c_index_year / c_index_addr_id drift "
+        "Appendix A — c_index_year / c_index_addr_id drift "
         "vs the cbdb-online-main-server snapshot "
         "(differences need per-row classification before being filed as bugs)"
         if is_en else
-        "附錄 —— c_index_year / c_index_addr_id 與 "
+        "附錄 A —— c_index_year / c_index_addr_id 與 "
         "cbdb-online-main-server 快照之間的偏差"
         "（差異需要逐筆分類後才能判定是否為缺陷）"
     )
@@ -4519,14 +4519,14 @@ def _build_md(lang: str, out_path: Path) -> None:
         f"- [{Z(appendix_title)}](#{_slug(Z(appendix_title))})"
     )
     schema_appendix_a_title = (
-        "Appendix A — TablesFields: documentation vs. actual structure"
+        "Appendix B — TablesFields: documentation vs. actual structure"
         if is_en else
-        "附錄 A —— TablesFields：文檔表與實際資料庫結構對比"
+        "附錄 B —— TablesFields：文檔表與實際資料庫結構對比"
     )
     schema_appendix_b_title = (
-        "Appendix B — ForeignKeys: documentation vs. actual structure"
+        "Appendix C — ForeignKeys: documentation vs. actual structure"
         if is_en else
-        "附錄 B —— ForeignKeys：文檔表與實際資料庫結構對比"
+        "附錄 C —— ForeignKeys：文檔表與實際資料庫結構對比"
     )
     lines.append(f"- [{Z(schema_appendix_a_title)}](#{_slug(Z(schema_appendix_a_title))})")
     lines.append(f"- [{Z(schema_appendix_b_title)}](#{_slug(Z(schema_appendix_b_title))})")
@@ -5344,7 +5344,7 @@ def _build_md(lang: str, out_path: Path) -> None:
                     lines.append(f"| `{f_label}` | {uv} | {sv} |")
                 lines.append("")
 
-    # ---- Appendix A & B: schema diff ----
+    # ---- Appendix B & C: schema diff ----
     _add_schema_diff_appendix_md(lines, "tables_fields", is_en, Z, _slug)
     _add_schema_diff_appendix_md(lines, "foreign_keys", is_en, Z, _slug)
 

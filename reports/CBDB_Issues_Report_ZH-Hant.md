@@ -40,9 +40,9 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
   - [Issue #11 — EVENTS_DATA_2 上 c_event_record_id 控制元件綁到不存在的欄位——但該控制元件本身是隱藏的（LATENT）](#issue-11--events_data_2-上-c_event_record_id-控制元件綁到不存在的欄位但該控制元件本身是隱藏的latent)
   - [Issue #12 — POSTED_TO_OFFICE_DATA_2 上 c_appt_type_code 控制元件綁到沒投影的欄位——但該控制元件是隱藏的，且使用者實際看的任職型別欄位是正常的（LATENT）](#issue-12--posted_to_office_data_2-上-c_appt_type_code-控制元件綁到沒投影的欄位但該控制元件是隱藏的且使用者實際看的任職型別欄位是正常的latent)
 - [嚴重等級說明](#嚴重等級說明)
-- [附錄 —— c_index_year / c_index_addr_id 與 cbdb-online-main-server 快照之間的偏差（差異需要逐筆分類後才能判定是否為缺陷）](#附錄--c_index_year--c_index_addr_id-與-cbdb-online-main-server-快照之間的偏差差異需要逐筆分類後才能判定是否為缺陷)
-- [附錄 A —— TablesFields：文件表與實際資料庫結構對比](#附錄-a--tablesfields文件表與實際資料庫結構對比)
-- [附錄 B —— ForeignKeys：文件表與實際資料庫結構對比](#附錄-b--foreignkeys文件表與實際資料庫結構對比)
+- [附錄 A —— c_index_year / c_index_addr_id 與 cbdb-online-main-server 快照之間的偏差（差異需要逐筆分類後才能判定是否為缺陷）](#附錄-a--c_index_year--c_index_addr_id-與-cbdb-online-main-server-快照之間的偏差差異需要逐筆分類後才能判定是否為缺陷)
+- [附錄 B —— TablesFields：文件表與實際資料庫結構對比](#附錄-b--tablesfields文件表與實際資料庫結構對比)
+- [附錄 C —— ForeignKeys：文件表與實際資料庫結構對比](#附錄-c--foreignkeys文件表與實際資料庫結構對比)
 - [結語](#結語)
 
 ## 嚴重等級說明
@@ -841,7 +841,7 @@ _**Hypothetical** popup, reconstructed in PIL.  Users currently CAN'T trigger th
 
 若這個隱藏控制元件用不到了，刪除即可；若是有意為之的隱藏 join-key 容器，把 ControlSource 改成真實的欄位（例如 `c_appt_code`）。無論怎麼改，使用者都看不到差別——這純粹是程式碼整潔。
 
-## 附錄 —— c_index_year / c_index_addr_id 與 cbdb-online-main-server 快照之間的偏差（差異需要逐筆分類後才能判定是否為缺陷）
+## 附錄 A —— c_index_year / c_index_addr_id 與 cbdb-online-main-server 快照之間的偏差（差異需要逐筆分類後才能判定是否為缺陷）
 
 我們把本 .mdb 的 BIOG_MAIN 與 cbdb-online-main-server 每週釋出的 SQLite 快照在 `c_index_year`、`c_index_addr_id` 兩個欄位上做比對，可以看到一小部分人物對不齊。
 
@@ -1054,11 +1054,11 @@ PR M（`analysis/dump_data_mdb_vba.py`）從 DATA mdb 抽出了 `frmBaseMaintena
 | `c_index_year_type_code` | 01 | 11 |
 | `c_index_year_source_id` |  | 41030 |
 
-## 附錄 A —— TablesFields：文件表與實際資料庫結構對比
+## 附錄 B —— TablesFields：文件表與實際資料庫結構對比
 
 本節將 `CBDB_20260430_DATA.mdb` 中 `TablesFields` 表的內容與 `reports/collect_schema_diffs.py` 透過 ODBC catalog 重建的資料庫結構進行比對。若存在差異，表示文件表可能已過時。
 
-TablesFields 共 875 筆。從資料庫重建：984 筆。
+TablesFields 共 875 筆。從資料庫重建：996 筆。
 
 ### TablesFields 中有但實際資料庫中不存在的記錄（過時）
 
@@ -1070,21 +1070,10 @@ TablesFields 共 875 筆。從資料庫重建：984 筆。
 | ADMIN_CAT_TYPES | c_admin_type_trans |
 | ENTRY_DATA | c_addr_id |
 | ENTRY_DATA | c_posting_id |
-| KINSHIP_CODES | c_colstep |
-| KINSHIP_CODES | c_dwnstep |
-| KINSHIP_CODES | c_kinrel |
-| KINSHIP_CODES | c_kinrel_alt |
-| KINSHIP_CODES | c_kinrel_chn |
-| KINSHIP_CODES | c_kinrel_simplified |
-| KINSHIP_CODES | c_kin_pair1 |
-| KINSHIP_CODES | c_kin_pair2 |
-| KINSHIP_CODES | c_kin_pair_notes |
-| KINSHIP_CODES | c_marstep |
-| KINSHIP_CODES | c_pick_sorting |
-| KINSHIP_CODES | c_upstep |
 | MERGED_PERSON_DATA | c_merged_to_personid |
 | PersonIDSource | LineNum |
-*… 還有 2 筆未顯示。*
+| PersonIDSource | SourceTable |
+| TMP_ADDR_C | Max_c_belongs_first_year |
 
 ### 實際資料庫中有但 TablesFields 未記錄的欄位
 
@@ -1136,9 +1125,9 @@ TablesFields 共 875 筆。從資料庫重建：984 筆。
 | ALTNAME_CODES | c_name_type_code | NULL_allowed | False | True |
 | ALTNAME_CODES | c_name_type_desc | NULL_allowed | False | True |
 | ALTNAME_CODES | c_name_type_desc_chn | NULL_allowed | False | True |
-*… 還有 317 筆未顯示。*
+*… 還有 628 筆未顯示。*
 
-## 附錄 B —— ForeignKeys：文件表與實際資料庫結構對比
+## 附錄 C —— ForeignKeys：文件表與實際資料庫結構對比
 
 本節將 `ForeignKeys` 表與透過 ODBC catalog 查詢所得的外部索引鍵關係進行比對。
 

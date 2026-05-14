@@ -103,27 +103,49 @@ def _columns_for_table(table_name: str) -> set[str]:
     the same shared connection (the Access ODBC driver can produce a
     UTF-16-LE decode error on subsequent catalog queries if any earlier
     call partially failed or left cursor state dirty).
+
+    If cursor.columns() itself raises UnicodeDecodeError (e.g. the table's
+    own ODBC column metadata is corrupt), falls back to SELECT TOP 1 to
+    enumerate column names from the live data.  DataFormat / nullability
+    are not needed here -- we only need the name set for existence checks.
     """
     fresh = _make_fresh_conn()
     try:
         cur = fresh.cursor()
-        cur.columns(table=table_name)
         names: set[str] = set()
-        while True:
+        partial_failure = False
+        try:
+            cur.columns(table=table_name)
+            while True:
+                try:
+                    row = cur.fetchone()
+                except UnicodeDecodeError:
+                    # Partial read -- fall through to SELECT fallback
+                    partial_failure = True
+                    break
+                if row is None:
+                    break
+                names.add(row.column_name.upper())
+        except UnicodeDecodeError:
+            partial_failure = True
+
+        if partial_failure or not names:
+            # SELECT TOP 1 fallback: enumerates columns without catalog
             try:
-                row = cur.fetchone()
-            except UnicodeDecodeError:
-                break
-            if row is None:
-                break
-            names.add(row.column_name.upper())
+                fb = fresh.cursor()
+                fb.execute(f"SELECT TOP 1 * FROM [{table_name}]")
+                fb.fetchall()
+                names = {d[0].upper() for d in fb.description}
+            except Exception:
+                pass  # return whatever partial names we already have
+
         return names
     finally:
         fresh.close()
 
 
 # ---------------------------------------------------------------------------
-# Test 1 â€” all tables documented in TablesFields actually exist
+# Test 1 â€" all tables documented in TablesFields actually exist
 # ---------------------------------------------------------------------------
 
 @pytest.mark.xfail(
@@ -152,17 +174,20 @@ def test_tables_fields_all_tables_exist(data_mdb_conn):
 
 
 # ---------------------------------------------------------------------------
-# Test 2 â€” all columns documented in TablesFields actually exist
+# Test 2 â€" all columns documented in TablesFields actually exist
 # ---------------------------------------------------------------------------
 
 @pytest.mark.xfail(
     reason=(
         "TablesFields documents columns that do not exist in the 2026-04-30 dump "
-        "(ADMIN_CAT_CODE_TYPE_REL.c_admin_type_code, ADMIN_CAT_TYPES 3 cols, "
+        "(ADMIN_CAT_CODE_TYPE_REL.c_admin_type_code, ADMIN_CAT_TYPES.c_admin_type_code, "
+        "ADMIN_CAT_TYPES.c_admin_type_hz, ADMIN_CAT_TYPES.c_admin_type_trans, "
         "ENTRY_DATA.c_addr_id, ENTRY_DATA.c_posting_id, "
-        "MERGED_PERSON_DATA.c_merged_to_personid, TMP_ADDR_C.Max_c_belongs_first_year "
-        "and others). These are stale documentation entries; see schema_diff.json "
-        "only_in_current for the full list. Promote to strict once docs are updated."
+        "MERGED_PERSON_DATA.c_merged_to_personid, PersonIDSource.LineNum, "
+        "PersonIDSource.SourceTable, TMP_ADDR_C.Max_c_belongs_first_year -- "
+        "10 stale documentation entries in total). "
+        "See schema_diff.json only_in_current for the authoritative list. "
+        "Promote to strict once docs are updated."
     ),
     strict=False,
 )
@@ -203,7 +228,7 @@ def test_tables_fields_all_columns_exist(data_mdb_conn):
 
 
 # ---------------------------------------------------------------------------
-# Test 3 â€” FK referenced tables exist
+# Test 3 â€" FK referenced tables exist
 # ---------------------------------------------------------------------------
 
 def test_foreign_keys_referenced_tables_exist(data_mdb_conn):
@@ -238,7 +263,7 @@ def test_foreign_keys_referenced_tables_exist(data_mdb_conn):
 
 
 # ---------------------------------------------------------------------------
-# Test 4 â€” FK referenced columns exist
+# Test 4 â€" FK referenced columns exist
 # ---------------------------------------------------------------------------
 
 def test_foreign_keys_referenced_columns_exist(data_mdb_conn):
@@ -285,14 +310,16 @@ def test_foreign_keys_referenced_columns_exist(data_mdb_conn):
 
 
 # ---------------------------------------------------------------------------
-# Test 5 â€” schema_diff.json is clean (no stale / missing entries)
+# Test 5 â€" schema_diff.json is clean (no stale / missing entries)
 # ---------------------------------------------------------------------------
 
 @pytest.mark.xfail(
     reason=(
         "TablesFields is known to be out of sync with the actual DB schema "
-        "in the 2026-04-30 dump (22 stale rows, 131 undocumented columns, "
-        "337 DataFormat/NULL_allowed mismatches â€” see schema_diff.json). "
+        "in the 2026-04-30 dump (10 stale rows, 131 undocumented columns, "
+        "648 DataFormat/NULL_allowed mismatches -- see schema_diff.json; "
+        "mismatch count is elevated because 8 tables required the SELECT "
+        "TOP 1 fallback, leaving DataFormat/NULL_allowed as None). "
         "This xfail documents the finding; promote to a strict assertion "
         "once the docs are updated."
     ),
