@@ -1,12 +1,12 @@
 """Collect diffs between the documentation tables (TablesFields,
 ForeignKeys) inside CBDB_20260430_DATA.mdb and the actual database
-structure reconstructed from ODBC catalog calls.
+structure reconstructed from Access DAO (TableDefs) via COM.
 
 Outputs (all in reports/):
   tables_fields_current.csv   — live dump of TablesFields
   foreign_keys_current.csv    — live dump of ForeignKeys
-  tables_fields_regen.csv     — reconstructed from ODBC catalog
-  foreign_keys_regen.csv      — reconstructed from ODBC foreignKeys()
+  tables_fields_regen.csv     — reconstructed from DAO TableDefs
+  foreign_keys_regen.csv      — reconstructed from DAO Relations
   schema_diff.json            — diff summary consumed by generate_report.py
 
 Run:
@@ -49,35 +49,27 @@ def _open_data_mdb() -> pyodbc.Connection:
 
 
 # ---------------------------------------------------------------------------
-# ODBC TYPE_NAME → Access DataFormat
+# DAO integer type code → Access DataFormat
 # ---------------------------------------------------------------------------
-_TYPE_MAP: dict[str, str] = {
-    "LONGCHAR": "Memo",
-    "MEMO":     "Memo",
-    "VARCHAR":  "Text",
-    "CHAR":     "Text",
-    "INTEGER":  "Long",
-    "LONG":     "Long",
-    "COUNTER":  "Long",
-    "SMALLINT": "Integer",
-    "SHORT":    "Integer",
-    "DOUBLE":   "Double",
-    "FLOAT":    "Double",
-    "SINGLE":   "Double",
-    "DATETIME": "Date/Time",
-    "DATE":     "Date/Time",
-    "LOGICAL":  "Yes/No",
-    "BIT":      "Yes/No",
-    "BOOLEAN":  "Yes/No",
-    "CURRENCY": "Currency",
-    "DECIMAL":  "Decimal",
-    "NUMERIC":  "Decimal",
-    "BYTE":     "Byte",
+DAO_TYPE_TO_FORMAT: dict[int, str] = {
+    1:   "Yes/No",          # dbBoolean
+    2:   "Byte",            # dbByte
+    3:   "Integer",         # dbInteger
+    4:   "Long",            # dbLong
+    5:   "Currency",        # dbCurrency
+    6:   "Single",          # dbSingle
+    7:   "Double",          # dbDouble
+    8:   "Date/Time",       # dbDate
+    10:  "Text",            # dbText
+    11:  "OLE Object",      # dbLongBinary
+    12:  "Memo",            # dbMemo
+    15:  "Replication ID",  # dbGUID
+    16:  "Long",            # dbBigInt (Access 2016+ Large Number → map to Long for compat)
+    17:  "Double",          # dbFloat
+    20:  "Decimal",         # dbDecimal
+    101: "Attachment",      # dbAttachment
 }
-
-
-def _map_type(odbc_type_name: str) -> str:
-    return _TYPE_MAP.get(odbc_type_name.upper(), odbc_type_name)
+# Fallback for unknown types: f"DAO_type_{type_int}"
 
 
 # ---------------------------------------------------------------------------
@@ -123,182 +115,86 @@ def _dump_current(conn: pyodbc.Connection) -> tuple[list[dict], list[dict]]:
 
 
 # ---------------------------------------------------------------------------
-# Step 2 — reconstruct from ODBC catalog
+# Step 2 — reconstruct from Access DAO (TableDefs + Relations)
 # ---------------------------------------------------------------------------
 
-def _regen_from_catalog(conn: pyodbc.Connection) -> tuple[list[dict], list[dict], bool]:
-    # Use a fresh dedicated cursor just for the initial table enumeration so
-    # we don't pollute any cursor state before the per-table column loops.
-    enum_cur = conn.cursor()
-    enum_cur.tables(tableType="TABLE")
-    all_tables = [
-        row.table_name
-        for row in enum_cur.fetchall()
-        if not row.table_name.startswith("MSys")
-        and not row.table_name.startswith("~")
-    ]
-    all_tables.sort()
-    print(f"  found {len(all_tables)} user tables via ODBC catalog")
+def _get_dao_data(data_mdb_path: Path) -> tuple[list[dict], list[dict]]:
+    """Open Access once via COM, collect TablesFields regen rows (from
+    db.TableDefs) and FK regen rows (from db.Relations), then quit.
 
-    # Build upper-case → actual-case mapping so that TablesFields entries
-    # (which may use a different capitalisation, e.g. KIN_MOURNING vs
-    # KIN_Mourning) can be matched case-insensitively when we later diff.
-    # We ALWAYS call cursor.columns() with the exact case from the catalog
-    # because the Access ODBC driver is case-sensitive for catalog queries.
-    upper_to_actual: dict[str, str] = {t.upper(): t for t in all_tables}
+    Returns (tf_rows, fk_rows).  Raises on COM failure so the caller can
+    surface the error clearly.
+    """
+    try:
+        import win32com.client  # type: ignore
+    except ImportError:
+        raise RuntimeError("win32com not available — install pywin32")
 
-    tf_regen: list[dict] = []
-    fk_regen: list[dict] = []
-    fk_introspection_available = False
+    app = win32com.client.DispatchEx("Access.Application")
+    app.Visible = False
+    try:
+        app.OpenCurrentDatabase(str(data_mdb_path), False)
+        db = app.CurrentDb()
 
-    for table_name in all_tables:
-        # ---- Primary keys (fresh cursor per table) ----
-        try:
-            pk_cur = conn.cursor()
-            pk_cur.primaryKeys(table=table_name)
-            pk_rows = pk_cur.fetchall()
-            pk_cols = {row[3] for row in pk_rows}  # COLUMN_NAME is index 3
-        except Exception:
-            pk_cols = set()
-
-        # ---- Columns (fresh cursor per table + UnicodeDecodeError fallback)
-        # The Access ODBC driver corrupts shared cursor state when
-        # cursor.columns() is called sequentially on many tables.  Using a
-        # fresh cursor per call eliminates that state pollution.  If
-        # UnicodeDecodeError still fires (e.g. corrupted column metadata in
-        # the .mdb itself), fall back to SELECT TOP 1 to enumerate names.
-        col_rows: list | None = None
-        try:
-            col_cur = conn.cursor()
-            col_cur.columns(table=table_name)
-            col_rows = []
-            while True:
-                try:
-                    row = col_cur.fetchone()
-                except UnicodeDecodeError:
-                    # Partial read — fall through to SELECT fallback
-                    col_rows = None
-                    break
-                if row is None:
-                    break
-                col_rows.append(row)
-        except UnicodeDecodeError:
-            col_rows = None
-
-        if col_rows is not None:
-            # Happy path — full ODBC metadata available
-            for col in col_rows:
-                col_name  = col.column_name
-                type_name = col.type_name if col.type_name else ""
-                nullable  = col.nullable   # 1 = nullable, 0 = not nullable
-
-                index_on = "Primary Key" if col_name in pk_cols else None
-                data_fmt = _map_type(type_name)
-                null_allowed = bool(nullable)
-
-                tf_regen.append({
-                    "AccessTblNm":       table_name,
-                    "AccessFldNm":       col_name,
-                    "IndexOnField":      index_on,
-                    "DataFormat":        data_fmt,
-                    "NULL_allowed":      null_allowed,
-                    "ForeignKey":        None,
+        # --- TablesFields regen ---
+        tf_rows: list[dict] = []
+        tdefs = db.TableDefs
+        print(f"  DAO db.TableDefs count (raw): {tdefs.Count}")
+        for i in range(tdefs.Count):
+            tdef = tdefs[i]
+            tname = tdef.Name
+            if tname.startswith("MSys") or tname.startswith("~"):
+                continue
+            # Build PK field set for this table
+            pk_fields: set[str] = set()
+            indexes = tdef.Indexes
+            for k in range(indexes.Count):
+                idx = indexes[k]
+                if idx.Primary:
+                    idx_fields = idx.Fields
+                    for m in range(idx_fields.Count):
+                        pk_fields.add(idx_fields[m].Name.upper())
+            # Enumerate fields
+            fields = tdef.Fields
+            for j in range(fields.Count):
+                fld = fields[j]
+                data_format = DAO_TYPE_TO_FORMAT.get(fld.Type, f"DAO_type_{fld.Type}")
+                null_allowed = not bool(fld.Required)
+                index_on_field = "Primary Key" if fld.Name.upper() in pk_fields else None
+                tf_rows.append({
+                    "AccessTblNm": tname,
+                    "AccessFldNm": fld.Name,
+                    "IndexOnField": index_on_field,
+                    "DataFormat": data_format,
+                    "NULL_allowed": null_allowed,
+                    "ForeignKey": None,
                     "ForeignKeyBaseField": None,
                 })
-        else:
-            # Fallback — cursor.columns() failed; enumerate via SELECT TOP 1
-            print(f"  [WARN] UnicodeDecodeError on cursor.columns({table_name!r})"
-                  f" — falling back to SELECT TOP 1")
-            try:
-                fb_cur = conn.cursor()
-                fb_cur.execute(f"SELECT TOP 1 * FROM [{table_name}]")
-                fb_cur.fetchall()
-                col_names = [d[0] for d in fb_cur.description]
-                for col_name in col_names:
-                    index_on = "Primary Key" if col_name in pk_cols else None
-                    tf_regen.append({
-                        "AccessTblNm":       table_name,
-                        "AccessFldNm":       col_name,
-                        "IndexOnField":      index_on,
-                        # DataFormat and NULL_allowed unknown via this path
-                        "DataFormat":        None,
-                        "NULL_allowed":      None,
-                        "ForeignKey":        None,
-                        "ForeignKeyBaseField": None,
-                    })
-            except Exception as exc:
-                print(f"  [ERROR] SELECT TOP 1 fallback also failed for "
-                      f"{table_name!r}: {exc}")
 
-        # ---- Foreign keys (fresh cursor per table) ----
+        # --- FK regen (same session) ---
+        fk_rows: list[dict] = []
+        rels = db.Relations
+        print(f"  DAO db.Relations count: {rels.Count}")
+        for i in range(rels.Count):
+            rel = rels[i]
+            rel_fields = rel.Fields
+            for j in range(rel_fields.Count):
+                fld = rel_fields[j]
+                fk_rows.append({
+                    "AccessTblNm": rel.ForeignTable,
+                    "AccessFldNm": fld.ForeignName,
+                    "ForeignKey": rel.Table,
+                    "ForeignKeyBaseField": fld.Name,
+                    "RelationName": rel.Name,
+                })
+    finally:
         try:
-            fk_cur = conn.cursor()
-            fk_cur.foreignKeys(table=table_name)
-            fk_rows_odbc = fk_cur.fetchall()
+            app.CloseCurrentDatabase()
+            app.Quit()
         except Exception:
-            fk_rows_odbc = []
+            pass
 
-        for fk_row in fk_rows_odbc:
-            # Standard ODBC columns: 0=PKTABLE_CAT, 1=PKTABLE_SCHEM,
-            # 2=PKTABLE_NAME, 3=PKCOLUMN_NAME, 4=FKTABLE_CAT,
-            # 5=FKTABLE_SCHEM, 6=FKTABLE_NAME, 7=FKCOLUMN_NAME, ...
-            try:
-                pktable  = fk_row[2]
-                pkcol    = fk_row[3]
-                fktable  = fk_row[6]
-                fkcol    = fk_row[7]
-            except (IndexError, TypeError):
-                continue
-            if pktable is None:
-                continue
-            fk_introspection_available = True
-            fk_regen.append({
-                "AccessTblNm":       fktable,
-                "AccessFldNm":       fkcol,
-                "ForeignKey":        pktable,
-                "ForeignKeyBaseField": pkcol,
-                "FKString":          None,
-                "FKName":            None,
-                "skip":              None,
-            })
-
-    # Update FK entries in tf_regen with FK information
-    fk_lookup: dict[tuple[str, str], dict] = {}
-    for fk in fk_regen:
-        key = (fk["AccessTblNm"], fk["AccessFldNm"])
-        fk_lookup[key] = fk
-
-    for row in tf_regen:
-        key = (row["AccessTblNm"], row["AccessFldNm"])
-        if key in fk_lookup:
-            row["ForeignKey"] = fk_lookup[key]["ForeignKey"]
-            row["ForeignKeyBaseField"] = fk_lookup[key]["ForeignKeyBaseField"]
-
-    # Write tables_fields_regen.csv
-    tf_regen_cols = [
-        "AccessTblNm", "AccessFldNm", "IndexOnField",
-        "DataFormat", "NULL_allowed", "ForeignKey", "ForeignKeyBaseField",
-    ]
-    with OUT_TF_REGEN.open("w", newline="", encoding="utf-8-sig") as fh:
-        writer = csv.DictWriter(fh, fieldnames=tf_regen_cols)
-        writer.writeheader()
-        writer.writerows(tf_regen)
-    print(f"wrote {OUT_TF_REGEN}  ({len(tf_regen)} rows)")
-
-    # Write foreign_keys_regen.csv
-    fk_regen_cols = [
-        "AccessTblNm", "AccessFldNm", "ForeignKey", "ForeignKeyBaseField",
-        "FKString", "FKName", "skip",
-    ]
-    with OUT_FK_REGEN.open("w", newline="", encoding="utf-8-sig") as fh:
-        writer = csv.DictWriter(fh, fieldnames=fk_regen_cols)
-        writer.writeheader()
-        if fk_introspection_available:
-            writer.writerows(fk_regen)
-    print(f"wrote {OUT_FK_REGEN}  "
-          f"({'%d rows' % len(fk_regen) if fk_introspection_available else 'empty — FK introspection unavailable'})")
-
-    return tf_regen, fk_regen, fk_introspection_available
+    return tf_rows, fk_rows
 
 
 # ---------------------------------------------------------------------------
@@ -498,56 +394,6 @@ def _write_diff_csvs(diff: dict) -> None:
     print(f"wrote {OUT_FK_MISMATCHES}  ({len(rows)} rows)")
 
 
-def _get_dao_relations(data_mdb_path: Path) -> list[dict]:
-    """Return FK relationships from the DATA mdb via the Access.Application
-    DAO COM interface.  Returns an empty list if COM is unavailable (e.g.
-    Access not installed) — caller checks and falls back gracefully.
-
-    Field mapping to match the ForeignKeys documentation table:
-      AccessTblNm        ← rel.ForeignTable  (FK table — the one with the FK column)
-      AccessFldNm        ← fld.ForeignName   (FK column)
-      ForeignKey         ← rel.Table         (PK table — referenced)
-      ForeignKeyBaseField← fld.Name          (PK column)
-      RelationName       ← rel.Name
-    """
-    try:
-        import win32com.client  # type: ignore
-    except ImportError:
-        print("[WARN] win32com not available — skipping DAO FK introspection")
-        return []
-
-    app = None
-    try:
-        app = win32com.client.DispatchEx("Access.Application")
-        app.Visible = False
-        app.OpenCurrentDatabase(str(data_mdb_path), False)
-        db = app.CurrentDb()
-        rels = db.Relations
-        print(f"  DAO db.Relations count: {rels.Count}")
-        rows: list[dict] = []
-        for i in range(rels.Count):
-            rel = rels.Item(i)
-            for j in range(rel.Fields.Count):
-                fld = rel.Fields.Item(j)
-                rows.append({
-                    "AccessTblNm": rel.ForeignTable,
-                    "AccessFldNm": fld.ForeignName,
-                    "ForeignKey": rel.Table,
-                    "ForeignKeyBaseField": fld.Name,
-                    "RelationName": rel.Name,
-                })
-        return rows
-    except Exception as exc:
-        print(f"[WARN] DAO FK introspection failed: {exc}")
-        return []
-    finally:
-        if app is not None:
-            try:
-                app.CloseCurrentDatabase()
-                app.Quit()
-            except Exception:
-                pass
-
 
 def _print_summary(diff: dict) -> None:
     tf = diff["tables_fields"]
@@ -578,35 +424,37 @@ def main() -> int:
     print("\nStep 1 — dumping current table contents ...")
     tf_current, fk_current = _dump_current(conn)
 
-    print("\nStep 2 — reconstructing from ODBC catalog ...")
-    tf_regen, _fk_regen_odbc, _fk_available_odbc = _regen_from_catalog(conn)
-
     conn.close()
 
-    print("\nStep 2b — fetching FK relationships via Access.Application DAO ...")
-    dao_rows = _get_dao_relations(DATA_MDB)
-    if dao_rows:
-        fk_available = True
-        # Normalise to match ForeignKeys table format; keep RelationName for CSV
-        fk_regen = dao_rows
-        # Write foreign_keys_regen.csv with DAO data
-        fk_regen_cols = [
-            "AccessTblNm", "AccessFldNm", "ForeignKey",
-            "ForeignKeyBaseField", "RelationName",
-        ]
-        fk_regen_sorted = sorted(
-            fk_regen,
-            key=lambda r: (r["AccessTblNm"].upper(), r["AccessFldNm"].upper()),
-        )
-        with OUT_FK_REGEN.open("w", newline="", encoding="utf-8-sig") as fh:
-            writer = csv.DictWriter(fh, fieldnames=fk_regen_cols)
-            writer.writeheader()
-            writer.writerows(fk_regen_sorted)
-        print(f"  wrote {OUT_FK_REGEN}  ({len(fk_regen_sorted)} rows, via DAO)")
-    else:
-        # Fall back to ODBC result (likely empty for Access)
-        fk_available = _fk_available_odbc
-        fk_regen = _fk_regen_odbc
+    print("\nStep 2 — reconstructing schema via Access DAO (TableDefs + Relations) ...")
+    tf_regen, fk_regen = _get_dao_data(DATA_MDB)
+    fk_available = bool(fk_regen)
+
+    # Write tables_fields_regen.csv
+    tf_regen_cols = [
+        "AccessTblNm", "AccessFldNm", "IndexOnField",
+        "DataFormat", "NULL_allowed", "ForeignKey", "ForeignKeyBaseField",
+    ]
+    with OUT_TF_REGEN.open("w", newline="", encoding="utf-8-sig") as fh:
+        writer = csv.DictWriter(fh, fieldnames=tf_regen_cols)
+        writer.writeheader()
+        writer.writerows(tf_regen)
+    print(f"wrote {OUT_TF_REGEN}  ({len(tf_regen)} rows)")
+
+    # Write foreign_keys_regen.csv
+    fk_regen_cols = [
+        "AccessTblNm", "AccessFldNm", "ForeignKey",
+        "ForeignKeyBaseField", "RelationName",
+    ]
+    fk_regen_sorted = sorted(
+        fk_regen,
+        key=lambda r: (r["AccessTblNm"].upper(), r["AccessFldNm"].upper()),
+    )
+    with OUT_FK_REGEN.open("w", newline="", encoding="utf-8-sig") as fh:
+        writer = csv.DictWriter(fh, fieldnames=fk_regen_cols)
+        writer.writeheader()
+        writer.writerows(fk_regen_sorted)
+    print(f"wrote {OUT_FK_REGEN}  ({len(fk_regen_sorted)} rows, via DAO)")
 
     print("\nStep 3 — computing diffs ...")
     diff = _compute_diffs(tf_current, tf_regen, fk_current, fk_regen, fk_available)

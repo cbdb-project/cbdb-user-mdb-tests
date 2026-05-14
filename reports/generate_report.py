@@ -3631,7 +3631,7 @@ def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
         intro = (
             "This section compares the contents of the `TablesFields` table "
             "in `CBDB_20260430_DATA.mdb` against the database schema "
-            "reconstructed from ODBC catalog calls by "
+            "reconstructed from Access DAO (TableDefs) by "
             "`reports/collect_schema_diffs.py`. Discrepancies indicate the "
             "documentation table may be out of date."
             if title_a.startswith("Appendix B") else
@@ -3640,7 +3640,7 @@ def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
         )
         intro_zh = (
             "本節將 `CBDB_20260430_DATA.mdb` 中 `TablesFields` 表的內容與"
-            "`reports/collect_schema_diffs.py` 透過 ODBC catalog 重建的資料"
+            "`reports/collect_schema_diffs.py` 透過 Access DAO（TableDefs）重建的資料"
             "庫結構進行比對。若存在差異，表示文檔表可能已過時。"
             if title_a.startswith("Appendix B") else
             "本節涵蓋 `ForeignKeys` 表及其所記錄的外鍵關係。"
@@ -4227,7 +4227,7 @@ def _add_schema_diff_appendix_md(
         (
             "This section compares the contents of the `TablesFields` table "
             "in `CBDB_20260430_DATA.mdb` against the database schema "
-            "reconstructed from ODBC catalog calls by "
+            "reconstructed from Access DAO (TableDefs) by "
             "`reports/collect_schema_diffs.py`. Discrepancies indicate the "
             "documentation table may be out of date."
         ) if is_tf else (
@@ -4238,7 +4238,7 @@ def _add_schema_diff_appendix_md(
     intro_zh = (
         (
             "本節將 `CBDB_20260430_DATA.mdb` 中 `TablesFields` 表的內容與 "
-            "`reports/collect_schema_diffs.py` 透過 ODBC catalog 重建的資料"
+            "`reports/collect_schema_diffs.py` 透過 Access DAO（TableDefs）重建的資料"
             "庫結構進行比對。若存在差異，表示文檔表可能已過時。"
         ) if is_tf else (
             "本節涵蓋 `ForeignKeys` 表及其所記錄的外鍵關係。"

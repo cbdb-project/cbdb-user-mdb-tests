@@ -1056,7 +1056,7 @@ PR M（`analysis/dump_data_mdb_vba.py`）從 DATA mdb 抽出了 `frmBaseMaintena
 
 ## 附錄 B —— TablesFields：文件表與實際資料庫結構對比
 
-本節將 `CBDB_20260430_DATA.mdb` 中 `TablesFields` 表的內容與 `reports/collect_schema_diffs.py` 透過 ODBC catalog 重建的資料庫結構進行比對。若存在差異，表示文件表可能已過時。
+本節將 `CBDB_20260430_DATA.mdb` 中 `TablesFields` 表的內容與 `reports/collect_schema_diffs.py` 透過 Access DAO（TableDefs）重建的資料庫結構進行比對。若存在差異，表示文件表可能已過時。
 
 TablesFields 共 875 筆。從資料庫重建：996 筆。
 
@@ -1098,15 +1098,15 @@ TablesFields 共 875 筆。從資料庫重建：996 筆。
 | ADDRESSES | c_name_chn | Text | True |
 | ADDRESSES | x_coord | Double | True |
 | ADDRESSES | y_coord | Double | True |
-| ADMIN_CAT_CODE_TYPE_REL | c_admin_cat_type_code | Text | True |
-| ADMIN_CAT_TYPES | c_admin_cat_type_code | Text | True |
-| ADMIN_CAT_TYPES | c_admin_cat_type_hz | Text | True |
-| ADMIN_CAT_TYPES | c_admin_cat_type_trans | Text | True |
+| ADMIN_CAT_CODE_TYPE_REL | c_admin_cat_type_code | Text | False |
+| ADMIN_CAT_TYPES | c_admin_cat_type_code | Text | False |
+| ADMIN_CAT_TYPES | c_admin_cat_type_hz | Text | False |
+| ADMIN_CAT_TYPES | c_admin_cat_type_trans | Text | False |
 | ASSOC_DATA | c_tertiary_type_notes | Text | True |
 | BIOG_ADDR_DATA | c_delete | Integer | True |
-| CopyTables | NotProcessed | Yes/No | False |
-| CopyTables | TableName | Text | True |
-| CopyTablesDefault | ID | Long | False |
+| CopyTables | NotProcessed | Yes/No | True |
+| CopyTables | TableName | Text | False |
+| CopyTablesDefault | ID | Long | True |
 | CopyTablesDefault | TableName | Text | True |
 | ENTRY_DATA | c_entry_addr_id | Long | True |
 | ETHNICITY_TRIBE_CODES | c_sortorder | Integer | True |
@@ -1118,14 +1118,14 @@ TablesFields 共 875 筆。從資料庫重建：996 筆。
 | ForeignKeys | ForeignKey | Text | True |
 | ForeignKeys | ForeignKeyBaseField | Text | True |
 | ForeignKeys | IndexOnField | Text | True |
-| ForeignKeys | NULL_allowed | Yes/No | False |
+| ForeignKeys | NULL_allowed | Yes/No | True |
 | ForeignKeys | skip | Integer | True |
 | FormLabels | c_english | Text | True |
 | FormLabels | c_fanti | Text | True |
 | FormLabels | c_form | Text | True |
 | FormLabels | c_jianti | Text | True |
 | FormLabels | c_label_id | Integer | True |
-| MERGED_PERSON_DATA | c_merged_from_personid | Long | True |
+| MERGED_PERSON_DATA | c_merged_from_personid | Long | False |
 | OFFICE_CODES_CONVERSION | c_office_chn | Text | True |
 | OFFICE_CODES_CONVERSION | c_office_chn_backup | Text | True |
 | OFFICE_CODES_CONVERSION | c_office_id | Long | True |
@@ -1164,11 +1164,11 @@ TablesFields 共 875 筆。從資料庫重建：996 筆。
 | SOCIAL_INSTITUTION_ALTNAME_CODES | c_inst_altname_desc | Text | True |
 | SOCIAL_INSTITUTION_ALTNAME_CODES | c_inst_altname_type | Integer | True |
 | SOCIAL_INSTITUTION_ALTNAME_CODES | c_notes | Text | True |
-| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_altname_hz | Text | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_altname_hz | Text | False |
 | SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_altname_py | Text | True |
-| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_altname_type | Integer | True |
-| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_code | Integer | True |
-| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_name_code | Integer | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_altname_type | Integer | False |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_code | Integer | False |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_name_code | Integer | False |
 | SOCIAL_INSTITUTION_ALTNAME_DATA | c_notes | Memo | True |
 | SOCIAL_INSTITUTION_ALTNAME_DATA | c_pages | Text | True |
 | SOCIAL_INSTITUTION_ALTNAME_DATA | c_source | Long | True |
@@ -1179,15 +1179,15 @@ TablesFields 共 875 筆。從資料庫重建：996 筆。
 | SOCIAL_INSTITUTION_CODES_CONVERSION | c_inst_name_code | Integer | True |
 | SOCIAL_INSTITUTION_CODES_CONVERSION | c_new_new_code | Long | True |
 | STATUS_TYPES | c_status_type_parent_code | Text | True |
-| TablesFields | AccessFldNm | Text | True |
-| TablesFields | AccessTblNm | Text | True |
+| TablesFields | AccessFldNm | Text | False |
+| TablesFields | AccessTblNm | Text | False |
 | TablesFields | DataFormat | Text | True |
 | TablesFields | DumpFldNm | Text | True |
 | TablesFields | DumpTblNm | Text | True |
 | TablesFields | ForeignKey | Text | True |
 | TablesFields | ForeignKeyBaseField | Text | True |
 | TablesFields | IndexOnField | Text | True |
-| TablesFields | NULL_allowed | Yes/No | False |
+| TablesFields | NULL_allowed | Yes/No | True |
 | TablesFields | RowNum | Long | True |
 | TablesFieldsChanges | Change | Text | True |
 | TablesFieldsChanges | ChangeDate | Text | True |
@@ -1202,18 +1202,18 @@ TablesFields 共 875 筆。從資料庫重建：996 筆。
 | TMP_ADDR_E | c_addr_cbd | Text | True |
 | TMP_DISTANCE_DATA | assoc_xcoord | Double | True |
 | TMP_DISTANCE_DATA | assoc_ycoord | Double | True |
-| TMP_DISTANCE_DATA | c_assoc_id | Long | True |
+| TMP_DISTANCE_DATA | c_assoc_id | Long | False |
 | TMP_DISTANCE_DATA | c_distance | Double | True |
-| TMP_DISTANCE_DATA | c_personid | Long | True |
+| TMP_DISTANCE_DATA | c_personid | Long | False |
 | TMP_DISTANCE_DATA | c_t_dist | Double | True |
 | TMP_DISTANCE_DATA | x_coord | Double | True |
 | TMP_DISTANCE_DATA | y_coord | Double | True |
-| ZZZ_DY_DATA | c_dy | Integer | True |
-| ZZZ_DY_DATA | c_personid | Long | True |
+| ZZZ_DY_DATA | c_dy | Integer | False |
+| ZZZ_DY_DATA | c_personid | Long | False |
 
 ### 屬性不一致
 
-完整清單：`reports/schema_diff_tables_fields_mismatches.csv`（346 筆）
+完整清單：`reports/schema_diff_tables_fields_mismatches.csv`（143 筆）
 
 ## 附錄 C —— ForeignKeys：文件表與實際資料庫結構對比
 
