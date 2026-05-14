@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-14T10:18:41.636017+00:00",
+  "generated_at": "2026-05-14T10:32:17.847409+00:00",
   "data_mdb": "CBDB_20260430_DATA.mdb",
   "tables_fields": {
     "total_current": 875,
@@ -188,8 +188,8 @@
       {
         "AccessTblNm": "ASSOC_DATA",
         "AccessFldNm": "c_tertiary_type_notes",
-        "DataFormat": null,
-        "NULL_allowed": null
+        "DataFormat": "Text",
+        "NULL_allowed": true
       },
       {
         "AccessTblNm": "BIOG_ADDR_DATA",
@@ -530,8 +530,8 @@
       {
         "AccessTblNm": "POSTED_TO_OFFICE_DATA",
         "AccessFldNm": "c_posting_id_old",
-        "DataFormat": null,
-        "NULL_allowed": null
+        "DataFormat": "Long",
+        "NULL_allowed": true
       },
       {
         "AccessTblNm": "SOCIAL_INSTITUTION_ALTNAME_CODES",
@@ -752,8 +752,8 @@
       {
         "AccessTblNm": "TEXT_CODES",
         "AccessFldNm": "c_text_type_id",
-        "DataFormat": null,
-        "NULL_allowed": null
+        "DataFormat": "Text",
+        "NULL_allowed": true
       },
       {
         "AccessTblNm": "TMP_ADDR_C",
@@ -1069,114 +1069,37 @@
       {
         "AccessTblNm": "ASSOC_CODES",
         "AccessFldNm": "c_assoc_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_CODES",
-        "AccessFldNm": "c_assoc_code",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_CODES",
-        "AccessFldNm": "c_assoc_desc",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_CODES",
-        "AccessFldNm": "c_assoc_desc",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_CODES",
-        "AccessFldNm": "c_assoc_desc_chn",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "ASSOC_CODES",
         "AccessFldNm": "c_assoc_desc_chn",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "ASSOC_CODES",
         "AccessFldNm": "c_assoc_pair",
         "field": "DataFormat",
         "current": "Long",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_CODES",
-        "AccessFldNm": "c_assoc_pair",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_CODES",
-        "AccessFldNm": "c_assoc_pair2",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_CODES",
-        "AccessFldNm": "c_assoc_pair2",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_CODES",
-        "AccessFldNm": "c_assoc_role_type",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
+        "regen": "Integer"
       },
       {
         "AccessTblNm": "ASSOC_CODES",
         "AccessFldNm": "c_assoc_role_type",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_CODES",
-        "AccessFldNm": "c_example",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_CODES",
-        "AccessFldNm": "c_example",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_CODES",
-        "AccessFldNm": "c_sortorder",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "ASSOC_CODES",
         "AccessFldNm": "c_sortorder",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "ASSOC_CODE_TYPE_REL",
@@ -1194,577 +1117,101 @@
       },
       {
         "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_addr_id",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_addr_id",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_claimer_id",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_claimer_id",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
         "AccessFldNm": "c_assoc_code",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_count",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_count",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_first_year",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_first_year",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_fy_day",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_fy_day",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_fy_day_gz",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_fy_day_gz",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "ASSOC_DATA",
         "AccessFldNm": "c_assoc_fy_intercalary",
         "field": "DataFormat",
         "current": "Binary",
-        "regen": null
+        "regen": "Yes/No"
       },
       {
         "AccessTblNm": "ASSOC_DATA",
         "AccessFldNm": "c_assoc_fy_intercalary",
         "field": "NULL_allowed",
         "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_fy_month",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_fy_month",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_fy_nh_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_fy_nh_code",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_fy_nh_year",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_fy_nh_year",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_fy_range",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_fy_range",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_id",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
+        "regen": false
       },
       {
         "AccessTblNm": "ASSOC_DATA",
         "AccessFldNm": "c_assoc_id",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_kin_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "ASSOC_DATA",
         "AccessFldNm": "c_assoc_kin_code",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_kin_id",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "ASSOC_DATA",
         "AccessFldNm": "c_assoc_kin_id",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_last_year",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_last_year",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_ly_day",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_ly_day",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_ly_day_gz",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_ly_day_gz",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "ASSOC_DATA",
         "AccessFldNm": "c_assoc_ly_intercalary",
         "field": "DataFormat",
         "current": "Binary",
-        "regen": null
+        "regen": "Yes/No"
       },
       {
         "AccessTblNm": "ASSOC_DATA",
         "AccessFldNm": "c_assoc_ly_intercalary",
         "field": "NULL_allowed",
         "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_ly_month",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_ly_month",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_ly_nh_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_ly_nh_code",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_ly_nh_year",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_ly_nh_year",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_ly_range",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_assoc_ly_range",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_created_by",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_created_by",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_created_date",
-        "field": "DataFormat",
-        "current": "Date/Time",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_created_date",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_inst_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_inst_code",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_inst_name_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_inst_name_code",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_kin_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
+        "regen": false
       },
       {
         "AccessTblNm": "ASSOC_DATA",
         "AccessFldNm": "c_kin_code",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_kin_id",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "ASSOC_DATA",
         "AccessFldNm": "c_kin_id",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_litgenre_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_litgenre_code",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_modified_by",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_modified_by",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_modified_date",
-        "field": "DataFormat",
-        "current": "Date/Time",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_modified_date",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_notes",
-        "field": "DataFormat",
-        "current": "Memo",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_notes",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "ASSOC_DATA",
         "AccessFldNm": "c_occasion_code",
         "field": "DataFormat",
         "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_occasion_code",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_pages",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_pages",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_personid",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
+        "regen": "Long"
       },
       {
         "AccessTblNm": "ASSOC_DATA",
         "AccessFldNm": "c_personid",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_sequence",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_sequence",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_source",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_source",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_tertiary_personid",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_tertiary_personid",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_text_title",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "ASSOC_DATA",
         "AccessFldNm": "c_text_title",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "ASSOC_DATA",
         "AccessFldNm": "c_topic_code",
         "field": "DataFormat",
         "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "ASSOC_DATA",
-        "AccessFldNm": "c_topic_code",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
+        "regen": "Long"
       },
       {
         "AccessTblNm": "ASSOC_TYPES",
@@ -2707,184 +2154,72 @@
       {
         "AccessTblNm": "KINSHIP_CODES",
         "AccessFldNm": "c_colstep",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_colstep",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_dwnstep",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "KINSHIP_CODES",
         "AccessFldNm": "c_dwnstep",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_kincode",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "KINSHIP_CODES",
         "AccessFldNm": "c_kincode",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_kinrel",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "KINSHIP_CODES",
         "AccessFldNm": "c_kinrel",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_kinrel_alt",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_kinrel_alt",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_kinrel_chn",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "KINSHIP_CODES",
         "AccessFldNm": "c_kinrel_chn",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_kinrel_simplified",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "KINSHIP_CODES",
         "AccessFldNm": "c_kinrel_simplified",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_kin_pair1",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "KINSHIP_CODES",
         "AccessFldNm": "c_kin_pair1",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_kin_pair2",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "KINSHIP_CODES",
         "AccessFldNm": "c_kin_pair2",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_kin_pair_notes",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_kin_pair_notes",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_marstep",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "KINSHIP_CODES",
         "AccessFldNm": "c_marstep",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_pick_sorting",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_pick_sorting",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_upstep",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "KINSHIP_CODES",
         "AccessFldNm": "c_upstep",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "KIN_DATA",
@@ -3231,283 +2566,31 @@
       },
       {
         "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_addr_id",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_addr_id",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_created_by",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_created_by",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_created_date",
-        "field": "DataFormat",
-        "current": "Date/Time",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_created_date",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_measure_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_measure_code",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_modified_by",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_modified_by",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_modified_date",
-        "field": "DataFormat",
-        "current": "Date/Time",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_modified_date",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_notes",
-        "field": "DataFormat",
-        "current": "Memo",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_notes",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_pages",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_pages",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_personid",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
         "AccessFldNm": "c_personid",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_possession_act_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "POSSESSION_DATA",
         "AccessFldNm": "c_possession_act_code",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_possession_desc",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_possession_desc",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_possession_desc_chn",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_possession_desc_chn",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_possession_nh_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_possession_nh_code",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_possession_nh_yr",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_possession_nh_yr",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_possession_record_id",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "POSSESSION_DATA",
         "AccessFldNm": "c_possession_record_id",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_possession_yr",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_possession_yr",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_possession_yr_range",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_possession_yr_range",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_quantity",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_quantity",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "POSSESSION_DATA",
         "AccessFldNm": "c_sequence",
         "field": "DataFormat",
         "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_sequence",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_source",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSSESSION_DATA",
-        "AccessFldNm": "c_source",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
+        "regen": "Long"
       },
       {
         "AccessTblNm": "POSTED_TO_ADDR_DATA",
@@ -3539,479 +2622,66 @@
       },
       {
         "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_appt_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_appt_code",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_assume_office_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_assume_office_code",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_created_by",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_created_by",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_created_date",
-        "field": "DataFormat",
-        "current": "Date/Time",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_created_date",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_dy",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_dy",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_firstyear",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_firstyear",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_fy_day",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_fy_day",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_fy_day_gz",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_fy_day_gz",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
         "AccessFldNm": "c_fy_intercalary",
         "field": "DataFormat",
         "current": "Binary",
-        "regen": null
+        "regen": "Yes/No"
       },
       {
         "AccessTblNm": "POSTED_TO_OFFICE_DATA",
         "AccessFldNm": "c_fy_intercalary",
         "field": "NULL_allowed",
         "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_fy_month",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_fy_month",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_fy_nh_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_fy_nh_code",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_fy_nh_year",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_fy_nh_year",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_fy_range",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_fy_range",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
+        "regen": false
       },
       {
         "AccessTblNm": "POSTED_TO_OFFICE_DATA",
         "AccessFldNm": "c_inst_code",
         "field": "DataFormat",
         "current": "Long",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_inst_code",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_inst_name_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_inst_name_code",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_lastyear",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_lastyear",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
+        "regen": "Integer"
       },
       {
         "AccessTblNm": "POSTED_TO_OFFICE_DATA",
         "AccessFldNm": "c_ly_day",
         "field": "DataFormat",
         "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_ly_day",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_ly_day_gz",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_ly_day_gz",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
+        "regen": "Long"
       },
       {
         "AccessTblNm": "POSTED_TO_OFFICE_DATA",
         "AccessFldNm": "c_ly_intercalary",
         "field": "DataFormat",
         "current": "Binary",
-        "regen": null
+        "regen": "Yes/No"
       },
       {
         "AccessTblNm": "POSTED_TO_OFFICE_DATA",
         "AccessFldNm": "c_ly_intercalary",
         "field": "NULL_allowed",
         "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_ly_month",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_ly_month",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_ly_nh_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_ly_nh_code",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_ly_nh_year",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_ly_nh_year",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_ly_range",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_ly_range",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_modified_by",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_modified_by",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_modified_date",
-        "field": "DataFormat",
-        "current": "Date/Time",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_modified_date",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_notes",
-        "field": "DataFormat",
-        "current": "Memo",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_notes",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_office_category_id",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_office_category_id",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_office_id",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
+        "regen": false
       },
       {
         "AccessTblNm": "POSTED_TO_OFFICE_DATA",
         "AccessFldNm": "c_office_id",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_office_id_backup",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_office_id_backup",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_pages",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_pages",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_personid",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "POSTED_TO_OFFICE_DATA",
         "AccessFldNm": "c_personid",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_posting_id",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "POSTED_TO_OFFICE_DATA",
         "AccessFldNm": "c_posting_id",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_sequence",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_sequence",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_source",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
-        "AccessFldNm": "c_source",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "POSTING_DATA",
@@ -4184,44 +2854,23 @@
       {
         "AccessTblNm": "SOCIAL_INSTITUTION_TYPES",
         "AccessFldNm": "c_inst_type_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "SOCIAL_INSTITUTION_TYPES",
-        "AccessFldNm": "c_inst_type_code",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "SOCIAL_INSTITUTION_TYPES",
-        "AccessFldNm": "c_inst_type_hz",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "SOCIAL_INSTITUTION_TYPES",
         "AccessFldNm": "c_inst_type_hz",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "SOCIAL_INSTITUTION_TYPES",
-        "AccessFldNm": "c_inst_type_py",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "SOCIAL_INSTITUTION_TYPES",
         "AccessFldNm": "c_inst_type_py",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "STATUS_CODES",
@@ -4372,815 +3021,52 @@
       },
       {
         "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_bibl_cat_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_bibl_cat_code",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_counter",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_counter",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_created_by",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_created_by",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_created_date",
-        "field": "DataFormat",
-        "current": "Date/Time",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_created_date",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_extant",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_extant",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_modified_by",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_modified_by",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_modified_date",
-        "field": "DataFormat",
-        "current": "Date/Time",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_modified_date",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_notes",
-        "field": "DataFormat",
-        "current": "Memo",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_notes",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_number",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_number",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_pages",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_pages",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_period",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_period",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_source",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_source",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_suffix_version",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_suffix_version",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_textid",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
         "AccessFldNm": "c_textid",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_text_country",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_text_country",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_text_dy",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_text_dy",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_text_nh_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_text_nh_code",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_text_nh_year",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_text_nh_year",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_text_range_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_text_range_code",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_text_year",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_text_year",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_title",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_title",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_title_alt_chn",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_title_alt_chn",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_title_chn",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "TEXT_CODES",
         "AccessFldNm": "c_title_chn",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_title_trans",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_title_trans",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_url_api",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_url_api",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_url_api_coda",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_url_api_coda",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_url_homepage",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_CODES",
-        "AccessFldNm": "c_url_homepage",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_counter",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_counter",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_created_by",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_created_by",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_created_date",
-        "field": "DataFormat",
-        "current": "Date/Time",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_created_date",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_extant",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_extant",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_instance_title",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_instance_title",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_instance_title_chn",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "TEXT_INSTANCE_DATA",
         "AccessFldNm": "c_instance_title_chn",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_instance_title_trans",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_instance_title_trans",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_modified_by",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_modified_by",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_modified_date",
-        "field": "DataFormat",
-        "current": "Date/Time",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_modified_date",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_notes",
-        "field": "DataFormat",
-        "current": "Memo",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_notes",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_number",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_number",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_pages",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_pages",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_part_of_instance",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_part_of_instance",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_part_of_instance_notes",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_part_of_instance_notes",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_print",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_print",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_publisher",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_publisher",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_pub_country",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_pub_country",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_pub_dy",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_pub_dy",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_pub_loc",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_pub_loc",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_pub_nh_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_pub_nh_code",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "TEXT_INSTANCE_DATA",
         "AccessFldNm": "c_pub_nh_year",
         "field": "DataFormat",
         "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_pub_nh_year",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_pub_notes",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_pub_notes",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_pub_range_code",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_pub_range_code",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_pub_year",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_pub_year",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_source",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_source",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_textid",
-        "field": "DataFormat",
-        "current": "Long",
-        "regen": null
+        "regen": "Long"
       },
       {
         "AccessTblNm": "TEXT_INSTANCE_DATA",
         "AccessFldNm": "c_textid",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_text_edition_id",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "TEXT_INSTANCE_DATA",
         "AccessFldNm": "c_text_edition_id",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_text_instance_id",
-        "field": "DataFormat",
-        "current": "Integer",
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "TEXT_INSTANCE_DATA",
         "AccessFldNm": "c_text_instance_id",
         "field": "NULL_allowed",
         "current": false,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_title_alt_chn",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_title_alt_chn",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_url_api",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_url_api",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_url_homepage",
-        "field": "DataFormat",
-        "current": "Text",
-        "regen": null
-      },
-      {
-        "AccessTblNm": "TEXT_INSTANCE_DATA",
-        "AccessFldNm": "c_url_homepage",
-        "field": "NULL_allowed",
-        "current": true,
-        "regen": null
+        "regen": true
       },
       {
         "AccessTblNm": "TEXT_ROLE_CODES",

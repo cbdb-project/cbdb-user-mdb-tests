@@ -1,0 +1,11 @@
+﻿AccessTblNm,AccessFldNm
+ADMIN_CAT_CODE_TYPE_REL,c_admin_type_code
+ADMIN_CAT_TYPES,c_admin_type_code
+ADMIN_CAT_TYPES,c_admin_type_hz
+ADMIN_CAT_TYPES,c_admin_type_trans
+ENTRY_DATA,c_addr_id
+ENTRY_DATA,c_posting_id
+MERGED_PERSON_DATA,c_merged_to_personid
+PersonIDSource,LineNum
+PersonIDSource,SourceTable
+TMP_ADDR_C,Max_c_belongs_first_year

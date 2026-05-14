@@ -3690,89 +3690,69 @@ def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
 
         if only_cur:
             _h(doc, 2, Z(only_cur_hdr))
-            cap = min(20, len(only_cur))
+            n = len(only_cur)
             if block_key == "tables_fields":
-                tbl = doc.add_table(rows=cap + 1, cols=2)
+                tbl = doc.add_table(rows=n + 1, cols=2)
                 tbl.style = "Table Grid"
                 hdr = tbl.rows[0].cells
                 hdr[0].text = "AccessTblNm"; hdr[1].text = "AccessFldNm"
-                for i, row in enumerate(only_cur[:cap]):
+                for i, row in enumerate(only_cur):
                     r = tbl.rows[i + 1].cells
                     r[0].text = row["AccessTblNm"]
                     r[1].text = row["AccessFldNm"]
             else:
-                tbl = doc.add_table(rows=cap + 1, cols=4)
+                tbl = doc.add_table(rows=n + 1, cols=4)
                 tbl.style = "Table Grid"
                 hdr = tbl.rows[0].cells
                 for ci, h in enumerate(["AccessTblNm","AccessFldNm","ForeignKey","ForeignKeyBaseField"]):
                     hdr[ci].text = h
-                for i, row in enumerate(only_cur[:cap]):
+                for i, row in enumerate(only_cur):
                     r = tbl.rows[i + 1].cells
                     r[0].text = row["AccessTblNm"]
                     r[1].text = row["AccessFldNm"]
                     r[2].text = row.get("ForeignKey") or ""
                     r[3].text = row.get("ForeignKeyBaseField") or ""
-            if len(only_cur) > 20:
-                doc.add_paragraph(Z(
-                    f"… {len(only_cur) - 20} more rows not shown."
-                    if is_en else f"… 還有 {len(only_cur) - 20} 筆未顯示。"
-                ))
 
         if only_reg:
             _h(doc, 2, Z(only_reg_hdr))
-            cap = min(20, len(only_reg))
+            n = len(only_reg)
             if block_key == "tables_fields":
-                tbl = doc.add_table(rows=cap + 1, cols=4)
+                tbl = doc.add_table(rows=n + 1, cols=4)
                 tbl.style = "Table Grid"
                 hdr = tbl.rows[0].cells
                 for ci, h in enumerate(["AccessTblNm","AccessFldNm","DataFormat","NULL_allowed"]):
                     hdr[ci].text = h
-                for i, row in enumerate(only_reg[:cap]):
+                for i, row in enumerate(only_reg):
                     r = tbl.rows[i + 1].cells
                     r[0].text = row["AccessTblNm"]
                     r[1].text = row["AccessFldNm"]
                     r[2].text = str(row.get("DataFormat") or "")
                     r[3].text = str(row.get("NULL_allowed") or "")
             else:
-                tbl = doc.add_table(rows=cap + 1, cols=4)
+                tbl = doc.add_table(rows=n + 1, cols=4)
                 tbl.style = "Table Grid"
                 hdr = tbl.rows[0].cells
                 for ci, h in enumerate(["AccessTblNm","AccessFldNm","ForeignKey","ForeignKeyBaseField"]):
                     hdr[ci].text = h
-                for i, row in enumerate(only_reg[:cap]):
+                for i, row in enumerate(only_reg):
                     r = tbl.rows[i + 1].cells
                     r[0].text = row["AccessTblNm"]
                     r[1].text = row["AccessFldNm"]
                     r[2].text = row.get("ForeignKey") or ""
                     r[3].text = row.get("ForeignKeyBaseField") or ""
-            if len(only_reg) > 20:
-                doc.add_paragraph(Z(
-                    f"… {len(only_reg) - 20} more rows not shown."
-                    if is_en else f"… 還有 {len(only_reg) - 20} 筆未顯示。"
-                ))
 
         if mismatches:
             _h(doc, 2, Z(mismatch_hdr))
-            cap = min(20, len(mismatches))
-            tbl = doc.add_table(rows=cap + 1, cols=5)
-            tbl.style = "Table Grid"
-            hdr = tbl.rows[0].cells
-            for ci, h in enumerate(["AccessTblNm","AccessFldNm","Field",
-                                      "In TablesFields" if block_key == "tables_fields" else "In ForeignKeys",
-                                      "In actual DB"]):
-                hdr[ci].text = h
-            for i, row in enumerate(mismatches[:cap]):
-                r = tbl.rows[i + 1].cells
-                r[0].text = row["AccessTblNm"]
-                r[1].text = row["AccessFldNm"]
-                r[2].text = row.get("field", "")
-                r[3].text = str(row.get("current") or "")
-                r[4].text = str(row.get("regen") or "")
-            if len(mismatches) > 20:
-                doc.add_paragraph(Z(
-                    f"… {len(mismatches) - 20} more rows not shown."
-                    if is_en else f"… 還有 {len(mismatches) - 20} 筆未顯示。"
-                ))
+            # Mismatches are too numerous to inline — point to the CSV file.
+            if block_key == "tables_fields":
+                csv_file = "reports/schema_diff_tables_fields_mismatches.csv"
+            else:
+                csv_file = "reports/schema_diff_foreign_keys_mismatches.csv"
+            doc.add_paragraph(Z(
+                f"Full list: `{csv_file}` ({len(mismatches)} rows)"
+                if is_en else
+                f"完整清單：`{csv_file}`（{len(mismatches)} 筆）"
+            ))
 
         if not only_cur and not only_reg and not mismatches:
             doc.add_paragraph(Z(
@@ -4303,21 +4283,16 @@ def _add_schema_diff_appendix_md(
         if is_tf:
             lines.append("| AccessTblNm | AccessFldNm |")
             lines.append("|---|---|")
-            for row in only_cur[:20]:
+            for row in only_cur:
                 lines.append(f"| {row['AccessTblNm']} | {row['AccessFldNm']} |")
         else:
             lines.append("| AccessTblNm | AccessFldNm | ForeignKey | ForeignKeyBaseField |")
             lines.append("|---|---|---|---|")
-            for row in only_cur[:20]:
+            for row in only_cur:
                 lines.append(
                     f"| {row['AccessTblNm']} | {row['AccessFldNm']} "
                     f"| {row.get('ForeignKey','')} | {row.get('ForeignKeyBaseField','')} |"
                 )
-        if len(only_cur) > 20:
-            lines.append(Z(
-                f"*… {len(only_cur) - 20} more rows not shown.*"
-                if is_en else f"*… 還有 {len(only_cur) - 20} 筆未顯示。*"
-            ))
         lines.append("")
 
     if only_reg:
@@ -4331,7 +4306,7 @@ def _add_schema_diff_appendix_md(
         if is_tf:
             lines.append("| AccessTblNm | AccessFldNm | DataFormat | NULL_allowed |")
             lines.append("|---|---|---|---|")
-            for row in only_reg[:20]:
+            for row in only_reg:
                 lines.append(
                     f"| {row['AccessTblNm']} | {row['AccessFldNm']} "
                     f"| {row.get('DataFormat','')} | {row.get('NULL_allowed','')} |"
@@ -4339,16 +4314,11 @@ def _add_schema_diff_appendix_md(
         else:
             lines.append("| AccessTblNm | AccessFldNm | ForeignKey | ForeignKeyBaseField |")
             lines.append("|---|---|---|---|")
-            for row in only_reg[:20]:
+            for row in only_reg:
                 lines.append(
                     f"| {row['AccessTblNm']} | {row['AccessFldNm']} "
                     f"| {row.get('ForeignKey','')} | {row.get('ForeignKeyBaseField','')} |"
                 )
-        if len(only_reg) > 20:
-            lines.append(Z(
-                f"*… {len(only_reg) - 20} more rows not shown.*"
-                if is_en else f"*… 還有 {len(only_reg) - 20} 筆未顯示。*"
-            ))
         lines.append("")
 
     if mismatches:
@@ -4357,20 +4327,16 @@ def _add_schema_diff_appendix_md(
         )
         lines.append(f"### {Z(mis_hdr)}")
         lines.append("")
-        doc_col = "In TablesFields" if is_tf else f"In {doc_name}"
-        lines.append(f"| AccessTblNm | AccessFldNm | Field | {doc_col} | In actual DB |")
-        lines.append("|---|---|---|---|---|")
-        for row in mismatches[:20]:
-            lines.append(
-                f"| {row['AccessTblNm']} | {row['AccessFldNm']} "
-                f"| {row.get('field','')} | {row.get('current','')} "
-                f"| {row.get('regen','')} |"
-            )
-        if len(mismatches) > 20:
-            lines.append(Z(
-                f"*… {len(mismatches) - 20} more rows not shown.*"
-                if is_en else f"*… 還有 {len(mismatches) - 20} 筆未顯示。*"
-            ))
+        # Mismatches are too numerous to inline — point to the CSV file.
+        if is_tf:
+            csv_file = "reports/schema_diff_tables_fields_mismatches.csv"
+        else:
+            csv_file = "reports/schema_diff_foreign_keys_mismatches.csv"
+        lines.append(Z(
+            f"Full list: `{csv_file}` ({len(mismatches)} rows)"
+            if is_en else
+            f"完整清單：`{csv_file}`（{len(mismatches)} 筆）"
+        ))
         lines.append("")
 
     if not only_cur and not only_reg and not mismatches:

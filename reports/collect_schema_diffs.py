@@ -31,6 +31,14 @@ OUT_TF_REGEN   = REPORTS / "tables_fields_regen.csv"
 OUT_FK_REGEN   = REPORTS / "foreign_keys_regen.csv"
 OUT_JSON       = REPORTS / "schema_diff.json"
 
+# Diff-result CSV files (written by _write_diff_csvs)
+OUT_TF_ONLY_CURRENT  = REPORTS / "schema_diff_tables_fields_only_in_current.csv"
+OUT_TF_ONLY_REGEN    = REPORTS / "schema_diff_tables_fields_only_in_regen.csv"
+OUT_TF_MISMATCHES    = REPORTS / "schema_diff_tables_fields_mismatches.csv"
+OUT_FK_ONLY_CURRENT  = REPORTS / "schema_diff_foreign_keys_only_in_current.csv"
+OUT_FK_ONLY_REGEN    = REPORTS / "schema_diff_foreign_keys_only_in_regen.csv"
+OUT_FK_MISMATCHES    = REPORTS / "schema_diff_foreign_keys_mismatches.csv"
+
 
 def _open_data_mdb() -> pyodbc.Connection:
     cs = (
@@ -413,6 +421,61 @@ def _compute_diffs(
     return result
 
 
+def _write_diff_csvs(diff: dict) -> None:
+    """Write the six diff-result CSV files from the in-memory diff data."""
+    tf = diff["tables_fields"]
+    fk = diff["foreign_keys"]
+
+    # --- TablesFields: only_in_current ---
+    rows = tf["only_in_current"]
+    with OUT_TF_ONLY_CURRENT.open("w", newline="", encoding="utf-8-sig") as fh:
+        writer = csv.DictWriter(fh, fieldnames=["AccessTblNm", "AccessFldNm"])
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"wrote {OUT_TF_ONLY_CURRENT}  ({len(rows)} rows)")
+
+    # --- TablesFields: only_in_regen ---
+    rows = tf["only_in_regen"]
+    with OUT_TF_ONLY_REGEN.open("w", newline="", encoding="utf-8-sig") as fh:
+        writer = csv.DictWriter(fh, fieldnames=["AccessTblNm", "AccessFldNm", "DataFormat", "NULL_allowed"])
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"wrote {OUT_TF_ONLY_REGEN}  ({len(rows)} rows)")
+
+    # --- TablesFields: mismatches ---
+    rows = tf["mismatches"]
+    with OUT_TF_MISMATCHES.open("w", newline="", encoding="utf-8-sig") as fh:
+        writer = csv.DictWriter(fh, fieldnames=["AccessTblNm", "AccessFldNm", "field", "current", "regen"])
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"wrote {OUT_TF_MISMATCHES}  ({len(rows)} rows)")
+
+    # --- ForeignKeys: only_in_current ---
+    rows = fk["only_in_current"]
+    fk_cols = ["AccessTblNm", "AccessFldNm", "ForeignKey", "ForeignKeyBaseField"]
+    with OUT_FK_ONLY_CURRENT.open("w", newline="", encoding="utf-8-sig") as fh:
+        writer = csv.DictWriter(fh, fieldnames=fk_cols)
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"wrote {OUT_FK_ONLY_CURRENT}  ({len(rows)} rows)")
+
+    # --- ForeignKeys: only_in_regen ---
+    rows = fk["only_in_regen"]
+    with OUT_FK_ONLY_REGEN.open("w", newline="", encoding="utf-8-sig") as fh:
+        writer = csv.DictWriter(fh, fieldnames=fk_cols)
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"wrote {OUT_FK_ONLY_REGEN}  ({len(rows)} rows)")
+
+    # --- ForeignKeys: mismatches ---
+    rows = fk["mismatches"]
+    with OUT_FK_MISMATCHES.open("w", newline="", encoding="utf-8-sig") as fh:
+        writer = csv.DictWriter(fh, fieldnames=fk_cols)
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"wrote {OUT_FK_MISMATCHES}  ({len(rows)} rows)")
+
+
 def _print_summary(diff: dict) -> None:
     tf = diff["tables_fields"]
     fk = diff["foreign_keys"]
@@ -449,6 +512,9 @@ def main() -> int:
 
     print("\nStep 3 — computing diffs ...")
     diff = _compute_diffs(tf_current, tf_regen, fk_current, fk_regen, fk_available)
+
+    print("\nStep 4 — writing diff CSV files ...")
+    _write_diff_csvs(diff)
 
     _print_summary(diff)
     return 0

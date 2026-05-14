@@ -1099,33 +1099,121 @@ TablesFields 共 875 筆。從資料庫重建：996 筆。
 | ADDRESSES | x_coord | Double | True |
 | ADDRESSES | y_coord | Double | True |
 | ADMIN_CAT_CODE_TYPE_REL | c_admin_cat_type_code | Text | True |
-*… 還有 111 筆未顯示。*
+| ADMIN_CAT_TYPES | c_admin_cat_type_code | Text | True |
+| ADMIN_CAT_TYPES | c_admin_cat_type_hz | Text | True |
+| ADMIN_CAT_TYPES | c_admin_cat_type_trans | Text | True |
+| ASSOC_DATA | c_tertiary_type_notes | Text | True |
+| BIOG_ADDR_DATA | c_delete | Integer | True |
+| CopyTables | NotProcessed | Yes/No | False |
+| CopyTables | TableName | Text | True |
+| CopyTablesDefault | ID | Long | False |
+| CopyTablesDefault | TableName | Text | True |
+| ENTRY_DATA | c_entry_addr_id | Long | True |
+| ETHNICITY_TRIBE_CODES | c_sortorder | Integer | True |
+| ForeignKeys | AccessFldNm | Text | True |
+| ForeignKeys | AccessTblNm | Text | True |
+| ForeignKeys | DataFormat | Text | True |
+| ForeignKeys | FKName | Text | True |
+| ForeignKeys | FKString | Text | True |
+| ForeignKeys | ForeignKey | Text | True |
+| ForeignKeys | ForeignKeyBaseField | Text | True |
+| ForeignKeys | IndexOnField | Text | True |
+| ForeignKeys | NULL_allowed | Yes/No | False |
+| ForeignKeys | skip | Integer | True |
+| FormLabels | c_english | Text | True |
+| FormLabels | c_fanti | Text | True |
+| FormLabels | c_form | Text | True |
+| FormLabels | c_jianti | Text | True |
+| FormLabels | c_label_id | Integer | True |
+| MERGED_PERSON_DATA | c_merged_from_personid | Long | True |
+| OFFICE_CODES_CONVERSION | c_office_chn | Text | True |
+| OFFICE_CODES_CONVERSION | c_office_chn_backup | Text | True |
+| OFFICE_CODES_CONVERSION | c_office_id | Long | True |
+| OFFICE_CODES_CONVERSION | c_office_id_backup | Long | True |
+| OFFICE_TYPE_TREE_backup | c_office_type_desc | Text | True |
+| OFFICE_TYPE_TREE_backup | c_office_type_desc_chn | Text | True |
+| OFFICE_TYPE_TREE_backup | c_office_type_node_id | Text | True |
+| OFFICE_TYPE_TREE_backup | c_parent_id | Text | True |
+| OFFICE_TYPE_TREE_backup | c_tts_node_id | Text | True |
+| Paste Errors | c_bibl_cat_code | Long | True |
+| Paste Errors | c_created_by | Text | True |
+| Paste Errors | c_created_date | Date/Time | True |
+| Paste Errors | c_extant | Long | True |
+| Paste Errors | c_modified_by | Text | True |
+| Paste Errors | c_modified_date | Date/Time | True |
+| Paste Errors | c_notes | Memo | True |
+| Paste Errors | c_pages | Text | True |
+| Paste Errors | c_source | Long | True |
+| Paste Errors | c_textid | Long | True |
+| Paste Errors | c_text_country | Long | True |
+| Paste Errors | c_text_dy | Long | True |
+| Paste Errors | c_text_nh_code | Long | True |
+| Paste Errors | c_text_nh_year | Long | True |
+| Paste Errors | c_text_range_code | Long | True |
+| Paste Errors | c_text_type_id | Text | True |
+| Paste Errors | c_text_year | Long | True |
+| Paste Errors | c_title | Text | True |
+| Paste Errors | c_title_alt_chn | Text | True |
+| Paste Errors | c_title_chn | Text | True |
+| Paste Errors | c_title_trans | Text | True |
+| Paste Errors | c_url_api | Text | True |
+| Paste Errors | c_url_api_coda | Text | True |
+| Paste Errors | c_url_homepage | Text | True |
+| POSTED_TO_OFFICE_DATA | c_posting_id_old | Long | True |
+| SOCIAL_INSTITUTION_ALTNAME_CODES | c_inst_altname_chn | Text | True |
+| SOCIAL_INSTITUTION_ALTNAME_CODES | c_inst_altname_desc | Text | True |
+| SOCIAL_INSTITUTION_ALTNAME_CODES | c_inst_altname_type | Integer | True |
+| SOCIAL_INSTITUTION_ALTNAME_CODES | c_notes | Text | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_altname_hz | Text | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_altname_py | Text | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_altname_type | Integer | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_code | Integer | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_name_code | Integer | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_notes | Memo | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_pages | Text | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_source | Long | True |
+| SOCIAL_INSTITUTION_CODES | c_inst_end_dy | Integer | True |
+| SOCIAL_INSTITUTION_CODES | c_inst_end_year | Integer | True |
+| SOCIAL_INSTITUTION_CODES_CONVERSION | c_inst_code | Long | True |
+| SOCIAL_INSTITUTION_CODES_CONVERSION | c_inst_code_new | Integer | True |
+| SOCIAL_INSTITUTION_CODES_CONVERSION | c_inst_name_code | Integer | True |
+| SOCIAL_INSTITUTION_CODES_CONVERSION | c_new_new_code | Long | True |
+| STATUS_TYPES | c_status_type_parent_code | Text | True |
+| TablesFields | AccessFldNm | Text | True |
+| TablesFields | AccessTblNm | Text | True |
+| TablesFields | DataFormat | Text | True |
+| TablesFields | DumpFldNm | Text | True |
+| TablesFields | DumpTblNm | Text | True |
+| TablesFields | ForeignKey | Text | True |
+| TablesFields | ForeignKeyBaseField | Text | True |
+| TablesFields | IndexOnField | Text | True |
+| TablesFields | NULL_allowed | Yes/No | False |
+| TablesFields | RowNum | Long | True |
+| TablesFieldsChanges | Change | Text | True |
+| TablesFieldsChanges | ChangeDate | Text | True |
+| TablesFieldsChanges | ChangeNotes | Text | True |
+| TablesFieldsChanges | FieldName | Text | True |
+| TablesFieldsChanges | TableName | Text | True |
+| TEXT_BIBLCAT_CODES | c_text_cat_level | Text | True |
+| TEXT_BIBLCAT_CODES | c_text_cat_parent_id | Text | True |
+| TEXT_CODES | c_text_type_id | Text | True |
+| TMP_ADDR_C | Min_c_belongs_first_year | Integer | True |
+| TMP_ADDR_D | c_addr_cbd | Text | True |
+| TMP_ADDR_E | c_addr_cbd | Text | True |
+| TMP_DISTANCE_DATA | assoc_xcoord | Double | True |
+| TMP_DISTANCE_DATA | assoc_ycoord | Double | True |
+| TMP_DISTANCE_DATA | c_assoc_id | Long | True |
+| TMP_DISTANCE_DATA | c_distance | Double | True |
+| TMP_DISTANCE_DATA | c_personid | Long | True |
+| TMP_DISTANCE_DATA | c_t_dist | Double | True |
+| TMP_DISTANCE_DATA | x_coord | Double | True |
+| TMP_DISTANCE_DATA | y_coord | Double | True |
+| ZZZ_DY_DATA | c_dy | Integer | True |
+| ZZZ_DY_DATA | c_personid | Long | True |
 
 ### 屬性不一致
 
-| AccessTblNm | AccessFldNm | Field | In TablesFields | In actual DB |
-|---|---|---|---|---|
-| ADDR_BELONGS_DATA | c_addr_id | NULL_allowed | False | True |
-| ADDR_BELONGS_DATA | c_belongs_to | NULL_allowed | False | True |
-| ADDR_BELONGS_DATA | c_firstyear | NULL_allowed | False | True |
-| ADDR_BELONGS_DATA | c_lastyear | NULL_allowed | False | True |
-| ADDR_BELONGS_DATA | c_notes | DataFormat | Memo | Text |
-| ADDR_CODES | c_addr_id | NULL_allowed | False | True |
-| ADDR_CODES | c_admin_cat_code | NULL_allowed | False | True |
-| ADDR_CODES | c_admin_type | NULL_allowed | False | True |
-| ADDR_CODES | c_name | NULL_allowed | False | True |
-| ADDR_CODES | c_name_chn | NULL_allowed | False | True |
-| ADDR_CODES | x_coord | NULL_allowed | False | True |
-| ADDR_CODES | y_coord | NULL_allowed | False | True |
-| ADMIN_CAT_CODES | c_admin_cat_code | NULL_allowed | False | True |
-| ADMIN_CAT_CODES | c_admin_cat_hz | NULL_allowed | False | True |
-| ADMIN_CAT_CODES | c_admin_cat_py | NULL_allowed | False | True |
-| ADMIN_CAT_CODE_TYPE_REL | c_admin_cat_code | NULL_allowed | False | True |
-| ADMIN_CAT_TYPES | c_notes | NULL_allowed | False | True |
-| ALTNAME_CODES | c_name_type_code | NULL_allowed | False | True |
-| ALTNAME_CODES | c_name_type_desc | NULL_allowed | False | True |
-| ALTNAME_CODES | c_name_type_desc_chn | NULL_allowed | False | True |
-*… 還有 628 筆未顯示。*
+完整清單：`reports/schema_diff_tables_fields_mismatches.csv`（346 筆）
 
 ## 附錄 C —— ForeignKeys：文件表與實際資料庫結構對比
 
