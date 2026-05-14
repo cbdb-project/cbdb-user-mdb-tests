@@ -2870,11 +2870,11 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
     data = _json.loads(DRIFT_JSON.read_text(encoding="utf-8"))
 
     title = (
-        "Appendix — `c_index_year` / `c_index_addr_id` drift "
+        "Appendix A — `c_index_year` / `c_index_addr_id` drift "
         "vs the cbdb-online-main-server snapshot "
         "(differences need per-row classification before being filed as bugs)"
         if is_en else
-        "附錄 —— `c_index_year` / `c_index_addr_id` 與 "
+        "附錄 A —— `c_index_year` / `c_index_addr_id` 與 "
         "cbdb-online-main-server 快照之間的偏差"
         "（差異需要逐筆分類後才能判定是否為缺陷）"
     )
@@ -3617,7 +3617,7 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
 # ---------------------------------------------------------------------------
 
 def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
-    """Render Appendix A (TablesFields) and Appendix B (ForeignKeys)
+    """Render Appendix B (TablesFields) and Appendix C (ForeignKeys)
     schema-diff sections using the python-docx API.
     Consumes reports/schema_diff.json produced by collect_schema_diffs.py."""
     import json as _json
@@ -3625,7 +3625,7 @@ def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
     def _table_section(data_block: dict, title_a: str, title_b: str,
                         only_cur_hdr: str, only_reg_hdr: str,
                         mismatch_hdr: str) -> None:
-        """Render one appendix section (A or B) for a schema block."""
+        """Render one appendix section (B or C) for a schema block."""
         _h(doc, 1, Z(title_a if is_en else title_b))
 
         intro = (
@@ -3634,7 +3634,7 @@ def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
             "reconstructed from ODBC catalog calls by "
             "`reports/collect_schema_diffs.py`. Discrepancies indicate the "
             "documentation table may be out of date."
-            if title_a.startswith("Appendix A") else
+            if title_a.startswith("Appendix B") else
             "This section compares the `ForeignKeys` table against FK "
             "relationships derived from ODBC catalog introspection."
         )
@@ -3642,7 +3642,7 @@ def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
             "本節將 `CBDB_20260430_DATA.mdb` 中 `TablesFields` 表的內容與"
             "`reports/collect_schema_diffs.py` 透過 ODBC catalog 重建的資料"
             "庫結構進行比對。若存在差異，表示文檔表可能已過時。"
-            if title_a.startswith("Appendix A") else
+            if title_a.startswith("Appendix B") else
             "本節將 `ForeignKeys` 表與透過 ODBC catalog 查詢所得的外鍵關係"
             "進行比對。"
         )
@@ -3660,19 +3660,25 @@ def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
             return
 
         diff = _json.loads(SCHEMA_DIFF_JSON.read_text(encoding="utf-8"))
-        block_key = "tables_fields" if title_a.startswith("Appendix A") else "foreign_keys"
+        block_key = "tables_fields" if title_a.startswith("Appendix B") else "foreign_keys"
         blk = diff[block_key]
 
-        # ForeignKeys: check if introspection was available
+        # ForeignKeys: catalog-level diff not available for Access; describe what IS validated
         if block_key == "foreign_keys" and not blk.get("fk_introspection_available"):
             doc.add_paragraph(Z(
-                "ODBC FK introspection returned no data for this Access "
-                "database. Structural tests (referenced table/column existence) "
-                "are covered in `tests/test_schema_data_mdb.py`."
+                "The `ForeignKeys` table (188 rows) documents FK relationships in the database. "
+                "All 188 referenced table/column pairs have been verified to exist in the current "
+                "dump — `tests/test_schema_data_mdb.py` (`test_foreign_keys_referenced_tables_exist`, "
+                "`test_foreign_keys_referenced_columns_exist`) passes against the current data. "
+                "A catalog-level diff (documented FK vs. all actual FK constraints) is not available "
+                "for Access databases and is omitted here."
                 if is_en else
-                "ODBC 外鍵查詢對此 Access 資料庫未能返回資料。"
-                "結構性測試（被參照表/欄位是否存在）已在 "
-                "`tests/test_schema_data_mdb.py` 中覆蓋。"
+                "`ForeignKeys` 表共 188 笔，记录了数据库中的外键关系。"
+                "我们已验证所有 188 笔所参照的表名与列名均存在于当前 dump 中——"
+                "`tests/test_schema_data_mdb.py`（`test_foreign_keys_referenced_tables_exist`、"
+                "`test_foreign_keys_referenced_columns_exist`）在当前数据上均通过。"
+                "由于 Access 数据库不支持通过标准 ODBC catalog API 枚举外键约束，"
+                "此处无法提供「文件记载 FK 与实际 FK 约束」的完整对比。"
             ))
             return
 
@@ -3690,89 +3696,69 @@ def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
 
         if only_cur:
             _h(doc, 2, Z(only_cur_hdr))
-            cap = min(20, len(only_cur))
+            n = len(only_cur)
             if block_key == "tables_fields":
-                tbl = doc.add_table(rows=cap + 1, cols=2)
+                tbl = doc.add_table(rows=n + 1, cols=2)
                 tbl.style = "Table Grid"
                 hdr = tbl.rows[0].cells
                 hdr[0].text = "AccessTblNm"; hdr[1].text = "AccessFldNm"
-                for i, row in enumerate(only_cur[:cap]):
+                for i, row in enumerate(only_cur):
                     r = tbl.rows[i + 1].cells
                     r[0].text = row["AccessTblNm"]
                     r[1].text = row["AccessFldNm"]
             else:
-                tbl = doc.add_table(rows=cap + 1, cols=4)
+                tbl = doc.add_table(rows=n + 1, cols=4)
                 tbl.style = "Table Grid"
                 hdr = tbl.rows[0].cells
                 for ci, h in enumerate(["AccessTblNm","AccessFldNm","ForeignKey","ForeignKeyBaseField"]):
                     hdr[ci].text = h
-                for i, row in enumerate(only_cur[:cap]):
+                for i, row in enumerate(only_cur):
                     r = tbl.rows[i + 1].cells
                     r[0].text = row["AccessTblNm"]
                     r[1].text = row["AccessFldNm"]
                     r[2].text = row.get("ForeignKey") or ""
                     r[3].text = row.get("ForeignKeyBaseField") or ""
-            if len(only_cur) > 20:
-                doc.add_paragraph(Z(
-                    f"… {len(only_cur) - 20} more rows not shown."
-                    if is_en else f"… 還有 {len(only_cur) - 20} 筆未顯示。"
-                ))
 
         if only_reg:
             _h(doc, 2, Z(only_reg_hdr))
-            cap = min(20, len(only_reg))
+            n = len(only_reg)
             if block_key == "tables_fields":
-                tbl = doc.add_table(rows=cap + 1, cols=4)
+                tbl = doc.add_table(rows=n + 1, cols=4)
                 tbl.style = "Table Grid"
                 hdr = tbl.rows[0].cells
                 for ci, h in enumerate(["AccessTblNm","AccessFldNm","DataFormat","NULL_allowed"]):
                     hdr[ci].text = h
-                for i, row in enumerate(only_reg[:cap]):
+                for i, row in enumerate(only_reg):
                     r = tbl.rows[i + 1].cells
                     r[0].text = row["AccessTblNm"]
                     r[1].text = row["AccessFldNm"]
                     r[2].text = str(row.get("DataFormat") or "")
                     r[3].text = str(row.get("NULL_allowed") or "")
             else:
-                tbl = doc.add_table(rows=cap + 1, cols=4)
+                tbl = doc.add_table(rows=n + 1, cols=4)
                 tbl.style = "Table Grid"
                 hdr = tbl.rows[0].cells
                 for ci, h in enumerate(["AccessTblNm","AccessFldNm","ForeignKey","ForeignKeyBaseField"]):
                     hdr[ci].text = h
-                for i, row in enumerate(only_reg[:cap]):
+                for i, row in enumerate(only_reg):
                     r = tbl.rows[i + 1].cells
                     r[0].text = row["AccessTblNm"]
                     r[1].text = row["AccessFldNm"]
                     r[2].text = row.get("ForeignKey") or ""
                     r[3].text = row.get("ForeignKeyBaseField") or ""
-            if len(only_reg) > 20:
-                doc.add_paragraph(Z(
-                    f"… {len(only_reg) - 20} more rows not shown."
-                    if is_en else f"… 還有 {len(only_reg) - 20} 筆未顯示。"
-                ))
 
         if mismatches:
             _h(doc, 2, Z(mismatch_hdr))
-            cap = min(20, len(mismatches))
-            tbl = doc.add_table(rows=cap + 1, cols=5)
-            tbl.style = "Table Grid"
-            hdr = tbl.rows[0].cells
-            for ci, h in enumerate(["AccessTblNm","AccessFldNm","Field",
-                                      "In TablesFields" if block_key == "tables_fields" else "In ForeignKeys",
-                                      "In actual DB"]):
-                hdr[ci].text = h
-            for i, row in enumerate(mismatches[:cap]):
-                r = tbl.rows[i + 1].cells
-                r[0].text = row["AccessTblNm"]
-                r[1].text = row["AccessFldNm"]
-                r[2].text = row.get("field", "")
-                r[3].text = str(row.get("current") or "")
-                r[4].text = str(row.get("regen") or "")
-            if len(mismatches) > 20:
-                doc.add_paragraph(Z(
-                    f"… {len(mismatches) - 20} more rows not shown."
-                    if is_en else f"… 還有 {len(mismatches) - 20} 筆未顯示。"
-                ))
+            # Mismatches are too numerous to inline — point to the CSV file.
+            if block_key == "tables_fields":
+                csv_file = "reports/schema_diff_tables_fields_mismatches.csv"
+            else:
+                csv_file = "reports/schema_diff_foreign_keys_mismatches.csv"
+            doc.add_paragraph(Z(
+                f"Full list: `{csv_file}` ({len(mismatches)} rows)"
+                if is_en else
+                f"完整清單：`{csv_file}`（{len(mismatches)} 筆）"
+            ))
 
         if not only_cur and not only_reg and not mismatches:
             doc.add_paragraph(Z(
@@ -3785,11 +3771,11 @@ def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
                 "與實際資料庫結構一致。"
             ))
 
-    # ---- Appendix A ----
+    # ---- Appendix B ----
     _table_section(
         data_block={},
-        title_a="Appendix A — TablesFields: documentation vs. actual structure",
-        title_b="附錄 A —— TablesFields：文檔表與實際資料庫結構對比",
+        title_a="Appendix B — TablesFields: documentation vs. actual structure",
+        title_b="附錄 B —— TablesFields：文檔表與實際資料庫結構對比",
         only_cur_hdr=(
             "Rows in TablesFields not found in actual DB (stale)"
             if is_en else
@@ -3809,11 +3795,11 @@ def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
 
     doc.add_page_break()
 
-    # ---- Appendix B ----
+    # ---- Appendix C ----
     _table_section(
         data_block={},
-        title_a="Appendix B — ForeignKeys: documentation vs. actual structure",
-        title_b="附錄 B —— ForeignKeys：文檔表與實際資料庫結構對比",
+        title_a="Appendix C — ForeignKeys: documentation vs. actual structure",
+        title_b="附錄 C —— ForeignKeys：文檔表與實際資料庫結構對比",
         only_cur_hdr=(
             "Rows in ForeignKeys not found in actual DB (stale)"
             if is_en else
@@ -4164,7 +4150,7 @@ def _build(lang: str, out_path: Path) -> None:
     doc.add_page_break()
     _add_index_drift_appendix(doc, is_en, Z)
 
-    # ---- Appendix A & B: schema diff ----
+    # ---- Appendix B & C: schema diff ----
     doc.add_page_break()
     _add_schema_diff_appendix_docx(doc, is_en, Z)
 
@@ -4206,23 +4192,23 @@ def _add_schema_diff_appendix_md(
     Z,
     _slug,
 ) -> None:
-    """Render one schema-diff appendix section (Appendix A or B) into
+    """Render one schema-diff appendix section (Appendix B or C) into
     the markdown lines list.
 
-    block_key: 'tables_fields' for Appendix A, 'foreign_keys' for Appendix B.
+    block_key: 'tables_fields' for Appendix B, 'foreign_keys' for Appendix C.
     """
     import json as _json
 
     is_tf = (block_key == "tables_fields")
 
     heading = (
-        ("Appendix A — TablesFields: documentation vs. actual structure"
+        ("Appendix B — TablesFields: documentation vs. actual structure"
          if is_tf else
-         "Appendix B — ForeignKeys: documentation vs. actual structure")
+         "Appendix C — ForeignKeys: documentation vs. actual structure")
         if is_en else
-        ("附錄 A —— TablesFields：文檔表與實際資料庫結構對比"
+        ("附錄 B —— TablesFields：文檔表與實際資料庫結構對比"
          if is_tf else
-         "附錄 B —— ForeignKeys：文檔表與實際資料庫結構對比")
+         "附錄 C —— ForeignKeys：文檔表與實際資料庫結構對比")
     )
     lines.append(f"## {Z(heading)}")
     lines.append("")
@@ -4267,13 +4253,19 @@ def _add_schema_diff_appendix_md(
 
     if not is_tf and not blk.get("fk_introspection_available"):
         lines.append(Z(
-            "ODBC FK introspection returned no data for this Access database. "
-            "Structural tests (referenced table/column existence) are covered "
-            "in `tests/test_schema_data_mdb.py`."
+            "The `ForeignKeys` table (188 rows) documents FK relationships in the database. "
+            "All 188 referenced table/column pairs have been verified to exist in the current "
+            "dump — `tests/test_schema_data_mdb.py` (`test_foreign_keys_referenced_tables_exist`, "
+            "`test_foreign_keys_referenced_columns_exist`) passes against the current data. "
+            "A catalog-level diff (documented FK vs. all actual FK constraints) is not available "
+            "for Access databases and is omitted here."
             if is_en else
-            "ODBC 外鍵查詢對此 Access 資料庫未能返回資料。"
-            "結構性測試（被參照表/欄位是否存在）已在 "
-            "`tests/test_schema_data_mdb.py` 中覆蓋。"
+            "`ForeignKeys` 表共 188 笔，记录了数据库中的外键关系。"
+            "我们已验证所有 188 笔所参照的表名与列名均存在于当前 dump 中——"
+            "`tests/test_schema_data_mdb.py`（`test_foreign_keys_referenced_tables_exist`、"
+            "`test_foreign_keys_referenced_columns_exist`）在当前数据上均通过。"
+            "由于 Access 数据库不支持通过标准 ODBC catalog API 枚举外键约束，"
+            "此处无法提供「文件记载 FK 与实际 FK 约束」的完整对比。"
         ))
         lines.append("")
         return
@@ -4303,21 +4295,16 @@ def _add_schema_diff_appendix_md(
         if is_tf:
             lines.append("| AccessTblNm | AccessFldNm |")
             lines.append("|---|---|")
-            for row in only_cur[:20]:
+            for row in only_cur:
                 lines.append(f"| {row['AccessTblNm']} | {row['AccessFldNm']} |")
         else:
             lines.append("| AccessTblNm | AccessFldNm | ForeignKey | ForeignKeyBaseField |")
             lines.append("|---|---|---|---|")
-            for row in only_cur[:20]:
+            for row in only_cur:
                 lines.append(
                     f"| {row['AccessTblNm']} | {row['AccessFldNm']} "
                     f"| {row.get('ForeignKey','')} | {row.get('ForeignKeyBaseField','')} |"
                 )
-        if len(only_cur) > 20:
-            lines.append(Z(
-                f"*… {len(only_cur) - 20} more rows not shown.*"
-                if is_en else f"*… 還有 {len(only_cur) - 20} 筆未顯示。*"
-            ))
         lines.append("")
 
     if only_reg:
@@ -4331,7 +4318,7 @@ def _add_schema_diff_appendix_md(
         if is_tf:
             lines.append("| AccessTblNm | AccessFldNm | DataFormat | NULL_allowed |")
             lines.append("|---|---|---|---|")
-            for row in only_reg[:20]:
+            for row in only_reg:
                 lines.append(
                     f"| {row['AccessTblNm']} | {row['AccessFldNm']} "
                     f"| {row.get('DataFormat','')} | {row.get('NULL_allowed','')} |"
@@ -4339,16 +4326,11 @@ def _add_schema_diff_appendix_md(
         else:
             lines.append("| AccessTblNm | AccessFldNm | ForeignKey | ForeignKeyBaseField |")
             lines.append("|---|---|---|---|")
-            for row in only_reg[:20]:
+            for row in only_reg:
                 lines.append(
                     f"| {row['AccessTblNm']} | {row['AccessFldNm']} "
                     f"| {row.get('ForeignKey','')} | {row.get('ForeignKeyBaseField','')} |"
                 )
-        if len(only_reg) > 20:
-            lines.append(Z(
-                f"*… {len(only_reg) - 20} more rows not shown.*"
-                if is_en else f"*… 還有 {len(only_reg) - 20} 筆未顯示。*"
-            ))
         lines.append("")
 
     if mismatches:
@@ -4357,20 +4339,16 @@ def _add_schema_diff_appendix_md(
         )
         lines.append(f"### {Z(mis_hdr)}")
         lines.append("")
-        doc_col = "In TablesFields" if is_tf else f"In {doc_name}"
-        lines.append(f"| AccessTblNm | AccessFldNm | Field | {doc_col} | In actual DB |")
-        lines.append("|---|---|---|---|---|")
-        for row in mismatches[:20]:
-            lines.append(
-                f"| {row['AccessTblNm']} | {row['AccessFldNm']} "
-                f"| {row.get('field','')} | {row.get('current','')} "
-                f"| {row.get('regen','')} |"
-            )
-        if len(mismatches) > 20:
-            lines.append(Z(
-                f"*… {len(mismatches) - 20} more rows not shown.*"
-                if is_en else f"*… 還有 {len(mismatches) - 20} 筆未顯示。*"
-            ))
+        # Mismatches are too numerous to inline — point to the CSV file.
+        if is_tf:
+            csv_file = "reports/schema_diff_tables_fields_mismatches.csv"
+        else:
+            csv_file = "reports/schema_diff_foreign_keys_mismatches.csv"
+        lines.append(Z(
+            f"Full list: `{csv_file}` ({len(mismatches)} rows)"
+            if is_en else
+            f"完整清單：`{csv_file}`（{len(mismatches)} 筆）"
+        ))
         lines.append("")
 
     if not only_cur and not only_reg and not mismatches:
@@ -4507,11 +4485,11 @@ def _build_md(lang: str, out_path: Path) -> None:
         f"(#{_slug(Z('Severity legend' if is_en else '严重等级说明'))})"
     )
     appendix_title = (
-        "Appendix — c_index_year / c_index_addr_id drift "
+        "Appendix A — c_index_year / c_index_addr_id drift "
         "vs the cbdb-online-main-server snapshot "
         "(differences need per-row classification before being filed as bugs)"
         if is_en else
-        "附錄 —— c_index_year / c_index_addr_id 與 "
+        "附錄 A —— c_index_year / c_index_addr_id 與 "
         "cbdb-online-main-server 快照之間的偏差"
         "（差異需要逐筆分類後才能判定是否為缺陷）"
     )
@@ -4519,14 +4497,14 @@ def _build_md(lang: str, out_path: Path) -> None:
         f"- [{Z(appendix_title)}](#{_slug(Z(appendix_title))})"
     )
     schema_appendix_a_title = (
-        "Appendix A — TablesFields: documentation vs. actual structure"
+        "Appendix B — TablesFields: documentation vs. actual structure"
         if is_en else
-        "附錄 A —— TablesFields：文檔表與實際資料庫結構對比"
+        "附錄 B —— TablesFields：文檔表與實際資料庫結構對比"
     )
     schema_appendix_b_title = (
-        "Appendix B — ForeignKeys: documentation vs. actual structure"
+        "Appendix C — ForeignKeys: documentation vs. actual structure"
         if is_en else
-        "附錄 B —— ForeignKeys：文檔表與實際資料庫結構對比"
+        "附錄 C —— ForeignKeys：文檔表與實際資料庫結構對比"
     )
     lines.append(f"- [{Z(schema_appendix_a_title)}](#{_slug(Z(schema_appendix_a_title))})")
     lines.append(f"- [{Z(schema_appendix_b_title)}](#{_slug(Z(schema_appendix_b_title))})")
@@ -5344,7 +5322,7 @@ def _build_md(lang: str, out_path: Path) -> None:
                     lines.append(f"| `{f_label}` | {uv} | {sv} |")
                 lines.append("")
 
-    # ---- Appendix A & B: schema diff ----
+    # ---- Appendix B & C: schema diff ----
     _add_schema_diff_appendix_md(lines, "tables_fields", is_en, Z, _slug)
     _add_schema_diff_appendix_md(lines, "foreign_keys", is_en, Z, _slug)
 

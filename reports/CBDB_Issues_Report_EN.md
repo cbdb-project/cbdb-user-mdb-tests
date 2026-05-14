@@ -40,9 +40,9 @@ The issues are ordered by severity (P0 highest). Each entry includes a concise d
   - [Issue #11 — EVENTS_DATA_2's c_event_record_id control bound to a non-existent column — but the control is hidden (LATENT)](#issue-11--events_data_2s-c_event_record_id-control-bound-to-a-non-existent-column--but-the-control-is-hidden-latent)
   - [Issue #12 — POSTED_TO_OFFICE_DATA_2's c_appt_type_code control bound to a non-projected column — but the control is hidden AND the user-facing appointment-type controls work (LATENT)](#issue-12--posted_to_office_data_2s-c_appt_type_code-control-bound-to-a-non-projected-column--but-the-control-is-hidden-and-the-user-facing-appointment-type-controls-work-latent)
 - [Severity legend](#severity-legend)
-- [Appendix — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (differences need per-row classification before being filed as bugs)](#appendix--c_index_year--c_index_addr_id-drift-vs-the-cbdb-online-main-server-snapshot-differences-need-per-row-classification-before-being-filed-as-bugs)
-- [Appendix A — TablesFields: documentation vs. actual structure](#appendix-a--tablesfields-documentation-vs-actual-structure)
-- [Appendix B — ForeignKeys: documentation vs. actual structure](#appendix-b--foreignkeys-documentation-vs-actual-structure)
+- [Appendix A — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (differences need per-row classification before being filed as bugs)](#appendix-a--c_index_year--c_index_addr_id-drift-vs-the-cbdb-online-main-server-snapshot-differences-need-per-row-classification-before-being-filed-as-bugs)
+- [Appendix B — TablesFields: documentation vs. actual structure](#appendix-b--tablesfields-documentation-vs-actual-structure)
+- [Appendix C — ForeignKeys: documentation vs. actual structure](#appendix-c--foreignkeys-documentation-vs-actual-structure)
 - [Closing note](#closing-note)
 
 ## Severity legend
@@ -841,7 +841,7 @@ Open person 2 (安邡, An Fang). The POSTED-TO-OFFICE sub-datasheet shows 1 post
 
 If the hidden control isn't needed, delete it.  If it's an intentional hidden join-key holder, change its ControlSource to a real column (e.g. `c_appt_code`).  Either way the change is invisible to users; this is code-hygiene only.
 
-## Appendix — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (differences need per-row classification before being filed as bugs)
+## Appendix A — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (differences need per-row classification before being filed as bugs)
 
 When we compare BIOG_MAIN's `c_index_year` and `c_index_addr_id` between this User MDB and the weekly cbdb-online-main-server SQLite snapshot, a small fraction of persons disagree.
 
@@ -1056,11 +1056,11 @@ Top suggested next investigations (full list in the cause-analysis md):
 | `c_index_year_type_code` | 01 | 11 |
 | `c_index_year_source_id` |  | 41030 |
 
-## Appendix A — TablesFields: documentation vs. actual structure
+## Appendix B — TablesFields: documentation vs. actual structure
 
 This section compares the contents of the `TablesFields` table in `CBDB_20260430_DATA.mdb` against the database schema reconstructed from ODBC catalog calls by `reports/collect_schema_diffs.py`. Discrepancies indicate the documentation table may be out of date.
 
-Total rows in TablesFields: 875. Reconstructed from DB: 984.
+Total rows in TablesFields: 875. Reconstructed from DB: 996.
 
 ### Rows in TablesFields not found in actual DB (stale)
 
@@ -1072,21 +1072,10 @@ Total rows in TablesFields: 875. Reconstructed from DB: 984.
 | ADMIN_CAT_TYPES | c_admin_type_trans |
 | ENTRY_DATA | c_addr_id |
 | ENTRY_DATA | c_posting_id |
-| KINSHIP_CODES | c_colstep |
-| KINSHIP_CODES | c_dwnstep |
-| KINSHIP_CODES | c_kinrel |
-| KINSHIP_CODES | c_kinrel_alt |
-| KINSHIP_CODES | c_kinrel_chn |
-| KINSHIP_CODES | c_kinrel_simplified |
-| KINSHIP_CODES | c_kin_pair1 |
-| KINSHIP_CODES | c_kin_pair2 |
-| KINSHIP_CODES | c_kin_pair_notes |
-| KINSHIP_CODES | c_marstep |
-| KINSHIP_CODES | c_pick_sorting |
-| KINSHIP_CODES | c_upstep |
 | MERGED_PERSON_DATA | c_merged_to_personid |
 | PersonIDSource | LineNum |
-*… 2 more rows not shown.*
+| PersonIDSource | SourceTable |
+| TMP_ADDR_C | Max_c_belongs_first_year |
 
 ### Columns in actual DB not documented in TablesFields
 
@@ -1112,39 +1101,127 @@ Total rows in TablesFields: 875. Reconstructed from DB: 984.
 | ADDRESSES | x_coord | Double | True |
 | ADDRESSES | y_coord | Double | True |
 | ADMIN_CAT_CODE_TYPE_REL | c_admin_cat_type_code | Text | True |
-*… 111 more rows not shown.*
+| ADMIN_CAT_TYPES | c_admin_cat_type_code | Text | True |
+| ADMIN_CAT_TYPES | c_admin_cat_type_hz | Text | True |
+| ADMIN_CAT_TYPES | c_admin_cat_type_trans | Text | True |
+| ASSOC_DATA | c_tertiary_type_notes | Text | True |
+| BIOG_ADDR_DATA | c_delete | Integer | True |
+| CopyTables | NotProcessed | Yes/No | False |
+| CopyTables | TableName | Text | True |
+| CopyTablesDefault | ID | Long | False |
+| CopyTablesDefault | TableName | Text | True |
+| ENTRY_DATA | c_entry_addr_id | Long | True |
+| ETHNICITY_TRIBE_CODES | c_sortorder | Integer | True |
+| ForeignKeys | AccessFldNm | Text | True |
+| ForeignKeys | AccessTblNm | Text | True |
+| ForeignKeys | DataFormat | Text | True |
+| ForeignKeys | FKName | Text | True |
+| ForeignKeys | FKString | Text | True |
+| ForeignKeys | ForeignKey | Text | True |
+| ForeignKeys | ForeignKeyBaseField | Text | True |
+| ForeignKeys | IndexOnField | Text | True |
+| ForeignKeys | NULL_allowed | Yes/No | False |
+| ForeignKeys | skip | Integer | True |
+| FormLabels | c_english | Text | True |
+| FormLabels | c_fanti | Text | True |
+| FormLabels | c_form | Text | True |
+| FormLabels | c_jianti | Text | True |
+| FormLabels | c_label_id | Integer | True |
+| MERGED_PERSON_DATA | c_merged_from_personid | Long | True |
+| OFFICE_CODES_CONVERSION | c_office_chn | Text | True |
+| OFFICE_CODES_CONVERSION | c_office_chn_backup | Text | True |
+| OFFICE_CODES_CONVERSION | c_office_id | Long | True |
+| OFFICE_CODES_CONVERSION | c_office_id_backup | Long | True |
+| OFFICE_TYPE_TREE_backup | c_office_type_desc | Text | True |
+| OFFICE_TYPE_TREE_backup | c_office_type_desc_chn | Text | True |
+| OFFICE_TYPE_TREE_backup | c_office_type_node_id | Text | True |
+| OFFICE_TYPE_TREE_backup | c_parent_id | Text | True |
+| OFFICE_TYPE_TREE_backup | c_tts_node_id | Text | True |
+| Paste Errors | c_bibl_cat_code | Long | True |
+| Paste Errors | c_created_by | Text | True |
+| Paste Errors | c_created_date | Date/Time | True |
+| Paste Errors | c_extant | Long | True |
+| Paste Errors | c_modified_by | Text | True |
+| Paste Errors | c_modified_date | Date/Time | True |
+| Paste Errors | c_notes | Memo | True |
+| Paste Errors | c_pages | Text | True |
+| Paste Errors | c_source | Long | True |
+| Paste Errors | c_textid | Long | True |
+| Paste Errors | c_text_country | Long | True |
+| Paste Errors | c_text_dy | Long | True |
+| Paste Errors | c_text_nh_code | Long | True |
+| Paste Errors | c_text_nh_year | Long | True |
+| Paste Errors | c_text_range_code | Long | True |
+| Paste Errors | c_text_type_id | Text | True |
+| Paste Errors | c_text_year | Long | True |
+| Paste Errors | c_title | Text | True |
+| Paste Errors | c_title_alt_chn | Text | True |
+| Paste Errors | c_title_chn | Text | True |
+| Paste Errors | c_title_trans | Text | True |
+| Paste Errors | c_url_api | Text | True |
+| Paste Errors | c_url_api_coda | Text | True |
+| Paste Errors | c_url_homepage | Text | True |
+| POSTED_TO_OFFICE_DATA | c_posting_id_old | Long | True |
+| SOCIAL_INSTITUTION_ALTNAME_CODES | c_inst_altname_chn | Text | True |
+| SOCIAL_INSTITUTION_ALTNAME_CODES | c_inst_altname_desc | Text | True |
+| SOCIAL_INSTITUTION_ALTNAME_CODES | c_inst_altname_type | Integer | True |
+| SOCIAL_INSTITUTION_ALTNAME_CODES | c_notes | Text | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_altname_hz | Text | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_altname_py | Text | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_altname_type | Integer | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_code | Integer | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_name_code | Integer | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_notes | Memo | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_pages | Text | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_source | Long | True |
+| SOCIAL_INSTITUTION_CODES | c_inst_end_dy | Integer | True |
+| SOCIAL_INSTITUTION_CODES | c_inst_end_year | Integer | True |
+| SOCIAL_INSTITUTION_CODES_CONVERSION | c_inst_code | Long | True |
+| SOCIAL_INSTITUTION_CODES_CONVERSION | c_inst_code_new | Integer | True |
+| SOCIAL_INSTITUTION_CODES_CONVERSION | c_inst_name_code | Integer | True |
+| SOCIAL_INSTITUTION_CODES_CONVERSION | c_new_new_code | Long | True |
+| STATUS_TYPES | c_status_type_parent_code | Text | True |
+| TablesFields | AccessFldNm | Text | True |
+| TablesFields | AccessTblNm | Text | True |
+| TablesFields | DataFormat | Text | True |
+| TablesFields | DumpFldNm | Text | True |
+| TablesFields | DumpTblNm | Text | True |
+| TablesFields | ForeignKey | Text | True |
+| TablesFields | ForeignKeyBaseField | Text | True |
+| TablesFields | IndexOnField | Text | True |
+| TablesFields | NULL_allowed | Yes/No | False |
+| TablesFields | RowNum | Long | True |
+| TablesFieldsChanges | Change | Text | True |
+| TablesFieldsChanges | ChangeDate | Text | True |
+| TablesFieldsChanges | ChangeNotes | Text | True |
+| TablesFieldsChanges | FieldName | Text | True |
+| TablesFieldsChanges | TableName | Text | True |
+| TEXT_BIBLCAT_CODES | c_text_cat_level | Text | True |
+| TEXT_BIBLCAT_CODES | c_text_cat_parent_id | Text | True |
+| TEXT_CODES | c_text_type_id | Text | True |
+| TMP_ADDR_C | Min_c_belongs_first_year | Integer | True |
+| TMP_ADDR_D | c_addr_cbd | Text | True |
+| TMP_ADDR_E | c_addr_cbd | Text | True |
+| TMP_DISTANCE_DATA | assoc_xcoord | Double | True |
+| TMP_DISTANCE_DATA | assoc_ycoord | Double | True |
+| TMP_DISTANCE_DATA | c_assoc_id | Long | True |
+| TMP_DISTANCE_DATA | c_distance | Double | True |
+| TMP_DISTANCE_DATA | c_personid | Long | True |
+| TMP_DISTANCE_DATA | c_t_dist | Double | True |
+| TMP_DISTANCE_DATA | x_coord | Double | True |
+| TMP_DISTANCE_DATA | y_coord | Double | True |
+| ZZZ_DY_DATA | c_dy | Integer | True |
+| ZZZ_DY_DATA | c_personid | Long | True |
 
 ### Attribute mismatches
 
-| AccessTblNm | AccessFldNm | Field | In TablesFields | In actual DB |
-|---|---|---|---|---|
-| ADDR_BELONGS_DATA | c_addr_id | NULL_allowed | False | True |
-| ADDR_BELONGS_DATA | c_belongs_to | NULL_allowed | False | True |
-| ADDR_BELONGS_DATA | c_firstyear | NULL_allowed | False | True |
-| ADDR_BELONGS_DATA | c_lastyear | NULL_allowed | False | True |
-| ADDR_BELONGS_DATA | c_notes | DataFormat | Memo | Text |
-| ADDR_CODES | c_addr_id | NULL_allowed | False | True |
-| ADDR_CODES | c_admin_cat_code | NULL_allowed | False | True |
-| ADDR_CODES | c_admin_type | NULL_allowed | False | True |
-| ADDR_CODES | c_name | NULL_allowed | False | True |
-| ADDR_CODES | c_name_chn | NULL_allowed | False | True |
-| ADDR_CODES | x_coord | NULL_allowed | False | True |
-| ADDR_CODES | y_coord | NULL_allowed | False | True |
-| ADMIN_CAT_CODES | c_admin_cat_code | NULL_allowed | False | True |
-| ADMIN_CAT_CODES | c_admin_cat_hz | NULL_allowed | False | True |
-| ADMIN_CAT_CODES | c_admin_cat_py | NULL_allowed | False | True |
-| ADMIN_CAT_CODE_TYPE_REL | c_admin_cat_code | NULL_allowed | False | True |
-| ADMIN_CAT_TYPES | c_notes | NULL_allowed | False | True |
-| ALTNAME_CODES | c_name_type_code | NULL_allowed | False | True |
-| ALTNAME_CODES | c_name_type_desc | NULL_allowed | False | True |
-| ALTNAME_CODES | c_name_type_desc_chn | NULL_allowed | False | True |
-*… 317 more rows not shown.*
+Full list: `reports/schema_diff_tables_fields_mismatches.csv` (346 rows)
 
-## Appendix B — ForeignKeys: documentation vs. actual structure
+## Appendix C — ForeignKeys: documentation vs. actual structure
 
 This section compares the `ForeignKeys` table against FK relationships derived from ODBC catalog introspection.
 
-ODBC FK introspection returned no data for this Access database. Structural tests (referenced table/column existence) are covered in `tests/test_schema_data_mdb.py`.
+The `ForeignKeys` table (188 rows) documents FK relationships in the database. All 188 referenced table/column pairs have been verified to exist in the current dump — `tests/test_schema_data_mdb.py` (`test_foreign_keys_referenced_tables_exist`, `test_foreign_keys_referenced_columns_exist`) passes against the current data. A catalog-level diff (documented FK vs. all actual FK constraints) is not available for Access databases and is omitted here.
 
 ## Closing note
 

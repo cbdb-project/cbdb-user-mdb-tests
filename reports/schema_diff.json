@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-05-14T10:07:55.013536+00:00",
+  "generated_at": "2026-05-14T10:32:17.847409+00:00",
   "data_mdb": "CBDB_20260430_DATA.mdb",
   "tables_fields": {
     "total_current": 875,
-    "total_regen": 984,
+    "total_regen": 996,
     "only_in_current": [
       {
         "AccessTblNm": "ADMIN_CAT_CODE_TYPE_REL",
@@ -28,54 +28,6 @@
       {
         "AccessTblNm": "ENTRY_DATA",
         "AccessFldNm": "c_posting_id"
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_colstep"
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_dwnstep"
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_kinrel"
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_kinrel_alt"
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_kinrel_chn"
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_kinrel_simplified"
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_kin_pair1"
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_kin_pair2"
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_kin_pair_notes"
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_marstep"
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_pick_sorting"
-      },
-      {
-        "AccessTblNm": "KINSHIP_CODES",
-        "AccessFldNm": "c_upstep"
       },
       {
         "AccessTblNm": "MERGED_PERSON_DATA",
@@ -2201,7 +2153,70 @@
       },
       {
         "AccessTblNm": "KINSHIP_CODES",
+        "AccessFldNm": "c_colstep",
+        "field": "NULL_allowed",
+        "current": false,
+        "regen": true
+      },
+      {
+        "AccessTblNm": "KINSHIP_CODES",
+        "AccessFldNm": "c_dwnstep",
+        "field": "NULL_allowed",
+        "current": false,
+        "regen": true
+      },
+      {
+        "AccessTblNm": "KINSHIP_CODES",
         "AccessFldNm": "c_kincode",
+        "field": "NULL_allowed",
+        "current": false,
+        "regen": true
+      },
+      {
+        "AccessTblNm": "KINSHIP_CODES",
+        "AccessFldNm": "c_kinrel",
+        "field": "NULL_allowed",
+        "current": false,
+        "regen": true
+      },
+      {
+        "AccessTblNm": "KINSHIP_CODES",
+        "AccessFldNm": "c_kinrel_chn",
+        "field": "NULL_allowed",
+        "current": false,
+        "regen": true
+      },
+      {
+        "AccessTblNm": "KINSHIP_CODES",
+        "AccessFldNm": "c_kinrel_simplified",
+        "field": "NULL_allowed",
+        "current": false,
+        "regen": true
+      },
+      {
+        "AccessTblNm": "KINSHIP_CODES",
+        "AccessFldNm": "c_kin_pair1",
+        "field": "NULL_allowed",
+        "current": false,
+        "regen": true
+      },
+      {
+        "AccessTblNm": "KINSHIP_CODES",
+        "AccessFldNm": "c_kin_pair2",
+        "field": "NULL_allowed",
+        "current": false,
+        "regen": true
+      },
+      {
+        "AccessTblNm": "KINSHIP_CODES",
+        "AccessFldNm": "c_marstep",
+        "field": "NULL_allowed",
+        "current": false,
+        "regen": true
+      },
+      {
+        "AccessTblNm": "KINSHIP_CODES",
+        "AccessFldNm": "c_upstep",
         "field": "NULL_allowed",
         "current": false,
         "regen": true

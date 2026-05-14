@@ -40,9 +40,9 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
   - [Issue #11 — EVENTS_DATA_2 上 c_event_record_id 控制元件綁到不存在的欄位——但該控制元件本身是隱藏的（LATENT）](#issue-11--events_data_2-上-c_event_record_id-控制元件綁到不存在的欄位但該控制元件本身是隱藏的latent)
   - [Issue #12 — POSTED_TO_OFFICE_DATA_2 上 c_appt_type_code 控制元件綁到沒投影的欄位——但該控制元件是隱藏的，且使用者實際看的任職型別欄位是正常的（LATENT）](#issue-12--posted_to_office_data_2-上-c_appt_type_code-控制元件綁到沒投影的欄位但該控制元件是隱藏的且使用者實際看的任職型別欄位是正常的latent)
 - [嚴重等級說明](#嚴重等級說明)
-- [附錄 —— c_index_year / c_index_addr_id 與 cbdb-online-main-server 快照之間的偏差（差異需要逐筆分類後才能判定是否為缺陷）](#附錄--c_index_year--c_index_addr_id-與-cbdb-online-main-server-快照之間的偏差差異需要逐筆分類後才能判定是否為缺陷)
-- [附錄 A —— TablesFields：文件表與實際資料庫結構對比](#附錄-a--tablesfields文件表與實際資料庫結構對比)
-- [附錄 B —— ForeignKeys：文件表與實際資料庫結構對比](#附錄-b--foreignkeys文件表與實際資料庫結構對比)
+- [附錄 A —— c_index_year / c_index_addr_id 與 cbdb-online-main-server 快照之間的偏差（差異需要逐筆分類後才能判定是否為缺陷）](#附錄-a--c_index_year--c_index_addr_id-與-cbdb-online-main-server-快照之間的偏差差異需要逐筆分類後才能判定是否為缺陷)
+- [附錄 B —— TablesFields：文件表與實際資料庫結構對比](#附錄-b--tablesfields文件表與實際資料庫結構對比)
+- [附錄 C —— ForeignKeys：文件表與實際資料庫結構對比](#附錄-c--foreignkeys文件表與實際資料庫結構對比)
 - [結語](#結語)
 
 ## 嚴重等級說明
@@ -841,7 +841,7 @@ _**Hypothetical** popup, reconstructed in PIL.  Users currently CAN'T trigger th
 
 若這個隱藏控制元件用不到了，刪除即可；若是有意為之的隱藏 join-key 容器，把 ControlSource 改成真實的欄位（例如 `c_appt_code`）。無論怎麼改，使用者都看不到差別——這純粹是程式碼整潔。
 
-## 附錄 —— c_index_year / c_index_addr_id 與 cbdb-online-main-server 快照之間的偏差（差異需要逐筆分類後才能判定是否為缺陷）
+## 附錄 A —— c_index_year / c_index_addr_id 與 cbdb-online-main-server 快照之間的偏差（差異需要逐筆分類後才能判定是否為缺陷）
 
 我們把本 .mdb 的 BIOG_MAIN 與 cbdb-online-main-server 每週釋出的 SQLite 快照在 `c_index_year`、`c_index_addr_id` 兩個欄位上做比對，可以看到一小部分人物對不齊。
 
@@ -1054,11 +1054,11 @@ PR M（`analysis/dump_data_mdb_vba.py`）從 DATA mdb 抽出了 `frmBaseMaintena
 | `c_index_year_type_code` | 01 | 11 |
 | `c_index_year_source_id` |  | 41030 |
 
-## 附錄 A —— TablesFields：文件表與實際資料庫結構對比
+## 附錄 B —— TablesFields：文件表與實際資料庫結構對比
 
 本節將 `CBDB_20260430_DATA.mdb` 中 `TablesFields` 表的內容與 `reports/collect_schema_diffs.py` 透過 ODBC catalog 重建的資料庫結構進行比對。若存在差異，表示文件表可能已過時。
 
-TablesFields 共 875 筆。從資料庫重建：984 筆。
+TablesFields 共 875 筆。從資料庫重建：996 筆。
 
 ### TablesFields 中有但實際資料庫中不存在的記錄（過時）
 
@@ -1070,21 +1070,10 @@ TablesFields 共 875 筆。從資料庫重建：984 筆。
 | ADMIN_CAT_TYPES | c_admin_type_trans |
 | ENTRY_DATA | c_addr_id |
 | ENTRY_DATA | c_posting_id |
-| KINSHIP_CODES | c_colstep |
-| KINSHIP_CODES | c_dwnstep |
-| KINSHIP_CODES | c_kinrel |
-| KINSHIP_CODES | c_kinrel_alt |
-| KINSHIP_CODES | c_kinrel_chn |
-| KINSHIP_CODES | c_kinrel_simplified |
-| KINSHIP_CODES | c_kin_pair1 |
-| KINSHIP_CODES | c_kin_pair2 |
-| KINSHIP_CODES | c_kin_pair_notes |
-| KINSHIP_CODES | c_marstep |
-| KINSHIP_CODES | c_pick_sorting |
-| KINSHIP_CODES | c_upstep |
 | MERGED_PERSON_DATA | c_merged_to_personid |
 | PersonIDSource | LineNum |
-*… 還有 2 筆未顯示。*
+| PersonIDSource | SourceTable |
+| TMP_ADDR_C | Max_c_belongs_first_year |
 
 ### 實際資料庫中有但 TablesFields 未記錄的欄位
 
@@ -1110,39 +1099,127 @@ TablesFields 共 875 筆。從資料庫重建：984 筆。
 | ADDRESSES | x_coord | Double | True |
 | ADDRESSES | y_coord | Double | True |
 | ADMIN_CAT_CODE_TYPE_REL | c_admin_cat_type_code | Text | True |
-*… 還有 111 筆未顯示。*
+| ADMIN_CAT_TYPES | c_admin_cat_type_code | Text | True |
+| ADMIN_CAT_TYPES | c_admin_cat_type_hz | Text | True |
+| ADMIN_CAT_TYPES | c_admin_cat_type_trans | Text | True |
+| ASSOC_DATA | c_tertiary_type_notes | Text | True |
+| BIOG_ADDR_DATA | c_delete | Integer | True |
+| CopyTables | NotProcessed | Yes/No | False |
+| CopyTables | TableName | Text | True |
+| CopyTablesDefault | ID | Long | False |
+| CopyTablesDefault | TableName | Text | True |
+| ENTRY_DATA | c_entry_addr_id | Long | True |
+| ETHNICITY_TRIBE_CODES | c_sortorder | Integer | True |
+| ForeignKeys | AccessFldNm | Text | True |
+| ForeignKeys | AccessTblNm | Text | True |
+| ForeignKeys | DataFormat | Text | True |
+| ForeignKeys | FKName | Text | True |
+| ForeignKeys | FKString | Text | True |
+| ForeignKeys | ForeignKey | Text | True |
+| ForeignKeys | ForeignKeyBaseField | Text | True |
+| ForeignKeys | IndexOnField | Text | True |
+| ForeignKeys | NULL_allowed | Yes/No | False |
+| ForeignKeys | skip | Integer | True |
+| FormLabels | c_english | Text | True |
+| FormLabels | c_fanti | Text | True |
+| FormLabels | c_form | Text | True |
+| FormLabels | c_jianti | Text | True |
+| FormLabels | c_label_id | Integer | True |
+| MERGED_PERSON_DATA | c_merged_from_personid | Long | True |
+| OFFICE_CODES_CONVERSION | c_office_chn | Text | True |
+| OFFICE_CODES_CONVERSION | c_office_chn_backup | Text | True |
+| OFFICE_CODES_CONVERSION | c_office_id | Long | True |
+| OFFICE_CODES_CONVERSION | c_office_id_backup | Long | True |
+| OFFICE_TYPE_TREE_backup | c_office_type_desc | Text | True |
+| OFFICE_TYPE_TREE_backup | c_office_type_desc_chn | Text | True |
+| OFFICE_TYPE_TREE_backup | c_office_type_node_id | Text | True |
+| OFFICE_TYPE_TREE_backup | c_parent_id | Text | True |
+| OFFICE_TYPE_TREE_backup | c_tts_node_id | Text | True |
+| Paste Errors | c_bibl_cat_code | Long | True |
+| Paste Errors | c_created_by | Text | True |
+| Paste Errors | c_created_date | Date/Time | True |
+| Paste Errors | c_extant | Long | True |
+| Paste Errors | c_modified_by | Text | True |
+| Paste Errors | c_modified_date | Date/Time | True |
+| Paste Errors | c_notes | Memo | True |
+| Paste Errors | c_pages | Text | True |
+| Paste Errors | c_source | Long | True |
+| Paste Errors | c_textid | Long | True |
+| Paste Errors | c_text_country | Long | True |
+| Paste Errors | c_text_dy | Long | True |
+| Paste Errors | c_text_nh_code | Long | True |
+| Paste Errors | c_text_nh_year | Long | True |
+| Paste Errors | c_text_range_code | Long | True |
+| Paste Errors | c_text_type_id | Text | True |
+| Paste Errors | c_text_year | Long | True |
+| Paste Errors | c_title | Text | True |
+| Paste Errors | c_title_alt_chn | Text | True |
+| Paste Errors | c_title_chn | Text | True |
+| Paste Errors | c_title_trans | Text | True |
+| Paste Errors | c_url_api | Text | True |
+| Paste Errors | c_url_api_coda | Text | True |
+| Paste Errors | c_url_homepage | Text | True |
+| POSTED_TO_OFFICE_DATA | c_posting_id_old | Long | True |
+| SOCIAL_INSTITUTION_ALTNAME_CODES | c_inst_altname_chn | Text | True |
+| SOCIAL_INSTITUTION_ALTNAME_CODES | c_inst_altname_desc | Text | True |
+| SOCIAL_INSTITUTION_ALTNAME_CODES | c_inst_altname_type | Integer | True |
+| SOCIAL_INSTITUTION_ALTNAME_CODES | c_notes | Text | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_altname_hz | Text | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_altname_py | Text | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_altname_type | Integer | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_code | Integer | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_name_code | Integer | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_notes | Memo | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_pages | Text | True |
+| SOCIAL_INSTITUTION_ALTNAME_DATA | c_source | Long | True |
+| SOCIAL_INSTITUTION_CODES | c_inst_end_dy | Integer | True |
+| SOCIAL_INSTITUTION_CODES | c_inst_end_year | Integer | True |
+| SOCIAL_INSTITUTION_CODES_CONVERSION | c_inst_code | Long | True |
+| SOCIAL_INSTITUTION_CODES_CONVERSION | c_inst_code_new | Integer | True |
+| SOCIAL_INSTITUTION_CODES_CONVERSION | c_inst_name_code | Integer | True |
+| SOCIAL_INSTITUTION_CODES_CONVERSION | c_new_new_code | Long | True |
+| STATUS_TYPES | c_status_type_parent_code | Text | True |
+| TablesFields | AccessFldNm | Text | True |
+| TablesFields | AccessTblNm | Text | True |
+| TablesFields | DataFormat | Text | True |
+| TablesFields | DumpFldNm | Text | True |
+| TablesFields | DumpTblNm | Text | True |
+| TablesFields | ForeignKey | Text | True |
+| TablesFields | ForeignKeyBaseField | Text | True |
+| TablesFields | IndexOnField | Text | True |
+| TablesFields | NULL_allowed | Yes/No | False |
+| TablesFields | RowNum | Long | True |
+| TablesFieldsChanges | Change | Text | True |
+| TablesFieldsChanges | ChangeDate | Text | True |
+| TablesFieldsChanges | ChangeNotes | Text | True |
+| TablesFieldsChanges | FieldName | Text | True |
+| TablesFieldsChanges | TableName | Text | True |
+| TEXT_BIBLCAT_CODES | c_text_cat_level | Text | True |
+| TEXT_BIBLCAT_CODES | c_text_cat_parent_id | Text | True |
+| TEXT_CODES | c_text_type_id | Text | True |
+| TMP_ADDR_C | Min_c_belongs_first_year | Integer | True |
+| TMP_ADDR_D | c_addr_cbd | Text | True |
+| TMP_ADDR_E | c_addr_cbd | Text | True |
+| TMP_DISTANCE_DATA | assoc_xcoord | Double | True |
+| TMP_DISTANCE_DATA | assoc_ycoord | Double | True |
+| TMP_DISTANCE_DATA | c_assoc_id | Long | True |
+| TMP_DISTANCE_DATA | c_distance | Double | True |
+| TMP_DISTANCE_DATA | c_personid | Long | True |
+| TMP_DISTANCE_DATA | c_t_dist | Double | True |
+| TMP_DISTANCE_DATA | x_coord | Double | True |
+| TMP_DISTANCE_DATA | y_coord | Double | True |
+| ZZZ_DY_DATA | c_dy | Integer | True |
+| ZZZ_DY_DATA | c_personid | Long | True |
 
 ### 屬性不一致
 
-| AccessTblNm | AccessFldNm | Field | In TablesFields | In actual DB |
-|---|---|---|---|---|
-| ADDR_BELONGS_DATA | c_addr_id | NULL_allowed | False | True |
-| ADDR_BELONGS_DATA | c_belongs_to | NULL_allowed | False | True |
-| ADDR_BELONGS_DATA | c_firstyear | NULL_allowed | False | True |
-| ADDR_BELONGS_DATA | c_lastyear | NULL_allowed | False | True |
-| ADDR_BELONGS_DATA | c_notes | DataFormat | Memo | Text |
-| ADDR_CODES | c_addr_id | NULL_allowed | False | True |
-| ADDR_CODES | c_admin_cat_code | NULL_allowed | False | True |
-| ADDR_CODES | c_admin_type | NULL_allowed | False | True |
-| ADDR_CODES | c_name | NULL_allowed | False | True |
-| ADDR_CODES | c_name_chn | NULL_allowed | False | True |
-| ADDR_CODES | x_coord | NULL_allowed | False | True |
-| ADDR_CODES | y_coord | NULL_allowed | False | True |
-| ADMIN_CAT_CODES | c_admin_cat_code | NULL_allowed | False | True |
-| ADMIN_CAT_CODES | c_admin_cat_hz | NULL_allowed | False | True |
-| ADMIN_CAT_CODES | c_admin_cat_py | NULL_allowed | False | True |
-| ADMIN_CAT_CODE_TYPE_REL | c_admin_cat_code | NULL_allowed | False | True |
-| ADMIN_CAT_TYPES | c_notes | NULL_allowed | False | True |
-| ALTNAME_CODES | c_name_type_code | NULL_allowed | False | True |
-| ALTNAME_CODES | c_name_type_desc | NULL_allowed | False | True |
-| ALTNAME_CODES | c_name_type_desc_chn | NULL_allowed | False | True |
-*… 還有 317 筆未顯示。*
+完整清單：`reports/schema_diff_tables_fields_mismatches.csv`（346 筆）
 
-## 附錄 B —— ForeignKeys：文件表與實際資料庫結構對比
+## 附錄 C —— ForeignKeys：文件表與實際資料庫結構對比
 
 本節將 `ForeignKeys` 表與透過 ODBC catalog 查詢所得的外部索引鍵關係進行比對。
 
-ODBC 外部索引鍵查詢對此 Access 資料庫未能返回資料。結構性測試（被參照表/欄位是否存在）已在 `tests/test_schema_data_mdb.py` 中覆蓋。
+`ForeignKeys` 表共 188 筆，記錄了資料庫中的外部索引鍵關係。我們已驗證所有 188 筆所參照的表名與列名均存在於當前 dump 中——`tests/test_schema_data_mdb.py`（`test_foreign_keys_referenced_tables_exist`、`test_foreign_keys_referenced_columns_exist`）在當前資料上均通過。由於 Access 資料庫不支援通過標準 ODBC catalog API 列舉外部索引鍵約束，此處無法提供「檔案記載 FK 與實際 FK 約束」的完整對比。
 
 ## 結語
 

@@ -31,6 +31,14 @@ OUT_TF_REGEN   = REPORTS / "tables_fields_regen.csv"
 OUT_FK_REGEN   = REPORTS / "foreign_keys_regen.csv"
 OUT_JSON       = REPORTS / "schema_diff.json"
 
+# Diff-result CSV files (written by _write_diff_csvs)
+OUT_TF_ONLY_CURRENT  = REPORTS / "schema_diff_tables_fields_only_in_current.csv"
+OUT_TF_ONLY_REGEN    = REPORTS / "schema_diff_tables_fields_only_in_regen.csv"
+OUT_TF_MISMATCHES    = REPORTS / "schema_diff_tables_fields_mismatches.csv"
+OUT_FK_ONLY_CURRENT  = REPORTS / "schema_diff_foreign_keys_only_in_current.csv"
+OUT_FK_ONLY_REGEN    = REPORTS / "schema_diff_foreign_keys_only_in_regen.csv"
+OUT_FK_MISMATCHES    = REPORTS / "schema_diff_foreign_keys_mismatches.csv"
+
 
 def _open_data_mdb() -> pyodbc.Connection:
     cs = (
@@ -119,68 +127,114 @@ def _dump_current(conn: pyodbc.Connection) -> tuple[list[dict], list[dict]]:
 # ---------------------------------------------------------------------------
 
 def _regen_from_catalog(conn: pyodbc.Connection) -> tuple[list[dict], list[dict], bool]:
-    cur = conn.cursor()
-
-    # Enumerate user tables (skip MSys* and ~*)
-    cur.tables(tableType="TABLE")
+    # Use a fresh dedicated cursor just for the initial table enumeration so
+    # we don't pollute any cursor state before the per-table column loops.
+    enum_cur = conn.cursor()
+    enum_cur.tables(tableType="TABLE")
     all_tables = [
         row.table_name
-        for row in cur.fetchall()
+        for row in enum_cur.fetchall()
         if not row.table_name.startswith("MSys")
         and not row.table_name.startswith("~")
     ]
     all_tables.sort()
     print(f"  found {len(all_tables)} user tables via ODBC catalog")
 
+    # Build upper-case → actual-case mapping so that TablesFields entries
+    # (which may use a different capitalisation, e.g. KIN_MOURNING vs
+    # KIN_Mourning) can be matched case-insensitively when we later diff.
+    # We ALWAYS call cursor.columns() with the exact case from the catalog
+    # because the Access ODBC driver is case-sensitive for catalog queries.
+    upper_to_actual: dict[str, str] = {t.upper(): t for t in all_tables}
+
     tf_regen: list[dict] = []
     fk_regen: list[dict] = []
     fk_introspection_available = False
 
     for table_name in all_tables:
-        # Primary keys for this table
+        # ---- Primary keys (fresh cursor per table) ----
         try:
-            cur.primaryKeys(table=table_name)
-            pk_rows = cur.fetchall()
+            pk_cur = conn.cursor()
+            pk_cur.primaryKeys(table=table_name)
+            pk_rows = pk_cur.fetchall()
             pk_cols = {row[3] for row in pk_rows}  # COLUMN_NAME is index 3
         except Exception:
             pk_cols = set()
 
-        # Columns — fetch one at a time to survive UTF-16-LE decode
-        # errors in column metadata for certain Access system-ish tables.
-        cur.columns(table=table_name)
-        col_rows = []
-        while True:
-            try:
-                row = cur.fetchone()
-            except UnicodeDecodeError:
-                # Skip the rest of this table's column metadata
-                break
-            if row is None:
-                break
-            col_rows.append(row)
-        for col in col_rows:
-            col_name  = col.column_name
-            type_name = col.type_name if col.type_name else ""
-            nullable  = col.nullable   # 1 = nullable, 0 = not nullable
-
-            index_on = "Primary Key" if col_name in pk_cols else None
-            data_fmt = _map_type(type_name)
-            null_allowed = bool(nullable)
-
-            tf_regen.append({
-                "AccessTblNm":       table_name,
-                "AccessFldNm":       col_name,
-                "IndexOnField":      index_on,
-                "DataFormat":        data_fmt,
-                "NULL_allowed":      null_allowed,
-                "ForeignKey":        None,
-                "ForeignKeyBaseField": None,
-            })
-
-        # Foreign keys
+        # ---- Columns (fresh cursor per table + UnicodeDecodeError fallback)
+        # The Access ODBC driver corrupts shared cursor state when
+        # cursor.columns() is called sequentially on many tables.  Using a
+        # fresh cursor per call eliminates that state pollution.  If
+        # UnicodeDecodeError still fires (e.g. corrupted column metadata in
+        # the .mdb itself), fall back to SELECT TOP 1 to enumerate names.
+        col_rows: list | None = None
         try:
-            cur.foreignKeys(table=table_name)
-            fk_rows_odbc = cur.fetchall()
+            col_cur = conn.cursor()
+            col_cur.columns(table=table_name)
+            col_rows = []
+            while True:
+                try:
+                    row = col_cur.fetchone()
+                except UnicodeDecodeError:
+                    # Partial read — fall through to SELECT fallback
+                    col_rows = None
+                    break
+                if row is None:
+                    break
+                col_rows.append(row)
+        except UnicodeDecodeError:
+            col_rows = None
+
+        if col_rows is not None:
+            # Happy path — full ODBC metadata available
+            for col in col_rows:
+                col_name  = col.column_name
+                type_name = col.type_name if col.type_name else ""
+                nullable  = col.nullable   # 1 = nullable, 0 = not nullable
+
+                index_on = "Primary Key" if col_name in pk_cols else None
+                data_fmt = _map_type(type_name)
+                null_allowed = bool(nullable)
+
+                tf_regen.append({
+                    "AccessTblNm":       table_name,
+                    "AccessFldNm":       col_name,
+                    "IndexOnField":      index_on,
+                    "DataFormat":        data_fmt,
+                    "NULL_allowed":      null_allowed,
+                    "ForeignKey":        None,
+                    "ForeignKeyBaseField": None,
+                })
+        else:
+            # Fallback — cursor.columns() failed; enumerate via SELECT TOP 1
+            print(f"  [WARN] UnicodeDecodeError on cursor.columns({table_name!r})"
+                  f" — falling back to SELECT TOP 1")
+            try:
+                fb_cur = conn.cursor()
+                fb_cur.execute(f"SELECT TOP 1 * FROM [{table_name}]")
+                fb_cur.fetchall()
+                col_names = [d[0] for d in fb_cur.description]
+                for col_name in col_names:
+                    index_on = "Primary Key" if col_name in pk_cols else None
+                    tf_regen.append({
+                        "AccessTblNm":       table_name,
+                        "AccessFldNm":       col_name,
+                        "IndexOnField":      index_on,
+                        # DataFormat and NULL_allowed unknown via this path
+                        "DataFormat":        None,
+                        "NULL_allowed":      None,
+                        "ForeignKey":        None,
+                        "ForeignKeyBaseField": None,
+                    })
+            except Exception as exc:
+                print(f"  [ERROR] SELECT TOP 1 fallback also failed for "
+                      f"{table_name!r}: {exc}")
+
+        # ---- Foreign keys (fresh cursor per table) ----
+        try:
+            fk_cur = conn.cursor()
+            fk_cur.foreignKeys(table=table_name)
+            fk_rows_odbc = fk_cur.fetchall()
         except Exception:
             fk_rows_odbc = []
 
@@ -367,6 +421,61 @@ def _compute_diffs(
     return result
 
 
+def _write_diff_csvs(diff: dict) -> None:
+    """Write the six diff-result CSV files from the in-memory diff data."""
+    tf = diff["tables_fields"]
+    fk = diff["foreign_keys"]
+
+    # --- TablesFields: only_in_current ---
+    rows = tf["only_in_current"]
+    with OUT_TF_ONLY_CURRENT.open("w", newline="", encoding="utf-8-sig") as fh:
+        writer = csv.DictWriter(fh, fieldnames=["AccessTblNm", "AccessFldNm"])
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"wrote {OUT_TF_ONLY_CURRENT}  ({len(rows)} rows)")
+
+    # --- TablesFields: only_in_regen ---
+    rows = tf["only_in_regen"]
+    with OUT_TF_ONLY_REGEN.open("w", newline="", encoding="utf-8-sig") as fh:
+        writer = csv.DictWriter(fh, fieldnames=["AccessTblNm", "AccessFldNm", "DataFormat", "NULL_allowed"])
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"wrote {OUT_TF_ONLY_REGEN}  ({len(rows)} rows)")
+
+    # --- TablesFields: mismatches ---
+    rows = tf["mismatches"]
+    with OUT_TF_MISMATCHES.open("w", newline="", encoding="utf-8-sig") as fh:
+        writer = csv.DictWriter(fh, fieldnames=["AccessTblNm", "AccessFldNm", "field", "current", "regen"])
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"wrote {OUT_TF_MISMATCHES}  ({len(rows)} rows)")
+
+    # --- ForeignKeys: only_in_current ---
+    rows = fk["only_in_current"]
+    fk_cols = ["AccessTblNm", "AccessFldNm", "ForeignKey", "ForeignKeyBaseField"]
+    with OUT_FK_ONLY_CURRENT.open("w", newline="", encoding="utf-8-sig") as fh:
+        writer = csv.DictWriter(fh, fieldnames=fk_cols)
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"wrote {OUT_FK_ONLY_CURRENT}  ({len(rows)} rows)")
+
+    # --- ForeignKeys: only_in_regen ---
+    rows = fk["only_in_regen"]
+    with OUT_FK_ONLY_REGEN.open("w", newline="", encoding="utf-8-sig") as fh:
+        writer = csv.DictWriter(fh, fieldnames=fk_cols)
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"wrote {OUT_FK_ONLY_REGEN}  ({len(rows)} rows)")
+
+    # --- ForeignKeys: mismatches ---
+    rows = fk["mismatches"]
+    with OUT_FK_MISMATCHES.open("w", newline="", encoding="utf-8-sig") as fh:
+        writer = csv.DictWriter(fh, fieldnames=fk_cols)
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"wrote {OUT_FK_MISMATCHES}  ({len(rows)} rows)")
+
+
 def _print_summary(diff: dict) -> None:
     tf = diff["tables_fields"]
     fk = diff["foreign_keys"]
@@ -403,6 +512,9 @@ def main() -> int:
 
     print("\nStep 3 — computing diffs ...")
     diff = _compute_diffs(tf_current, tf_regen, fk_current, fk_regen, fk_available)
+
+    print("\nStep 4 — writing diff CSV files ...")
+    _write_diff_csvs(diff)
 
     _print_summary(diff)
     return 0
