@@ -1221,7 +1221,60 @@ Full list: `reports/schema_diff_tables_fields_mismatches.csv` (346 rows)
 
 This section covers the `ForeignKeys` table and the FK relationships it documents.
 
-The `ForeignKeys` table (188 rows) documents FK relationships in the database. All 188 referenced table/column pairs have been verified to exist in the current dump — `tests/test_schema_data_mdb.py` (`test_foreign_keys_referenced_tables_exist`, `test_foreign_keys_referenced_columns_exist`) passes against the current data. A catalog-level diff (documented FK vs. all actual FK constraints) is not available for Access databases and is omitted here.
+Total rows in ForeignKeys: 188. Reconstructed from DB (via Access.Application DAO): 223.
+
+### Rows in ForeignKeys not found in actual DB (stale)
+
+| AccessTblNm | AccessFldNm | ForeignKey | ForeignKeyBaseField |
+|---|---|---|---|
+| ADDR_BELONGS_DATA | c_source | TEXT_CODES | c_textid |
+| assoc_data | c_assoc_day_gz | GANZHI_CODES | c_ganzhi_code |
+| assoc_data | c_assoc_nh_code | nian_hao | c_nianhao_id |
+| assoc_data | c_assoc_range | year_range_codes | c_range_code |
+| assoc_data | c_inst_name_code | SOCIAL_INSTITUTION_NAME_CODES | c_inst_name_code |
+| assoc_data | c_inst_name_code,c_inst_code | SOCIAL_INSTITUTION_CODES | c_inst_code |
+| biog_addr_data | c_addr_id | ADDR_CODES | c_addr_id |
+| biog_addr_data | c_fy_day_gz | GANZHI_CODES | c_ganzhi_code |
+| biog_addr_data | c_fy_nh_code | nian_hao | c_nianhao_id |
+| biog_addr_data | c_fy_range | year_range_codes | c_range_code |
+| biog_addr_data | c_ly_day_gz | GANZHI_CODES | c_ganzhi_code |
+| biog_addr_data | c_ly_nh_code | nian_hao | c_nianhao_id |
+| biog_addr_data | c_ly_range | year_range_codes | c_range_code |
+| biog_addr_data | c_personid | BIOG_MAIN | c_personid |
+| biog_addr_data | c_source | TEXT_CODES | c_textid |
+| BIOG_INST_DATA | c_inst_name_code | SOCIAL_INSTITUTION_NAME_CODES | c_inst_name_code |
+| BIOG_INST_DATA | c_inst_name_code,c_inst_code | SOCIAL_INSTITUTION_CODES | c_inst_code |
+| biog_main | c_death_age_range | year_range_codes | c_range_code |
+| biog_main | c_index_year_source_id | BIOG_MAIN | c_personid |
+| biog_main | c_index_year_type_code | INDEXYEAR_TYPE_CODES | c_index_year_type_code |
+| ENTRY_DATA | c_entry_dy | DYNASTIES | c_dy |
+| ENTRY_DATA | c_inst_name_code | SOCIAL_INSTITUTION_NAME_CODES | c_inst_name_code |
+| ENTRY_DATA | c_inst_name_code,c_inst_code | SOCIAL_INSTITUTION_CODES | c_inst_code |
+| EVENTS_ADDR | c_event_code | EVENT_CODES | c_event_code |
+| EVENTS_ADDR | c_personid | BIOG_MAIN | c_personid |
+| EVENTS_ADDR | c_personid,c_sequence,c_event_code | EVENTS_DATA | c_event_code |
+| POSTED_TO_OFFICE_DATA | c_inst_name_code,c_inst_code | SOCIAL_INSTITUTION_CODES | c_inst_code |
+| SOCIAL_INSTITUTION_ADDR | c_inst_name_code,c_inst_code | SOCIAL_INSTITUTION_CODES | c_inst_code |
+
+### Columns in actual DB not documented in ForeignKeys
+
+| AccessTblNm | AccessFldNm | ForeignKey | ForeignKeyBaseField |
+|---|---|---|---|
+| ADDRESSES | c_addr_id | ADDR_CODES | c_addr_id |
+| ASSOC_CODES | c_assoc_pair | ASSOC_CODES | c_assoc_code |
+| Assoc_data | c_assoc_fy_day_gz | GANZHI_CODES | c_ganzhi_code |
+| Assoc_data | c_assoc_fy_nh_code | NIAN_HAO | c_nianhao_id |
+| Assoc_data | c_assoc_fy_range | YEAR_RANGE_CODES | c_range_code |
+| ASSOC_TYPES | c_assoc_type_parent_id | ASSOC_TYPES | c_assoc_type_code |
+| ENTRY_DATA | c_entry_addr_id | ADDR_CODES | c_addr_id |
+| EVENTS_DATA | c_event_code | EVENTS_ADDR | c_event_code |
+| EVENTS_DATA | c_personid | EVENTS_ADDR | c_personid |
+| EVENTS_DATA | c_sequence | EVENTS_ADDR | c_sequence |
+| POSTED_TO_OFFICE_DATA | c_inst_code | SOCIAL_INSTITUTION_CODES | c_inst_code |
+| POSTED_TO_OFFICE_DATA | c_inst_name_code | SOCIAL_INSTITUTION_CODES | c_inst_name_code |
+| SOCIAL_INSTITUTION_ADDR | c_inst_code | SOCIAL_INSTITUTION_CODES | c_inst_code |
+| SOCIAL_INSTITUTION_ADDR | c_inst_name_code | SOCIAL_INSTITUTION_CODES | c_inst_name_code |
+| SOCIAL_INSTITUTION_CODES | c_inst_end_dy | DYNASTIES | c_dy |
 
 ## Closing note
 

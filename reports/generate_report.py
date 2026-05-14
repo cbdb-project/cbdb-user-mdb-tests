@@ -3681,12 +3681,23 @@ def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
             ))
             return
 
+        doc_name_label = 'TablesFields' if block_key == 'tables_fields' else 'ForeignKeys'
+        regen_source = (
+            "Reconstructed from DB"
+            if block_key == "tables_fields"
+            else "Reconstructed from DB (via Access.Application DAO)"
+        )
+        regen_source_zh = (
+            "從資料庫重建"
+            if block_key == "tables_fields"
+            else "從資料庫重建（透過 Access.Application DAO）"
+        )
         doc.add_paragraph(Z(
-            f"Total rows in {'TablesFields' if block_key == 'tables_fields' else 'ForeignKeys'}: "
-            f"{blk['total_current']}. Reconstructed from DB: {blk['total_regen']}."
+            f"Total rows in {doc_name_label}: "
+            f"{blk['total_current']}. {regen_source}: {blk['total_regen']}."
             if is_en else
-            f"{'TablesFields' if block_key == 'tables_fields' else 'ForeignKeys'} "
-            f"共 {blk['total_current']} 筆。從資料庫重建：{blk['total_regen']} 筆。"
+            f"{doc_name_label} "
+            f"共 {blk['total_current']} 筆。{regen_source_zh}：{blk['total_regen']} 筆。"
         ))
 
         only_cur = blk["only_in_current"]
@@ -4269,12 +4280,22 @@ def _add_schema_diff_appendix_md(
         return
 
     doc_name = "TablesFields" if is_tf else "ForeignKeys"
+    regen_src = (
+        "Reconstructed from DB"
+        if is_tf
+        else "Reconstructed from DB (via Access.Application DAO)"
+    )
+    regen_src_zh = (
+        "從資料庫重建"
+        if is_tf
+        else "從資料庫重建（透過 Access.Application DAO）"
+    )
     lines.append(Z(
         f"Total rows in {doc_name}: {blk['total_current']}. "
-        f"Reconstructed from DB: {blk['total_regen']}."
+        f"{regen_src}: {blk['total_regen']}."
         if is_en else
         f"{doc_name} 共 {blk['total_current']} 筆。"
-        f"從資料庫重建：{blk['total_regen']} 筆。"
+        f"{regen_src_zh}：{blk['total_regen']} 筆。"
     ))
     lines.append("")
 

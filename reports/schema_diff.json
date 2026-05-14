@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-14T10:32:17.847409+00:00",
+  "generated_at": "2026-05-14T10:50:02.761039+00:00",
   "data_mdb": "CBDB_20260430_DATA.mdb",
   "tables_fields": {
     "total_current": 875,
@@ -3260,11 +3260,271 @@
     ]
   },
   "foreign_keys": {
-    "fk_introspection_available": false,
+    "fk_introspection_available": true,
     "total_current": 188,
-    "total_regen": 0,
-    "only_in_current": [],
-    "only_in_regen": [],
+    "total_regen": 223,
+    "only_in_current": [
+      {
+        "AccessTblNm": "ADDR_BELONGS_DATA",
+        "AccessFldNm": "c_source",
+        "ForeignKey": "TEXT_CODES",
+        "ForeignKeyBaseField": "c_textid"
+      },
+      {
+        "AccessTblNm": "assoc_data",
+        "AccessFldNm": "c_assoc_day_gz",
+        "ForeignKey": "GANZHI_CODES",
+        "ForeignKeyBaseField": "c_ganzhi_code"
+      },
+      {
+        "AccessTblNm": "assoc_data",
+        "AccessFldNm": "c_assoc_nh_code",
+        "ForeignKey": "nian_hao",
+        "ForeignKeyBaseField": "c_nianhao_id"
+      },
+      {
+        "AccessTblNm": "assoc_data",
+        "AccessFldNm": "c_assoc_range",
+        "ForeignKey": "year_range_codes",
+        "ForeignKeyBaseField": "c_range_code"
+      },
+      {
+        "AccessTblNm": "assoc_data",
+        "AccessFldNm": "c_inst_name_code",
+        "ForeignKey": "SOCIAL_INSTITUTION_NAME_CODES",
+        "ForeignKeyBaseField": "c_inst_name_code"
+      },
+      {
+        "AccessTblNm": "assoc_data",
+        "AccessFldNm": "c_inst_name_code,c_inst_code",
+        "ForeignKey": "SOCIAL_INSTITUTION_CODES",
+        "ForeignKeyBaseField": "c_inst_code"
+      },
+      {
+        "AccessTblNm": "biog_addr_data",
+        "AccessFldNm": "c_addr_id",
+        "ForeignKey": "ADDR_CODES",
+        "ForeignKeyBaseField": "c_addr_id"
+      },
+      {
+        "AccessTblNm": "biog_addr_data",
+        "AccessFldNm": "c_fy_day_gz",
+        "ForeignKey": "GANZHI_CODES",
+        "ForeignKeyBaseField": "c_ganzhi_code"
+      },
+      {
+        "AccessTblNm": "biog_addr_data",
+        "AccessFldNm": "c_fy_nh_code",
+        "ForeignKey": "nian_hao",
+        "ForeignKeyBaseField": "c_nianhao_id"
+      },
+      {
+        "AccessTblNm": "biog_addr_data",
+        "AccessFldNm": "c_fy_range",
+        "ForeignKey": "year_range_codes",
+        "ForeignKeyBaseField": "c_range_code"
+      },
+      {
+        "AccessTblNm": "biog_addr_data",
+        "AccessFldNm": "c_ly_day_gz",
+        "ForeignKey": "GANZHI_CODES",
+        "ForeignKeyBaseField": "c_ganzhi_code"
+      },
+      {
+        "AccessTblNm": "biog_addr_data",
+        "AccessFldNm": "c_ly_nh_code",
+        "ForeignKey": "nian_hao",
+        "ForeignKeyBaseField": "c_nianhao_id"
+      },
+      {
+        "AccessTblNm": "biog_addr_data",
+        "AccessFldNm": "c_ly_range",
+        "ForeignKey": "year_range_codes",
+        "ForeignKeyBaseField": "c_range_code"
+      },
+      {
+        "AccessTblNm": "biog_addr_data",
+        "AccessFldNm": "c_personid",
+        "ForeignKey": "BIOG_MAIN",
+        "ForeignKeyBaseField": "c_personid"
+      },
+      {
+        "AccessTblNm": "biog_addr_data",
+        "AccessFldNm": "c_source",
+        "ForeignKey": "TEXT_CODES",
+        "ForeignKeyBaseField": "c_textid"
+      },
+      {
+        "AccessTblNm": "BIOG_INST_DATA",
+        "AccessFldNm": "c_inst_name_code",
+        "ForeignKey": "SOCIAL_INSTITUTION_NAME_CODES",
+        "ForeignKeyBaseField": "c_inst_name_code"
+      },
+      {
+        "AccessTblNm": "BIOG_INST_DATA",
+        "AccessFldNm": "c_inst_name_code,c_inst_code",
+        "ForeignKey": "SOCIAL_INSTITUTION_CODES",
+        "ForeignKeyBaseField": "c_inst_code"
+      },
+      {
+        "AccessTblNm": "biog_main",
+        "AccessFldNm": "c_death_age_range",
+        "ForeignKey": "year_range_codes",
+        "ForeignKeyBaseField": "c_range_code"
+      },
+      {
+        "AccessTblNm": "biog_main",
+        "AccessFldNm": "c_index_year_source_id",
+        "ForeignKey": "BIOG_MAIN",
+        "ForeignKeyBaseField": "c_personid"
+      },
+      {
+        "AccessTblNm": "biog_main",
+        "AccessFldNm": "c_index_year_type_code",
+        "ForeignKey": "INDEXYEAR_TYPE_CODES",
+        "ForeignKeyBaseField": "c_index_year_type_code"
+      },
+      {
+        "AccessTblNm": "ENTRY_DATA",
+        "AccessFldNm": "c_entry_dy",
+        "ForeignKey": "DYNASTIES",
+        "ForeignKeyBaseField": "c_dy"
+      },
+      {
+        "AccessTblNm": "ENTRY_DATA",
+        "AccessFldNm": "c_inst_name_code",
+        "ForeignKey": "SOCIAL_INSTITUTION_NAME_CODES",
+        "ForeignKeyBaseField": "c_inst_name_code"
+      },
+      {
+        "AccessTblNm": "ENTRY_DATA",
+        "AccessFldNm": "c_inst_name_code,c_inst_code",
+        "ForeignKey": "SOCIAL_INSTITUTION_CODES",
+        "ForeignKeyBaseField": "c_inst_code"
+      },
+      {
+        "AccessTblNm": "EVENTS_ADDR",
+        "AccessFldNm": "c_event_code",
+        "ForeignKey": "EVENT_CODES",
+        "ForeignKeyBaseField": "c_event_code"
+      },
+      {
+        "AccessTblNm": "EVENTS_ADDR",
+        "AccessFldNm": "c_personid",
+        "ForeignKey": "BIOG_MAIN",
+        "ForeignKeyBaseField": "c_personid"
+      },
+      {
+        "AccessTblNm": "EVENTS_ADDR",
+        "AccessFldNm": "c_personid,c_sequence,c_event_code",
+        "ForeignKey": "EVENTS_DATA",
+        "ForeignKeyBaseField": "c_event_code"
+      },
+      {
+        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
+        "AccessFldNm": "c_inst_name_code,c_inst_code",
+        "ForeignKey": "SOCIAL_INSTITUTION_CODES",
+        "ForeignKeyBaseField": "c_inst_code"
+      },
+      {
+        "AccessTblNm": "SOCIAL_INSTITUTION_ADDR",
+        "AccessFldNm": "c_inst_name_code,c_inst_code",
+        "ForeignKey": "SOCIAL_INSTITUTION_CODES",
+        "ForeignKeyBaseField": "c_inst_code"
+      }
+    ],
+    "only_in_regen": [
+      {
+        "AccessTblNm": "ADDRESSES",
+        "AccessFldNm": "c_addr_id",
+        "ForeignKey": "ADDR_CODES",
+        "ForeignKeyBaseField": "c_addr_id"
+      },
+      {
+        "AccessTblNm": "ASSOC_CODES",
+        "AccessFldNm": "c_assoc_pair",
+        "ForeignKey": "ASSOC_CODES",
+        "ForeignKeyBaseField": "c_assoc_code"
+      },
+      {
+        "AccessTblNm": "Assoc_data",
+        "AccessFldNm": "c_assoc_fy_day_gz",
+        "ForeignKey": "GANZHI_CODES",
+        "ForeignKeyBaseField": "c_ganzhi_code"
+      },
+      {
+        "AccessTblNm": "Assoc_data",
+        "AccessFldNm": "c_assoc_fy_nh_code",
+        "ForeignKey": "NIAN_HAO",
+        "ForeignKeyBaseField": "c_nianhao_id"
+      },
+      {
+        "AccessTblNm": "Assoc_data",
+        "AccessFldNm": "c_assoc_fy_range",
+        "ForeignKey": "YEAR_RANGE_CODES",
+        "ForeignKeyBaseField": "c_range_code"
+      },
+      {
+        "AccessTblNm": "ASSOC_TYPES",
+        "AccessFldNm": "c_assoc_type_parent_id",
+        "ForeignKey": "ASSOC_TYPES",
+        "ForeignKeyBaseField": "c_assoc_type_code"
+      },
+      {
+        "AccessTblNm": "ENTRY_DATA",
+        "AccessFldNm": "c_entry_addr_id",
+        "ForeignKey": "ADDR_CODES",
+        "ForeignKeyBaseField": "c_addr_id"
+      },
+      {
+        "AccessTblNm": "EVENTS_DATA",
+        "AccessFldNm": "c_event_code",
+        "ForeignKey": "EVENTS_ADDR",
+        "ForeignKeyBaseField": "c_event_code"
+      },
+      {
+        "AccessTblNm": "EVENTS_DATA",
+        "AccessFldNm": "c_personid",
+        "ForeignKey": "EVENTS_ADDR",
+        "ForeignKeyBaseField": "c_personid"
+      },
+      {
+        "AccessTblNm": "EVENTS_DATA",
+        "AccessFldNm": "c_sequence",
+        "ForeignKey": "EVENTS_ADDR",
+        "ForeignKeyBaseField": "c_sequence"
+      },
+      {
+        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
+        "AccessFldNm": "c_inst_code",
+        "ForeignKey": "SOCIAL_INSTITUTION_CODES",
+        "ForeignKeyBaseField": "c_inst_code"
+      },
+      {
+        "AccessTblNm": "POSTED_TO_OFFICE_DATA",
+        "AccessFldNm": "c_inst_name_code",
+        "ForeignKey": "SOCIAL_INSTITUTION_CODES",
+        "ForeignKeyBaseField": "c_inst_name_code"
+      },
+      {
+        "AccessTblNm": "SOCIAL_INSTITUTION_ADDR",
+        "AccessFldNm": "c_inst_code",
+        "ForeignKey": "SOCIAL_INSTITUTION_CODES",
+        "ForeignKeyBaseField": "c_inst_code"
+      },
+      {
+        "AccessTblNm": "SOCIAL_INSTITUTION_ADDR",
+        "AccessFldNm": "c_inst_name_code",
+        "ForeignKey": "SOCIAL_INSTITUTION_CODES",
+        "ForeignKeyBaseField": "c_inst_name_code"
+      },
+      {
+        "AccessTblNm": "SOCIAL_INSTITUTION_CODES",
+        "AccessFldNm": "c_inst_end_dy",
+        "ForeignKey": "DYNASTIES",
+        "ForeignKeyBaseField": "c_dy"
+      }
+    ],
     "mismatches": []
   }
 }

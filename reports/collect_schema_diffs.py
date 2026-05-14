@@ -372,26 +372,48 @@ def _compute_diffs(
     fk_mismatches: list[dict] = []
 
     if fk_introspection_available:
-        def _fk_key(row: dict) -> tuple:
+        # Normalise to uppercase for comparison — DAO returns mixed-case names
+        # (e.g. 'Assoc_data') while the ForeignKeys documentation table uses
+        # uppercase.  We normalise the KEY but preserve the original case of
+        # each source when building the display rows.
+        def _fk_upper_key(row: dict) -> tuple:
             return (
-                row["AccessTblNm"],
-                row["AccessFldNm"],
-                row["ForeignKey"],
-                row["ForeignKeyBaseField"],
+                (row["AccessTblNm"] or "").upper(),
+                (row["AccessFldNm"] or "").upper(),
+                (row["ForeignKey"] or "").upper(),
+                (row["ForeignKeyBaseField"] or "").upper(),
             )
 
-        fk_cur_keys = set(_fk_key(r) for r in fk_current if r.get("ForeignKey"))
-        fk_reg_keys = set(_fk_key(r) for r in fk_regen)
+        # Build lookup: normalised key → original-case row (for display)
+        fk_cur_map: dict[tuple, dict] = {}
+        for r in fk_current:
+            if r.get("ForeignKey"):
+                fk_cur_map[_fk_upper_key(r)] = r
+
+        fk_reg_map: dict[tuple, dict] = {}
+        for r in fk_regen:
+            fk_reg_map[_fk_upper_key(r)] = r
+
+        fk_cur_set = set(fk_cur_map)
+        fk_reg_set = set(fk_reg_map)
 
         fk_only_in_current = [
-            {"AccessTblNm": k[0], "AccessFldNm": k[1],
-             "ForeignKey": k[2], "ForeignKeyBaseField": k[3]}
-            for k in sorted(fk_cur_keys - fk_reg_keys)
+            {
+                "AccessTblNm": fk_cur_map[k]["AccessTblNm"],
+                "AccessFldNm": fk_cur_map[k]["AccessFldNm"],
+                "ForeignKey": fk_cur_map[k]["ForeignKey"],
+                "ForeignKeyBaseField": fk_cur_map[k]["ForeignKeyBaseField"],
+            }
+            for k in sorted(fk_cur_set - fk_reg_set)
         ]
         fk_only_in_regen = [
-            {"AccessTblNm": k[0], "AccessFldNm": k[1],
-             "ForeignKey": k[2], "ForeignKeyBaseField": k[3]}
-            for k in sorted(fk_reg_keys - fk_cur_keys)
+            {
+                "AccessTblNm": fk_reg_map[k]["AccessTblNm"],
+                "AccessFldNm": fk_reg_map[k]["AccessFldNm"],
+                "ForeignKey": fk_reg_map[k]["ForeignKey"],
+                "ForeignKeyBaseField": fk_reg_map[k]["ForeignKeyBaseField"],
+            }
+            for k in sorted(fk_reg_set - fk_cur_set)
         ]
 
     result = {
@@ -476,6 +498,57 @@ def _write_diff_csvs(diff: dict) -> None:
     print(f"wrote {OUT_FK_MISMATCHES}  ({len(rows)} rows)")
 
 
+def _get_dao_relations(data_mdb_path: Path) -> list[dict]:
+    """Return FK relationships from the DATA mdb via the Access.Application
+    DAO COM interface.  Returns an empty list if COM is unavailable (e.g.
+    Access not installed) — caller checks and falls back gracefully.
+
+    Field mapping to match the ForeignKeys documentation table:
+      AccessTblNm        ← rel.ForeignTable  (FK table — the one with the FK column)
+      AccessFldNm        ← fld.ForeignName   (FK column)
+      ForeignKey         ← rel.Table         (PK table — referenced)
+      ForeignKeyBaseField← fld.Name          (PK column)
+      RelationName       ← rel.Name
+    """
+    try:
+        import win32com.client  # type: ignore
+    except ImportError:
+        print("[WARN] win32com not available — skipping DAO FK introspection")
+        return []
+
+    app = None
+    try:
+        app = win32com.client.DispatchEx("Access.Application")
+        app.Visible = False
+        app.OpenCurrentDatabase(str(data_mdb_path), False)
+        db = app.CurrentDb()
+        rels = db.Relations
+        print(f"  DAO db.Relations count: {rels.Count}")
+        rows: list[dict] = []
+        for i in range(rels.Count):
+            rel = rels.Item(i)
+            for j in range(rel.Fields.Count):
+                fld = rel.Fields.Item(j)
+                rows.append({
+                    "AccessTblNm": rel.ForeignTable,
+                    "AccessFldNm": fld.ForeignName,
+                    "ForeignKey": rel.Table,
+                    "ForeignKeyBaseField": fld.Name,
+                    "RelationName": rel.Name,
+                })
+        return rows
+    except Exception as exc:
+        print(f"[WARN] DAO FK introspection failed: {exc}")
+        return []
+    finally:
+        if app is not None:
+            try:
+                app.CloseCurrentDatabase()
+                app.Quit()
+            except Exception:
+                pass
+
+
 def _print_summary(diff: dict) -> None:
     tf = diff["tables_fields"]
     fk = diff["foreign_keys"]
@@ -506,9 +579,34 @@ def main() -> int:
     tf_current, fk_current = _dump_current(conn)
 
     print("\nStep 2 — reconstructing from ODBC catalog ...")
-    tf_regen, fk_regen, fk_available = _regen_from_catalog(conn)
+    tf_regen, _fk_regen_odbc, _fk_available_odbc = _regen_from_catalog(conn)
 
     conn.close()
+
+    print("\nStep 2b — fetching FK relationships via Access.Application DAO ...")
+    dao_rows = _get_dao_relations(DATA_MDB)
+    if dao_rows:
+        fk_available = True
+        # Normalise to match ForeignKeys table format; keep RelationName for CSV
+        fk_regen = dao_rows
+        # Write foreign_keys_regen.csv with DAO data
+        fk_regen_cols = [
+            "AccessTblNm", "AccessFldNm", "ForeignKey",
+            "ForeignKeyBaseField", "RelationName",
+        ]
+        fk_regen_sorted = sorted(
+            fk_regen,
+            key=lambda r: (r["AccessTblNm"].upper(), r["AccessFldNm"].upper()),
+        )
+        with OUT_FK_REGEN.open("w", newline="", encoding="utf-8-sig") as fh:
+            writer = csv.DictWriter(fh, fieldnames=fk_regen_cols)
+            writer.writeheader()
+            writer.writerows(fk_regen_sorted)
+        print(f"  wrote {OUT_FK_REGEN}  ({len(fk_regen_sorted)} rows, via DAO)")
+    else:
+        # Fall back to ODBC result (likely empty for Access)
+        fk_available = _fk_available_odbc
+        fk_regen = _fk_regen_odbc
 
     print("\nStep 3 — computing diffs ...")
     diff = _compute_diffs(tf_current, tf_regen, fk_current, fk_regen, fk_available)
