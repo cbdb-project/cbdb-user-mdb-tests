@@ -1221,7 +1221,7 @@ Full list: `reports/schema_diff_tables_fields_mismatches.csv` (346 rows)
 
 This section compares the `ForeignKeys` table against FK relationships derived from ODBC catalog introspection.
 
-ODBC FK introspection returned no data for this Access database. Structural tests (referenced table/column existence) are covered in `tests/test_schema_data_mdb.py`.
+The `ForeignKeys` table (188 rows) documents FK relationships in the database. All 188 referenced table/column pairs have been verified to exist in the current dump — `tests/test_schema_data_mdb.py` (`test_foreign_keys_referenced_tables_exist`, `test_foreign_keys_referenced_columns_exist`) passes against the current data. A catalog-level diff (documented FK vs. all actual FK constraints) is not available for Access databases and is omitted here.
 
 ## Closing note
 

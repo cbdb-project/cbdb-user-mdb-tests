@@ -1219,7 +1219,7 @@ TablesFields 共 875 筆。從資料庫重建：996 筆。
 
 本節將 `ForeignKeys` 表與透過 ODBC catalog 查詢所得的外部索引鍵關係進行比對。
 
-ODBC 外部索引鍵查詢對此 Access 資料庫未能返回資料。結構性測試（被參照表/欄位是否存在）已在 `tests/test_schema_data_mdb.py` 中覆蓋。
+`ForeignKeys` 表共 188 筆，記錄了資料庫中的外部索引鍵關係。我們已驗證所有 188 筆所參照的表名與列名均存在於當前 dump 中——`tests/test_schema_data_mdb.py`（`test_foreign_keys_referenced_tables_exist`、`test_foreign_keys_referenced_columns_exist`）在當前資料上均通過。由於 Access 資料庫不支援通過標準 ODBC catalog API 列舉外部索引鍵約束，此處無法提供「檔案記載 FK 與實際 FK 約束」的完整對比。
 
 ## 結語
 
