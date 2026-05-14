@@ -41,6 +41,8 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
   - [Issue #12 — POSTED_TO_OFFICE_DATA_2 上 c_appt_type_code 控制元件綁到沒投影的欄位——但該控制元件是隱藏的，且使用者實際看的任職型別欄位是正常的（LATENT）](#issue-12--posted_to_office_data_2-上-c_appt_type_code-控制元件綁到沒投影的欄位但該控制元件是隱藏的且使用者實際看的任職型別欄位是正常的latent)
 - [嚴重等級說明](#嚴重等級說明)
 - [附錄 —— c_index_year / c_index_addr_id 與 cbdb-online-main-server 快照之間的偏差（差異需要逐筆分類後才能判定是否為缺陷）](#附錄--c_index_year--c_index_addr_id-與-cbdb-online-main-server-快照之間的偏差差異需要逐筆分類後才能判定是否為缺陷)
+- [附錄 A —— TablesFields：文件表與實際資料庫結構對比](#附錄-a--tablesfields文件表與實際資料庫結構對比)
+- [附錄 B —— ForeignKeys：文件表與實際資料庫結構對比](#附錄-b--foreignkeys文件表與實際資料庫結構對比)
 - [結語](#結語)
 
 ## 嚴重等級說明
@@ -1051,6 +1053,96 @@ PR M（`analysis/dump_data_mdb_vba.py`）從 DATA mdb 抽出了 `frmBaseMaintena
 | `c_deathyear` | 1076 | 0 |
 | `c_index_year_type_code` | 01 | 11 |
 | `c_index_year_source_id` |  | 41030 |
+
+## 附錄 A —— TablesFields：文件表與實際資料庫結構對比
+
+本節將 `CBDB_20260430_DATA.mdb` 中 `TablesFields` 表的內容與 `reports/collect_schema_diffs.py` 透過 ODBC catalog 重建的資料庫結構進行比對。若存在差異，表示文件表可能已過時。
+
+TablesFields 共 875 筆。從資料庫重建：984 筆。
+
+### TablesFields 中有但實際資料庫中不存在的記錄（過時）
+
+| AccessTblNm | AccessFldNm |
+|---|---|
+| ADMIN_CAT_CODE_TYPE_REL | c_admin_type_code |
+| ADMIN_CAT_TYPES | c_admin_type_code |
+| ADMIN_CAT_TYPES | c_admin_type_hz |
+| ADMIN_CAT_TYPES | c_admin_type_trans |
+| ENTRY_DATA | c_addr_id |
+| ENTRY_DATA | c_posting_id |
+| KINSHIP_CODES | c_colstep |
+| KINSHIP_CODES | c_dwnstep |
+| KINSHIP_CODES | c_kinrel |
+| KINSHIP_CODES | c_kinrel_alt |
+| KINSHIP_CODES | c_kinrel_chn |
+| KINSHIP_CODES | c_kinrel_simplified |
+| KINSHIP_CODES | c_kin_pair1 |
+| KINSHIP_CODES | c_kin_pair2 |
+| KINSHIP_CODES | c_kin_pair_notes |
+| KINSHIP_CODES | c_marstep |
+| KINSHIP_CODES | c_pick_sorting |
+| KINSHIP_CODES | c_upstep |
+| MERGED_PERSON_DATA | c_merged_to_personid |
+| PersonIDSource | LineNum |
+*… 還有 2 筆未顯示。*
+
+### 實際資料庫中有但 TablesFields 未記錄的欄位
+
+| AccessTblNm | AccessFldNm | DataFormat | NULL_allowed |
+|---|---|---|---|
+| ADDRESSES | belongs1_ID | Long | True |
+| ADDRESSES | belongs1_Name | Text | True |
+| ADDRESSES | belongs2_ID | Long | True |
+| ADDRESSES | belongs2_Name | Text | True |
+| ADDRESSES | belongs3_ID | Long | True |
+| ADDRESSES | belongs3_Name | Text | True |
+| ADDRESSES | belongs4_ID | Long | True |
+| ADDRESSES | belongs4_Name | Text | True |
+| ADDRESSES | belongs5_ID | Long | True |
+| ADDRESSES | belongs5_Name | Text | True |
+| ADDRESSES | c_addr_cbd | Text | True |
+| ADDRESSES | c_addr_id | Long | True |
+| ADDRESSES | c_admin_type | Text | True |
+| ADDRESSES | c_firstyear | Integer | True |
+| ADDRESSES | c_lastyear | Integer | True |
+| ADDRESSES | c_name | Text | True |
+| ADDRESSES | c_name_chn | Text | True |
+| ADDRESSES | x_coord | Double | True |
+| ADDRESSES | y_coord | Double | True |
+| ADMIN_CAT_CODE_TYPE_REL | c_admin_cat_type_code | Text | True |
+*… 還有 111 筆未顯示。*
+
+### 屬性不一致
+
+| AccessTblNm | AccessFldNm | Field | In TablesFields | In actual DB |
+|---|---|---|---|---|
+| ADDR_BELONGS_DATA | c_addr_id | NULL_allowed | False | True |
+| ADDR_BELONGS_DATA | c_belongs_to | NULL_allowed | False | True |
+| ADDR_BELONGS_DATA | c_firstyear | NULL_allowed | False | True |
+| ADDR_BELONGS_DATA | c_lastyear | NULL_allowed | False | True |
+| ADDR_BELONGS_DATA | c_notes | DataFormat | Memo | Text |
+| ADDR_CODES | c_addr_id | NULL_allowed | False | True |
+| ADDR_CODES | c_admin_cat_code | NULL_allowed | False | True |
+| ADDR_CODES | c_admin_type | NULL_allowed | False | True |
+| ADDR_CODES | c_name | NULL_allowed | False | True |
+| ADDR_CODES | c_name_chn | NULL_allowed | False | True |
+| ADDR_CODES | x_coord | NULL_allowed | False | True |
+| ADDR_CODES | y_coord | NULL_allowed | False | True |
+| ADMIN_CAT_CODES | c_admin_cat_code | NULL_allowed | False | True |
+| ADMIN_CAT_CODES | c_admin_cat_hz | NULL_allowed | False | True |
+| ADMIN_CAT_CODES | c_admin_cat_py | NULL_allowed | False | True |
+| ADMIN_CAT_CODE_TYPE_REL | c_admin_cat_code | NULL_allowed | False | True |
+| ADMIN_CAT_TYPES | c_notes | NULL_allowed | False | True |
+| ALTNAME_CODES | c_name_type_code | NULL_allowed | False | True |
+| ALTNAME_CODES | c_name_type_desc | NULL_allowed | False | True |
+| ALTNAME_CODES | c_name_type_desc_chn | NULL_allowed | False | True |
+*… 還有 317 筆未顯示。*
+
+## 附錄 B —— ForeignKeys：文件表與實際資料庫結構對比
+
+本節將 `ForeignKeys` 表與透過 ODBC catalog 查詢所得的外部索引鍵關係進行比對。
+
+ODBC 外部索引鍵查詢對此 Access 資料庫未能返回資料。結構性測試（被參照表/欄位是否存在）已在 `tests/test_schema_data_mdb.py` 中覆蓋。
 
 ## 結語
 

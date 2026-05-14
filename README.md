@@ -172,6 +172,7 @@ python -m pytest tests/test_known_bugs.py -W ignore --no-discover-inputs \
     --json-report --json-report-file=reports/known_bugs_status.json
 python reports/probe_demo_persons.py    # refresh concrete demo personids
 python reports/collect_index_year_diffs.py  # refresh drift appendix
+python reports/collect_schema_diffs.py      # refresh schema-diff appendix (TablesFields / ForeignKeys vs actual DB)
 python reports/capture_screenshots.py   # refresh real-Access screenshots
 python reports/generate_report.py       # rebuild all four outputs:
                                          #   reports/CBDB_Issues_Report_EN.md          (committed)
