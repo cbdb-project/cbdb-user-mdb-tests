@@ -1062,6 +1062,8 @@ This section compares the contents of the `TablesFields` table in `CBDB_20260430
 
 Total rows in TablesFields: 875. Reconstructed from DB: 996.
 
+Reconstructed schema: [tables_fields_regen.csv](tables_fields_regen.csv)
+
 ### Rows in TablesFields not found in actual DB (stale)
 
 | AccessTblNm | AccessFldNm |
@@ -1222,6 +1224,8 @@ Full list: `reports/schema_diff_tables_fields_mismatches.csv` (143 rows)
 This section covers the `ForeignKeys` table and the FK relationships it documents.
 
 Total rows in ForeignKeys: 188. Reconstructed from DB (via Access.Application DAO): 223.
+
+Reconstructed FK list: [foreign_keys_regen.csv](foreign_keys_regen.csv)
 
 ### Rows in ForeignKeys not found in actual DB (stale)
 

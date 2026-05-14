@@ -1060,6 +1060,8 @@ PR M（`analysis/dump_data_mdb_vba.py`）從 DATA mdb 抽出了 `frmBaseMaintena
 
 TablesFields 共 875 筆。從資料庫重建：996 筆。
 
+重建結果: [tables_fields_regen.csv](tables_fields_regen.csv)
+
 ### TablesFields 中有但實際資料庫中不存在的記錄（過時）
 
 | AccessTblNm | AccessFldNm |
@@ -1220,6 +1222,8 @@ TablesFields 共 875 筆。從資料庫重建：996 筆。
 本節涵蓋 `ForeignKeys` 表及其所記錄的外部索引鍵關係。
 
 ForeignKeys 共 188 筆。從資料庫重建（透過 Access.Application DAO）：223 筆。
+
+重建結果: [foreign_keys_regen.csv](foreign_keys_regen.csv)
 
 ### ForeignKeys 中有但實際資料庫中不存在的記錄（過時）
 

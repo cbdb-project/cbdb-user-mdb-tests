@@ -3616,6 +3616,32 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
 # Schema-diff appendix helpers (Part C)
 # ---------------------------------------------------------------------------
 
+def _add_hyperlink(paragraph, url: str, text: str):
+    """Insert a clickable hyperlink run into *paragraph* (python-docx helper)."""
+    from docx.oxml.ns import qn
+    from docx.oxml import OxmlElement
+    part = paragraph.part
+    r_id = part.relate_to(
+        url,
+        "http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink",
+        is_external=True,
+    )
+    hyperlink = OxmlElement("w:hyperlink")
+    hyperlink.set(qn("r:id"), r_id)
+    run = OxmlElement("w:r")
+    rPr = OxmlElement("w:rPr")
+    rStyle = OxmlElement("w:rStyle")
+    rStyle.set(qn("w:val"), "Hyperlink")
+    rPr.append(rStyle)
+    run.append(rPr)
+    t = OxmlElement("w:t")
+    t.text = text
+    run.append(t)
+    hyperlink.append(run)
+    paragraph._p.append(hyperlink)
+    return hyperlink
+
+
 def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
     """Render Appendix B (TablesFields) and Appendix C (ForeignKeys)
     schema-diff sections using the python-docx API.
@@ -3679,6 +3705,13 @@ def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
                 "由于 Access 数据库不支持通过标准 ODBC catalog API 枚举外键约束，"
                 "此处无法提供「文件记载 FK 与实际 FK 约束」的完整对比。"
             ))
+            _fk_link_label = "Reconstructed FK list: " if is_en else "重建結果："
+            _fk_link_para = doc.add_paragraph(_fk_link_label)
+            _add_hyperlink(
+                _fk_link_para,
+                "https://github.com/cbdb-project/cbdb-user-mdb-tests/blob/main/reports/foreign_keys_regen.csv",
+                "foreign_keys_regen.csv",
+            )
             return
 
         doc_name_label = 'TablesFields' if block_key == 'tables_fields' else 'ForeignKeys'
@@ -3699,6 +3732,20 @@ def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
             f"{doc_name_label} "
             f"共 {blk['total_current']} 筆。{regen_source_zh}：{blk['total_regen']} 筆。"
         ))
+
+        # Link to regen CSV
+        _regen_csv_file = (
+            "tables_fields_regen.csv" if block_key == "tables_fields" else "foreign_keys_regen.csv"
+        )
+        _regen_csv_url = (
+            f"https://github.com/cbdb-project/cbdb-user-mdb-tests/blob/main/reports/{_regen_csv_file}"
+        )
+        _link_label = (
+            (f"Reconstructed schema: " if block_key == "tables_fields" else "Reconstructed FK list: ")
+            if is_en else "重建結果："
+        )
+        _link_para = doc.add_paragraph(_link_label)
+        _add_hyperlink(_link_para, _regen_csv_url, _regen_csv_file)
 
         only_cur = blk["only_in_current"]
         only_reg = blk["only_in_regen"]
@@ -4277,6 +4324,9 @@ def _add_schema_diff_appendix_md(
             "此处无法提供「文件记载 FK 与实际 FK 约束」的完整对比。"
         ))
         lines.append("")
+        _fk_link_label_md = "Reconstructed FK list" if is_en else "重建結果"
+        lines.append(Z(f"{_fk_link_label_md}: [foreign_keys_regen.csv](foreign_keys_regen.csv)"))
+        lines.append("")
         return
 
     doc_name = "TablesFields" if is_tf else "ForeignKeys"
@@ -4296,6 +4346,19 @@ def _add_schema_diff_appendix_md(
         if is_en else
         f"{doc_name} 共 {blk['total_current']} 筆。"
         f"{regen_src_zh}：{blk['total_regen']} 筆。"
+    ))
+    lines.append("")
+
+    # Link to regen CSV
+    _regen_csv_md = (
+        "tables_fields_regen.csv" if is_tf else "foreign_keys_regen.csv"
+    )
+    _regen_link_label = (
+        ("Reconstructed schema" if is_tf else "Reconstructed FK list")
+        if is_en else "重建結果"
+    )
+    lines.append(Z(
+        f"{_regen_link_label}: [{_regen_csv_md}]({_regen_csv_md})"
     ))
     lines.append("")
 
