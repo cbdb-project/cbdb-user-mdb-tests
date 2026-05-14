@@ -3635,16 +3635,15 @@ def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
             "`reports/collect_schema_diffs.py`. Discrepancies indicate the "
             "documentation table may be out of date."
             if title_a.startswith("Appendix B") else
-            "This section compares the `ForeignKeys` table against FK "
-            "relationships derived from ODBC catalog introspection."
+            "This section covers the `ForeignKeys` table and the FK "
+            "relationships it documents."
         )
         intro_zh = (
             "本節將 `CBDB_20260430_DATA.mdb` 中 `TablesFields` 表的內容與"
             "`reports/collect_schema_diffs.py` 透過 ODBC catalog 重建的資料"
             "庫結構進行比對。若存在差異，表示文檔表可能已過時。"
             if title_a.startswith("Appendix B") else
-            "本節將 `ForeignKeys` 表與透過 ODBC catalog 查詢所得的外鍵關係"
-            "進行比對。"
+            "本節涵蓋 `ForeignKeys` 表及其所記錄的外鍵關係。"
         )
         doc.add_paragraph(Z(intro if is_en else intro_zh))
 
@@ -4221,8 +4220,8 @@ def _add_schema_diff_appendix_md(
             "`reports/collect_schema_diffs.py`. Discrepancies indicate the "
             "documentation table may be out of date."
         ) if is_tf else (
-            "This section compares the `ForeignKeys` table against FK "
-            "relationships derived from ODBC catalog introspection."
+            "This section covers the `ForeignKeys` table and the FK "
+            "relationships it documents."
         )
     )
     intro_zh = (
@@ -4231,8 +4230,7 @@ def _add_schema_diff_appendix_md(
             "`reports/collect_schema_diffs.py` 透過 ODBC catalog 重建的資料"
             "庫結構進行比對。若存在差異，表示文檔表可能已過時。"
         ) if is_tf else (
-            "本節將 `ForeignKeys` 表與透過 ODBC catalog 查詢所得的外鍵關係"
-            "進行比對。"
+            "本節涵蓋 `ForeignKeys` 表及其所記錄的外鍵關係。"
         )
     )
     lines.append(Z(intro if is_en else intro_zh))
