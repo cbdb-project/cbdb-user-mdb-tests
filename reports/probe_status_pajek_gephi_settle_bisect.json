@@ -1,0 +1,709 @@
+{
+  "schema_version": 1,
+  "generated_date": "2026-05-08",
+  "probe_branch": "investigate/status-settle-bisect",
+  "main_at_probe": "5f100b4_then_rebased",
+  "form": "LookAtStatus",
+  "buttons_probed": [
+    "CmdPajek",
+    "CmdGephi"
+  ],
+  "settle_ms_values_tested": [
+    500,
+    750,
+    1000
+  ],
+  "intervention": {
+    "shape": "explicit <subform>.Form.Requery for ZZ_SCRATCH_STATUS + ZZ_SCRATCH_P_STATUS, INSIDE the For loop body BEFORE Select Case Call",
+    "settle_kind": "Timer-driven DoEvents loop for configured settle_ms; wrapped in On Error Resume Next",
+    "fixed_across_settle_values": true,
+    "scope": "Form_LookAtStatus only via _PER_FORM_PER_STEP_REQUERY_SUBFORMS dict; settle_ms parametric via _PER_FORM_PER_STEP_REQUERY_SETTLE_MS class const"
+  },
+  "config": {
+    "click_via_timer_timeout_sec": 180,
+    "per_phase_outer_timeout_sec": 240,
+    "object_required_text": "Object required",
+    "PR127_baseline_scratch_status": 17023,
+    "PR127_baseline_scratch_p_status": 17022
+  },
+  "total_wall_elapsed_sec": 132.9,
+  "phases": [
+    {
+      "settle_ms": 500,
+      "settle_outcome": "unblocks_neither",
+      "CmdPajek": {
+        "outcome": "object_required_still_observed",
+        "file_count": 0,
+        "object_required": true,
+        "err_texts": [
+          "Object required"
+        ],
+        "scratch_status": 17023,
+        "scratch_p_status": 17022,
+        "watchdog_dialog_count": 0,
+        "zz_test_debug_msgs": [
+          "LookAtStatus:ENTER",
+          "LookAtStatus:ERR Object required",
+          "LookAtStatus:DONE"
+        ]
+      },
+      "CmdGephi": {
+        "outcome": "object_required_still_observed",
+        "file_count": 0,
+        "object_required": true,
+        "err_texts": [
+          "Object required"
+        ],
+        "scratch_status": 17023,
+        "scratch_p_status": 17022,
+        "watchdog_dialog_count": 0,
+        "zz_test_debug_msgs": [
+          "LookAtStatus:ENTER",
+          "LookAtStatus:ERR Object required",
+          "LookAtStatus:DONE"
+        ]
+      }
+    },
+    {
+      "settle_ms": 750,
+      "settle_outcome": "unblocks_neither",
+      "CmdPajek": {
+        "outcome": "object_required_still_observed",
+        "file_count": 0,
+        "object_required": true,
+        "err_texts": [
+          "Object required"
+        ],
+        "scratch_status": 17023,
+        "scratch_p_status": 17022,
+        "watchdog_dialog_count": 0,
+        "zz_test_debug_msgs": [
+          "LookAtStatus:ENTER",
+          "LookAtStatus:ERR Object required",
+          "LookAtStatus:DONE"
+        ]
+      },
+      "CmdGephi": {
+        "outcome": "object_required_still_observed",
+        "file_count": 0,
+        "object_required": true,
+        "err_texts": [
+          "Object required"
+        ],
+        "scratch_status": 17023,
+        "scratch_p_status": 17022,
+        "watchdog_dialog_count": 0,
+        "zz_test_debug_msgs": [
+          "LookAtStatus:ENTER",
+          "LookAtStatus:ERR Object required",
+          "LookAtStatus:DONE"
+        ]
+      }
+    },
+    {
+      "settle_ms": 1000,
+      "settle_outcome": "unblocks_neither",
+      "CmdPajek": {
+        "outcome": "object_required_still_observed",
+        "file_count": 0,
+        "object_required": true,
+        "err_texts": [
+          "Object required"
+        ],
+        "scratch_status": 17023,
+        "scratch_p_status": 17022,
+        "watchdog_dialog_count": 0,
+        "zz_test_debug_msgs": [
+          "LookAtStatus:ENTER",
+          "LookAtStatus:ERR Object required",
+          "LookAtStatus:DONE"
+        ]
+      },
+      "CmdGephi": {
+        "outcome": "object_required_still_observed",
+        "file_count": 0,
+        "object_required": true,
+        "err_texts": [
+          "Object required"
+        ],
+        "scratch_status": 17023,
+        "scratch_p_status": 17022,
+        "watchdog_dialog_count": 0,
+        "zz_test_debug_msgs": [
+          "LookAtStatus:ENTER",
+          "LookAtStatus:ERR Object required",
+          "LookAtStatus:DONE"
+        ]
+      }
+    }
+  ],
+  "raw_per_settle_results": [
+    {
+      "settle_ms": 500,
+      "settle_outcome": "unblocks_neither",
+      "pajek_phase": {
+        "settle_ms": 500,
+        "button": "CmdPajek",
+        "fixture_name": "status_40_unfiltered",
+        "fixture_picker_ids": [
+          40
+        ],
+        "fixture_controls": {
+          "FrameFilterYears": 1
+        },
+        "markers": [
+          {
+            "t": 0.0,
+            "marker": "settle_ms_set_to_500"
+          },
+          {
+            "t": 0.0,
+            "marker": "constructing_session"
+          },
+          {
+            "t": 5.32,
+            "marker": "session_opened_attempt_1"
+          },
+          {
+            "t": 5.56,
+            "marker": "filedialog_patched"
+          },
+          {
+            "t": 6.28,
+            "marker": "form_opened"
+          },
+          {
+            "t": 6.29,
+            "marker": "picker_seeded_1_codes"
+          },
+          {
+            "t": 6.29,
+            "marker": "fixture_seeded"
+          },
+          {
+            "t": 6.3,
+            "marker": "form_tag_set_chain_CmdQuery_CmdPajek"
+          },
+          {
+            "t": 6.3,
+            "marker": "chain_fire_t_start"
+          },
+          {
+            "t": 8.35,
+            "marker": "click_via_timer_returned_17023"
+          },
+          {
+            "t": 16.35,
+            "marker": "chain_quiescent_zero_files_stable_for_8s"
+          },
+          {
+            "t": 16.35,
+            "marker": "chain_elapsed_10.06s"
+          },
+          {
+            "t": 16.35,
+            "marker": "files_inventoried_0"
+          },
+          {
+            "t": 16.36,
+            "marker": "row_counts_captured"
+          },
+          {
+            "t": 16.36,
+            "marker": "zz_test_debug_captured"
+          }
+        ],
+        "elapsed_sec": 18.94,
+        "exception": null,
+        "row_counts": {
+          "ZZ_SCRATCH_STATUS": 17023,
+          "ZZ_SCRATCH_P_STATUS": 17022,
+          "ZZ_TEST_DEBUG": 3
+        },
+        "files": [],
+        "file_count": 0,
+        "click_via_timer_returned": 17023,
+        "chain_elapsed_sec": 10.06,
+        "chain_observed_done": true,
+        "msgbox_observed": [],
+        "zz_test_debug_msgs": [
+          "LookAtStatus:ENTER",
+          "LookAtStatus:ERR Object required",
+          "LookAtStatus:DONE"
+        ]
+      },
+      "gephi_phase": {
+        "settle_ms": 500,
+        "button": "CmdGephi",
+        "fixture_name": "status_40_unfiltered",
+        "fixture_picker_ids": [
+          40
+        ],
+        "fixture_controls": {
+          "FrameFilterYears": 1
+        },
+        "markers": [
+          {
+            "t": 0.0,
+            "marker": "settle_ms_set_to_500"
+          },
+          {
+            "t": 0.0,
+            "marker": "constructing_session"
+          },
+          {
+            "t": 5.04,
+            "marker": "session_opened_attempt_1"
+          },
+          {
+            "t": 5.28,
+            "marker": "filedialog_patched"
+          },
+          {
+            "t": 6.02,
+            "marker": "form_opened"
+          },
+          {
+            "t": 6.03,
+            "marker": "picker_seeded_1_codes"
+          },
+          {
+            "t": 6.03,
+            "marker": "fixture_seeded"
+          },
+          {
+            "t": 6.03,
+            "marker": "form_tag_set_chain_CmdQuery_CmdGephi"
+          },
+          {
+            "t": 6.03,
+            "marker": "chain_fire_t_start"
+          },
+          {
+            "t": 8.06,
+            "marker": "click_via_timer_returned_17023"
+          },
+          {
+            "t": 16.07,
+            "marker": "chain_quiescent_zero_files_stable_for_8s"
+          },
+          {
+            "t": 16.07,
+            "marker": "chain_elapsed_10.04s"
+          },
+          {
+            "t": 16.07,
+            "marker": "files_inventoried_0"
+          },
+          {
+            "t": 16.07,
+            "marker": "row_counts_captured"
+          },
+          {
+            "t": 16.07,
+            "marker": "zz_test_debug_captured"
+          }
+        ],
+        "elapsed_sec": 18.63,
+        "exception": null,
+        "row_counts": {
+          "ZZ_SCRATCH_STATUS": 17023,
+          "ZZ_SCRATCH_P_STATUS": 17022,
+          "ZZ_TEST_DEBUG": 3
+        },
+        "files": [],
+        "file_count": 0,
+        "click_via_timer_returned": 17023,
+        "chain_elapsed_sec": 10.04,
+        "chain_observed_done": true,
+        "msgbox_observed": [],
+        "zz_test_debug_msgs": [
+          "LookAtStatus:ENTER",
+          "LookAtStatus:ERR Object required",
+          "LookAtStatus:DONE"
+        ]
+      }
+    },
+    {
+      "settle_ms": 750,
+      "settle_outcome": "unblocks_neither",
+      "pajek_phase": {
+        "settle_ms": 750,
+        "button": "CmdPajek",
+        "fixture_name": "status_40_unfiltered",
+        "fixture_picker_ids": [
+          40
+        ],
+        "fixture_controls": {
+          "FrameFilterYears": 1
+        },
+        "markers": [
+          {
+            "t": 0.0,
+            "marker": "settle_ms_set_to_750"
+          },
+          {
+            "t": 0.0,
+            "marker": "constructing_session"
+          },
+          {
+            "t": 5.07,
+            "marker": "session_opened_attempt_1"
+          },
+          {
+            "t": 5.31,
+            "marker": "filedialog_patched"
+          },
+          {
+            "t": 6.05,
+            "marker": "form_opened"
+          },
+          {
+            "t": 6.07,
+            "marker": "picker_seeded_1_codes"
+          },
+          {
+            "t": 6.07,
+            "marker": "fixture_seeded"
+          },
+          {
+            "t": 6.07,
+            "marker": "form_tag_set_chain_CmdQuery_CmdPajek"
+          },
+          {
+            "t": 6.07,
+            "marker": "chain_fire_t_start"
+          },
+          {
+            "t": 8.6,
+            "marker": "click_via_timer_returned_17023"
+          },
+          {
+            "t": 16.61,
+            "marker": "chain_quiescent_zero_files_stable_for_8s"
+          },
+          {
+            "t": 16.61,
+            "marker": "chain_elapsed_10.54s"
+          },
+          {
+            "t": 16.61,
+            "marker": "files_inventoried_0"
+          },
+          {
+            "t": 16.61,
+            "marker": "row_counts_captured"
+          },
+          {
+            "t": 16.61,
+            "marker": "zz_test_debug_captured"
+          }
+        ],
+        "elapsed_sec": 19.04,
+        "exception": null,
+        "row_counts": {
+          "ZZ_SCRATCH_STATUS": 17023,
+          "ZZ_SCRATCH_P_STATUS": 17022,
+          "ZZ_TEST_DEBUG": 3
+        },
+        "files": [],
+        "file_count": 0,
+        "click_via_timer_returned": 17023,
+        "chain_elapsed_sec": 10.54,
+        "chain_observed_done": true,
+        "msgbox_observed": [],
+        "zz_test_debug_msgs": [
+          "LookAtStatus:ENTER",
+          "LookAtStatus:ERR Object required",
+          "LookAtStatus:DONE"
+        ]
+      },
+      "gephi_phase": {
+        "settle_ms": 750,
+        "button": "CmdGephi",
+        "fixture_name": "status_40_unfiltered",
+        "fixture_picker_ids": [
+          40
+        ],
+        "fixture_controls": {
+          "FrameFilterYears": 1
+        },
+        "markers": [
+          {
+            "t": 0.0,
+            "marker": "settle_ms_set_to_750"
+          },
+          {
+            "t": 0.0,
+            "marker": "constructing_session"
+          },
+          {
+            "t": 5.1,
+            "marker": "session_opened_attempt_1"
+          },
+          {
+            "t": 5.34,
+            "marker": "filedialog_patched"
+          },
+          {
+            "t": 6.07,
+            "marker": "form_opened"
+          },
+          {
+            "t": 6.08,
+            "marker": "picker_seeded_1_codes"
+          },
+          {
+            "t": 6.08,
+            "marker": "fixture_seeded"
+          },
+          {
+            "t": 6.09,
+            "marker": "form_tag_set_chain_CmdQuery_CmdGephi"
+          },
+          {
+            "t": 6.09,
+            "marker": "chain_fire_t_start"
+          },
+          {
+            "t": 8.61,
+            "marker": "click_via_timer_returned_17023"
+          },
+          {
+            "t": 16.62,
+            "marker": "chain_quiescent_zero_files_stable_for_8s"
+          },
+          {
+            "t": 16.62,
+            "marker": "chain_elapsed_10.54s"
+          },
+          {
+            "t": 16.62,
+            "marker": "files_inventoried_0"
+          },
+          {
+            "t": 16.63,
+            "marker": "row_counts_captured"
+          },
+          {
+            "t": 16.63,
+            "marker": "zz_test_debug_captured"
+          }
+        ],
+        "elapsed_sec": 18.95,
+        "exception": null,
+        "row_counts": {
+          "ZZ_SCRATCH_STATUS": 17023,
+          "ZZ_SCRATCH_P_STATUS": 17022,
+          "ZZ_TEST_DEBUG": 3
+        },
+        "files": [],
+        "file_count": 0,
+        "click_via_timer_returned": 17023,
+        "chain_elapsed_sec": 10.54,
+        "chain_observed_done": true,
+        "msgbox_observed": [],
+        "zz_test_debug_msgs": [
+          "LookAtStatus:ENTER",
+          "LookAtStatus:ERR Object required",
+          "LookAtStatus:DONE"
+        ]
+      }
+    },
+    {
+      "settle_ms": 1000,
+      "settle_outcome": "unblocks_neither",
+      "pajek_phase": {
+        "settle_ms": 1000,
+        "button": "CmdPajek",
+        "fixture_name": "status_40_unfiltered",
+        "fixture_picker_ids": [
+          40
+        ],
+        "fixture_controls": {
+          "FrameFilterYears": 1
+        },
+        "markers": [
+          {
+            "t": 0.0,
+            "marker": "settle_ms_set_to_1000"
+          },
+          {
+            "t": 0.0,
+            "marker": "constructing_session"
+          },
+          {
+            "t": 5.07,
+            "marker": "session_opened_attempt_1"
+          },
+          {
+            "t": 5.31,
+            "marker": "filedialog_patched"
+          },
+          {
+            "t": 6.05,
+            "marker": "form_opened"
+          },
+          {
+            "t": 6.07,
+            "marker": "picker_seeded_1_codes"
+          },
+          {
+            "t": 6.07,
+            "marker": "fixture_seeded"
+          },
+          {
+            "t": 6.07,
+            "marker": "form_tag_set_chain_CmdQuery_CmdPajek"
+          },
+          {
+            "t": 6.07,
+            "marker": "chain_fire_t_start"
+          },
+          {
+            "t": 8.6,
+            "marker": "click_via_timer_returned_17023"
+          },
+          {
+            "t": 16.61,
+            "marker": "chain_quiescent_zero_files_stable_for_8s"
+          },
+          {
+            "t": 16.61,
+            "marker": "chain_elapsed_10.54s"
+          },
+          {
+            "t": 16.61,
+            "marker": "files_inventoried_0"
+          },
+          {
+            "t": 16.61,
+            "marker": "row_counts_captured"
+          },
+          {
+            "t": 16.61,
+            "marker": "zz_test_debug_captured"
+          }
+        ],
+        "elapsed_sec": 18.97,
+        "exception": null,
+        "row_counts": {
+          "ZZ_SCRATCH_STATUS": 17023,
+          "ZZ_SCRATCH_P_STATUS": 17022,
+          "ZZ_TEST_DEBUG": 3
+        },
+        "files": [],
+        "file_count": 0,
+        "click_via_timer_returned": 17023,
+        "chain_elapsed_sec": 10.54,
+        "chain_observed_done": true,
+        "msgbox_observed": [],
+        "zz_test_debug_msgs": [
+          "LookAtStatus:ENTER",
+          "LookAtStatus:ERR Object required",
+          "LookAtStatus:DONE"
+        ]
+      },
+      "gephi_phase": {
+        "settle_ms": 1000,
+        "button": "CmdGephi",
+        "fixture_name": "status_40_unfiltered",
+        "fixture_picker_ids": [
+          40
+        ],
+        "fixture_controls": {
+          "FrameFilterYears": 1
+        },
+        "markers": [
+          {
+            "t": 0.0,
+            "marker": "settle_ms_set_to_1000"
+          },
+          {
+            "t": 0.0,
+            "marker": "constructing_session"
+          },
+          {
+            "t": 5.08,
+            "marker": "session_opened_attempt_1"
+          },
+          {
+            "t": 5.33,
+            "marker": "filedialog_patched"
+          },
+          {
+            "t": 6.07,
+            "marker": "form_opened"
+          },
+          {
+            "t": 6.08,
+            "marker": "picker_seeded_1_codes"
+          },
+          {
+            "t": 6.08,
+            "marker": "fixture_seeded"
+          },
+          {
+            "t": 6.08,
+            "marker": "form_tag_set_chain_CmdQuery_CmdGephi"
+          },
+          {
+            "t": 6.08,
+            "marker": "chain_fire_t_start"
+          },
+          {
+            "t": 9.11,
+            "marker": "click_via_timer_returned_17023"
+          },
+          {
+            "t": 17.12,
+            "marker": "chain_quiescent_zero_files_stable_for_8s"
+          },
+          {
+            "t": 17.12,
+            "marker": "chain_elapsed_11.04s"
+          },
+          {
+            "t": 17.12,
+            "marker": "files_inventoried_0"
+          },
+          {
+            "t": 17.12,
+            "marker": "row_counts_captured"
+          },
+          {
+            "t": 17.12,
+            "marker": "zz_test_debug_captured"
+          }
+        ],
+        "elapsed_sec": 19.55,
+        "exception": null,
+        "row_counts": {
+          "ZZ_SCRATCH_STATUS": 17023,
+          "ZZ_SCRATCH_P_STATUS": 17022,
+          "ZZ_TEST_DEBUG": 3
+        },
+        "files": [],
+        "file_count": 0,
+        "click_via_timer_returned": 17023,
+        "chain_elapsed_sec": 11.04,
+        "chain_observed_done": true,
+        "msgbox_observed": [],
+        "zz_test_debug_msgs": [
+          "LookAtStatus:ENTER",
+          "LookAtStatus:ERR Object required",
+          "LookAtStatus:DONE"
+        ]
+      }
+    }
+  ],
+  "verdict": "no_value_up_to_1000ms_unblocks",
+  "verdict_note": "**No tested VBA-side settle value (up to 1000 ms) unblocked either button.**  All phases produced identical failure shape (`:ERR Object required` + 0 files).  This is a SURPRISING result given PR #131's positive 1.5 s signal — and it has a specific mechanism implication.\n\n**Mechanism implication.**  PR #131's positive signal used Python COM-side `time.sleep(1.5)` — that releases the COM thread fully, allowing the Access UI thread to process `Form.Requery` side-effects asynchronously.  This probe's settle is a VBA-side `Do While Timer DoEvents` loop running ON THE Access UI THREAD itself.  DoEvents from inside the UI thread lets nested UI events fire but does NOT release the thread the way Python's `time.sleep` does.  So **COM-side sleep ≠ VBA-side DoEvents settle**, even at the same wall-clock duration.  Naively extrapolating from PR #131's COM-side 1.5 s to a VBA-side 1.5 s would not work either.\n\nPer the brief: do NOT silently extend the bisect range or switch intervention.  But the result narrows the next-brief candidate space meaningfully:\n  - **VBA-side DoEvents-only settle is unlikely to ever work** at any duration; the mechanism is structurally wrong.\n  - **COM-side sleep injection** is the path PR #131 already validated.  The driver could interpose between dispatcher steps via Python COM (e.g. set Form.Tag to single-step `CmdQuery` only, await completion, then separately fire each Cmd<X>_Click via timer) — but that's a larger refactor of the chain dispatcher, not a settle-value tweak.\n  - **Synchronous in-VBA Requery commit** — alternative VBA primitives might force synchronous commit (e.g. `Forms!LookAtStatus.Painting = True`, `Application.RefreshDatabaseWindow`, `<subform>.SourceObject = ...` reassignment, or `MoveLast` after Requery to force dynaset population).  PR #133's variant + this PR's settle bisect rule out plain Requery + DoEvents; a separate brief would need to test these other primitives.\n  - **Maintainer-line / canonical Issue** — the underlying CBDB pattern (Dim'd-local Set <subform>.Form.Recordset rebind in CmdQuery cleanup) is fragile against COM-driven chained-step access; the upstream `.mdb` could be fixed to use globals (per Form_LookAtStatus line 1184's `gRstPeople` global as precedent) or refactor to not need the rebind at all.\n\n**This PR pins the time-axis bisect range and the mechanism boundary**: VBA-side settle interventions are now ruled out (probe surface exhausted); next brief picks a structurally different intervention or escalates to maintainer-line.",
+  "answers": {
+    "pajek_first_no_object_required_ms": null,
+    "gephi_first_no_object_required_ms": null,
+    "pajek_first_file_count_geq_1_ms": null,
+    "gephi_first_file_count_geq_1_ms": null,
+    "first_divergence_ms": null
+  }
+}
