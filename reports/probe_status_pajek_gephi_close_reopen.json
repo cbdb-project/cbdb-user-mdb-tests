@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "generated_date": "2026-05-09",
+  "probe_branch": "investigate/status-close-reopen",
+  "main_at_probe": "6b06d6a",
+  "form": "LookAtStatus",
+  "buttons_probed": [
+    "CmdPajek",
+    "CmdGephi"
+  ],
+  "experiment_design": {
+    "phase_a": "trigger CmdQuery only via click_via_timer; capture scratch baseline",
+    "snapshot": "SELECT * INTO ZZ_SNAPSHOT_*_CR FROM ZZ_SCRATCH_*",
+    "close": "DoCmd.Close acForm, LookAtStatus, acSaveNo",
+    "reopen": "DoCmd.OpenForm — Form_Open destructively DELETEs scratch tables",
+    "restore": "INSERT INTO ZZ_SCRATCH_* SELECT * FROM ZZ_SNAPSHOT_*_CR",
+    "reseed": "set_control for fixture controls + set_picker_codes for picker",
+    "phase_b": "trigger Cmd<button> via click_via_timer (FIRST OnTimer use on new form instance)"
+  },
+  "state_restored": [
+    {
+      "key": "scratch_tables_via_sql_insert",
+      "rationale": "Form_Open destructively DELETEs ZZ_SCRATCH_STATUS and ZZ_SCRATCH_P_STATUS at lines 2090/2103 of Form_LookAtStatus.vb. Without restoration, Phase B has no data to export. Snapshot via SELECT INTO before close; INSERT INTO ... SELECT * FROM snapshot after reopen. Restores the data precondition only — does not alter the subform Recordset binding (Form_Open's own logic re-binds the subform Recordsets, which is the exact pathology we are testing close+reopen against)."
+    },
+    {
+      "key": "form_tag_for_export_path",
+      "rationale": "Set Form.Tag to '<button>|<output_dir>' for the autodetect to pick up output dir. Runtime form property; doesn't survive close. Re-set after reopen. This is a test-scaffolding precondition, NOT a state-restoration that would smuggle the experiment into a different workflow."
+    },
+    {
+      "key": "form_controls_via_setcontrol",
+      "rationale": "Re-set the same picker / control values used in Phase A (picker_codes, etc.). This matches the input state the user would have set before clicking Cmd<X> manually in the same session; the control values are runtime form properties that don't survive close. Required so Cmd<X>_Click reads the same inputs it would in real use."
+    }
+  ],
+  "state_not_restored": [
+    {
+      "key": "subform_recordset_binding",
+      "rationale": "We DO NOT restore or rebind the subform Recordset (ZZ_SCRATCH_STATUS / ZZ_SCRATCH_P_STATUS subforms). Form_Open of the new instance handles that itself. If the new instance's subform binding is healthy, the close+reopen workaround works; if it isn't, the workaround doesn't work. This is exactly what we are testing — restoring it would beg the question."
+    },
+    {
+      "key": "any_in_process_recordset_variables",
+      "rationale": "Module-level / Dim'd-local Recordset variables from Phase A's CmdQuery_Click are NOT restored. They cannot be — they don't survive form close, by VBA's scoping rules. This is a key part of why close+reopen is a structurally distinct mechanism vs PR #129-#137/#141 in-process workarounds."
+    },
+    {
+      "key": "onTimer_state_or_eventBinding_cache",
+      "rationale": "We DO NOT touch OnTimer / event-binding cache state. The new form instance gets fresh cache, fresh OnTimer binding. PR #137 pinned the second-Form_Timer-call failure at the form-class-instance event-binding cache for the SAME instance. New instance = fresh cache by construction."
+    }
+  ],
+  "viability_threshold": {
+    "both_buttons_fire": true,
+    "object_required_disappears": true,
+    "file_count_geq_1_both_buttons": true
+  },
+  "total_wall_elapsed_sec": 299.16,
+  "per_button_results": {
+    "CmdPajek": {
+      "button": "CmdPajek",
+      "phase_a_click_via_timer_returned": 17023,
+      "phase_a_zz_test_debug_msgs": [
+        "LookAtStatus:ENTER",
+        "LookAtStatus:DONE"
+      ],
+      "phase_a_row_counts": {
+        "ZZ_SCRATCH_STATUS": 17023,
+        "ZZ_SCRATCH_P_STATUS": 17022
+      },
+      "snapshot_counts": {
+        "ZZ_SNAPSHOT_STATUS_CR": 17023,
+        "ZZ_SNAPSHOT_P_STATUS_CR": 17022
+      },
+      "close_ok": true,
+      "close_err": null,
+      "reopen_ok": true,
+      "reopen_err": null,
+      "row_counts_after_form_open_delete": {
+        "ZZ_SCRATCH_STATUS": 0,
+        "ZZ_SCRATCH_P_STATUS": 0
+      },
+      "row_counts_after_restore": {
+        "ZZ_SCRATCH_STATUS": 17023,
+        "ZZ_SCRATCH_P_STATUS": 17022
+      },
+      "phase_b_click_via_timer_returned": 17023,
+      "phase_b_zz_test_debug_msgs": [],
+      "phase_b_row_counts": {
+        "ZZ_SCRATCH_STATUS": 17023,
+        "ZZ_SCRATCH_P_STATUS": 17022
+      },
+      "files": [],
+      "file_count": 0,
+      "msgbox_observed": [
+        {
+          "t": 15.9,
+          "hwnd": 1904190,
+          "msg_text": "There are no records to save."
+        }
+      ],
+      "exception": null
+    },
+    "CmdGephi": {
+      "button": "CmdGephi",
+      "phase_a_click_via_timer_returned": 17023,
+      "phase_a_zz_test_debug_msgs": [
+        "LookAtStatus:ENTER",
+        "LookAtStatus:DONE"
+      ],
+      "phase_a_row_counts": {
+        "ZZ_SCRATCH_STATUS": 17023,
+        "ZZ_SCRATCH_P_STATUS": 17022
+      },
+      "snapshot_counts": {
+        "ZZ_SNAPSHOT_STATUS_CR": 17023,
+        "ZZ_SNAPSHOT_P_STATUS_CR": 17022
+      },
+      "close_ok": true,
+      "close_err": null,
+      "reopen_ok": true,
+      "reopen_err": null,
+      "row_counts_after_form_open_delete": {
+        "ZZ_SCRATCH_STATUS": 0,
+        "ZZ_SCRATCH_P_STATUS": 0
+      },
+      "row_counts_after_restore": {
+        "ZZ_SCRATCH_STATUS": 17023,
+        "ZZ_SCRATCH_P_STATUS": 17022
+      },
+      "phase_b_click_via_timer_returned": 17023,
+      "phase_b_zz_test_debug_msgs": [],
+      "phase_b_row_counts": {
+        "ZZ_SCRATCH_STATUS": 17023,
+        "ZZ_SCRATCH_P_STATUS": 17022
+      },
+      "files": [],
+      "file_count": 0,
+      "msgbox_observed": [
+        {
+          "t": 15.57,
+          "hwnd": 8326946,
+          "msg_text": "There are no records to save."
+        }
+      ],
+      "exception": null
+    }
+  },
+  "per_button_classifications": {
+    "CmdPajek": {
+      "button": "CmdPajek",
+      "outcome": "sub_did_not_fire",
+      "answers": {
+        "q1_state_restorable": true,
+        "q2_or_q3_button_truly_fired": false,
+        "q4_object_required_disappeared": false,
+        "q5_file_count_geq_1": false
+      },
+      "raw_signals": {
+        "snapshot_counts_ok": true,
+        "restored_counts_ok": true,
+        "phase_b_enter_seen": false,
+        "phase_b_done_seen": false,
+        "phase_b_other_marker": false,
+        "phase_b_object_required": false,
+        "phase_b_err_texts": [],
+        "phase_b_file_count": 0
+      }
+    },
+    "CmdGephi": {
+      "button": "CmdGephi",
+      "outcome": "sub_did_not_fire",
+      "answers": {
+        "q1_state_restorable": true,
+        "q2_or_q3_button_truly_fired": false,
+        "q4_object_required_disappeared": false,
+        "q5_file_count_geq_1": false
+      },
+      "raw_signals": {
+        "snapshot_counts_ok": true,
+        "restored_counts_ok": true,
+        "phase_b_enter_seen": false,
+        "phase_b_done_seen": false,
+        "phase_b_other_marker": false,
+        "phase_b_object_required": false,
+        "phase_b_err_texts": [],
+        "phase_b_file_count": 0
+      }
+    }
+  },
+  "verdict": {
+    "verdict_bucket": "close_reopen_does_not_unblock",
+    "failure_shapes_per_button": {
+      "CmdPajek": "sub_did_not_fire",
+      "CmdGephi": "sub_did_not_fire"
+    },
+    "recommendation": "non-UI local workaround line is now exhausted; next step should be UI direct simulation fallback (pywinauto on the live Access UI). Do NOT carve more non-UI sub-variants — they would re-test structurally already-failed mechanisms.",
+    "next_step": "ui_direct_simulation_fallback"
+  }
+}
