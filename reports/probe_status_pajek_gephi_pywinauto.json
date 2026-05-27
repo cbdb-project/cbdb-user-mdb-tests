@@ -1,0 +1,446 @@
+{
+  "schema_version": 1,
+  "generated_date": "2026-05-09",
+  "probe_branch": "investigate/status-pywinauto",
+  "main_at_probe": "6b06d6a",
+  "form": "LookAtStatus",
+  "buttons_probed": [
+    "CmdPajek",
+    "CmdGephi"
+  ],
+  "experiment_design": {
+    "phase_a": "trigger CmdQuery only via click_via_timer (existing Form_Timer machinery; not what we are testing)",
+    "diagnostic": "recursive COM Controls enumeration of the form (incl. subforms) + UIA descendants enumeration of the Access app window",
+    "phase_b_strategies": [
+      "uia_auto_id_click_input",
+      "uia_name_click_input",
+      "win32_enum_child",
+      "com_setfocus_sendkeys_enter"
+    ]
+  },
+  "minimum_viable_questions": [
+    "q1_button_trigger_truly_fired",
+    "q2_zz_test_debug_marker_present",
+    "q3_object_required_observed",
+    "q4_file_count_geq_1",
+    "q5_scratch_counts_at_baseline"
+  ],
+  "viability_threshold": {
+    "both_buttons_fire": true,
+    "object_required_disappears": true,
+    "file_count_geq_1_both_buttons": true
+  },
+  "total_wall_elapsed_sec": 287.3,
+  "per_button_results": {
+    "CmdPajek": {
+      "button": "CmdPajek",
+      "phase_a_click_via_timer_returned": 17023,
+      "phase_a_zz_test_debug_msgs": [
+        "LookAtStatus:ENTER",
+        "LookAtStatus:DONE"
+      ],
+      "phase_a_row_counts": {
+        "ZZ_SCRATCH_STATUS": 17023,
+        "ZZ_SCRATCH_P_STATUS": 17022
+      },
+      "diag_form_controls_via_com": {
+        "total_controls_recursive": 136,
+        "all_cmd_controls": [
+          {
+            "path": "CmdQuery",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdPickStatus",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdGIS",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdFanti",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdJianti",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdSelectPlace",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdImportPlaces",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdAllPlaces",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdHelp",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdStoreID",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdFromDynasty",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdToDynasty",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdAllDynasties",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdNeo4j",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdImportStatusCodes",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdSaveStatusCodes",
+            "control_type": 104,
+            "visible": true
+          }
+        ],
+        "subform_controls": [
+          "ZZ_SCRATCH_STATUS",
+          "ZZ_SCRATCH_P_STATUS"
+        ],
+        "buttons_named_export": [],
+        "controls_named_pajek_or_gephi": []
+      },
+      "diag_uia_descendants": {
+        "access_window_hwnd": 30738458,
+        "access_window_title": "Welcome to CBDB!",
+        "uia_descendants_total": 1187,
+        "control_type_histogram": {
+          "Pane": 62,
+          "Window": 11,
+          "ScrollBar": 20,
+          "Button": 428,
+          "Thumb": 21,
+          "TitleBar": 13,
+          "MenuBar": 12,
+          "MenuItem": 17,
+          "ToolBar": 1,
+          "SplitButton": 2,
+          "Tab": 1,
+          "TabItem": 5,
+          "Edit": 2,
+          "StatusBar": 1,
+          "Text": 293,
+          "Custom": 1,
+          "Group": 5,
+          "Image": 292
+        },
+        "all_form_windows": [
+          "Look at Status 查詢社會區分",
+          "NAVIGATION_PANE",
+          "LookAtEntry",
+          "LookAtOffice",
+          "LookAtTexts",
+          "LookAtAssociations",
+          "LookAtPlace",
+          "LookAtAssociationPairs",
+          "LookAtKinship",
+          "LookAtNetworks",
+          "LookAtGroupData"
+        ],
+        "buttons_named_with_cmd_or_pajek_or_gephi": [],
+        "lookatstatus_uia_visible_as_form_window": false
+      },
+      "phase_b_pywinauto_attempts": [
+        {
+          "strategy": "uia_auto_id_lookup",
+          "ok": false,
+          "error": "TypeError(\"IUIA.build_condition() got an unexpected keyword argument 'auto_id'\")"
+        },
+        {
+          "strategy": "uia_name_lookup",
+          "ok": false,
+          "error": "no UIA Button descendant with name='CmdPajek'"
+        },
+        {
+          "strategy": "win32_enum_child",
+          "ok": false,
+          "error": "no Win32 child window with title matching 'CmdPajek'"
+        },
+        {
+          "strategy": "com_setfocus_sendkeys_enter",
+          "ok": false,
+          "error": "COM Controls('CmdPajek').SetFocus failed: com_error(-2147352567, 'Exception occurred.', (0, None, \"Welcome to CBDB! can't find the field 'CmdPajek' referred to in your expression.\", 'acmain11.chm', 11730, -2146825823), None)"
+        }
+      ],
+      "phase_b_zz_test_debug_msgs": [],
+      "phase_b_row_counts": {
+        "ZZ_SCRATCH_STATUS": 17023,
+        "ZZ_SCRATCH_P_STATUS": 17022
+      },
+      "files": [],
+      "file_count": 0,
+      "msgbox_observed": [],
+      "exception": null
+    },
+    "CmdGephi": {
+      "button": "CmdGephi",
+      "phase_a_click_via_timer_returned": 17023,
+      "phase_a_zz_test_debug_msgs": [
+        "LookAtStatus:ENTER",
+        "LookAtStatus:DONE"
+      ],
+      "phase_a_row_counts": {
+        "ZZ_SCRATCH_STATUS": 17023,
+        "ZZ_SCRATCH_P_STATUS": 17022
+      },
+      "diag_form_controls_via_com": {
+        "total_controls_recursive": 136,
+        "all_cmd_controls": [
+          {
+            "path": "CmdQuery",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdPickStatus",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdGIS",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdFanti",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdJianti",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdSelectPlace",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdImportPlaces",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdAllPlaces",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdHelp",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdStoreID",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdFromDynasty",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdToDynasty",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdAllDynasties",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdNeo4j",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdImportStatusCodes",
+            "control_type": 104,
+            "visible": true
+          },
+          {
+            "path": "CmdSaveStatusCodes",
+            "control_type": 104,
+            "visible": true
+          }
+        ],
+        "subform_controls": [
+          "ZZ_SCRATCH_STATUS",
+          "ZZ_SCRATCH_P_STATUS"
+        ],
+        "buttons_named_export": [],
+        "controls_named_pajek_or_gephi": []
+      },
+      "diag_uia_descendants": {
+        "access_window_hwnd": 31262448,
+        "access_window_title": "Welcome to CBDB!",
+        "uia_descendants_total": 1187,
+        "control_type_histogram": {
+          "Pane": 62,
+          "Window": 11,
+          "ScrollBar": 20,
+          "Button": 428,
+          "Thumb": 21,
+          "TitleBar": 13,
+          "MenuBar": 12,
+          "MenuItem": 17,
+          "ToolBar": 1,
+          "SplitButton": 2,
+          "Tab": 1,
+          "TabItem": 5,
+          "Edit": 2,
+          "StatusBar": 1,
+          "Text": 293,
+          "Custom": 1,
+          "Group": 5,
+          "Image": 292
+        },
+        "all_form_windows": [
+          "Look at Status 查詢社會區分",
+          "NAVIGATION_PANE",
+          "LookAtEntry",
+          "LookAtOffice",
+          "LookAtTexts",
+          "LookAtAssociations",
+          "LookAtPlace",
+          "LookAtAssociationPairs",
+          "LookAtKinship",
+          "LookAtNetworks",
+          "LookAtGroupData"
+        ],
+        "buttons_named_with_cmd_or_pajek_or_gephi": [],
+        "lookatstatus_uia_visible_as_form_window": false
+      },
+      "phase_b_pywinauto_attempts": [
+        {
+          "strategy": "uia_auto_id_lookup",
+          "ok": false,
+          "error": "TypeError(\"IUIA.build_condition() got an unexpected keyword argument 'auto_id'\")"
+        },
+        {
+          "strategy": "uia_name_lookup",
+          "ok": false,
+          "error": "no UIA Button descendant with name='CmdGephi'"
+        },
+        {
+          "strategy": "win32_enum_child",
+          "ok": false,
+          "error": "no Win32 child window with title matching 'CmdGephi'"
+        },
+        {
+          "strategy": "com_setfocus_sendkeys_enter",
+          "ok": false,
+          "error": "COM Controls('CmdGephi').SetFocus failed: com_error(-2147352567, 'Exception occurred.', (0, None, \"Welcome to CBDB! can't find the field 'CmdGephi' referred to in your expression.\", 'acmain11.chm', 11730, -2146825823), None)"
+        }
+      ],
+      "phase_b_zz_test_debug_msgs": [],
+      "phase_b_row_counts": {
+        "ZZ_SCRATCH_STATUS": 17023,
+        "ZZ_SCRATCH_P_STATUS": 17022
+      },
+      "files": [],
+      "file_count": 0,
+      "msgbox_observed": [],
+      "exception": null
+    }
+  },
+  "per_button_classifications": {
+    "CmdPajek": {
+      "button": "CmdPajek",
+      "outcome": "ui_path_infeasible_no_button_on_form",
+      "answers": {
+        "q1_button_trigger_truly_fired": false,
+        "q2_zz_test_debug_marker_present": false,
+        "q3_object_required_observed": false,
+        "q4_file_count_geq_1": false,
+        "q5_scratch_counts_at_baseline": true
+      },
+      "raw_signals": {
+        "phase_b_enter_seen": false,
+        "phase_b_done_seen": false,
+        "phase_b_msgbox_seen": false,
+        "phase_b_err_seen": false,
+        "phase_b_object_required": false,
+        "phase_b_file_count": 0,
+        "button_exists_as_com_control": false,
+        "button_exists_as_uia_button": false,
+        "any_pywinauto_attempt_ok": false,
+        "n_attempts": 4
+      }
+    },
+    "CmdGephi": {
+      "button": "CmdGephi",
+      "outcome": "ui_path_infeasible_no_button_on_form",
+      "answers": {
+        "q1_button_trigger_truly_fired": false,
+        "q2_zz_test_debug_marker_present": false,
+        "q3_object_required_observed": false,
+        "q4_file_count_geq_1": false,
+        "q5_scratch_counts_at_baseline": true
+      },
+      "raw_signals": {
+        "phase_b_enter_seen": false,
+        "phase_b_done_seen": false,
+        "phase_b_msgbox_seen": false,
+        "phase_b_err_seen": false,
+        "phase_b_object_required": false,
+        "phase_b_file_count": 0,
+        "button_exists_as_com_control": false,
+        "button_exists_as_uia_button": false,
+        "any_pywinauto_attempt_ok": false,
+        "n_attempts": 4
+      }
+    }
+  },
+  "verdict": {
+    "verdict_bucket": "ui_direct_simulation_infeasible_no_ui_buttons",
+    "next_step": "pure_maintainer_line_only",
+    "recommendation": "UI direct simulation is mechanically impossible for these buttons on the LookAtStatus form: the form's design has no UI controls named CmdPajek / CmdGephi (verified by recursive COM Controls enumeration AND UIA descendants scan). This probe runtime-corroborates the existing canonical missing-UI issues #16 (LookAtStatus is missing its CmdPajek button) and #17 (LookAtStatus is missing its CmdGephi button); the same shape is also already filed as canonical Issue #18 for CmdUCINet. This PR does NOT expand canonical scope, does NOT open a new issue candidate, and does NOT add the missing-UI fix to the existing maintainer-line. It supplies runtime corroboration for canonical Issues #16/#17 and closes the pywinauto fallback line. Next step remains the existing pure maintainer-line.",
+    "runtime_corroborates_canonical_issues": [
+      16,
+      17
+    ],
+    "shape_consistent_with_canonical_issues": [
+      18
+    ],
+    "expands_canonical_scope": false,
+    "expands_existing_maintainer_line_scope": false
+  }
+}
