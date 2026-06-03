@@ -83,32 +83,29 @@ ISSUES = [
             "由 test_vba_full_matrix[top_entry_code_36_unfiltered] 偵測到，"
             "斷言 'c_entry_desc backfill wrong'，影響 92,545 筆。"
         ),
-        "steps_en": (
-            "1. Open CBDB_BJ_User.mdb in Microsoft Access.\n"
-            "2. From the Navigation Pane, open the form **LookAtEntry**.\n"
-            "3. In the Entry Code picker, select entry code **36** "
-            "(label: 'examination: jinshi (general)').\n"
-            "4. Leave dynasty, address, and year filters blank.\n"
-            "5. Click **Run Query** (CmdQuery button).\n"
-            "6. When the query completes, inspect the result grid: the "
-            "entry-type description column (c_entry_desc) is blank for "
-            "every row.\n"
-            "7. SQL verification: "
-            "`SELECT TOP 5 c_entry_code, c_entry_desc FROM ZZ_SCRATCH_ENTRY` "
-            "returns (36, NULL) for all rows."
-        ),
-        "steps_zh": (
-            "1. 以 Microsoft Access 開啟 CBDB_BJ_User.mdb。\n"
-            "2. 從導覽窗格開啟 **LookAtEntry** 表單。\n"
-            "3. 在 Entry Code 選擇器中，選取 entry code **36**（標籤：'examination: "
-            "jinshi (general)'）。\n"
-            "4. 朝代、地址、年份篩選器留空。\n"
-            "5. 點擊 **Run Query**（CmdQuery 按鈕）。\n"
-            "6. 查詢完成後，檢視結果格：每一筆記錄的入仕方式說明欄（c_entry_desc）"
-            "皆為空白。\n"
-            "7. SQL 驗證：`SELECT TOP 5 c_entry_code, c_entry_desc FROM "
-            "ZZ_SCRATCH_ENTRY` 對所有列回傳 (36, NULL)。"
-        ),
+        "steps_en": [
+            "Open CBDB_BJ_User.mdb in Microsoft Access.",
+            "From the Navigation Pane, open the form **LookAtEntry**.",
+            "In the Entry Code picker, select entry code **36** "
+            "(label: 'examination: jinshi (general)').",
+            "Leave dynasty, address, and year filters blank.",
+            "Click **Run Query** (CmdQuery button).",
+            "When the query completes, inspect the result grid: the "
+            "entry-type description column (c_entry_desc) is blank for every row.",
+            "SQL verification: `SELECT TOP 5 c_entry_code, c_entry_desc FROM "
+            "ZZ_SCRATCH_ENTRY` returns (36, NULL) for all rows.",
+        ],
+        "steps_zh": [
+            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
+            "從導覽窗格開啟 **LookAtEntry** 表單。",
+            "在 Entry Code 選擇器中，選取 entry code **36**"
+            "（標籤：'examination: jinshi (general)'）。",
+            "朝代、地址、年份篩選器留空。",
+            "點擊 **Run Query**（CmdQuery 按鈕）。",
+            "查詢完成後，檢視結果格：每一筆記錄的入仕方式說明欄（c_entry_desc）皆為空白。",
+            "SQL 驗證：`SELECT TOP 5 c_entry_code, c_entry_desc FROM "
+            "ZZ_SCRATCH_ENTRY` 對所有列回傳 (36, NULL)。",
+        ],
         "screenshots": [],
         "severity_en": (
             "P2 — Silent display issue: 92,545 rows affected.  The user can "
@@ -169,27 +166,25 @@ ISSUES = [
             "斷言 'CmdRun didn't backfill c_name for c_person_id=1'，CmdRun "
             "完成後 c_name 仍為 None。"
         ),
-        "steps_en": (
-            "1. Open CBDB_BJ_User.mdb in Microsoft Access.\n"
-            "2. From the Navigation Pane, open the form **LookAtGroupData**.\n"
-            "3. In the import person list, enter a valid person ID (e.g. **1**).\n"
-            "4. Click **Run** (CmdRun button).\n"
-            "5. When CmdRun completes, inspect the result: the Name column "
-            "is blank.\n"
-            "6. SQL verification: "
-            "`SELECT c_person_id, c_name FROM ZZ_SCRATCH_IMPORT_PEOPLE` "
-            "returns (1, NULL) — c_name was not backfilled from BIOG_MAIN."
-        ),
-        "steps_zh": (
-            "1. 以 Microsoft Access 開啟 CBDB_BJ_User.mdb。\n"
-            "2. 從導覽窗格開啟 **LookAtGroupData** 表單。\n"
-            "3. 在匯入人員清單中，輸入一個有效的 person ID（例如 **1**）。\n"
-            "4. 點擊 **Run**（CmdRun 按鈕）。\n"
-            "5. CmdRun 完成後，檢視結果：姓名欄為空白。\n"
-            "6. SQL 驗證：`SELECT c_person_id, c_name FROM "
-            "ZZ_SCRATCH_IMPORT_PEOPLE` 回傳 (1, NULL)——c_name 未從 BIOG_MAIN "
-            "回填。"
-        ),
+        "steps_en": [
+            "Open CBDB_BJ_User.mdb in Microsoft Access.",
+            "From the Navigation Pane, open the form **LookAtGroupData**.",
+            "In the import person list, enter a valid person ID (e.g. **1**).",
+            "Click **Run** (CmdRun button).",
+            "When CmdRun completes, inspect the result: the Name column is blank.",
+            "SQL verification: `SELECT c_person_id, c_name FROM "
+            "ZZ_SCRATCH_IMPORT_PEOPLE` returns (1, NULL) — "
+            "c_name was not backfilled from BIOG_MAIN.",
+        ],
+        "steps_zh": [
+            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
+            "從導覽窗格開啟 **LookAtGroupData** 表單。",
+            "在匯入人員清單中，輸入一個有效的 person ID（例如 **1**）。",
+            "點擊 **Run**（CmdRun 按鈕）。",
+            "CmdRun 完成後，檢視結果：姓名欄為空白。",
+            "SQL 驗證：`SELECT c_person_id, c_name FROM ZZ_SCRATCH_IMPORT_PEOPLE` "
+            "回傳 (1, NULL)——c_name 未從 BIOG_MAIN 回填。",
+        ],
         "screenshots": [],
         "severity_en": (
             "P2 — Silent display issue: CmdRun completes without any error "
