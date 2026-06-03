@@ -85,27 +85,43 @@ def user_mdb_path(request) -> Path:
 
 
 def _resolve_data_mdb(root: Path) -> Path | None:
-    """Resolve the DATA mdb in data/, returning the newest if multiple exist.
+    """Resolve the DATA mdb in data/.
 
-    Uses the same pick-newest-by-YYYYMMDD strategy as
-    analysis/discover_test_inputs.py so both functions agree on which
-    DATA mdb is active.  Returns None only when the data/ directory
-    has no CBDB_*_DATA.mdb files at all.
+    Delegates to analysis/discover_test_inputs._find_data_mdb() so both
+    the conftest gate and the discovery script use identical selection
+    logic (pick newest by YYYYMMDD when multiple exist).
 
-    Having multiple DATA mdbs is a user error (AGENTS.md: "delete old
-    one first"), but returning the newest is safer than returning None
-    and silently skipping the stale-link check.
+    Returns None only when data/ has no CBDB_*_DATA.mdb files at all
+    (FileNotFoundError from _find_data_mdb is caught and converted).
+
+    NOTE: DATA mdb is always resolved from ROOT/data regardless of the
+    --user-mdb option.  The standard workflow (AGENTS.md) keeps both
+    files in the same repo data/ directory.  If --user-mdb points to an
+    external path with a different DATA mdb, update data/ accordingly.
     """
-    matches = list((root / "data").glob("CBDB_*_DATA.mdb"))
-    if not matches:
+    # Import _find_data_mdb from the repo's analysis/ directory (always the
+    # same location regardless of the `root` parameter, which can be a
+    # tmp_path in tests).
+    _analysis = TESTS_DIR.parent / "analysis"
+    if str(_analysis) not in sys.path:
+        sys.path.insert(0, str(_analysis))
+    try:
+        from discover_test_inputs import _find_data_mdb  # type: ignore[import]
+        return _find_data_mdb(root)
+    except FileNotFoundError:
         return None
-    if len(matches) == 1:
-        return matches[0]
-    # Multiple: pick newest by YYYYMMDD embedded in filename
-    def _date_key(p: Path) -> str:
-        parts = p.stem.split("_")   # ["CBDB", "YYYYMMDD", "DATA"]
-        return parts[1] if len(parts) >= 2 else p.stem
-    return sorted(matches, key=_date_key)[-1]
+    except Exception:
+        # Import failed (e.g. pyodbc missing on headless) — fall back to
+        # simple single-match glob so collection stays clean.
+        matches = list((root / "data").glob("CBDB_*_DATA.mdb"))
+        if not matches:
+            return None
+        if len(matches) == 1:
+            return matches[0]
+        def _date_key(p: Path) -> str:
+            parts = p.stem.split("_")
+            return parts[1] if len(parts) >= 2 else p.stem
+        return sorted(matches, key=_date_key)[-1]
 
 
 def _refresh_decision(
