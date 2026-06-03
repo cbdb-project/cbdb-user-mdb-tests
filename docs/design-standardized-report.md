@@ -211,6 +211,189 @@ Script: `analysis/compare_schema.py` (not yet written).
 
 ---
 
+---
+
+## Phase 6: Fix VBA fixture orphan-process cascade
+
+**Status**: Implemented (Fixes A, B, C complete as of 2026-06-03).
+
+### Problem
+
+Every pytest run with `--include-vba` produces a cascade of ~120 `ERROR`
+results in the VBA test files.  The cascade starts at the second parametrized
+case of the first alphabetical VBA test file
+(`test_vba_associationpairs_probe.py`) and propagates through every subsequent
+VBA fixture setup:
+
+```
+tests\test_vba_associationpairs_probe.py .E
+tests\test_vba_bilingual_toggle.py       .EEEEEEEEEEEEE
+tests\test_vba_bilingual_ui.py           EEEEEEEEE
+...
+```
+
+The errors are all `PermissionError: cannot remove stale working copy
+..._copy.mdb: [WinError 32] The process cannot access the file because it is
+being used by another process.`
+
+### Root cause analysis
+
+There are two independent root causes that compound each other.
+
+**Root cause A — `kill_access_pid()` returns before the process exits.**
+
+`VbaSession.close()` calls `kill_access_pid(self._pid)` which runs
+`taskkill /F /PID <n>`.  `taskkill /F` delivers the termination signal
+*synchronously* but the Access process may remain alive for 100–500 ms
+afterwards as Windows drains its I/O completion ports and releases file
+handles.  The next test's `VbaSession.open()` calls `self.work.unlink()`
+immediately, which races against the dying process.  When it loses the race
+it raises `PermissionError`, errors the test in setup, and leaves the
+working-copy file on disk — permanently locking out every subsequent test
+that uses the same path.
+
+Location: `tests/cbdb_driver/access_app.py::kill_access_pid` (lines 47-57).
+
+**Root cause B — `test_vba_inline.py` uses `Dispatch` instead of
+`DispatchEx`.**
+
+`test_vba_inline.py` fixture opens Access with
+`win32com.client.Dispatch("Access.Application")`.  `Dispatch` can reuse
+ROT (Running Object Table) entries from a previously killed Access process,
+which causes a Windows fatal exception 0x800706be when the stale ROT entry
+points to a dead server.  This crashes the test with a non-fatal thread
+exception that pytest survives, but the working copy
+`analysis/_inline_test_copy.mdb` is left on disk with no PID to kill.
+
+`VbaSession` already uses `DispatchEx` for exactly this reason (landmine #9
+in AGENTS.md).  `AccessApp.open()` in `access_app.py` also uses `Dispatch`
+and has the same latent bug.
+
+Location: `tests/test_vba_inline.py` line 59;
+`tests/cbdb_driver/access_app.py` line 157.
+
+### Fix plan (three changes)
+
+#### Fix A — wait for process exit in `kill_access_pid()`
+
+After `taskkill /F /PID`, poll until the PID is gone or a 3-second deadline
+passes.  Use `psutil.pid_exists(pid)` if psutil is available; fall back to
+attempting `OpenProcess` via `win32api` and checking if it returns
+`ERROR_INVALID_PARAMETER` (process gone).
+
+```python
+def kill_access_pid(pid: int, wait_s: float = 3.0) -> bool:
+    if not pid:
+        return False
+    rc = subprocess.run(["taskkill", "/F", "/PID", str(int(pid))],
+                        capture_output=True, check=False)
+    deadline = time.monotonic() + wait_s
+    while time.monotonic() < deadline:
+        try:
+            import psutil
+            if not psutil.pid_exists(pid):
+                return True
+        except ImportError:
+            # fallback: try to open the process; if it's gone, OSError
+            try:
+                import win32api, win32con
+                h = win32api.OpenProcess(win32con.SYNCHRONIZE, False, pid)
+                win32api.WaitForSingleObject(h, 100)
+                win32api.CloseHandle(h)
+            except Exception:
+                return True   # process gone
+        time.sleep(0.05)
+    return rc.returncode == 0
+```
+
+#### Fix B — kill-and-retry in `VbaSession.open()` and `make_working_copy()`
+
+When `self.work.unlink()` raises `PermissionError`, instead of immediately
+surfacing the error, find the PID holding the file (via `psutil`) and kill it
+with `kill_access_pid()`, which now waits.  Retry `unlink()` once.  Only if
+the retry also fails should the exception be re-raised.
+
+```python
+if self.work.exists():
+    try:
+        self.work.unlink()
+    except PermissionError:
+        _kill_file_holder(self.work)   # find PID via psutil, kill+wait
+        self.work.unlink()             # retry — should succeed now
+```
+
+`_kill_file_holder(path)` implementation:
+
+```python
+def _kill_file_holder(path: Path) -> None:
+    """Kill the MSACCESS.EXE process holding `path` open, if identifiable."""
+    try:
+        import psutil
+        for proc in psutil.process_iter(["pid", "name", "open_files"]):
+            if proc.info["name"] and "MSACCESS" in proc.info["name"].upper():
+                try:
+                    files = proc.open_files()
+                except (psutil.AccessDenied, psutil.NoSuchProcess):
+                    continue
+                if any(Path(f.path).resolve() == path.resolve()
+                       for f in files):
+                    kill_access_pid(proc.pid)   # includes wait
+                    return
+    except ImportError:
+        pass
+    # psutil unavailable or process not found — fall back to kill-all if env var set
+    kill_orphan_access()
+```
+
+#### Fix C — replace `Dispatch` with `DispatchEx`
+
+In `test_vba_inline.py` line 59:
+```python
+# Before:
+app = win32com.client.Dispatch("Access.Application")
+# After:
+app = win32com.client.DispatchEx("Access.Application")
+```
+
+In `access_app.py` line 157 (same fix for `AccessApp.open()`):
+```python
+# Before:
+self._app = win32com.client.Dispatch("Access.Application")
+# After:
+self._app = win32com.client.DispatchEx("Access.Application")
+```
+
+### Expected outcome
+
+After all three fixes:
+- Each VBA test's teardown waits for Access to fully release file handles
+  before returning → next test's `unlink()` always succeeds
+- `test_vba_inline.py` no longer crashes with 0x800706be even when ROT has
+  stale entries → no orphan working copy left behind
+- The ERROR cascade of ~120 tests collapses to zero infrastructure errors;
+  only genuine PASS / FAIL / SKIP results remain
+
+### Prerequisites
+
+`psutil` must be installed in the test environment:
+```
+pip install psutil
+```
+
+Add to `requirements.txt` / `environment.yml` alongside existing deps.
+
+### Regression risk
+
+- Fix A adds up to 3 s of polling overhead per test teardown in the worst
+  case.  In practice Access exits in < 300 ms after `taskkill /F`; the
+  50 ms polling interval means typical overhead is one extra poll (50 ms).
+- Fix B only activates on `PermissionError` (the error path) — zero cost on
+  clean runs.
+- Fix C is strictly safer: `DispatchEx` always creates a fresh process;
+  `Dispatch` only reuses ROT if a stale entry exists.
+
+---
+
 ## Open Questions
 
 1. **`cbdb_replay/` test_lookatentry.py etc.** — these non-VBA tests currently
