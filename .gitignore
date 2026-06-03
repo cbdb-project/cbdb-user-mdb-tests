@@ -9,6 +9,8 @@ data/
 # the analysis/ and tests/ scripts spew into analysis/.
 analysis/_*
 analysis/_exports_tmp/
+# Exception: _data_mdb_finder.py is a committed shared utility module.
+!analysis/_data_mdb_finder.py
 
 # Bug-report capture working copies + lock files.
 # (.docx outputs are GENERATED on demand by reports/generate_report.py
