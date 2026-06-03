@@ -40,9 +40,7 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
   - [Issue #11 — EVENTS_DATA_2 上 c_event_record_id 控制元件綁到不存在的欄位——但該控制元件本身是隱藏的（LATENT）](#issue-11--events_data_2-上-c_event_record_id-控制元件綁到不存在的欄位但該控制元件本身是隱藏的latent)
   - [Issue #12 — POSTED_TO_OFFICE_DATA_2 上 c_appt_type_code 控制元件綁到沒投影的欄位——但該控制元件是隱藏的，且使用者實際看的任職型別欄位是正常的（LATENT）](#issue-12--posted_to_office_data_2-上-c_appt_type_code-控制元件綁到沒投影的欄位但該控制元件是隱藏的且使用者實際看的任職型別欄位是正常的latent)
 - [嚴重等級說明](#嚴重等級說明)
-- [附錄 A —— c_index_year / c_index_addr_id 與 cbdb-online-main-server 快照之間的偏差（差異需要逐筆分類後才能判定是否為缺陷）](#附錄-a--c_index_year--c_index_addr_id-與-cbdb-online-main-server-快照之間的偏差差異需要逐筆分類後才能判定是否為缺陷)
-- [附錄 B —— TablesFields：文件表與實際資料庫結構對比](#附錄-b--tablesfields文件表與實際資料庫結構對比)
-- [附錄 C —— ForeignKeys：文件表與實際資料庫結構對比](#附錄-c--foreignkeys文件表與實際資料庫結構對比)
+- [附錄 —— c_index_year / c_index_addr_id 與 cbdb-online-main-server 快照之間的偏差（差異需要逐筆分類後才能判定是否為缺陷）](#附錄--c_index_year--c_index_addr_id-與-cbdb-online-main-server-快照之間的偏差差異需要逐筆分類後才能判定是否為缺陷)
 - [結語](#結語)
 
 ## 嚴重等級說明
@@ -123,11 +121,11 @@ _Reconstructed-in-PIL popup showing the JET 'Item not found in this collection' 
 
 **涉及位置:** `ADDR_CODES + Form_LookAt*.CmdGIS_Click`
 
-**嚴重等級:** P0 — 靜默匯出欄位錯位（數字欄位落到文本欄，所有欄位向右挪一格，結尾多出一欄）
+**嚴重等級:** P0 — 靜默匯出欄位錯位（數字欄位落到文字欄，所有欄位向右挪一格，結尾多出一欄）
 
 #### 問題描述
 
-`ADDR_CODES` 中有 315 行在 `c_name` **和** `c_name_chn` 裡都帶著 `U+FEFF`（BOM）字首，幾乎可以確定是資料匯入時從 UTF-8-with-BOM 文件複製貼上留下的痕跡。當 `LookAtStatus.CmdQuery`（以及其他 LookAt 表單的對應 CmdQuery / CmdRun）把這些行通過 SQL UPDATE/INSERT 複製到自己的 scratch 暫存表時，JET 會先把 BOM 去掉，再把剩下的 UTF-16 LE 位元組重新當成單位元組字元——升回 Unicode 之後值就被破壞了。以 `c_addr_id = 702559`（尉氏）為例，源字串 `﻿尉氏`（UTF-16 位元組 `ff fe 09 5c 0f 6c`）變成了暫存字串 `\t\\\x0fl`（UTF-16 位元組 `09 00 5c 00 0f 00 6c 00`），第 0 位上多了一個**真正的 TAB 字元**。
+`ADDR_CODES` 中有 315 行在 `c_name` **和** `c_name_chn` 裡都帶著 `U+FEFF`（BOM）字首，幾乎可以確定是資料匯入時從 UTF-8-with-BOM 文件複製貼上留下的痕跡。當 `LookAtStatus.CmdQuery`（以及其他 LookAt 表單的對應 CmdQuery / CmdRun）把這些行透過 SQL UPDATE/INSERT 複製到自己的 scratch 暫存表時，JET 會先把 BOM 去掉，再把剩下的 UTF-16 LE 位元組重新當成單位元組字元——升回 Unicode 之後值就被破壞了。以 `c_addr_id = 702559`（尉氏）為例，源字串 `﻿尉氏`（UTF-16 位元組 `ff fe 09 5c 0f 6c`）變成了暫存字串 `\t\\\x0fl`（UTF-16 位元組 `09 00 5c 00 0f 00 6c 00`），第 0 位上多了一個**真正的 TAB 字元**。
 
 隨後 `Form_LookAtStatus.CmdGIS_Click`（第 1554–1636 行）把每個欄位寫成 `tStr + value + tC`，其中 `tC = Chr(9)` （第 1552 行）——完全沒有做任何轉義。這個嵌入的 TAB 就被當作分隔符，把 AddrChn 拆成兩欄，往後所有的欄位都悄無聲息地往右挪一格。使用者在 Excel 裡開啟這份 `.tab` 檔，會看到座標落在錯誤的欄位、還多出一個尾欄。LookAtTexts / LookAtPlace / LookAtAssociations / LookAtOffice / LookAtKinship 的 CmdGIS 都用同樣的 `tStr + value + tC` 模式，所以任何 LookAt 表單只要查詢結果裡碰到這 315 個髒地址裡的任何一個，都會重現同樣的欄位錯位。
 
@@ -140,7 +138,7 @@ _Reconstructed-in-PIL popup showing the JET 'Item not found in this collection' 
 1. 開啟 **LookAtStatus**。在 status picker 裡挑 status code **40**（[為官者：文] / civil office），不要設年份過濾——測試 fixture 裡 `FrameFilterYears = 1`。
 2. 點 **Run Query**。結果網格里大約填進 17 000 行。
 3. 點 **GIS**，把編碼選成 UTF-8（`GISFrame = 1`）。把匯出的 `.tab` 檔存下來。
-4. 在任意支援 tab 的工具（Excel / 帶欄位標尺的文本編輯器）裡開啟這個檔。第 **11476** 行附近（對應人物阮孚，`c_addr_id = 702559` / 尉氏）有一行包含 10 個 tab 欄位、卻對著 9 欄的表頭。AddrChn 是空的、X 欄裡塞了文字，真正的 X / Y 值都往右挪了一欄。
+4. 在任意支援 tab 的工具（Excel / 帶欄位標尺的文字編輯器）裡開啟這個檔。第 **11476** 行附近（對應人物阮孚，`c_addr_id = 702559` / 尉氏）有一行包含 10 個 tab 欄位、卻對著 9 欄的表頭。AddrChn 是空的、X 欄裡塞了文字，真正的 X / Y 值都往右挪了一欄。
 
 #### 建議修復方案
 
@@ -167,10 +165,6 @@ _Reconstructed-in-PIL popup showing the JET 'Item not found in this collection' 
 `Form_LookAtEntry.vb:1650` 寫的是同一段邏輯查詢而且名字是對的，可以參考。
 
 #### 復現步驟
-
-**建議使用的範例人物：** `c_personid=1`（安惇，An Dun）
-
-用人物 1（安惇，An Dun）當匯入清單（資料少、只有 2 條 entry 記錄，方便復現）。在 LookAtGroupData 上只勾 **Entry**，點 **Run**。 _由 `reports/probe_demo_persons.py` 透過 SQL probe 挑選；之所以選這位，是因為其底層記錄數確實滿足這個 bug 的觸發條件。_
 
 1. 在 **LookAtGroupData** 上把匯入清單設為一個人——例如 c_personid = 1（安惇 An Dun），他只有 2 條 ENTRY_DATA 記錄，足以讓有缺陷的 queryEntry SQL 在一個小而熟知的樣本上跑起來。
 2. **只**勾 **Entry** 核取方塊（Status / Office / Text / Addr 都不勾，避免無關的查詢分支幹擾）。
@@ -204,10 +198,6 @@ _Step 2 — the JET error popup users see.  The popup graphic is reconstructed i
 可能原因：picker 表單在某次重構中被重新命名或合併了，而這個呼叫處沒有跟著更新。
 
 #### 復現步驟
-
-**建議使用的範例人物：** `c_personid=5`（查籥，Zha Yue）
-
-開啟人物 5（查籥，Zha Yue）。其 `c_fl_ey_notes` 欄位有真實內容（樣例：「紹興二十一年進士。…」），所以點選它會真的觸發這個有缺陷的 Sub。 _由 `reports/probe_demo_persons.py` 透過 SQL probe 挑選；之所以選這位，是因為其底層記錄數確實滿足這個 bug 的觸發條件。_
 
 1. 開啟人物 **c_personid = 5（查籥 Zha Yue）** 的生平詳情——之所以選他，是因為其 BIOG_MAIN 上 `c_fl_ey_notes` 欄位有實際內容，欄位可點（點一個空欄位不會觸發這個 Sub）。
 2. 在 BIOG_MAIN_2 子表單上點 `c_fl_ey_notes` 欄位——這會觸發 `c_fl_ey_notes_Click` Sub。
@@ -274,7 +264,7 @@ End With
 
 **涉及位置:** `Form_LookAtAssociations.CmdUCINet_Click`
 
-**嚴重等級:** P1 — 正常使用者點選下的可見報錯。任何使用者只要在 `LookAtAssociations × CmdUCINet` 上發起的查詢結果集中含有 c_name 帶 CJK 漢字的人，就會遇到 Run-time error 5 對話方塊，匯出全部失敗。當前 dump 上至少以 c_assoc_code = 437 為 fixture 驗證的 8087 行暫存表會觸發；更大範圍的影響取決於 BIOG_MAIN 中 c_name（理論上是 Latin / Pinyin）含漢字的行數 —— 至少 2 行落在該查詢結果集裡，只要結果集含其中任一行就會受影響。
+**嚴重等級:** P1 — 正常使用者點選下的可見報錯。任何使用者只要在 `LookAtAssociations × CmdUCINet` 上選的人在當前 dump 的 1 階關聯網路中含有 c_name 帶 CJK 漢字的人，就會遇到 Run-time error 5 對話方塊，匯出全部失敗。當前 dump 上至少 person 437（已驗證 fixture）的 8087 行暫存表會觸發；更大範圍的影響人數取決於 BIOG_MAIN 中 c_name （理論上是 Latin / Pinyin）含漢字的行數 —— 至少 2 行落在 person 437 的網路裡，只要選的人 1 階鄰居含其中任一行都會受影響。
 
 #### 問題描述
 
@@ -290,13 +280,13 @@ End With
 - **LookAtKinship** — **同 root cause 的 runtime-confirmed sibling form。**`Form_LookAtKinship.CmdUCINet_Click` 在約 line 2510 用同樣的 `CreateTextFile(tFileName, True)` 2-arg 模式。透過 probe `investigate/kinship-cmducinet-sibling-risk`（commit 154bb4b）以 picker = pid 152930（He Jing 何淨，唯一 1-hop kin 是 pid 140733 He Mou 取，U+53D6 = 與 Associations 的 稜 = U+7A1C 同屬 CJK Han ideograph 觸發類）復現。Probe 結果：同樣的 `:ERR Invalid procedure call or argument`，同樣的殘破檔案形狀（`*node data` 完整 + `*node properties` 截斷 + `*tie data` 完全沒寫）。本 PR 已擴充套件靜態 marker `tests/test_known_bugs.py::test_bug22_associations_cmducinet_createtextfile_no_unicode_arg`，讓它同時檢查 `Form_LookAtKinship.vb` 的同樣 2-arg 模式；Kinship 的執行時 pin 暫緩（見下方 Coverage caveat）。
 - **LookAtPlace** — 可能存在的獨立風險；**本 issue 的確認範圍不包含 Place。**`Form_LookAtPlace.CmdUCINet_Click` 用的是 ADO Stream（`tStream.WriteText`），不是 FSO （`tVNA.WriteLine`），編碼行為可能不同，需要單獨的 per-form probe 才能下同 bug-family 的結論。Place CmdUCINet 在 inventory 仍維持 `gap`。
 
-**Coverage caveat：** 現有的 Kinship × CmdUCINet 覆蓋測試（`tests/test_vba_cmducinet_kinship.py`）在 inventory 上仍是 `covered`，但已 **明確標註為 fixture-fragile** —— 它能通過只是因為 matrix 提供的 person 3211 網路剛好沒有 Han 字元 c_name。換成一個網路能觸達Han 名字的 fixture（sibling probe 直接示範了這一點）就會在同一段 .vna 寫出路徑上崩潰。已在測試的 docstring 與 inventory manifest 的 notes 欄位同步備註。
+**Coverage caveat：** 現有的 Kinship × CmdUCINet 覆蓋測試（`tests/test_vba_cmducinet_kinship.py`）在 inventory 上仍是 `covered`，但已 **明確標註為 fixture-fragile** —— 它能透過只是因為 matrix 提供的 person 3211 網路剛好沒有 Han 字元 c_name。換成一個網路能觸達Han 名字的 fixture（sibling probe 直接示範了這一點）就會在同一段 .vna 寫出路徑上崩潰。已在測試的 docstring 與 inventory manifest 的 notes 欄位同步備註。
 
 #### 復現步驟
 
 1. 在 Microsoft Access 裡開啟 CBDB_BJ_User.mdb。
 2. 開啟 **LookAtAssociations** 表單（F11 → 導航窗格 → 表單 → 雙擊 `LookAtAssociations`）。
-3. 用關聯程式碼 picker（**CmdPickAssoc**）選取 **c_assoc_code = 437（贈詩、文）** —— 在當前 dump 上，該程式碼的查詢結果包含 person 445395（c_name = `Hu Fa稜`），其 c_name 含 CJK 漢字（U+7A1C 稜），在 cp1252 碼頁下無法編碼也無 FSO 替代對映。
+3. 用人物 picker 選 **c_personid = 437（賈昭明 Jia Zhaoming）** —— 此人在當前 dump 上的 1 階關聯網路含有 c_name 帶漢字的人（具體是 pid 445395，c_name = `Hu Fa稜`）。
 4. 點 **Run**（CmdQuery），等它把 ZZ_SCRATCH_ASSOC 和 ZZ_SCRATCH_P_ASSOC 填好。
 5. 點 **UCINet** 匯出按鈕（CmdUCINet），隨便選一個 `.vna` 檔案的存檔位置。
 6. 彈出對話方塊：`Run-time error '5': Invalid procedure call or argument`。匯出中斷，硬碟上只剩殘破的 `.vna` 檔：`*node data` 區段完整，`*node properties` 區段被截斷，`*tie data` 區段完全沒寫 —— UCINET / Visone 都沒法當成 import 檔案使用。
@@ -328,9 +318,9 @@ Set tVNA = tFileSystem.CreateTextFile(tFileName, True, True)
 
 #### 問題描述
 
-`Form_LookAtAssociations.CmdNeo4j_Click` 通過 `INSERT INTO ZZ_SCRATCH_PEOPLE ( c_person_id, c_name, c_name_chn, c_index_year, c_index_year_type_code, c_dy, c_addr_id, c_index_addr_type_code, c_female ) SELECT DISTINCT … BIOG_MAIN.c_index_addr_type_code, BIOG_MAIN.c_female …` 來填充 `ZZ_SCRATCH_PEOPLE` 工作表。INSERT 目標列裡把 **c_index_addr_type_code** 當作 `ZZ_SCRATCH_PEOPLE` 上的列引用，但當前 dump 的 `ZZ_SCRATCH_PEOPLE` 共 22 列，並沒有這一列（canonical 列名見 `analysis/dump/tables.json`）。JET 報 **3061「INSERT INTO 語句包含未知的欄位名 c_index_addr_type_code」**，整個 Neo4j 匯出在 body 中途中斷 —— 在任何磁碟檔案被寫出之前 —— 即便 `dlgSaveAs.Show` 已經彈出且鏈條已進入 People-block True 分支。
+`Form_LookAtAssociations.CmdNeo4j_Click` 透過 `INSERT INTO ZZ_SCRATCH_PEOPLE ( c_person_id, c_name, c_name_chn, c_index_year, c_index_year_type_code, c_dy, c_addr_id, c_index_addr_type_code, c_female ) SELECT DISTINCT … BIOG_MAIN.c_index_addr_type_code, BIOG_MAIN.c_female …` 來填充 `ZZ_SCRATCH_PEOPLE` 工作表。INSERT 目標列裡把 **c_index_addr_type_code** 當作 `ZZ_SCRATCH_PEOPLE` 上的列引用，但當前 dump 的 `ZZ_SCRATCH_PEOPLE` 共 22 列，並沒有這一列（canonical 列名見 `analysis/dump/tables.json`）。JET 報 **3061「INSERT INTO 語句包含未知的欄位名 c_index_addr_type_code」**，整個 Neo4j 匯出在 body 中途中斷 —— 在任何磁碟檔案被寫出之前 —— 即便 `dlgSaveAs.Show` 已經彈出且鏈條已進入 People-block True 分支。
 
-靜態 schema 互相印證：source 端 `BIOG_MAIN` **有** `c_index_addr_type_code`（共 55 列；該列在 `tests/test_schema.py` 的 REQUIRED_COLUMNS 中，schema 測試通過即獨立證實）。所以缺的是 **target** 表，不是 source。
+靜態 schema 互相印證：source 端 `BIOG_MAIN` **有** `c_index_addr_type_code`（共 55 列；該列在 `tests/test_schema.py` 的 REQUIRED_COLUMNS 中，schema 測試透過即獨立證實）。所以缺的是 **target** 表，不是 source。
 
 關於作者意圖的強靜態推斷：失敗 INSERT 之後緊鄰的 `UPDATE` 是 LEFT JOIN `ZZ_SCRATCH_PEOPLE.c_addr_type = BIOG_ADDR_CODES.c_addr_type` 並 SET 一組地址描述列。target 表 **有** `c_addr_type`，但失敗的 INSERT 從未寫入 `c_addr_type` —— 而 `c_addr_type` 正是 source `BIOG_MAIN.c_index_addr_type_code` 的自然 rename 目標（同一 INSERT 在前一列已經做過一模一樣的 rename：`BIOG_MAIN.c_index_addr_id ↦ ZZ_SCRATCH_PEOPLE.c_addr_id`）。看起來作者把 source 列名直接複製到 INSERT 目標列表裡，本意是 rename 成 `c_addr_type`。與 Bug #4 / #5 / #6 同形（per-form column-name typo class）。
 
@@ -347,7 +337,7 @@ Set tVNA = tFileSystem.CreateTextFile(tFileName, True, True)
 5. 點 **Neo4j**（匯出按鈕）。
 6. 彈出 **執行時錯誤 3061 —— INSERT INTO 語句包含未知的欄位名 c_index_addr_type_code** 對話方塊（或 headless ／driver-instrumented 跑法下，對應的 `LookAtAssociations:ERR ...` ZZ_TEST_DEBUG marker 被寫入）。Neo4j 匯出產出 **0 份 CSV** —— 沒有 `People_*.csv`、沒有 `Places_*.csv`，什麼都沒有。
 
-已通過 probe `analysis/probe_associations_cmdneo4j.py` 端到端驗證（PR #112，已 merge `1145219`）；根因經靜態調查 `analysis/investigate_associations_cmdneo4j_c_index_addr_type_code.{py,md}` 確認（PR #114，已 merge `68cfa9b`）。
+已透過 probe `analysis/probe_associations_cmdneo4j.py` 端到端驗證（PR #112，已 merge `1145219`）；根因經靜態調查 `analysis/investigate_associations_cmdneo4j_c_index_addr_type_code.{py,md}` 確認（PR #114，已 merge `68cfa9b`）。
 
 #### 建議修復方案
 
@@ -415,7 +405,7 @@ JET 在第一次此類讀取時報 **3265「Item not found in this collection」
 5. 點 **Neo4j**（匯出按鈕）。
 6. 彈出 **執行時錯誤 3265 —— Item not found in this collection.** 對話方塊（或 headless ／ driver-instrumented 跑法下，對應的 `LookAtPlace:ERR Item not found in this collection.` ZZ_TEST_DEBUG marker 被寫入）。Neo4j 匯出產出 **0 份 CSV** —— 沒有 `People_*.csv`、沒有 `Places_*.csv`，什麼都沒有。
 
-已通過 probe `analysis/probe_place_cmdneo4j.py` 端到端驗證（PR #120，已 merge `8f94276`）；具體的失敗引用點由靜態調查 `analysis/investigate_place_cmdneo4j_item_not_found.{py,md}` 確認（PR #121，已 merge `97e1162`）。
+已透過 probe `analysis/probe_place_cmdneo4j.py` 端到端驗證（PR #120，已 merge `8f94276`）；具體的失敗引用點由靜態調查 `analysis/investigate_place_cmdneo4j_item_not_found.{py,md}` 確認（PR #121，已 merge `97e1162`）。
 
 #### 建議修復方案
 
@@ -458,10 +448,6 @@ FROM / JOIN 結構已經把源表帶進範圍；這純粹是 SELECT 缺欄位的
 但該表單的 RecordSource 是存檔查詢 `View_EventAddrData`，裡面把 ADDR_CODES.c_name_chn 起別名成 `c_event_addr_chn`、把 ADDR_CODES.c_name 起別名成 `c_event_addr_name`。投影裡既沒有 `c_name` 也沒有 `c_name_chn`，所以這兩個控制元件每一行都默默地顯示為空。
 
 #### 復現步驟
-
-**建議使用的範例人物：** `c_personid=44872`（孫才，Sun Cai）
-
-開啟人物 44872（孫才，Sun Cai）。EVENTS 子資料表會顯示 1 條事件，其中 1 條有對應地址。相關繫結控制元件在每一列都會顯示空白。 _由 `reports/probe_demo_persons.py` 透過 SQL probe 挑選；之所以選這位，是因為其底層記錄數確實滿足這個 bug 的觸發條件。_
 
 1. 開啟 CBDB_Browser_2，導航到 **c_personid = 44872（孫才 Sun Cai）**——選他是因為他有 1 條 EVENTS_DATA 記錄，對應 1 條 EVENT_ADDR 指向 `c_addr_id = 12603`（ADDR_CODES 裡是 Anfeng / 安豐）。切到 **Events** 子分頁。
 2. 看事件那行內嵌的 EVENT_ADDR_2 子表單（在主事件那行下方的一小條）。那裡的兩個位址列位 `TxtAddrCHN` 與 `TxtAddrPY` 都是空白。
@@ -643,11 +629,6 @@ _本層的條目作為歷史 / 潛伏記錄保留。可分為三類：(a) DORMAN
 
 #### 復現步驟
 
-⚠ **在當前資料快照下無法在 UI 上復現——請看下方說明**
-
-在當前資料快照下，這個 bug 處於 **潛伏 (dormant) 狀態**——STATUS_DATA 共 70,761 行，但只有 13 行 c_fy_range > 0、0 行 c_ly_range > 0；兩個都有值且不同的只有 0 行。所以目前沒有任何人物能在 UI 上重現這個別名錯位。SQL 缺陷仍然存在；只要未來某次資料更新插入一條 fy/ly range 都填了且不同的 STATUS_DATA 記錄，對應的子資料表那一行就會顯示錯誤文字。今天若要驗證這個 bug，可以直接跑 SQL：
-  SELECT c_personid, c_fy_range, c_fy_range_desc, c_ly_range, c_ly_range_desc FROM View_StatusData WHERE c_fy_range > 0 OR c_ly_range > 0;
-
 1. 由於本 .mdb 當前快照下，沒有任何 STATUS_DATA 列同時填了 c_fy_range 和 c_ly_range，這個 bug 暫時無法在 UI 上復現。請直接用 SQL 驗證：
 2. 在 Access 裡開啟 .mdb，按 F11 顯示導航窗格，雙擊查詢 **View_StatusData**。
 3. 檢視 SELECT 子句：所有 `c_fy_range_*` 別名都從 `YEAR_RANGE_CODES_1` 取值，但 FROM 子句把這個別名 JOIN 在末年份範圍上——這就是錯位。
@@ -770,10 +751,6 @@ _**Hypothetical** popup, reconstructed in PIL.  Users currently CAN'T trigger th
 
 #### 復現步驟
 
-**建議使用的範例人物：** `c_personid=1`（安惇，An Dun）
-
-開啟人物 1（安惇，An Dun）。KIN_DATA 子資料表會顯示 5 條親屬記錄——點任一條的「kinship code」picker 欄位即可觸發這個有缺陷的 Sub。 _由 `reports/probe_demo_persons.py` 透過 SQL probe 挑選；之所以選這位，是因為其底層記錄數確實滿足這個 bug 的觸發條件。_
-
 1. 驗證路徑**只能靜態驗證**——當前 .mdb 中並無主表單嵌入受影響的子表單，因此無法在執行時重現點選。
 2. 靜態證據 (1)：開啟 `analysis/dump/vba/Form_KIN_DATA_Subform.vb` 第 52 行——可見該 Sub 確實呼叫 `DoCmd.OpenForm "frmPickKINSHIP_CODES"`。
 3. 靜態證據 (2)：開啟 `analysis/dump/control_inventory.json`，以 `"frmPickKINSHIP_CODES"` 為鍵搜尋——不存在。該 picker 表單已不存在於 .mdb 中。
@@ -796,10 +773,6 @@ _**Hypothetical** popup, reconstructed in PIL.  Users currently CAN'T trigger th
 **為何 LATENT。**對 runtime 表單做 COM 探測（`analysis/probe_bug_10_11_12_visibility.py`）顯示該控制元件 `Visible = False`，寬 240 twips（~4mm）、高 270 twips——這就是一個隱藏的內部控制元件，幾乎可以肯定是早期殘留的 join-key 欄位，本來就不打算給使用者看。使用者不會看到空白欄位，因為根本看不到這個控制元件。2026-05-03 從 P2 降到 P5。
 
 #### 復現步驟
-
-**建議使用的範例人物：** `c_personid=44872`（孫才，Sun Cai）
-
-開啟人物 44872（孫才，Sun Cai）。EVENTS 子資料表會顯示 1 條事件，其中 1 條有對應地址。相關繫結控制元件在每一列都會顯示空白。 _由 `reports/probe_demo_persons.py` 透過 SQL probe 挑選；之所以選這位，是因為其底層記錄數確實滿足這個 bug 的觸發條件。_
 
 1. 驗證路徑**只能靜態 + COM 探測**——沒有 UI 上的可見徵狀。
 2. 靜態證據：對 user mdb 跑 `SELECT c_event_record_id FROM View_EventsData` 會拋 `Too few parameters. Expected 1.`，確認該欄位不在投影裡。
@@ -828,10 +801,6 @@ _**Hypothetical** popup, reconstructed in PIL.  Users currently CAN'T trigger th
 
 #### 復現步驟
 
-**建議使用的範例人物：** `c_personid=2`（安邡，An Fang）
-
-開啟人物 2（安邡，An Fang）。POSTED-TO-OFFICE 子資料表會顯示 1 條官職任命記錄，c_appt_code 都不為 NULL；但任職型別那一列每一列都是空白。 _由 `reports/probe_demo_persons.py` 透過 SQL probe 挑選；之所以選這位，是因為其底層記錄數確實滿足這個 bug 的觸發條件。_
-
 1. 驗證路徑**只能靜態 + COM 探測**——沒有 UI 上的可見徵狀。
 2. 靜態證據：`SELECT c_appt_type_code FROM View_PostingOfficeData` 會拋 `Too few parameters. Expected 1.`，確認該欄位不在投影裡。
 3. 可見性證據：跑 `python analysis/probe_bug_10_11_12_visibility.py`，看 `analysis/dump/bug_10_11_12_visibility.json` 中 bug #12 那筆——`control_summary.visible` 是 `False`、width 是 180 twips。
@@ -840,443 +809,6 @@ _**Hypothetical** popup, reconstructed in PIL.  Users currently CAN'T trigger th
 #### 建議修復方案
 
 若這個隱藏控制元件用不到了，刪除即可；若是有意為之的隱藏 join-key 容器，把 ControlSource 改成真實的欄位（例如 `c_appt_code`）。無論怎麼改，使用者都看不到差別——這純粹是程式碼整潔。
-
-## 附錄 A —— c_index_year / c_index_addr_id 與 cbdb-online-main-server 快照之間的偏差（差異需要逐筆分類後才能判定是否為缺陷）
-
-我們把本 .mdb 的 BIOG_MAIN 與 cbdb-online-main-server 每週釋出的 SQLite 快照在 `c_index_year`、`c_index_addr_id` 兩個欄位上做比對，可以看到一小部分人物對不齊。
-
-**兩邊是兩套獨立的實作。**SQLite 快照中的 `c_index_year` 是 cbdb-online-main-server 的 PHP `IndexYearRebuildService.php` 算出來的，`c_index_addr_id` 則是 `IndexAddressRebuildService.php` 算出來的（程式碼都在 <https://github.com/cbdb-project/cbdb-online-main-server>）；User MDB 上對應的這兩個User MDB 那一邊：`c_index_addr_id` 由前端 mdb 裡的 `Form_frmIndexAddr` VBA 重建；`c_index_year` 由連結表後端 `data/CBDB_<YYYYMMDD>_DATA.mdb` 裡 **37 條 `BM IY Rule …` 的 QueryDef** 重建，由 `frmBaseMaintenance` 驅動。兩邊演算法已抽取到 `analysis/dump_data/querydefs_index/*.sql`；form / module 驅動 VBA 仍需 Access SaveAsText 互動式提取。PHP **意圖**映象 VBA，但兩者是兩條獨立的程式路徑。每一行差異**可能**來自下列至少四個原因，光看差異本身分不出來：(1) 源資料快照漂移；(2) PHP 與 VBA 之間的演算法 / 移植差異；(3) 優先序 / 平手規則不同；(4) null / 預設值處理不同。
-
-**我們並沒有對目前看到的 ~575 / 657 246 筆差異做完整分類。**下方列舉的樣本（目前共 13 筆、3 種分桶，來自 `reports/index_drift_examples.json`）只是**示範**這些差異**長什麼樣**，並非統計上有代表性，是後續逐筆分類的起點，不是結論。
-
-### 分類匯總
-
-比對了兩邊都有的 **657,245** 個 personid（User MDB 共 657,784 筆；SQLite 共 657,478 筆；僅 User MDB 有 539 筆；僅 SQLite 有 233 筆）。
-
-| 分桶 | 筆數 | 佔比 | 含義 |
-|---|---:|---:|---|
-| `exact_match` | 656,682 | 99.914% | 四個欄位全部一致 |
-| `source_drift_index_agrees` | 2 | 0.000% | 源資料有漂移但兩邊 index 都一致 |
-| `source_drift_index_diffs_too` | 14 | 0.002% | 源資料有漂移、且至少一個 index 不同 |
-| `index_year_only_diff` | 59 | 0.009% | 生年/卒年一致，但只有 c_index_year 不同 —— 待追查 |
-| `index_addr_only_diff` | 478 | 0.073% | 生年/卒年一致，但只有 c_index_addr_id 不同 —— 待追查 |
-| `index_both_diff` | 10 | 0.002% | 生年/卒年一致，但兩個 index 都不同 —— 複合差異最強訊號 |
-
-淨差異：**563** / 657,245（0.086 %）。其中 **16** 筆能明確歸因於 birthyear / deathyear 的源資料漂移；剩下 **547** 筆需要逐筆追查（可能是 PHP↔VBA 演算法差異，也可能是本分類器沒有比較的 evidence 表（BIOG_ADDR_DATA / ENTRY_DATA / NIAN_HAO 等）裡的漂移）。完整輸出見 `reports/index_drift_classification.json`，演算法來源指標見 `analysis/index_drift_algorithm_notes.md`。
-
-### 年份差異 —— 逐筆 rule 分類
-
-在 **69** 筆「只有 c_index_year 不一致」的行中，逐筆比對 PR N (`analysis/index_year_rule_comparison.md`) 的runtime-vs-PHP 規則級差異。保守分類如下：
-
-| 分桶 | 筆數 |
-|---|---:|
-| `php_returned_sentinel` (PHP 寫了 sentinel／溢位值) | 1 |
-| `php_did_not_compute` (PHP 沒算出值（覆蓋率缺口）) | 19 |
-| `access_did_not_compute` (Access 沒算出值（覆蓋率缺口）) | 7 |
-| `iteration_order_diff` (Phase-C 迭代次數不同) | 5 |
-| `consistent_within_rule` (多列共享同一 (php_tcode, access_tcode, diff)) | 14 |
-| `candidate_algorithm_divergence` (形狀符合 K1 的歷史 hypothesis probe 但無法以單筆證據重建) | 5 |
-| `unclassified` (尚未對上任何模式) | 18 |
-
-以上沒有任何一筆被視為已確認的 bug。逐筆輸出見 `reports/index_year_drift_rule_classification.json`。
-
-PR K2 進一步的 triage (`analysis/triage_index_year_drift_groups.py` → `reports/index_year_drift_rule_groups.json`) 把剩下的桶命名清楚：
-
-- `consistent_within_rule` × 14 → 5 個 signature 分組。PR AI + AJ 的逐筆探測推翻了原本的 tie-break 假說：14 筆全是 `source_data_drift_biog_main_or_kin_data_between_sides`（8 筆 BIOG_MAIN birthyear 漂移 + 6 筆 KIN_DATA evidence-pid 漂移）。屬於 PHP-side / SQLite snapshot 的上游資料漂移，並非 CBDB 演算法差異。
-- `unclassified` × 18 → 18 筆已命名，17 筆標為 `blocked_by_runtime_priority_triage_pending`（PR M 已 dump frmBaseMaintenance，原始碼已在 repo；要逐筆判斷哪邊正確仍需走一遍 runtime 的 priority／iteration 順序）。
-- `php_did_not_compute` × 19 → 按 Access tcode 分 6 組；最大的是 `access_tcode='05'` × 7（jinshi 進士類的 `candidate_php_entry_code_mapping_gap`）。
-
-### c_index_addr_id 差異 —— 逐筆分類
-
-在 **488** 筆 c_index_addr 差異中（PR G 的 478 `index_addr_only_diff` + 10 `index_both_diff`），逐筆把兩邊的 BIOG_ADDR_DATA 代入「rank-priority + MAX(c_sequence)」演算法重算，與實際儲存值對照分類：
-
-| 分桶 | 筆數 |
-|---|---:|
-| `mdb_stale_index_addr` | 412 |
-| `mdb_value_php_null` | 47 |
-| `same_candidates_diff_winner` | 10 |
-| `both_stale_recompute_mismatch` | 10 |
-| `both_sides_match_recomputed` | 6 |
-| `sqlite_stale_index_addr` | 2 |
-| `mdb_null_php_value` | 1 |
-
-以上沒有任何一筆被視為已確認的 bug。412 筆 `mdb_stale_index_addr` 屬於維護週期差異（User MDB 在下次釋出前需要重跑 frmBaseMaintenance）。10 筆 `same_candidates_diff_winner` 是唯一的候選演算法差異。逐筆輸出見 `reports/index_addr_drift_classification.json`。
-
-PR M（`analysis/dump_data_mdb_vba.py`）從 DATA mdb 抽出了 `frmBaseMaintenance.CmdIndexAddress_Click`。它**沒有**像 PHP 那樣明確 `MAX(c_sequence)` 聚合 —— 在維護週期差異之外，這還是一個候選演算法差異。建議的 release checklist 緩解步驟：在 User MDB 出貨前先在 DATA mdb 上跑 `CmdIndexYear`，再跑 `CmdIndexAddress`。詳見 `analysis/index_drift_algorithm_notes.md` 中的 "Maintenance trigger path" 段。
-
-### 目前能解釋的 drift 原因
-
-每個 bucket 的成因／證據／信心度／下一步追查都寫在 `analysis/index_drift_cause_analysis.md`。本節只列每個 bucket 的計數和信心度摘要；目前沒有任何 bucket 被列為已確認的 CBDB bug。
-
-**c_index_year 原因桶**
-
-| Bucket | 筆數 | 信心度 |
-|---|---:|---|
-| `php_returned_sentinel` | 1 | high |
-| `php_did_not_compute` | 19 | tcode='05' × 7: supported_by_focused_probe (PR Z).  tcode='11' × 5: medium.  Phase-C tcodes (14/20/2304): medium.  tcode='07' × 1: medium (vestigial-vs-intentional unresolved). |
-| `access_did_not_compute` | 7 | medium |
-| `iteration_order_diff` | 5 | medium |
-| `consistent_within_rule` | 14 | supported_by_focused_probe (PR AI + AJ) |
-| `candidate_algorithm_divergence` | 5 | low-medium |
-| `blocked_by_runtime_priority_triage_pending` | 17 | low (per-row causes); high (category label) |
-
-**c_index_addr_id 原因桶**
-
-| Bucket | 筆數 | 信心度 |
-|---|---:|---|
-| `mdb_stale_index_addr` | 412 | high |
-| `mdb_value_php_null` | 47 | medium |
-| `same_candidates_diff_winner` | 10 | high |
-| `both_stale_recompute_mismatch` | 10 | medium-high |
-| `both_sides_match_recomputed` | 6 | low-medium |
-| `sqlite_stale_index_addr` | 2 | medium |
-| `mdb_null_php_value` | 1 | medium-high |
-
-建議優先處理的調查專案（完整列表見 cause-analysis md）：
-
-1. B1 release-process step (CmdIndexYear → CmdIndexAddress before shipping User MDB) —— 可消化 412 筆；工程成本：zero (process change)。
-2. B3 secondary tie-break (MIN(c_addr_id)) added to both implementations —— 可消化 10 筆；工程成本：small algorithm tweak per side。
-3. A2 tcode 05 entry-code-mapping check — DONE by PR Z (6 mapping gaps + 1 c_year=0 gap; all PHP-side upstream data) —— 可消化 7 筆；工程成本：single SQL probe (already run)。
-
-### 僅 c_index_year 不一致的樣例
-
-**`c_personid = 3501` — 李孝稱 (Li Xiaocheng)**
-
-| 欄位 | 本 .mdb (User MDB) | cbdb-online-main-server 快照 |
-|---|---|---|
-| `c_index_year` | 1018 | 1028 |
-| `c_index_addr_id` | 100658 | 100658 |
-| `c_birthyear` | 0 | 0 |
-| `c_deathyear` | 0 | 0 |
-| `c_index_year_type_code` | 19 | 1912 |
-| `c_index_year_source_id` | 19149 | 3479 |
-
-**`c_personid = 16266` — 錢孟回 (Qian Menghui)**
-
-| 欄位 | 本 .mdb (User MDB) | cbdb-online-main-server 快照 |
-|---|---|---|
-| `c_index_year` | 1004 | 992 |
-| `c_index_addr_id` | 12723 | 12723 |
-| `c_birthyear` | 0 | 0 |
-| `c_deathyear` | 0 | 0 |
-| `c_index_year_type_code` | 13 | 0512 |
-| `c_index_year_source_id` | 700103 | 3035 |
-
-**`c_personid = 16267` — 錢知雄 (Qian Zhixiong)**
-
-| 欄位 | 本 .mdb (User MDB) | cbdb-online-main-server 快照 |
-|---|---|---|
-| `c_index_year` | 1034 | 1071 |
-| `c_index_addr_id` | 12723 | 12723 |
-| `c_birthyear` | 0 | 0 |
-| `c_deathyear` | 0 | 0 |
-| `c_index_year_type_code` | 1312 | 14 |
-| `c_index_year_source_id` | 16266 | 16269 |
-
-### 僅 c_index_addr_id 不一致的樣例
-
-**`c_personid = 1` — 安惇 (An Dun)**
-
-| 欄位 | 本 .mdb (User MDB) | cbdb-online-main-server 快照 |
-|---|---|---|
-| `c_index_year` | 1042 | 1042 |
-| `c_index_addr_id` | 101117 |  |
-| `c_birthyear` | 1042 | 1042 |
-| `c_deathyear` | 1104 | 1104 |
-| `c_index_year_type_code` | 01 | 01 |
-| `c_index_year_source_id` |  |  |
-
-**`c_personid = 470` — 金君卿 (Jin Junqing)**
-
-| 欄位 | 本 .mdb (User MDB) | cbdb-online-main-server 快照 |
-|---|---|---|
-| `c_index_year` | 1012 | 1012 |
-| `c_index_addr_id` | 12879 | 12785 |
-| `c_birthyear` | 0 | 0 |
-| `c_deathyear` | 0 | 0 |
-| `c_index_year_type_code` | 05 | 05 |
-| `c_index_year_source_id` |  |  |
-
-**`c_personid = 481` — 周秩 (Zhou Zhi)**
-
-| 欄位 | 本 .mdb (User MDB) | cbdb-online-main-server 快照 |
-|---|---|---|
-| `c_index_year` | 1043 | 1043 |
-| `c_index_addr_id` | 100416 | 12785 |
-| `c_birthyear` | 0 | 0 |
-| `c_deathyear` | 0 | 0 |
-| `c_index_year_type_code` | 05 | 05 |
-| `c_index_year_source_id` |  |  |
-
-**`c_personid = 485` — 周穜 (Zhou Tong)**
-
-| 欄位 | 本 .mdb (User MDB) | cbdb-online-main-server 快照 |
-|---|---|---|
-| `c_index_year` | 1046 | 1046 |
-| `c_index_addr_id` | 100416 | 12785 |
-| `c_birthyear` | 0 | 0 |
-| `c_deathyear` | 0 | 0 |
-| `c_index_year_type_code` | 05 | 05 |
-| `c_index_year_source_id` |  |  |
-
-**`c_personid = 562` — 範沖 (Fan Chong)**
-
-| 欄位 | 本 .mdb (User MDB) | cbdb-online-main-server 快照 |
-|---|---|---|
-| `c_index_year` | 1067 | 1067 |
-| `c_index_addr_id` | 100658 | 13292 |
-| `c_birthyear` | 1067 | 1067 |
-| `c_deathyear` | 1141 | 1141 |
-| `c_index_year_type_code` | 01 | 01 |
-| `c_index_year_source_id` |  |  |
-
-### 底層 SOURCE 資料本身不同（生年 / 卒年）的樣例
-
-**`c_personid = 1455` — 沈邈 (Shen Miao)**
-
-| 欄位 | 本 .mdb (User MDB) | cbdb-online-main-server 快照 |
-|---|---|---|
-| `c_index_year` | 1001 | 1008 |
-| `c_index_addr_id` | 12887 | 12887 |
-| `c_birthyear` | 1001 | 0 |
-| `c_deathyear` | 1047 | 0 |
-| `c_index_year_type_code` | 01 | 05 |
-| `c_index_year_source_id` |  |  |
-
-**`c_personid = 19149` — 李孝基 (Li Xiaoji)**
-
-| 欄位 | 本 .mdb (User MDB) | cbdb-online-main-server 快照 |
-|---|---|---|
-| `c_index_year` | 1016 | 1026 |
-| `c_index_addr_id` | 100658 | 100658 |
-| `c_birthyear` | 1016 | 0 |
-| `c_deathyear` | 1076 | 0 |
-| `c_index_year_type_code` | 01 | 11 |
-| `c_index_year_source_id` |  | 41030 |
-
-## 附錄 B —— TablesFields：文件表與實際資料庫結構對比
-
-本節將 `CBDB_20260430_DATA.mdb` 中 `TablesFields` 表的內容與 `reports/collect_schema_diffs.py` 透過 Access DAO（TableDefs）重建的資料庫結構進行比對。若存在差異，表示文件表可能已過時。
-
-TablesFields 共 875 筆。從資料庫重建：996 筆。
-
-重建結果: [tables_fields_regen.csv](tables_fields_regen.csv)
-
-### TablesFields 中有但實際資料庫中不存在的記錄（過時）
-
-| AccessTblNm | AccessFldNm |
-|---|---|
-| ADMIN_CAT_CODE_TYPE_REL | c_admin_type_code |
-| ADMIN_CAT_TYPES | c_admin_type_code |
-| ADMIN_CAT_TYPES | c_admin_type_hz |
-| ADMIN_CAT_TYPES | c_admin_type_trans |
-| ENTRY_DATA | c_addr_id |
-| ENTRY_DATA | c_posting_id |
-| MERGED_PERSON_DATA | c_merged_to_personid |
-| PersonIDSource | LineNum |
-| PersonIDSource | SourceTable |
-| TMP_ADDR_C | Max_c_belongs_first_year |
-
-### 實際資料庫中有但 TablesFields 未記錄的欄位
-
-| AccessTblNm | AccessFldNm | DataFormat | NULL_allowed |
-|---|---|---|---|
-| ADDRESSES | belongs1_ID | Long | True |
-| ADDRESSES | belongs1_Name | Text | True |
-| ADDRESSES | belongs2_ID | Long | True |
-| ADDRESSES | belongs2_Name | Text | True |
-| ADDRESSES | belongs3_ID | Long | True |
-| ADDRESSES | belongs3_Name | Text | True |
-| ADDRESSES | belongs4_ID | Long | True |
-| ADDRESSES | belongs4_Name | Text | True |
-| ADDRESSES | belongs5_ID | Long | True |
-| ADDRESSES | belongs5_Name | Text | True |
-| ADDRESSES | c_addr_cbd | Text | True |
-| ADDRESSES | c_addr_id | Long | True |
-| ADDRESSES | c_admin_type | Text | True |
-| ADDRESSES | c_firstyear | Integer | True |
-| ADDRESSES | c_lastyear | Integer | True |
-| ADDRESSES | c_name | Text | True |
-| ADDRESSES | c_name_chn | Text | True |
-| ADDRESSES | x_coord | Double | True |
-| ADDRESSES | y_coord | Double | True |
-| ADMIN_CAT_CODE_TYPE_REL | c_admin_cat_type_code | Text | False |
-| ADMIN_CAT_TYPES | c_admin_cat_type_code | Text | False |
-| ADMIN_CAT_TYPES | c_admin_cat_type_hz | Text | False |
-| ADMIN_CAT_TYPES | c_admin_cat_type_trans | Text | False |
-| ASSOC_DATA | c_tertiary_type_notes | Text | True |
-| BIOG_ADDR_DATA | c_delete | Integer | True |
-| CopyTables | NotProcessed | Yes/No | True |
-| CopyTables | TableName | Text | False |
-| CopyTablesDefault | ID | Long | True |
-| CopyTablesDefault | TableName | Text | True |
-| ENTRY_DATA | c_entry_addr_id | Long | True |
-| ETHNICITY_TRIBE_CODES | c_sortorder | Integer | True |
-| ForeignKeys | AccessFldNm | Text | True |
-| ForeignKeys | AccessTblNm | Text | True |
-| ForeignKeys | DataFormat | Text | True |
-| ForeignKeys | FKName | Text | True |
-| ForeignKeys | FKString | Text | True |
-| ForeignKeys | ForeignKey | Text | True |
-| ForeignKeys | ForeignKeyBaseField | Text | True |
-| ForeignKeys | IndexOnField | Text | True |
-| ForeignKeys | NULL_allowed | Yes/No | True |
-| ForeignKeys | skip | Integer | True |
-| FormLabels | c_english | Text | True |
-| FormLabels | c_fanti | Text | True |
-| FormLabels | c_form | Text | True |
-| FormLabels | c_jianti | Text | True |
-| FormLabels | c_label_id | Integer | True |
-| MERGED_PERSON_DATA | c_merged_from_personid | Long | False |
-| OFFICE_CODES_CONVERSION | c_office_chn | Text | True |
-| OFFICE_CODES_CONVERSION | c_office_chn_backup | Text | True |
-| OFFICE_CODES_CONVERSION | c_office_id | Long | True |
-| OFFICE_CODES_CONVERSION | c_office_id_backup | Long | True |
-| OFFICE_TYPE_TREE_backup | c_office_type_desc | Text | True |
-| OFFICE_TYPE_TREE_backup | c_office_type_desc_chn | Text | True |
-| OFFICE_TYPE_TREE_backup | c_office_type_node_id | Text | True |
-| OFFICE_TYPE_TREE_backup | c_parent_id | Text | True |
-| OFFICE_TYPE_TREE_backup | c_tts_node_id | Text | True |
-| Paste Errors | c_bibl_cat_code | Long | True |
-| Paste Errors | c_created_by | Text | True |
-| Paste Errors | c_created_date | Date/Time | True |
-| Paste Errors | c_extant | Long | True |
-| Paste Errors | c_modified_by | Text | True |
-| Paste Errors | c_modified_date | Date/Time | True |
-| Paste Errors | c_notes | Memo | True |
-| Paste Errors | c_pages | Text | True |
-| Paste Errors | c_source | Long | True |
-| Paste Errors | c_textid | Long | True |
-| Paste Errors | c_text_country | Long | True |
-| Paste Errors | c_text_dy | Long | True |
-| Paste Errors | c_text_nh_code | Long | True |
-| Paste Errors | c_text_nh_year | Long | True |
-| Paste Errors | c_text_range_code | Long | True |
-| Paste Errors | c_text_type_id | Text | True |
-| Paste Errors | c_text_year | Long | True |
-| Paste Errors | c_title | Text | True |
-| Paste Errors | c_title_alt_chn | Text | True |
-| Paste Errors | c_title_chn | Text | True |
-| Paste Errors | c_title_trans | Text | True |
-| Paste Errors | c_url_api | Text | True |
-| Paste Errors | c_url_api_coda | Text | True |
-| Paste Errors | c_url_homepage | Text | True |
-| POSTED_TO_OFFICE_DATA | c_posting_id_old | Long | True |
-| SOCIAL_INSTITUTION_ALTNAME_CODES | c_inst_altname_chn | Text | True |
-| SOCIAL_INSTITUTION_ALTNAME_CODES | c_inst_altname_desc | Text | True |
-| SOCIAL_INSTITUTION_ALTNAME_CODES | c_inst_altname_type | Integer | True |
-| SOCIAL_INSTITUTION_ALTNAME_CODES | c_notes | Text | True |
-| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_altname_hz | Text | False |
-| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_altname_py | Text | True |
-| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_altname_type | Integer | False |
-| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_code | Integer | False |
-| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_name_code | Integer | False |
-| SOCIAL_INSTITUTION_ALTNAME_DATA | c_notes | Memo | True |
-| SOCIAL_INSTITUTION_ALTNAME_DATA | c_pages | Text | True |
-| SOCIAL_INSTITUTION_ALTNAME_DATA | c_source | Long | True |
-| SOCIAL_INSTITUTION_CODES | c_inst_end_dy | Integer | True |
-| SOCIAL_INSTITUTION_CODES | c_inst_end_year | Integer | True |
-| SOCIAL_INSTITUTION_CODES_CONVERSION | c_inst_code | Long | True |
-| SOCIAL_INSTITUTION_CODES_CONVERSION | c_inst_code_new | Integer | True |
-| SOCIAL_INSTITUTION_CODES_CONVERSION | c_inst_name_code | Integer | True |
-| SOCIAL_INSTITUTION_CODES_CONVERSION | c_new_new_code | Long | True |
-| STATUS_TYPES | c_status_type_parent_code | Text | True |
-| TablesFields | AccessFldNm | Text | False |
-| TablesFields | AccessTblNm | Text | False |
-| TablesFields | DataFormat | Text | True |
-| TablesFields | DumpFldNm | Text | True |
-| TablesFields | DumpTblNm | Text | True |
-| TablesFields | ForeignKey | Text | True |
-| TablesFields | ForeignKeyBaseField | Text | True |
-| TablesFields | IndexOnField | Text | True |
-| TablesFields | NULL_allowed | Yes/No | True |
-| TablesFields | RowNum | Long | True |
-| TablesFieldsChanges | Change | Text | True |
-| TablesFieldsChanges | ChangeDate | Text | True |
-| TablesFieldsChanges | ChangeNotes | Text | True |
-| TablesFieldsChanges | FieldName | Text | True |
-| TablesFieldsChanges | TableName | Text | True |
-| TEXT_BIBLCAT_CODES | c_text_cat_level | Text | True |
-| TEXT_BIBLCAT_CODES | c_text_cat_parent_id | Text | True |
-| TEXT_CODES | c_text_type_id | Text | True |
-| TMP_ADDR_C | Min_c_belongs_first_year | Integer | True |
-| TMP_ADDR_D | c_addr_cbd | Text | True |
-| TMP_ADDR_E | c_addr_cbd | Text | True |
-| TMP_DISTANCE_DATA | assoc_xcoord | Double | True |
-| TMP_DISTANCE_DATA | assoc_ycoord | Double | True |
-| TMP_DISTANCE_DATA | c_assoc_id | Long | False |
-| TMP_DISTANCE_DATA | c_distance | Double | True |
-| TMP_DISTANCE_DATA | c_personid | Long | False |
-| TMP_DISTANCE_DATA | c_t_dist | Double | True |
-| TMP_DISTANCE_DATA | x_coord | Double | True |
-| TMP_DISTANCE_DATA | y_coord | Double | True |
-| ZZZ_DY_DATA | c_dy | Integer | False |
-| ZZZ_DY_DATA | c_personid | Long | False |
-
-### 屬性不一致
-
-完整清單：`reports/schema_diff_tables_fields_mismatches.csv`（143 筆）
-
-## 附錄 C —— ForeignKeys：文件表與實際資料庫結構對比
-
-本節涵蓋 `ForeignKeys` 表及其所記錄的外部索引鍵關係。
-
-ForeignKeys 共 188 筆。從資料庫重建（透過 Access.Application DAO）：223 筆。
-
-重建結果: [foreign_keys_regen.csv](foreign_keys_regen.csv)
-
-### ForeignKeys 中有但實際資料庫中不存在的記錄（過時）
-
-| AccessTblNm | AccessFldNm | ForeignKey | ForeignKeyBaseField |
-|---|---|---|---|
-| ADDR_BELONGS_DATA | c_source | TEXT_CODES | c_textid |
-| assoc_data | c_assoc_day_gz | GANZHI_CODES | c_ganzhi_code |
-| assoc_data | c_assoc_nh_code | nian_hao | c_nianhao_id |
-| assoc_data | c_assoc_range | year_range_codes | c_range_code |
-| assoc_data | c_inst_name_code | SOCIAL_INSTITUTION_NAME_CODES | c_inst_name_code |
-| assoc_data | c_inst_name_code,c_inst_code | SOCIAL_INSTITUTION_CODES | c_inst_code |
-| biog_addr_data | c_addr_id | ADDR_CODES | c_addr_id |
-| biog_addr_data | c_fy_day_gz | GANZHI_CODES | c_ganzhi_code |
-| biog_addr_data | c_fy_nh_code | nian_hao | c_nianhao_id |
-| biog_addr_data | c_fy_range | year_range_codes | c_range_code |
-| biog_addr_data | c_ly_day_gz | GANZHI_CODES | c_ganzhi_code |
-| biog_addr_data | c_ly_nh_code | nian_hao | c_nianhao_id |
-| biog_addr_data | c_ly_range | year_range_codes | c_range_code |
-| biog_addr_data | c_personid | BIOG_MAIN | c_personid |
-| biog_addr_data | c_source | TEXT_CODES | c_textid |
-| BIOG_INST_DATA | c_inst_name_code | SOCIAL_INSTITUTION_NAME_CODES | c_inst_name_code |
-| BIOG_INST_DATA | c_inst_name_code,c_inst_code | SOCIAL_INSTITUTION_CODES | c_inst_code |
-| biog_main | c_death_age_range | year_range_codes | c_range_code |
-| biog_main | c_index_year_source_id | BIOG_MAIN | c_personid |
-| biog_main | c_index_year_type_code | INDEXYEAR_TYPE_CODES | c_index_year_type_code |
-| ENTRY_DATA | c_entry_dy | DYNASTIES | c_dy |
-| ENTRY_DATA | c_inst_name_code | SOCIAL_INSTITUTION_NAME_CODES | c_inst_name_code |
-| ENTRY_DATA | c_inst_name_code,c_inst_code | SOCIAL_INSTITUTION_CODES | c_inst_code |
-| EVENTS_ADDR | c_event_code | EVENT_CODES | c_event_code |
-| EVENTS_ADDR | c_personid | BIOG_MAIN | c_personid |
-| EVENTS_ADDR | c_personid,c_sequence,c_event_code | EVENTS_DATA | c_event_code |
-| POSTED_TO_OFFICE_DATA | c_inst_name_code,c_inst_code | SOCIAL_INSTITUTION_CODES | c_inst_code |
-| SOCIAL_INSTITUTION_ADDR | c_inst_name_code,c_inst_code | SOCIAL_INSTITUTION_CODES | c_inst_code |
-
-### 實際資料庫中有但 ForeignKeys 未記錄的欄位
-
-| AccessTblNm | AccessFldNm | ForeignKey | ForeignKeyBaseField |
-|---|---|---|---|
-| ADDRESSES | c_addr_id | ADDR_CODES | c_addr_id |
-| ASSOC_CODES | c_assoc_pair | ASSOC_CODES | c_assoc_code |
-| Assoc_data | c_assoc_fy_day_gz | GANZHI_CODES | c_ganzhi_code |
-| Assoc_data | c_assoc_fy_nh_code | NIAN_HAO | c_nianhao_id |
-| Assoc_data | c_assoc_fy_range | YEAR_RANGE_CODES | c_range_code |
-| ASSOC_TYPES | c_assoc_type_parent_id | ASSOC_TYPES | c_assoc_type_code |
-| ENTRY_DATA | c_entry_addr_id | ADDR_CODES | c_addr_id |
-| EVENTS_DATA | c_event_code | EVENTS_ADDR | c_event_code |
-| EVENTS_DATA | c_personid | EVENTS_ADDR | c_personid |
-| EVENTS_DATA | c_sequence | EVENTS_ADDR | c_sequence |
-| POSTED_TO_OFFICE_DATA | c_inst_code | SOCIAL_INSTITUTION_CODES | c_inst_code |
-| POSTED_TO_OFFICE_DATA | c_inst_name_code | SOCIAL_INSTITUTION_CODES | c_inst_name_code |
-| SOCIAL_INSTITUTION_ADDR | c_inst_code | SOCIAL_INSTITUTION_CODES | c_inst_code |
-| SOCIAL_INSTITUTION_ADDR | c_inst_name_code | SOCIAL_INSTITUTION_CODES | c_inst_name_code |
-| SOCIAL_INSTITUTION_CODES | c_inst_end_dy | DYNASTIES | c_dy |
 
 ## 結語
 
