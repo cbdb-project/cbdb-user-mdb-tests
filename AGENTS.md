@@ -23,11 +23,34 @@ User's stated pain points (in priority order):
 
 ## Build-test cycle: each run is a FRESH assessment
 
-Every time a new `CBDB_BJ_User.mdb` build or `CBDB_*_DATA.mdb` arrives,
-the test run starts from a clean slate.  The canonical workflow:
+### ⚠️ MANDATORY RULE — no exceptions
 
-1. **Archive** previous reports:
-   `mv reports/{*.md,*.json,screenshots/} reports/archive/build_YYYYMMDD/`
+**Every build test cycle is completely independent.**
+Do NOT carry forward any content from a previous build's test run.
+This means:
+
+- The `ISSUES` dict in `reports/generate_report.py` is **cleared and
+  rewritten from scratch** for every new build.  Do NOT copy-paste,
+  merge, or "update" entries from the previous cycle.  Delete the old
+  dict, run tests, write new entries based solely on what fails in
+  THIS build.
+- Bugs that passed in a previous build and still pass now → they do
+  not exist in this build's report.  Do not write "fixed in build X".
+- Bugs that were in a previous build and still fail now → write a
+  fresh entry as if you are seeing them for the first time.  Cross-
+  referencing old IDs is optional, not required.
+- The archive (`reports/archive/build_YYYYMMDD/`) is the historical
+  record.  The live `reports/` is a snapshot of the CURRENT build only.
+
+**Why:** Carrying forward history silently corrupts the report —
+"resolved" entries pollute the signal, re-numbering diverges, and
+reviewers can't trust whether a bug is real in the build they are
+looking at.
+
+### Canonical workflow (8 steps)
+
+1. **Archive** previous reports and screenshots:
+   move `reports/{*.md,*.json,screenshots/}` → `reports/archive/build_YYYYMMDD/`
 2. **Replace** data files in `data/`:
    - `CBDB_BJ_User.mdb` ← new build archive
    - `CBDB_YYYYMMDD_DATA.mdb` ← new DATA mdb (delete old one first)
@@ -36,19 +59,18 @@ the test run starts from a clean slate.  The canonical workflow:
 4. **Re-dump** metadata (after relink, so column defs are complete):
    `python analysis/dump_metadata.py && python analysis/dump_vba.py`
 5. **Run tests**: `python -m pytest tests/ -W ignore --include-vba`
+   Monitor the session — Access dialogs can block unhandled (see landmine #3b).
 6. **Capture screenshots**: `python reports/capture_screenshots.py`
-7. **Update** `reports/generate_report.py` ISSUES dict to reflect current build:
-   - Tests that NOW FAIL but previously passed → new bugs, add to ISSUES
-   - Tests that NOW PASS but previously failed → bug fixed by maintainer,
-     mark `"tier": "resolved"` and note the build in `"severity_en"`
-   - GOLDEN_STALE failures → update golden files, not a bug
+7. **Rebuild ISSUES dict from scratch**: clear `ISSUES = [` … `]` in
+   `reports/generate_report.py`, then write one entry per FAILED test,
+   based solely on what this build's test run produced.
+   - GOLDEN_STALE failures (row count drift, data ordering) → update
+     goldens, do NOT add to ISSUES.
+   - Infrastructure failures (dialog cascade, orphan Access process) →
+     fix infra, do NOT add to ISSUES.
 8. **Regenerate** report: `python reports/generate_report.py`
 
-**Do NOT carry forward past results.**  The archive preserves history.
-The live `reports/` directory and the ISSUES dict reflect only the
-CURRENT build's status.  This repo's job is to produce an accurate
-snapshot of bugs in the build under test, not to accumulate a
-changelog.  Bug-fixing is handled by the maintainer team.
+**Bug-fixing is the maintainer team's responsibility — not this repo's.**
 
 ## Single source of truth (two of them, scoped)
 
@@ -57,12 +79,11 @@ else.  Do not duplicate their content elsewhere — copies drift.
 
 1. **Roadmap, coverage table, fixture status** →
    **`README.md` § Plan & status**.
-2. **Issues / bugs (all 21 of them, content + tier + severity +
-   reproduction steps)** → the `ISSUES` dict in
-   **`reports/generate_report.py`**, which auto-generates the four
-   `reports/CBDB_Issues_Report_*.md` outputs (en + zh; the same
-   script also emits `.docx` siblings on demand, but those are
-   gitignored — see PR O policy).
+2. **Issues / bugs for the CURRENT build** → the `ISSUES` dict in
+   **`reports/generate_report.py`**.  This dict is cleared and rebuilt
+   from scratch on every build cycle (see mandatory rule above).
+   It auto-generates `reports/CBDB_Issues_Report_*.md` (en + zh; the
+   script also emits `.docx` siblings on demand, gitignored).
 
 **Hard rules for any agent (or human contributor):**
 
