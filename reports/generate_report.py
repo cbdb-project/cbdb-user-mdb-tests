@@ -65,10 +65,10 @@ ISSUES = [
     # ========== Tier 1: silent data corruption ==========
     {
         "id": 1,
-        "tier": "P5_dormant_or_latent",
+        "tier": "resolved",
         "form": "View_StatusData",
-        "title_en": "View_StatusData would display last-year range in the first-year column — DORMANT (no source rows trigger it on this dump)",
-        "title_zh": "View_StatusData 會把首年份範圍顯示成末年份範圍 — DORMANT（當前 dump 沒有源資料能觸發）",
+        "title_en": "View_StatusData FY/LY alias swap — RESOLVED in build 20260518",
+        "title_zh": "View_StatusData 首/末年份別名對調 — 已於 build 20260518 修復",
         "summary_en": (
             "The saved query `View_StatusData` joins `YEAR_RANGE_CODES` "
             "twice (once aliased as `YEAR_RANGE_CODES_1` for the last-year "
@@ -130,8 +130,8 @@ ISSUES = [
             "子句已经按 `c_fy_range` JOIN 了它）。"
         ),
         "screenshots": [],
-        "severity_en": "P5 — Dormant on this dump (would be P0 if any STATUS_DATA row had both fy/ly range codes set differently)",
-        "severity_zh": "P5 — 在當前 dump 上潛伏（若任何 STATUS_DATA 列同時填了 fy/ly range 且不同，會升為 P0）",
+        "severity_en": "Resolved — non-reproducing in build 20260518; FY and LY range codes now correctly joined from separate aliases in View_StatusData.",
+        "severity_zh": "已解決 — build 20260518 確認不再復現；View_StatusData 的首/末年份範圍碼現已正確地從各自的別名 JOIN。",
     },
     {
         "id": 7,
@@ -688,10 +688,10 @@ ISSUES = [
     # ========== Tier 2: visible runtime crash (popup blocks user) ==========
     {
         "id": 4,
-        "tier": "P5_dormant_or_latent",
+        "tier": "resolved",
         "form": "Form_LookAtPlace.CmdGIS_Click",
-        "title_en": "LookAtPlace.CmdGIS would abort with 'Object required' — LATENT, masked by Issue #15 (no CmdGIS button on the form)",
-        "title_zh": "LookAtPlace.CmdGIS 會報「Object required」 — LATENT，被 Issue #15（表單上沒有 CmdGIS 按鈕）所遮蔽",
+        "title_en": "LookAtPlace.CmdGIS 'Object required' — RESOLVED in build 20260518",
+        "title_zh": "LookAtPlace.CmdGIS「Object required」— 已於 build 20260518 修復",
         "summary_en": (
             "Note: this issue is moot in the current dump because there "
             "is no CmdGIS button on LookAtPlace's design (Issue #15) — "
@@ -751,15 +751,15 @@ ISSUES = [
              "PR C — only this faux popup is kept as latent-state "
              "evidence."),
         ],
-        "severity_en": "P5 — Latent (would be P1 if Issue #15 fixed without first fixing this)",
-        "severity_zh": "P5 — 潛伏（若先修了 Issue #15 而沒同時修本條，會變成 P1）",
+        "severity_en": "Resolved — non-reproducing in build 20260518; CmdGIS_Click no longer raises 'Object required'.",
+        "severity_zh": "已解決 — build 20260518 確認不再復現；CmdGIS_Click 不再拋出「Object required」。",
     },
     {
         "id": 5,
-        "tier": "P5_dormant_or_latent",
+        "tier": "resolved",
         "form": "Form_LookAtStatus.CmdPajek_Click",
-        "title_en": "LookAtStatus.CmdPajek references a missing control AND uses three columns that don't exist",
-        "title_zh": "LookAtStatus.CmdPajek 引用了不存在的控件，且 SQL 用了三个不存在的列",
+        "title_en": "LookAtStatus.CmdPajek SQL field error — RESOLVED in build 20260518",
+        "title_zh": "LookAtStatus.CmdPajek SQL 欄位錯誤 — 已於 build 20260518 修復",
         "summary_en": (
             "Two related defects in the same handler:\n\n"
             "  (a) Line 2308 reads `If ChkIDs.Value Then`, but Status has "
@@ -830,8 +830,8 @@ ISSUES = [
             "拷贝过来的，列名没校对过。"
         ),
         "screenshots": [],
-        "severity_en": "P5 — Latent (would be P1 if Issue #16 fixed without first fixing this)",
-        "severity_zh": "P5 — 潛伏（若先修了 Issue #16 而沒同時修本條，會變成 P1）",
+        "severity_en": "Resolved — non-reproducing in build 20260518; CmdPajek_Click completes without field errors.",
+        "severity_zh": "已解決 — build 20260518 確認不再復現；CmdPajek_Click 不再拋出欄位錯誤。",
     },
     {
         "id": 6,
@@ -3948,6 +3948,7 @@ def _build(lang: str, out_path: Path) -> None:
         "P4_setup": "P4 — Setup",
         "P5_dormant_or_latent":
             "P5 — Dormant / latent / not currently reproducible",
+        "resolved": "Resolved — fixed in this build",
     }
     tier_titles_zh = {
         "P0_silent_data": "P0 — 静默数据错误",
@@ -3956,6 +3957,7 @@ def _build(lang: str, out_path: Path) -> None:
         "P3_missing_ui": "P3 — 缺失界面",
         "P4_setup": "P4 — 安装设置",
         "P5_dormant_or_latent": "P5 — 潛伏 / 不可達 / 當前無法復現",
+        "resolved": "已解決 — 當前 build 已修復",
     }
     demo_persons = _load_demo_persons()
     bug_status = _load_bug_test_status()
@@ -4480,6 +4482,7 @@ def _build_md(lang: str, out_path: Path) -> None:
         "P4_setup": "P4 — Setup",
         "P5_dormant_or_latent":
             "P5 — Dormant / latent / not currently reproducible",
+        "resolved": "Resolved — fixed in this build",
     }
     tier_titles_zh = {
         "P0_silent_data": "P0 — 静默数据错误",
