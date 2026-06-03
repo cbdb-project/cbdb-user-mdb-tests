@@ -21,6 +21,35 @@ User's stated pain points (in priority order):
 5. Specific parameter combinations (entry method × dynasty × address)
    are the real test surface — random fixtures often hit sparse data
 
+## Build-test cycle: each run is a FRESH assessment
+
+Every time a new `CBDB_BJ_User.mdb` build or `CBDB_*_DATA.mdb` arrives,
+the test run starts from a clean slate.  The canonical workflow:
+
+1. **Archive** previous reports:
+   `mv reports/{*.md,*.json,screenshots/} reports/archive/build_YYYYMMDD/`
+2. **Replace** data files in `data/`:
+   - `CBDB_BJ_User.mdb` ← new build archive
+   - `CBDB_YYYYMMDD_DATA.mdb` ← new DATA mdb (delete old one first)
+3. **Relink** linked tables (auto on next `pytest`, or manual):
+   `python analysis/relink_data_mdb.py`
+4. **Re-dump** metadata (after relink, so column defs are complete):
+   `python analysis/dump_metadata.py && python analysis/dump_vba.py`
+5. **Run tests**: `python -m pytest tests/ -W ignore --include-vba`
+6. **Capture screenshots**: `python reports/capture_screenshots.py`
+7. **Update** `reports/generate_report.py` ISSUES dict to reflect current build:
+   - Tests that NOW FAIL but previously passed → new bugs, add to ISSUES
+   - Tests that NOW PASS but previously failed → bug fixed by maintainer,
+     mark `"tier": "resolved"` and note the build in `"severity_en"`
+   - GOLDEN_STALE failures → update golden files, not a bug
+8. **Regenerate** report: `python reports/generate_report.py`
+
+**Do NOT carry forward past results.**  The archive preserves history.
+The live `reports/` directory and the ISSUES dict reflect only the
+CURRENT build's status.  This repo's job is to produce an accurate
+snapshot of bugs in the build under test, not to accumulate a
+changelog.  Bug-fixing is handled by the maintainer team.
+
 ## Single source of truth (two of them, scoped)
 
 This project keeps **two** authoritative documents and nothing
