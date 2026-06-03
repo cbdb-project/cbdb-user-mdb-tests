@@ -1,8 +1,8 @@
 {
   "summary": {
-    "n_manifest_entries": 6,
-    "n_per_lang_checks_total": 12,
-    "n_per_lang_checks_passed": 12,
+    "n_manifest_entries": 7,
+    "n_per_lang_checks_total": 14,
+    "n_per_lang_checks_passed": 14,
     "n_mismatches": 0,
     "manifest_coverage": [
       {
@@ -40,6 +40,12 @@
         "table": "ADDR_CODES",
         "code_col": "c_addr_id",
         "code_value": 702559
+      },
+      {
+        "issue_id": 22,
+        "table": "ASSOC_CODES",
+        "code_col": "c_assoc_code",
+        "code_value": 437
       }
     ]
   },
@@ -219,6 +225,36 @@
       "mdb_desc": {
         "c_name": "Wei Shi",
         "c_name_chn": "尉氏"
+      },
+      "missing_expected_labels": [],
+      "found_forbidden_labels": [],
+      "mdb_desc_present_in_block": true
+    },
+    {
+      "issue_id": 22,
+      "table": "ASSOC_CODES",
+      "code_col": "c_assoc_code",
+      "code_value": 437,
+      "lang": "en",
+      "block_found": true,
+      "mdb_desc": {
+        "c_assoc_desc": "Presented literary composition as gift to",
+        "c_assoc_desc_chn": "贈詩、文"
+      },
+      "missing_expected_labels": [],
+      "found_forbidden_labels": [],
+      "mdb_desc_present_in_block": true
+    },
+    {
+      "issue_id": 22,
+      "table": "ASSOC_CODES",
+      "code_col": "c_assoc_code",
+      "code_value": 437,
+      "lang": "zh",
+      "block_found": true,
+      "mdb_desc": {
+        "c_assoc_desc": "Presented literary composition as gift to",
+        "c_assoc_desc_chn": "贈詩、文"
       },
       "missing_expected_labels": [],
       "found_forbidden_labels": [],

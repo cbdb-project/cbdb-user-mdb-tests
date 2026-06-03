@@ -1,5 +1,5 @@
 {
-  "report": "reports\\pytest_report_build20260518.json",
+  "report": "reports\\pytest_report_build20260603.json",
   "mapping": "C:\\Users\\how612\\Documents\\GitHub\\cbdb-user-mdb-tests\\docs\\test-matrix-mapping.json",
   "forms": [
     "LookAtEntry",
@@ -28,7 +28,7 @@
     "LookAtEntry": {
       "CmdQuery": "FAIL",
       "CmdGIS": "PASS",
-      "CmdNeo4j": "ERROR",
+      "CmdNeo4j": "PASS",
       "CmdPajek": "N/A",
       "CmdGephi": "N/A",
       "CmdUCINet": "N/A",
@@ -37,18 +37,18 @@
       "CmdRun": "N/A"
     },
     "LookAtStatus": {
-      "CmdQuery": "ERROR",
+      "CmdQuery": "PASS",
       "CmdGIS": "N/A",
       "CmdNeo4j": "N/A",
       "CmdPajek": "FAIL",
-      "CmdGephi": "ERROR",
-      "CmdUCINet": "ERROR",
+      "CmdGephi": "SKIP",
+      "CmdUCINet": "PASS",
       "CmdKML": "N/A",
       "CmdGUESS": "N/A",
       "CmdRun": "N/A"
     },
     "LookAtTexts": {
-      "CmdQuery": "ERROR",
+      "CmdQuery": "PASS",
       "CmdGIS": "N/A",
       "CmdNeo4j": "N/A",
       "CmdPajek": "N/A",
@@ -59,9 +59,9 @@
       "CmdRun": "N/A"
     },
     "LookAtPlace": {
-      "CmdQuery": "ERROR",
+      "CmdQuery": "PASS",
       "CmdGIS": "FAIL",
-      "CmdNeo4j": "ERROR",
+      "CmdNeo4j": "FAIL",
       "CmdPajek": "N/A",
       "CmdGephi": "N/A",
       "CmdUCINet": "N/A",
@@ -70,37 +70,37 @@
       "CmdRun": "N/A"
     },
     "LookAtAssociations": {
-      "CmdQuery": "ERROR",
-      "CmdGIS": "ERROR",
-      "CmdNeo4j": "ERROR",
+      "CmdQuery": "PASS",
+      "CmdGIS": "PASS",
+      "CmdNeo4j": "PASS",
       "CmdPajek": "N/A",
       "CmdGephi": "N/A",
-      "CmdUCINet": "ERROR",
+      "CmdUCINet": "FAIL",
       "CmdKML": "N/A",
       "CmdGUESS": "N/A",
       "CmdRun": "N/A"
     },
     "LookAtOffice": {
-      "CmdQuery": "ERROR",
-      "CmdGIS": "ERROR",
+      "CmdQuery": "PASS",
+      "CmdGIS": "FAIL",
       "CmdNeo4j": "N/A",
       "CmdPajek": "N/A",
       "CmdGephi": "N/A",
       "CmdUCINet": "N/A",
       "CmdKML": "N/A",
-      "CmdGUESS": "ERROR",
+      "CmdGUESS": "PASS",
       "CmdRun": "N/A"
     },
     "LookAtKinship": {
       "CmdQuery": "N/A",
-      "CmdGIS": "ERROR",
+      "CmdGIS": "PASS",
       "CmdNeo4j": "N/A",
       "CmdPajek": "PASS",
       "CmdGephi": "N/A",
-      "CmdUCINet": "ERROR",
+      "CmdUCINet": "FAIL",
       "CmdKML": "N/A",
-      "CmdGUESS": "ERROR",
-      "CmdRun": "ERROR"
+      "CmdGUESS": "FAIL",
+      "CmdRun": "PASS"
     },
     "LookAtNetworks": {
       "CmdQuery": "N/A",
@@ -116,7 +116,7 @@
     "LookAtGroupData": {
       "CmdQuery": "N/A",
       "CmdGIS": "N/A",
-      "CmdNeo4j": "ERROR",
+      "CmdNeo4j": "FAIL",
       "CmdPajek": "N/A",
       "CmdGephi": "N/A",
       "CmdUCINet": "N/A",
@@ -125,10 +125,10 @@
       "CmdRun": "FAIL"
     },
     "LookAtAssocPairs": {
-      "CmdQuery": "ERROR",
+      "CmdQuery": "SKIP",
       "CmdGIS": "N/A",
-      "CmdNeo4j": "ERROR",
-      "CmdPajek": "ERROR",
+      "CmdNeo4j": "PASS",
+      "CmdPajek": "PASS",
       "CmdGephi": "N/A",
       "CmdUCINet": "N/A",
       "CmdKML": "N/A",
@@ -138,10 +138,10 @@
   },
   "summary": {
     "NOT_RUN": 1,
-    "PASS": 2,
-    "SKIP": 2,
-    "ERROR": 22,
-    "FAIL": 4,
+    "PASS": 16,
+    "SKIP": 4,
+    "ERROR": 0,
+    "FAIL": 10,
     "N/A": 59
   }
 }

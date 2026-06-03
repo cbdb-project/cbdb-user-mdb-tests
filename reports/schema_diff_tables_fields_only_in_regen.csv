@@ -24,6 +24,7 @@ ADMIN_CAT_TYPES,c_admin_cat_type_hz,Text,False
 ADMIN_CAT_TYPES,c_admin_cat_type_trans,Text,False
 ASSOC_DATA,c_tertiary_type_notes,Text,True
 BIOG_ADDR_DATA,c_delete,Integer,True
+BIOG_MAIN,c_name_fixed,Text,True
 CopyTables,NotProcessed,Yes/No,True
 CopyTables,TableName,Text,False
 CopyTablesDefault,ID,Long,True

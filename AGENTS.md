@@ -114,6 +114,26 @@ looking at.
    Appendix A (index drift) | Appendix B (TablesFields diff) |
    Appendix C (ForeignKeys diff) | Closing.
 
+### ⛔ MANDATORY: report pipeline is NOT optional — even for verification runs
+
+**Any time you run the full `--include-vba` test suite, you MUST complete
+steps 5b → 5c → 5d → 8 before closing the session, even if the run was
+only to verify an infra fix and not a new build.**
+
+Rationale: a test run without a generated report leaves `reports/` in an
+incomplete state.  The reviewer cannot assess results; the coverage matrix
+and appendices are absent; and the next agent that opens the repo will
+find a JSON report with no matching MD.
+
+Quick pipeline for steps 5b–8 (substitute `<build>` for the date):
+```
+python analysis/build_coverage_matrix.py --report reports/pytest_report_<build>.json
+python reports/collect_index_year_diffs.py
+python reports/collect_schema_diffs.py
+# edit ISSUES dict in reports/generate_report.py, then:
+python reports/generate_report.py
+```
+
 **Bug-fixing is the maintainer team's responsibility — not this repo's.**
 
 ## Single source of truth (two of them, scoped)
