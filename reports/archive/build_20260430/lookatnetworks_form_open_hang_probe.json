@@ -1,0 +1,178 @@
+{
+  "preflight_row_counts": {
+    "ZZ_SOCIAL_NETWORK": 0,
+    "ZZ_SCRATCH_PEOPLE": 0,
+    "ZZ_SOCIAL_NETWORK_AGGREGATE": 0,
+    "ZZ_SCRATCH_ADDR_LIST": 0,
+    "ZZ_SCRATCH_IMPORT_PEOPLE": 0
+  },
+  "openform_timeout_sec": 30,
+  "variations": [
+    {
+      "variation": "V1_default",
+      "hidden": false,
+      "pre_clear": false,
+      "markers": [
+        {
+          "t": 0.01,
+          "marker": "copied_mdb"
+        },
+        {
+          "t": 0.09,
+          "marker": "patched_LinkListInit_to_work_mdb"
+        },
+        {
+          "t": 1.54,
+          "marker": "access_opened"
+        },
+        {
+          "t": 1.55,
+          "marker": "pid=None"
+        },
+        {
+          "t": 1.55,
+          "marker": "worker_starting_OpenForm"
+        },
+        {
+          "t": 1.77,
+          "marker": "worker_finished=True"
+        },
+        {
+          "t": 1.85,
+          "marker": "cleaned_up"
+        }
+      ],
+      "outcome": "succeeded",
+      "elapsed_sec": 1.85,
+      "exception": null
+    },
+    {
+      "variation": "V2_hidden",
+      "hidden": true,
+      "pre_clear": false,
+      "markers": [
+        {
+          "t": 0.02,
+          "marker": "copied_mdb"
+        },
+        {
+          "t": 0.1,
+          "marker": "patched_LinkListInit_to_work_mdb"
+        },
+        {
+          "t": 1.77,
+          "marker": "access_opened"
+        },
+        {
+          "t": 1.78,
+          "marker": "pid=None"
+        },
+        {
+          "t": 1.78,
+          "marker": "worker_starting_OpenForm"
+        },
+        {
+          "t": 1.96,
+          "marker": "worker_finished=True"
+        },
+        {
+          "t": 2.01,
+          "marker": "cleaned_up"
+        }
+      ],
+      "outcome": "succeeded",
+      "elapsed_sec": 2.01,
+      "exception": null
+    },
+    {
+      "variation": "V3_pre_clear_visible",
+      "hidden": false,
+      "pre_clear": true,
+      "markers": [
+        {
+          "t": 0.02,
+          "marker": "copied_mdb"
+        },
+        {
+          "t": 0.13,
+          "marker": "patched_LinkListInit_to_work_mdb"
+        },
+        {
+          "t": 0.41,
+          "marker": "pre_cleared"
+        },
+        {
+          "t": 1.74,
+          "marker": "access_opened"
+        },
+        {
+          "t": 1.75,
+          "marker": "pid=None"
+        },
+        {
+          "t": 1.75,
+          "marker": "worker_starting_OpenForm"
+        },
+        {
+          "t": 1.98,
+          "marker": "worker_finished=True"
+        },
+        {
+          "t": 2.07,
+          "marker": "cleaned_up"
+        }
+      ],
+      "outcome": "succeeded",
+      "elapsed_sec": 2.07,
+      "exception": null
+    },
+    {
+      "variation": "V4_pre_clear_hidden",
+      "hidden": true,
+      "pre_clear": true,
+      "markers": [
+        {
+          "t": 0.02,
+          "marker": "copied_mdb"
+        },
+        {
+          "t": 0.1,
+          "marker": "patched_LinkListInit_to_work_mdb"
+        },
+        {
+          "t": 0.33,
+          "marker": "pre_cleared"
+        },
+        {
+          "t": 1.62,
+          "marker": "access_opened"
+        },
+        {
+          "t": 1.62,
+          "marker": "pid=None"
+        },
+        {
+          "t": 1.62,
+          "marker": "worker_starting_OpenForm"
+        },
+        {
+          "t": 1.81,
+          "marker": "worker_finished=True"
+        },
+        {
+          "t": 1.85,
+          "marker": "cleaned_up"
+        }
+      ],
+      "outcome": "succeeded",
+      "elapsed_sec": 1.85,
+      "exception": null
+    }
+  ],
+  "summary_by_outcome": {
+    "V1_default": "succeeded",
+    "V2_hidden": "succeeded",
+    "V3_pre_clear_visible": "succeeded",
+    "V4_pre_clear_hidden": "succeeded"
+  }
+}

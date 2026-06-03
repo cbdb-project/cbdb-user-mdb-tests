@@ -76,29 +76,35 @@ def dump_via_dao(mdb_path: Path):
                 "allow_zero_length": bool(safe(lambda: f.AllowZeroLength, False)),
             })
         idxs = []
-        for ix in td.Indexes:
-            ix_fields = []
-            try:
-                for ixf in ix.Fields:
-                    ix_fields.append(ixf.Name)
-            except Exception:
-                # Some Index.Fields are exposed as a parseable string instead of a collection
+        idxs_error = None
+        try:
+            for ix in td.Indexes:
+                ix_fields = []
                 try:
-                    ix_fields = [str(ix.Fields)]
+                    for ixf in ix.Fields:
+                        ix_fields.append(ixf.Name)
                 except Exception:
-                    ix_fields = []
-            idxs.append({
-                "name": ix.Name,
-                "primary": bool(ix.Primary),
-                "unique": bool(ix.Unique),
-                "fields": ix_fields,
-            })
-        tables.append({
+                    try:
+                        ix_fields = [str(ix.Fields)]
+                    except Exception:
+                        ix_fields = []
+                idxs.append({
+                    "name": safe(lambda: ix.Name, "<unknown>"),
+                    "primary": bool(safe(lambda: ix.Primary, False)),
+                    "unique": bool(safe(lambda: ix.Unique, False)),
+                    "fields": ix_fields,
+                })
+        except Exception as e:
+            idxs_error = str(e)  # preserve failure; [] alone is indistinguishable from no-index
+        row = {
             "name": td.Name,
             "record_count": int(safe(lambda: td.RecordCount, -1)),
             "columns": cols,
             "indexes": idxs,
-        })
+        }
+        if idxs_error is not None:
+            row["indexes_error"] = idxs_error
+        tables.append(row)
     jdump(tables, "tables.json")
 
     # ----- queries -----
@@ -107,14 +113,24 @@ def dump_via_dao(mdb_path: Path):
         if qd.Name.startswith("~"):
             continue
         params = []
-        for p in qd.Parameters:
-            params.append({"name": p.Name, "type": int(p.Type)})
-        queries.append({
+        params_error = None
+        try:
+            for p in qd.Parameters:
+                params.append({
+                    "name": safe(lambda: p.Name, "<unknown>"),
+                    "type": int(safe(lambda: p.Type, 0)),
+                })
+        except Exception as e:
+            params_error = str(e)  # preserve failure; [] alone is indistinguishable from no-params
+        qrow = {
             "name": qd.Name,
             "type": int(qd.Type),
             "sql": qd.SQL,
             "parameters": params,
-        })
+        }
+        if params_error is not None:
+            qrow["parameters_error"] = params_error
+        queries.append(qrow)
     jdump(queries, "queries.json")
 
     # ----- relationships -----

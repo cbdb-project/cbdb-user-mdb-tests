@@ -535,376 +535,6 @@
     ]
   },
   {
-    "name": "frmBIOG_INST_CODES",
-    "properties": {
-      "RecordSource": "View_BiogInstAddrData",
-      "Filter": "",
-      "OrderBy": "",
-      "Caption": "frmBIOG_INST_DATA",
-      "DefaultView": 0,
-      "AllowEdits": true,
-      "AllowAdditions": true,
-      "AllowDeletions": true,
-      "DataEntry": false
-    },
-    "controls": [
-      {
-        "name": "c_bi_begin_year",
-        "control_type": 109,
-        "control_source": "c_bi_begin_year",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_bi_begin_year_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "初年"
-      },
-      {
-        "name": "c_bi_end_year",
-        "control_type": 109,
-        "control_source": "c_bi_end_year",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_bi_end_year_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "終年"
-      },
-      {
-        "name": "c_source",
-        "control_type": 109,
-        "control_source": "c_source_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_source_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "出處"
-      },
-      {
-        "name": "c_pages",
-        "control_type": 109,
-        "control_source": "c_pages",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_pages_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Pages"
-      },
-      {
-        "name": "c_notes",
-        "control_type": 109,
-        "control_source": "c_notes",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_notes_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "注"
-      },
-      {
-        "name": "c_bi_role_desc",
-        "control_type": 109,
-        "control_source": "c_bi_role_desc",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_bi_role_desc_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Role"
-      },
-      {
-        "name": "c_bi_role_chn",
-        "control_type": 109,
-        "control_source": "c_bi_role_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_bi_role_chn_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "角色"
-      },
-      {
-        "name": "c_inst_name_hz",
-        "control_type": 109,
-        "control_source": "c_inst_name_hz",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_inst_name_hz_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Institution"
-      },
-      {
-        "name": "c_inst_name_py",
-        "control_type": 109,
-        "control_source": "c_inst_name_py",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_inst_name_py_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "建設之名"
-      },
-      {
-        "name": "inst_xcoord",
-        "control_type": 109,
-        "control_source": "inst_xcoord",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "inst_xcoord_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "X:"
-      },
-      {
-        "name": "inst_ycoord",
-        "control_type": 109,
-        "control_source": "inst_ycoord",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "inst_ycoord_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Y:"
-      },
-      {
-        "name": "c_name",
-        "control_type": 109,
-        "control_source": "c_inst_addr_pinyin",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_place_name_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Place"
-      },
-      {
-        "name": "c_name_chn",
-        "control_type": 109,
-        "control_source": "c_inst_addr_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_inst_addr_type_desc",
-        "control_type": 109,
-        "control_source": "c_inst_addr_type_desc",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_place_type_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Place type"
-      },
-      {
-        "name": "c_inst_addr_type_chn",
-        "control_type": 109,
-        "control_source": "c_inst_addr_type_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Text43",
-        "control_type": 109,
-        "control_source": "c_source_py",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      }
-    ],
-    "code_error": "<unknown>.CodeModule"
-  },
-  {
-    "name": "frmPickTEXT_BIBLCAT",
-    "properties": {
-      "RecordSource": "",
-      "Filter": "",
-      "OrderBy": "",
-      "Caption": "Select Text Category",
-      "DefaultView": 0,
-      "AllowEdits": true,
-      "AllowAdditions": true,
-      "AllowDeletions": true,
-      "DataEntry": true
-    },
-    "controls": [
-      {
-        "name": "frmTEXT_BIBLCAT",
-        "control_type": 112,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "CmdCancel",
-        "control_type": 104,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Cancel",
-        "events": {
-          "OnClick": "[Event Procedure]"
-        }
-      },
-      {
-        "name": "CmdSelect",
-        "control_type": 104,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Select",
-        "events": {
-          "OnClick": "[Event Procedure]"
-        }
-      },
-      {
-        "name": "TxtSearch",
-        "control_type": 109,
-        "control_source": "",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null,
-        "events": {
-          "OnChange": "[Event Procedure]"
-        }
-      },
-      {
-        "name": "CmdFind",
-        "control_type": 104,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "查詢",
-        "events": {
-          "OnClick": "[Event Procedure]"
-        }
-      },
-      {
-        "name": "Label9",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "查詢字段為作品的文學樣式"
-      },
-      {
-        "name": "TxtCatCode",
-        "control_type": 109,
-        "control_source": "",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      }
-    ],
-    "code_error": "<unknown>.CodeModule"
-  },
-  {
     "name": "ZZ_SCRATCH_ASSOC",
     "properties": {
       "RecordSource": "ZZ_SCRATCH_ASSOC",
@@ -1750,6 +1380,376 @@
     "code_error": "<unknown>.CodeModule"
   },
   {
+    "name": "frmPickTEXT_BIBLCAT",
+    "properties": {
+      "RecordSource": "",
+      "Filter": "",
+      "OrderBy": "",
+      "Caption": "Select Text Category",
+      "DefaultView": 0,
+      "AllowEdits": true,
+      "AllowAdditions": true,
+      "AllowDeletions": true,
+      "DataEntry": true
+    },
+    "controls": [
+      {
+        "name": "frmTEXT_BIBLCAT",
+        "control_type": 112,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "CmdCancel",
+        "control_type": 104,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Cancel",
+        "events": {
+          "OnClick": "[Event Procedure]"
+        }
+      },
+      {
+        "name": "CmdSelect",
+        "control_type": 104,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Select",
+        "events": {
+          "OnClick": "[Event Procedure]"
+        }
+      },
+      {
+        "name": "TxtSearch",
+        "control_type": 109,
+        "control_source": "",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null,
+        "events": {
+          "OnChange": "[Event Procedure]"
+        }
+      },
+      {
+        "name": "CmdFind",
+        "control_type": 104,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "查詢",
+        "events": {
+          "OnClick": "[Event Procedure]"
+        }
+      },
+      {
+        "name": "Label9",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "查詢字段為作品的文學樣式"
+      },
+      {
+        "name": "TxtCatCode",
+        "control_type": 109,
+        "control_source": "",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      }
+    ],
+    "code_error": "<unknown>.CodeModule"
+  },
+  {
+    "name": "frmBIOG_INST_CODES",
+    "properties": {
+      "RecordSource": "View_BiogInstAddrData",
+      "Filter": "",
+      "OrderBy": "",
+      "Caption": "frmBIOG_INST_DATA",
+      "DefaultView": 0,
+      "AllowEdits": true,
+      "AllowAdditions": true,
+      "AllowDeletions": true,
+      "DataEntry": false
+    },
+    "controls": [
+      {
+        "name": "c_bi_begin_year",
+        "control_type": 109,
+        "control_source": "c_bi_begin_year",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_bi_begin_year_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "初年"
+      },
+      {
+        "name": "c_bi_end_year",
+        "control_type": 109,
+        "control_source": "c_bi_end_year",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_bi_end_year_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "終年"
+      },
+      {
+        "name": "c_source",
+        "control_type": 109,
+        "control_source": "c_source_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_source_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "出處"
+      },
+      {
+        "name": "c_pages",
+        "control_type": 109,
+        "control_source": "c_pages",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_pages_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Pages"
+      },
+      {
+        "name": "c_notes",
+        "control_type": 109,
+        "control_source": "c_notes",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_notes_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "注"
+      },
+      {
+        "name": "c_bi_role_desc",
+        "control_type": 109,
+        "control_source": "c_bi_role_desc",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_bi_role_desc_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Role"
+      },
+      {
+        "name": "c_bi_role_chn",
+        "control_type": 109,
+        "control_source": "c_bi_role_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_bi_role_chn_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "角色"
+      },
+      {
+        "name": "c_inst_name_hz",
+        "control_type": 109,
+        "control_source": "c_inst_name_hz",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_inst_name_hz_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Institution"
+      },
+      {
+        "name": "c_inst_name_py",
+        "control_type": 109,
+        "control_source": "c_inst_name_py",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_inst_name_py_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "建設之名"
+      },
+      {
+        "name": "inst_xcoord",
+        "control_type": 109,
+        "control_source": "inst_xcoord",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "inst_xcoord_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "X:"
+      },
+      {
+        "name": "inst_ycoord",
+        "control_type": 109,
+        "control_source": "inst_ycoord",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "inst_ycoord_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Y:"
+      },
+      {
+        "name": "c_name",
+        "control_type": 109,
+        "control_source": "c_inst_addr_pinyin",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_place_name_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Place"
+      },
+      {
+        "name": "c_name_chn",
+        "control_type": 109,
+        "control_source": "c_inst_addr_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_inst_addr_type_desc",
+        "control_type": 109,
+        "control_source": "c_inst_addr_type_desc",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_place_type_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Place type"
+      },
+      {
+        "name": "c_inst_addr_type_chn",
+        "control_type": 109,
+        "control_source": "c_inst_addr_type_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Text43",
+        "control_type": 109,
+        "control_source": "c_source_py",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      }
+    ],
+    "code_error": "<unknown>.CodeModule"
+  },
+  {
     "name": "ZZ_SCRATCH_STATUS",
     "properties": {
       "RecordSource": "ZZ_SCRATCH_STATUS",
@@ -2104,89 +2104,6 @@
         "row_source_type": null,
         "tag": "",
         "caption": "出處"
-      }
-    ],
-    "code_error": "<unknown>.CodeModule"
-  },
-  {
-    "name": "frmPickTEXTS",
-    "properties": {
-      "RecordSource": "",
-      "Filter": "",
-      "OrderBy": "",
-      "Caption": "Pick Text",
-      "DefaultView": 0,
-      "AllowEdits": true,
-      "AllowAdditions": true,
-      "AllowDeletions": true,
-      "DataEntry": true
-    },
-    "controls": [
-      {
-        "name": "frmTEXTS",
-        "control_type": 112,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "CmdCancel",
-        "control_type": 104,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Cancel",
-        "events": {
-          "OnClick": "[Event Procedure]"
-        }
-      },
-      {
-        "name": "CmdSelect",
-        "control_type": 104,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Select",
-        "events": {
-          "OnClick": "[Event Procedure]"
-        }
-      },
-      {
-        "name": "CmdFind",
-        "control_type": 104,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "查詢",
-        "events": {
-          "OnClick": "[Event Procedure]"
-        }
-      },
-      {
-        "name": "TxtSearch",
-        "control_type": 109,
-        "control_source": "",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null,
-        "events": {
-          "OnChange": "[Event Procedure]"
-        }
-      },
-      {
-        "name": "Label9",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "查詢字段為c_title_chn"
       }
     ],
     "code_error": "<unknown>.CodeModule"
@@ -2819,6 +2736,89 @@
         "events": {
           "OnClick": "[Event Procedure]"
         }
+      }
+    ],
+    "code_error": "<unknown>.CodeModule"
+  },
+  {
+    "name": "frmPickTEXTS",
+    "properties": {
+      "RecordSource": "",
+      "Filter": "",
+      "OrderBy": "",
+      "Caption": "Pick Text",
+      "DefaultView": 0,
+      "AllowEdits": true,
+      "AllowAdditions": true,
+      "AllowDeletions": true,
+      "DataEntry": true
+    },
+    "controls": [
+      {
+        "name": "frmTEXTS",
+        "control_type": 112,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "CmdCancel",
+        "control_type": 104,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Cancel",
+        "events": {
+          "OnClick": "[Event Procedure]"
+        }
+      },
+      {
+        "name": "CmdSelect",
+        "control_type": 104,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Select",
+        "events": {
+          "OnClick": "[Event Procedure]"
+        }
+      },
+      {
+        "name": "CmdFind",
+        "control_type": 104,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "查詢",
+        "events": {
+          "OnClick": "[Event Procedure]"
+        }
+      },
+      {
+        "name": "TxtSearch",
+        "control_type": 109,
+        "control_source": "",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null,
+        "events": {
+          "OnChange": "[Event Procedure]"
+        }
+      },
+      {
+        "name": "Label9",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "查詢字段為c_title_chn"
       }
     ],
     "code_error": "<unknown>.CodeModule"
@@ -3673,6 +3673,74 @@
         "row_source_type": null,
         "tag": "",
         "caption": "Hyperlink"
+      }
+    ],
+    "code_error": "<unknown>.CodeModule"
+  },
+  {
+    "name": "frmZZZ_OFFICE_CODE",
+    "properties": {
+      "RecordSource": "ZZ_OFFICE_CODE",
+      "Filter": "",
+      "OrderBy": "",
+      "Caption": "frmZZZ_OFFICE_CODE",
+      "DefaultView": 2,
+      "AllowEdits": true,
+      "AllowAdditions": true,
+      "AllowDeletions": true,
+      "DataEntry": false
+    },
+    "controls": [
+      {
+        "name": "c_office_code",
+        "control_type": 109,
+        "control_source": "c_office_id",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_office_desc",
+        "control_type": 109,
+        "control_source": "c_office_trans",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null,
+        "events": {
+          "OnClick": "[Event Procedure]"
+        }
+      },
+      {
+        "name": "c_office_desc_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Office Name"
+      },
+      {
+        "name": "c_office_desc_chn",
+        "control_type": 109,
+        "control_source": "c_office_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null,
+        "events": {
+          "OnClick": "[Event Procedure]"
+        }
+      },
+      {
+        "name": "c_office_desc_chn_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "官名"
       }
     ],
     "code_error": "<unknown>.CodeModule"
@@ -5004,74 +5072,6 @@
         "caption": "除授類別"
       }
     ]
-  },
-  {
-    "name": "frmZZZ_OFFICE_CODE",
-    "properties": {
-      "RecordSource": "ZZ_OFFICE_CODE",
-      "Filter": "",
-      "OrderBy": "",
-      "Caption": "frmZZZ_OFFICE_CODE",
-      "DefaultView": 2,
-      "AllowEdits": true,
-      "AllowAdditions": true,
-      "AllowDeletions": true,
-      "DataEntry": false
-    },
-    "controls": [
-      {
-        "name": "c_office_code",
-        "control_type": 109,
-        "control_source": "c_office_id",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_office_desc",
-        "control_type": 109,
-        "control_source": "c_office_trans",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null,
-        "events": {
-          "OnClick": "[Event Procedure]"
-        }
-      },
-      {
-        "name": "c_office_desc_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Office Name"
-      },
-      {
-        "name": "c_office_desc_chn",
-        "control_type": 109,
-        "control_source": "c_office_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null,
-        "events": {
-          "OnClick": "[Event Procedure]"
-        }
-      },
-      {
-        "name": "c_office_desc_chn_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "官名"
-      }
-    ],
-    "code_error": "<unknown>.CodeModule"
   },
   {
     "name": "ZZ_SOCIAL_NETWORK_AGGREGATED",
@@ -7075,57 +7075,84 @@
     ]
   },
   {
-    "name": "ZZ_SOCIAL_NETWORK",
+    "name": "ASSOC_DATA_2 Subform",
     "properties": {
-      "RecordSource": "ZZ_SOCIAL_NETWORK",
+      "RecordSource": "View_AssociationData",
       "Filter": "",
-      "OrderBy": "[ZZ_SOCIAL_NETWORK].[c_name]",
-      "Caption": "ZZZ_SOCIAL_NETWORK",
-      "DefaultView": 2,
-      "AllowEdits": true,
-      "AllowAdditions": true,
-      "AllowDeletions": true,
+      "OrderBy": "",
+      "Caption": "ASSOC_DATA Subform",
+      "DefaultView": 1,
+      "AllowEdits": false,
+      "AllowAdditions": false,
+      "AllowDeletions": false,
       "DataEntry": false
     },
     "controls": [
       {
-        "name": "c_name",
+        "name": "c_pages",
         "control_type": 109,
-        "control_source": "c_name",
+        "control_source": "c_pages",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "c_name_Label",
+        "name": "LblPages",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
-        "tag": "",
-        "caption": "Name"
+        "tag": "DetachedLabel",
+        "caption": "頁碼/條目"
       },
       {
-        "name": "c_name_chn",
+        "name": "c_assoc_year",
         "control_type": 109,
-        "control_source": "c_name_chn",
+        "control_source": "c_assoc_first_year",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "c_name_chn_Label",
+        "name": "LblYear",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "姓名"
+        "caption": "社會關係年份"
       },
       {
-        "name": "c_node_name",
+        "name": "c_assoc_nh_year",
+        "control_type": 109,
+        "control_source": "c_assoc_fy_nh_year",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtAssocNH",
+        "control_type": 109,
+        "control_source": "c_assoc_fy_nh_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblAssocNH",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "年號"
+      },
+      {
+        "name": "TxtAssocNM",
         "control_type": 109,
         "control_source": "c_node_name",
         "row_source": null,
@@ -7134,16 +7161,16 @@
         "caption": null
       },
       {
-        "name": "c_node_name_Label",
+        "name": "LblAssocName",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "Linked to"
+        "caption": "社會關係人"
       },
       {
-        "name": "c_node_chn",
+        "name": "TxtAssocNM_CHN",
         "control_type": 109,
         "control_source": "c_node_chn",
         "row_source": null,
@@ -7152,34 +7179,7 @@
         "caption": null
       },
       {
-        "name": "c_node_chn_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "社會關係人姓名"
-      },
-      {
-        "name": "c_link_type",
-        "control_type": 109,
-        "control_source": "c_link_type",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblKinNonkin",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Kin/Non"
-      },
-      {
-        "name": "c_link_desc",
+        "name": "TxtAssocDesc",
         "control_type": 109,
         "control_source": "c_link_desc",
         "row_source": null,
@@ -7188,16 +7188,16 @@
         "caption": null
       },
       {
-        "name": "c_link_desc_Label",
+        "name": "LblAssocDesc",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "Link"
+        "caption": "社會關係類別"
       },
       {
-        "name": "c_link_chn",
+        "name": "TxtAssocDesc_CHN",
         "control_type": 109,
         "control_source": "c_link_chn",
         "row_source": null,
@@ -7206,619 +7206,16 @@
         "caption": null
       },
       {
-        "name": "c_link_chn_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "聯繫"
-      },
-      {
-        "name": "c_addr_name",
+        "name": "TxtTitle_CHN",
         "control_type": 109,
-        "control_source": "c_addr_name",
+        "control_source": "c_source_chn",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "c_addr_name_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Index Place"
-      },
-      {
-        "name": "c_addr_chn",
-        "control_type": 109,
-        "control_source": "c_addr_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_addr_chn_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "指數地址"
-      },
-      {
-        "name": "TxtIndexYear",
-        "control_type": 109,
-        "control_source": "c_index_year",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblIndexYear",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Index Year"
-      },
-      {
-        "name": "TxtNodeIndexYear",
-        "control_type": 109,
-        "control_source": "c_node_index_year",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblNodeIndexYear",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Node's Index Year"
-      },
-      {
-        "name": "TxtPersonID",
-        "control_type": 109,
-        "control_source": "c_person_id",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label35",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "PersonID"
-      },
-      {
-        "name": "TxtNodeID",
-        "control_type": 109,
-        "control_source": "c_node_id",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label36",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "NodeID"
-      },
-      {
-        "name": "TxtXCoord",
-        "control_type": 109,
-        "control_source": "x_coord",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label37",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "X"
-      },
-      {
-        "name": "TxtYCoord",
-        "control_type": 109,
-        "control_source": "y_coord",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label38",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Y"
-      },
-      {
-        "name": "TxtNodeXCoord",
-        "control_type": 109,
-        "control_source": "node_xcoord",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblNodeX",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Node X"
-      },
-      {
-        "name": "TxtNodeYCoord",
-        "control_type": 109,
-        "control_source": "node_ycoord",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblNodeY",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Node Y"
-      },
-      {
-        "name": "TxtEdgeDist",
-        "control_type": 109,
-        "control_source": "c_edge_dist",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblEdgeDist",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Edge Dist.:"
-      },
-      {
-        "name": "c_node_addr_chn",
-        "control_type": 109,
-        "control_source": "c_node_addr_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label33",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "社會關係人籍貫"
-      },
-      {
-        "name": "c_node_addr_name",
-        "control_type": 109,
-        "control_source": "c_node_addr_name",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label34",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Node Index Place"
-      },
-      {
-        "name": "TxtAddrDesc",
-        "control_type": 109,
-        "control_source": "c_addr_desc",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label42",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Addr. Type"
-      },
-      {
-        "name": "TxtAddrDescChn",
-        "control_type": 109,
-        "control_source": "c_addr_desc_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label44",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "指數地址類"
-      },
-      {
-        "name": "TxtNodeAddrType",
-        "control_type": 109,
-        "control_source": "c_node_addr_desc",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label46",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Node Addr. Type"
-      },
-      {
-        "name": "TxtNodeAddrDescChn",
-        "control_type": 109,
-        "control_source": "c_node_addr_desc_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label48",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "關係人指數地址類"
-      },
-      {
-        "name": "c_link_count",
-        "control_type": 109,
-        "control_source": "c_link_count",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label50",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Count"
-      },
-      {
-        "name": "TxtTextTitle",
-        "control_type": 109,
-        "control_source": "c_text_title",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label52",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Text Title: "
-      },
-      {
-        "name": "c_distance",
-        "control_type": 109,
-        "control_source": "c_distance",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblDistance",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Distance 距離"
-      },
-      {
-        "name": "c_index_year_type_desc",
-        "control_type": 109,
-        "control_source": "c_index_year_type_desc",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblIndexYearTypeDesc",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Index Year Type"
-      },
-      {
-        "name": "c_index_year_type_hz",
-        "control_type": 109,
-        "control_source": "c_index_year_type_hz",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblIndexYearTypeHZ",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "指數年類別"
-      },
-      {
-        "name": "c_index_year_type_code",
-        "control_type": 109,
-        "control_source": "c_index_year_type_code",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblIndexYearTypeCode",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Index Year Type Code"
-      },
-      {
-        "name": "c_node_index_year_type_desc",
-        "control_type": 109,
-        "control_source": "c_node_index_year_type_desc",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblNodeIndexYearTypeDesc",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Node Index Year Type"
-      },
-      {
-        "name": "c_node_index_year_type_hz",
-        "control_type": 109,
-        "control_source": "c_node_index_year_type_hz",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblNodeIndexYearTypeHZ",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "關係人指數年類別"
-      },
-      {
-        "name": "c_node_index_year_type_code",
-        "control_type": 109,
-        "control_source": "c_node_index_year_type_code",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblNodeIndexYearTypeCode",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Node Index Year Type Code"
-      },
-      {
-        "name": "c_dynasty",
-        "control_type": 109,
-        "control_source": "c_dynasty",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_dynasty_lbl",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Dynasty"
-      },
-      {
-        "name": "c_dynasty_chn",
-        "control_type": 109,
-        "control_source": "c_dynasty_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_dynasty_chn_lbl",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "朝代"
-      },
-      {
-        "name": "c_dy",
-        "control_type": 109,
-        "control_source": "c_dy",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_dy_lbl",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Dynasty Code"
-      },
-      {
-        "name": "c_node_dynasty",
-        "control_type": 109,
-        "control_source": "c_node_dynasty",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_node_dynasty_lbl",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Node Dynasty"
-      },
-      {
-        "name": "c_node_dynasty_chn",
-        "control_type": 109,
-        "control_source": "c_node_dynasty_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_node_dynasty_chn_lbl",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "關係人朝代"
-      },
-      {
-        "name": "c_node_dy",
-        "control_type": 109,
-        "control_source": "c_node_dy",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_node_dy_lbl",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Node Dynasty Code"
-      },
-      {
-        "name": "c_source_text",
-        "control_type": 109,
-        "control_source": "c_source_text",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label81",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Source"
-      },
-      {
-        "name": "c_source_txt_chn",
-        "control_type": 109,
-        "control_source": "c_source_txt_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label83",
+        "name": "LblSource",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
@@ -7827,132 +7224,61 @@
         "caption": "出處"
       },
       {
-        "name": "c_link_addr_name",
+        "name": "c_notes",
         "control_type": 109,
-        "control_source": "c_link_addr_name",
+        "control_source": "c_notes",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "Lbl_c_link_addr_name",
+        "name": "LblNotes",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "Assoc. Place"
+        "caption": "注"
       },
       {
-        "name": "c_link_addr_chn",
+        "name": "c_sequence",
         "control_type": 109,
-        "control_source": "c_link_addr_chn",
+        "control_source": "c_sequence",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "Lbl_c_link_addr_chn",
+        "name": "LblSequence",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "關係地址"
+        "caption": "次序"
       },
       {
-        "name": "c_link_first_year",
+        "name": "TxtKinRel",
         "control_type": 109,
-        "control_source": "c_link_first_year",
+        "control_source": "c_kinrel",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "Lbl_c_link_first_year",
+        "name": "LblKinRel",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "Assoc. First Year"
+        "caption": "親屬關係類別"
       },
       {
-        "name": "c_link_last_year",
-        "control_type": 109,
-        "control_source": "c_link_last_year",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Lbl_c_link_last_year",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Assoc. Last Year"
-      }
-    ],
-    "code_error": "<unknown>.CodeModule"
-  },
-  {
-    "name": "frmZZ_SCRATCH_KIN",
-    "properties": {
-      "RecordSource": "ZZ_SCRATCH_KIN",
-      "Filter": "",
-      "OrderBy": "c_up, c_down, c_collateral, c_marriage",
-      "Caption": "frmZZZ_SCRATCH_KIN",
-      "DefaultView": 2,
-      "AllowEdits": true,
-      "AllowAdditions": true,
-      "AllowDeletions": true,
-      "DataEntry": false
-    },
-    "controls": [
-      {
-        "name": "c_name",
-        "control_type": 109,
-        "control_source": "c_name",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_name_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Name"
-      },
-      {
-        "name": "c_name_chn",
-        "control_type": 109,
-        "control_source": "c_name_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_name_chn_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "姓名"
-      },
-      {
-        "name": "c_kin_name",
+        "name": "TxtKinPY",
         "control_type": 109,
         "control_source": "c_kin_name",
         "row_source": null,
@@ -7961,16 +7287,196 @@
         "caption": null
       },
       {
-        "name": "c_kin_name_Label",
+        "name": "TxtAssocKinRel",
+        "control_type": 109,
+        "control_source": "c_assoc_kinrel",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblAssocKinrel",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "Kin"
+        "caption": "社會關係人親屬關係類別"
       },
       {
-        "name": "c_kin_chn",
+        "name": "TxtAssocKinNM",
+        "control_type": 109,
+        "control_source": "c_assoc_kin_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblAssocKinChn",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "社會關係人親戚姓名"
+      },
+      {
+        "name": "c_text_title",
+        "control_type": 109,
+        "control_source": "c_text_title",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblTitle",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "作品標題"
+      },
+      {
+        "name": "TxtTopic_CHN",
+        "control_type": 109,
+        "control_source": "c_topic_desc_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblTopicChn",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "學術主題"
+      },
+      {
+        "name": "TxtInst_CHN",
+        "control_type": 109,
+        "control_source": "c_inst_name_hz",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblSocInst",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "就讀學校"
+      },
+      {
+        "name": "TxtAddrCHN",
+        "control_type": 109,
+        "control_source": "c_assoc_addr_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblAssocAddr",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "社會關係發生地"
+      },
+      {
+        "name": "TxtClaimer_CHN",
+        "control_type": 109,
+        "control_source": "c_assoc_claimer_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblClaimerChn",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "社會關係指證人姓名"
+      },
+      {
+        "name": "c_assoc_intercalary",
+        "control_type": 106,
+        "control_source": "c_assoc_fy_intercalary",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblIntercalary",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "閏"
+      },
+      {
+        "name": "c_assoc_month",
+        "control_type": 109,
+        "control_source": "c_assoc_fy_month",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_assoc_day",
+        "control_type": 109,
+        "control_source": "c_assoc_fy_day",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblNHYear",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "年/月/日"
+      },
+      {
+        "name": "Box156",
+        "control_type": 101,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblSupplement",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "補充信息"
+      },
+      {
+        "name": "TxtKinNMChn",
         "control_type": 109,
         "control_source": "c_kin_chn",
         "row_source": null,
@@ -7979,32 +7485,606 @@
         "caption": null
       },
       {
-        "name": "c_kin_chn_Label",
+        "name": "LblKinName",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "親戚"
+        "caption": "親戚姓名"
       },
       {
-        "name": "c_person_id",
+        "name": "c_assoc_count",
         "control_type": 109,
-        "control_source": "c_person_id",
+        "control_source": "c_link_count",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "c_person_id_Label",
+        "name": "LblCount",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "ID"
+        "caption": "Count"
       },
+      {
+        "name": "TxtKinrelChn",
+        "control_type": 109,
+        "control_source": "c_kinrel_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtAssocKinRelChn",
+        "control_type": 109,
+        "control_source": "c_assoc_kinrel_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtAssocKinPY",
+        "control_type": 109,
+        "control_source": "c_assoc_kin_name",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtAddrPY",
+        "control_type": 109,
+        "control_source": "c_assoc_addr_name",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtAssocClaimerPY",
+        "control_type": 109,
+        "control_source": "c_assoc_claimer_name",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtTopicDesc",
+        "control_type": 109,
+        "control_source": "c_topic_desc",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtInstNamePY",
+        "control_type": 109,
+        "control_source": "c_inst_name_py",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtOccassionEng",
+        "control_type": 109,
+        "control_source": "c_occasion_desc",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtLitGenre",
+        "control_type": 109,
+        "control_source": "c_lit_genre_desc",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtSourcePY",
+        "control_type": 109,
+        "control_source": "c_source_title",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtRangeChn",
+        "control_type": 109,
+        "control_source": "c_range_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblRange",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "時限"
+      },
+      {
+        "name": "TxtOccasionChn",
+        "control_type": 109,
+        "control_source": "c_occasion_desc",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblOccasion",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "社會關係發生場合"
+      },
+      {
+        "name": "TxtLitGenreChn",
+        "control_type": 109,
+        "control_source": "c_lit_genre_desc_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblGenre",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "作品的文學樣式"
+      },
+      {
+        "name": "TxtNHPY",
+        "control_type": 109,
+        "control_source": "c_assoc_fy_nh_py",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Text196",
+        "control_type": 109,
+        "control_source": "c_range",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtGZHZ",
+        "control_type": 109,
+        "control_source": "c_ganzhi_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtGZPY",
+        "control_type": 109,
+        "control_source": "c_ganzhi_py",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblGZ",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "日(干支)"
+      }
+    ],
+    "code_error": "<unknown>.CodeModule"
+  },
+  {
+    "name": "POSSESSION_DATA_2 Subform",
+    "properties": {
+      "RecordSource": "View_PossessionsAddrData",
+      "Filter": "",
+      "OrderBy": "",
+      "Caption": "POSSESSION_DATA Subform",
+      "DefaultView": 0,
+      "AllowEdits": false,
+      "AllowAdditions": false,
+      "AllowDeletions": false,
+      "DataEntry": false
+    },
+    "controls": [
+      {
+        "name": "c_possession_record_id",
+        "control_type": 109,
+        "control_source": "c_possession_record_id",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblRecordID",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "紀錄號"
+      },
+      {
+        "name": "c_sequence",
+        "control_type": 109,
+        "control_source": "c_sequence",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblSequence",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "次序"
+      },
+      {
+        "name": "c_possession_desc",
+        "control_type": 109,
+        "control_source": "c_possession_desc",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblDesc",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "財產(英文描述)"
+      },
+      {
+        "name": "c_possession_desc_chn",
+        "control_type": 109,
+        "control_source": "c_possession_desc_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblDescChn",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "財產(中文描述)"
+      },
+      {
+        "name": "c_quantity",
+        "control_type": 109,
+        "control_source": "c_quantity",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblQuantity",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "數量"
+      },
+      {
+        "name": "c_possession_yr",
+        "control_type": 109,
+        "control_source": "c_possession_yr",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblYear",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "年份"
+      },
+      {
+        "name": "c_possession_nh_code",
+        "control_type": 109,
+        "control_source": "c_possession_nh_code",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_possession_nh_yr",
+        "control_type": 109,
+        "control_source": "c_possession_nh_yr",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblNHYear",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "年"
+      },
+      {
+        "name": "c_source",
+        "control_type": 109,
+        "control_source": "c_source",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_pages",
+        "control_type": 109,
+        "control_source": "c_pages",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblPages",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "頁碼/條目"
+      },
+      {
+        "name": "c_notes",
+        "control_type": 109,
+        "control_source": "c_notes",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblNotes",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "注"
+      },
+      {
+        "name": "TxtNH",
+        "control_type": 109,
+        "control_source": "c_nianhao_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblNH",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "年號"
+      },
+      {
+        "name": "LastRecordID",
+        "control_type": 109,
+        "control_source": "",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtAddrCHN",
+        "control_type": 109,
+        "control_source": "c_addr_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblAddr",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "地名"
+      },
+      {
+        "name": "TxtAddrPY",
+        "control_type": 109,
+        "control_source": "c_aadr_name",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtTitle_CHN",
+        "control_type": 109,
+        "control_source": "c_title_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblSource",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "出處"
+      },
+      {
+        "name": "c_addr_id",
+        "control_type": 109,
+        "control_source": "c_addr_id",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtTitlePY",
+        "control_type": 109,
+        "control_source": "c_title",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtActChn",
+        "control_type": 109,
+        "control_source": "c_possession_act_desc_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblAct",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "行為(擁有、捐出等)"
+      },
+      {
+        "name": "TxtActEng",
+        "control_type": 109,
+        "control_source": "c_possession_act_desc",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtUnitChn",
+        "control_type": 109,
+        "control_source": "c_measure_desc_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblUnit",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "度量單位"
+      },
+      {
+        "name": "TxtUnitEng",
+        "control_type": 109,
+        "control_source": "c_measure_desc",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtRangeChn",
+        "control_type": 109,
+        "control_source": "c_range_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblRange",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "時限"
+      },
+      {
+        "name": "TxtRangeEng",
+        "control_type": 109,
+        "control_source": "c_range",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      }
+    ],
+    "code_error": "<unknown>.CodeModule"
+  },
+  {
+    "name": "KIN_DATA_2 Subform",
+    "properties": {
+      "RecordSource": "SELECT ZZ_SCRATCH_KIN.c_kin_id, ZZ_SCRATCH_KIN.c_kin_name, ZZ_SCRATCH_KIN.c_kin_chn, ZZ_SCRATCH_KIN.c_kin_code, ZZ_SCRATCH_KIN.c_kin_rel_total, ZZ_SCRATCH_KIN.c_kin_rel, ZZ_SCRATCH_KIN.c_person_id, ZZ_SCRATCH_KIN.c_source, ZZ_SCRATCH_KIN.c_source_text, ZZ_SCRATCH_KIN.c_source_text_chn, ZZ_SCRATCH_KIN.c_notes, ZZ_SCRATCH_KIN.c_up, ZZ_SCRATCH_KIN.c_down, ZZ_SCRATCH_KIN.c_marriage, ZZ_SCRATCH_KIN.c_collateral, ZZ_SCRATCH_KIN.c_pages FROM ZZ_SCRATCH_KIN;",
+      "Filter": "",
+      "OrderBy": "",
+      "Caption": "KIN_DATA Subform1",
+      "DefaultView": 1,
+      "AllowEdits": false,
+      "AllowAdditions": false,
+      "AllowDeletions": false,
+      "DataEntry": false
+    },
+    "controls": [
       {
         "name": "c_kin_id",
         "control_type": 109,
@@ -8015,16 +8095,106 @@
         "caption": null
       },
       {
-        "name": "c_kin_id_Label",
+        "name": "c_kin_code",
+        "control_type": 109,
+        "control_source": "c_kin_code",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_source",
+        "control_type": 109,
+        "control_source": "c_source",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_pages",
+        "control_type": 109,
+        "control_source": "c_pages",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblPages",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "Kin ID"
+        "caption": "頁碼/條目"
       },
       {
-        "name": "c_kin_rel",
+        "name": "c_notes",
+        "control_type": 109,
+        "control_source": "c_notes",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblNotes",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "注"
+      },
+      {
+        "name": "TxtTitle_CHN",
+        "control_type": 109,
+        "control_source": "c_source_text_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblSource",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "出處"
+      },
+      {
+        "name": "TxtKinNM",
+        "control_type": 109,
+        "control_source": "c_kin_name",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblKinName",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "親戚姓名"
+      },
+      {
+        "name": "TxtKinNM_CHN",
+        "control_type": 109,
+        "control_source": "c_kin_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtKinRel",
         "control_type": 109,
         "control_source": "c_kin_rel_total",
         "row_source": null,
@@ -8033,13 +8203,31 @@
         "caption": null
       },
       {
-        "name": "c_kin_rel_Label",
+        "name": "LblKinrel",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "KinRel to Self"
+        "caption": "親屬關係類別"
+      },
+      {
+        "name": "TxtKinRel_CHN",
+        "control_type": 109,
+        "control_source": "c_kin_rel",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtSourcePY",
+        "control_type": 109,
+        "control_source": "c_source_text",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
       },
       {
         "name": "c_up",
@@ -8051,13 +8239,31 @@
         "caption": null
       },
       {
-        "name": "c_up_Label",
+        "name": "Lbl_c_up",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": "Up"
+      },
+      {
+        "name": "c_collateral",
+        "control_type": 109,
+        "control_source": "c_collateral",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Lbl_c_collateral",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Collateral"
       },
       {
         "name": "c_down",
@@ -8069,7 +8275,7 @@
         "caption": null
       },
       {
-        "name": "c_down_Label",
+        "name": "Lbl_c_down",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
@@ -8087,32 +8293,31 @@
         "caption": null
       },
       {
-        "name": "c_marriage_Label",
+        "name": "Lbl_c_marriage",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "Mar."
-      },
-      {
-        "name": "c_collateral",
-        "control_type": 109,
-        "control_source": "c_collateral",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_collateral_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Col."
-      },
+        "caption": "Marriage"
+      }
+    ],
+    "code_error": "<unknown>.CodeModule"
+  },
+  {
+    "name": "EVENT_ADDR_2 Subform",
+    "properties": {
+      "RecordSource": "View_EventAddrData",
+      "Filter": "",
+      "OrderBy": "",
+      "Caption": "POST_ADDR Subform2",
+      "DefaultView": 0,
+      "AllowEdits": true,
+      "AllowAdditions": true,
+      "AllowDeletions": true,
+      "DataEntry": false
+    },
+    "controls": [
       {
         "name": "c_addr_id",
         "control_type": 109,
@@ -8123,339 +8328,87 @@
         "caption": null
       },
       {
-        "name": "c_addr_id_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Addr ID"
-      },
-      {
-        "name": "c_addr_name",
+        "name": "TxtAddrCHN",
         "control_type": 109,
-        "control_source": "c_kin_addr_name",
+        "control_source": "c_event_addr_chn",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "c_addr_name_Label",
+        "name": "LblName",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "Kin Index Place"
+        "caption": "地名"
       },
       {
-        "name": "c_addr_chn",
+        "name": "TxtAddrPY",
         "control_type": 109,
-        "control_source": "c_kin_addr_chn",
+        "control_source": "c_event_addr_name",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
-      },
-      {
-        "name": "c_addr_chn_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "親戚指數地址"
-      },
-      {
-        "name": "c_xcoord",
-        "control_type": 109,
-        "control_source": "kin_x_coord",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_xcoord_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "X"
-      },
-      {
-        "name": "c_ycoord",
-        "control_type": 109,
-        "control_source": "kin_y_coord",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_ycoord_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Y"
-      },
-      {
-        "name": "c_notes",
-        "control_type": 109,
-        "control_source": "c_notes",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_notes_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Notes"
-      },
-      {
-        "name": "Text36",
-        "control_type": 109,
-        "control_source": "c_kin_rel_0",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label37",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "KinRel calculation"
-      },
-      {
-        "name": "Text38",
-        "control_type": 109,
-        "control_source": "c_kin_index_year",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label39",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Index Year"
-      },
-      {
-        "name": "TxtXYCount",
-        "control_type": 109,
-        "control_source": "xy_count",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label41",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "XY Count"
-      },
-      {
-        "name": "TxtAddrDesc",
-        "control_type": 109,
-        "control_source": "c_kin_addr_desc",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label43",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Kin Addr. desc:"
-      },
-      {
-        "name": "TxtAddrDescChn",
-        "control_type": 109,
-        "control_source": "c_kin_addr_desc_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label45",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Kin Addr. desc:"
-      },
-      {
-        "name": "c_distance",
-        "control_type": 109,
-        "control_source": "c_distance",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblDistance",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Distance 距離"
-      },
-      {
-        "name": "c_kin_index_year_type_desc",
-        "control_type": 109,
-        "control_source": "c_kin_index_year_type_desc",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblIndexYearTypeDesc",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "IY Type"
-      },
-      {
-        "name": "c_kin_index_year_type_hz",
-        "control_type": 109,
-        "control_source": "c_kin_index_year_type_hz",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblIndexYearTypeHZ",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "指數年類別"
-      },
-      {
-        "name": "c_kin_index_year_type_code",
-        "control_type": 109,
-        "control_source": "c_kin_index_year_type_code",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblIndexYearTypeCode",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "IY Type Code"
-      },
-      {
-        "name": "c_kin_sex",
-        "control_type": 109,
-        "control_source": "c_kin_sex",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_kin_sex_lbl",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Kin Sex"
-      },
-      {
-        "name": "c_kin_dy",
-        "control_type": 109,
-        "control_source": "c_kin_dy",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Lbl_c_kin_dy",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Kin Dynasty Code"
-      },
-      {
-        "name": "c_kin_dynasty",
-        "control_type": 109,
-        "control_source": "c_kin_dynasty",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Lbl_c_kin_dynasty",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Kin Dynasty"
-      },
-      {
-        "name": "c_kin_dynasty_chn",
-        "control_type": 109,
-        "control_source": "c_kin_dynasty_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Lbl_c_kin_dynasty_chn",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "親戚朝代"
       }
-    ]
+    ],
+    "code_error": "<unknown>.CodeModule"
+  },
+  {
+    "name": "POSTED_TO_ADDR_DATA_2 Subform",
+    "properties": {
+      "RecordSource": "View_PostingAddrData",
+      "Filter": "",
+      "OrderBy": "",
+      "Caption": "POSTING_ADDR_DATA Subform",
+      "DefaultView": 0,
+      "AllowEdits": false,
+      "AllowAdditions": false,
+      "AllowDeletions": false,
+      "DataEntry": false
+    },
+    "controls": [
+      {
+        "name": "c_addr_id",
+        "control_type": 109,
+        "control_source": "c_addr_id",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "TxtAddrChn",
+        "control_type": 109,
+        "control_source": "c_office_addr_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblPlace",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Place"
+      },
+      {
+        "name": "TxtAddr",
+        "control_type": 109,
+        "control_source": "c_office_addr_name",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      }
+    ],
+    "code_error": "<unknown>.CodeModule"
   },
   {
     "name": "STATUS_DATA_2 Subform",
@@ -9077,15 +9030,6 @@
         "name": "c_addr_id",
         "control_type": 109,
         "control_source": "c_addr_id",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_event_record_id",
-        "control_type": 109,
-        "control_source": "c_event_record_id",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
@@ -10363,10 +10307,7 @@
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": null,
-        "events": {
-          "AfterUpdate": "[Event Procedure]"
-        }
+        "caption": null
       },
       {
         "name": "c_dy_nh_code",
@@ -10375,10 +10316,7 @@
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": null,
-        "events": {
-          "AfterUpdate": "[Event Procedure]"
-        }
+        "caption": null
       },
       {
         "name": "c_surname",
@@ -10387,10 +10325,7 @@
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": null,
-        "events": {
-          "AfterUpdate": "[Event Procedure]"
-        }
+        "caption": null
       },
       {
         "name": "c_surname_Label",
@@ -10430,10 +10365,7 @@
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": null,
-        "events": {
-          "OnGotFocus": "[Event Procedure]"
-        }
+        "caption": null
       },
       {
         "name": "c_mingzi_Label",
@@ -11746,9 +11678,9 @@
         "caption": null
       },
       {
-        "name": "c_appt_type_code",
+        "name": "c_appt_code",
         "control_type": 109,
-        "control_source": "c_appt_type_code",
+        "control_source": "c_appt_code",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
@@ -12333,210 +12265,57 @@
     "code_error": "<unknown>.CodeModule"
   },
   {
-    "name": "ASSOC_DATA_2 Subform",
+    "name": "frmZZ_SCRATCH_KIN",
     "properties": {
-      "RecordSource": "View_AssociationData",
+      "RecordSource": "ZZ_SCRATCH_KIN",
       "Filter": "",
-      "OrderBy": "",
-      "Caption": "ASSOC_DATA Subform",
-      "DefaultView": 1,
-      "AllowEdits": false,
-      "AllowAdditions": false,
-      "AllowDeletions": false,
+      "OrderBy": "c_up, c_down, c_collateral, c_marriage",
+      "Caption": "frmZZZ_SCRATCH_KIN",
+      "DefaultView": 2,
+      "AllowEdits": true,
+      "AllowAdditions": true,
+      "AllowDeletions": true,
       "DataEntry": false
     },
     "controls": [
       {
-        "name": "c_pages",
+        "name": "c_name",
         "control_type": 109,
-        "control_source": "c_pages",
+        "control_source": "c_name",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "LblPages",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "DetachedLabel",
-        "caption": "頁碼/條目"
-      },
-      {
-        "name": "c_assoc_year",
-        "control_type": 109,
-        "control_source": "c_assoc_first_year",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblYear",
+        "name": "c_name_Label",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "社會關係年份"
+        "caption": "Name"
       },
       {
-        "name": "c_assoc_nh_year",
+        "name": "c_name_chn",
         "control_type": 109,
-        "control_source": "c_assoc_fy_nh_year",
+        "control_source": "c_name_chn",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "TxtAssocNH",
-        "control_type": 109,
-        "control_source": "c_assoc_fy_nh_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblAssocNH",
+        "name": "c_name_chn_Label",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "年號"
+        "caption": "姓名"
       },
       {
-        "name": "TxtAssocNM",
-        "control_type": 109,
-        "control_source": "c_node_name",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblAssocName",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "社會關係人"
-      },
-      {
-        "name": "TxtAssocNM_CHN",
-        "control_type": 109,
-        "control_source": "c_node_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtAssocDesc",
-        "control_type": 109,
-        "control_source": "c_link_desc",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblAssocDesc",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "社會關係類別"
-      },
-      {
-        "name": "TxtAssocDesc_CHN",
-        "control_type": 109,
-        "control_source": "c_link_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtTitle_CHN",
-        "control_type": 109,
-        "control_source": "c_source_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblSource",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "出處"
-      },
-      {
-        "name": "c_notes",
-        "control_type": 109,
-        "control_source": "c_notes",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblNotes",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "注"
-      },
-      {
-        "name": "c_sequence",
-        "control_type": 109,
-        "control_source": "c_sequence",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblSequence",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "次序"
-      },
-      {
-        "name": "TxtKinRel",
-        "control_type": 109,
-        "control_source": "c_kinrel",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblKinRel",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "親屬關係類別"
-      },
-      {
-        "name": "TxtKinPY",
+        "name": "c_kin_name",
         "control_type": 109,
         "control_source": "c_kin_name",
         "row_source": null,
@@ -12545,196 +12324,16 @@
         "caption": null
       },
       {
-        "name": "TxtAssocKinRel",
-        "control_type": 109,
-        "control_source": "c_assoc_kinrel",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblAssocKinrel",
+        "name": "c_kin_name_Label",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "社會關係人親屬關係類別"
+        "caption": "Kin"
       },
       {
-        "name": "TxtAssocKinNM",
-        "control_type": 109,
-        "control_source": "c_assoc_kin_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblAssocKinChn",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "社會關係人親戚姓名"
-      },
-      {
-        "name": "c_text_title",
-        "control_type": 109,
-        "control_source": "c_text_title",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblTitle",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "作品標題"
-      },
-      {
-        "name": "TxtTopic_CHN",
-        "control_type": 109,
-        "control_source": "c_topic_desc_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblTopicChn",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "學術主題"
-      },
-      {
-        "name": "TxtInst_CHN",
-        "control_type": 109,
-        "control_source": "c_inst_name_hz",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblSocInst",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "就讀學校"
-      },
-      {
-        "name": "TxtAddrCHN",
-        "control_type": 109,
-        "control_source": "c_assoc_addr_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblAssocAddr",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "社會關係發生地"
-      },
-      {
-        "name": "TxtClaimer_CHN",
-        "control_type": 109,
-        "control_source": "c_assoc_claimer_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblClaimerChn",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "社會關係指證人姓名"
-      },
-      {
-        "name": "c_assoc_intercalary",
-        "control_type": 106,
-        "control_source": "c_assoc_fy_intercalary",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblIntercalary",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "閏"
-      },
-      {
-        "name": "c_assoc_month",
-        "control_type": 109,
-        "control_source": "c_assoc_fy_month",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_assoc_day",
-        "control_type": 109,
-        "control_source": "c_assoc_fy_day",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblNHYear",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "年/月/日"
-      },
-      {
-        "name": "Box156",
-        "control_type": 101,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblSupplement",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "補充信息"
-      },
-      {
-        "name": "TxtKinNMChn",
+        "name": "c_kin_chn",
         "control_type": 109,
         "control_source": "c_kin_chn",
         "row_source": null,
@@ -12743,606 +12342,32 @@
         "caption": null
       },
       {
-        "name": "LblKinName",
+        "name": "c_kin_chn_Label",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "親戚姓名"
+        "caption": "親戚"
       },
       {
-        "name": "c_assoc_count",
+        "name": "c_person_id",
         "control_type": 109,
-        "control_source": "c_link_count",
+        "control_source": "c_person_id",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "LblCount",
+        "name": "c_person_id_Label",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "Count"
+        "caption": "ID"
       },
-      {
-        "name": "TxtKinrelChn",
-        "control_type": 109,
-        "control_source": "c_kinrel_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtAssocKinRelChn",
-        "control_type": 109,
-        "control_source": "c_assoc_kinrel_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtAssocKinPY",
-        "control_type": 109,
-        "control_source": "c_assoc_kin_name",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtAddrPY",
-        "control_type": 109,
-        "control_source": "c_assoc_addr_name",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtAssocClaimerPY",
-        "control_type": 109,
-        "control_source": "c_assoc_claimer_name",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtTopicDesc",
-        "control_type": 109,
-        "control_source": "c_topic_desc",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtInstNamePY",
-        "control_type": 109,
-        "control_source": "c_inst_name_py",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtOccassionEng",
-        "control_type": 109,
-        "control_source": "c_occasion_desc",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtLitGenre",
-        "control_type": 109,
-        "control_source": "c_lit_genre_desc",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtSourcePY",
-        "control_type": 109,
-        "control_source": "c_source_title",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtRangeChn",
-        "control_type": 109,
-        "control_source": "c_range_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblRange",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "時限"
-      },
-      {
-        "name": "TxtOccasionChn",
-        "control_type": 109,
-        "control_source": "c_occasion_desc",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblOccasion",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "社會關係發生場合"
-      },
-      {
-        "name": "TxtLitGenreChn",
-        "control_type": 109,
-        "control_source": "c_lit_genre_desc_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblGenre",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "作品的文學樣式"
-      },
-      {
-        "name": "TxtNHPY",
-        "control_type": 109,
-        "control_source": "c_assoc_fy_nh_py",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Text196",
-        "control_type": 109,
-        "control_source": "c_range",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtGZHZ",
-        "control_type": 109,
-        "control_source": "c_ganzhi_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtGZPY",
-        "control_type": 109,
-        "control_source": "c_ganzhi_py",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblGZ",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "日(干支)"
-      }
-    ],
-    "code_error": "<unknown>.CodeModule"
-  },
-  {
-    "name": "POSSESSION_DATA_2 Subform",
-    "properties": {
-      "RecordSource": "View_PossessionsAddrData",
-      "Filter": "",
-      "OrderBy": "",
-      "Caption": "POSSESSION_DATA Subform",
-      "DefaultView": 0,
-      "AllowEdits": false,
-      "AllowAdditions": false,
-      "AllowDeletions": false,
-      "DataEntry": false
-    },
-    "controls": [
-      {
-        "name": "c_possession_record_id",
-        "control_type": 109,
-        "control_source": "c_possession_record_id",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblRecordID",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "紀錄號"
-      },
-      {
-        "name": "c_sequence",
-        "control_type": 109,
-        "control_source": "c_sequence",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblSequence",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "次序"
-      },
-      {
-        "name": "c_possession_desc",
-        "control_type": 109,
-        "control_source": "c_possession_desc",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblDesc",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "財產(英文描述)"
-      },
-      {
-        "name": "c_possession_desc_chn",
-        "control_type": 109,
-        "control_source": "c_possession_desc_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblDescChn",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "財產(中文描述)"
-      },
-      {
-        "name": "c_quantity",
-        "control_type": 109,
-        "control_source": "c_quantity",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblQuantity",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "數量"
-      },
-      {
-        "name": "c_possession_yr",
-        "control_type": 109,
-        "control_source": "c_possession_yr",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblYear",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "年份"
-      },
-      {
-        "name": "c_possession_nh_code",
-        "control_type": 109,
-        "control_source": "c_possession_nh_code",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_possession_nh_yr",
-        "control_type": 109,
-        "control_source": "c_possession_nh_yr",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblNHYear",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "年"
-      },
-      {
-        "name": "c_source",
-        "control_type": 109,
-        "control_source": "c_source",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_pages",
-        "control_type": 109,
-        "control_source": "c_pages",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblPages",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "頁碼/條目"
-      },
-      {
-        "name": "c_notes",
-        "control_type": 109,
-        "control_source": "c_notes",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblNotes",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "注"
-      },
-      {
-        "name": "TxtNH",
-        "control_type": 109,
-        "control_source": "c_nianhao_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblNH",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "年號"
-      },
-      {
-        "name": "LastRecordID",
-        "control_type": 109,
-        "control_source": "",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtAddrCHN",
-        "control_type": 109,
-        "control_source": "c_addr_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblAddr",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "地名"
-      },
-      {
-        "name": "TxtAddrPY",
-        "control_type": 109,
-        "control_source": "c_aadr_name",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtTitle_CHN",
-        "control_type": 109,
-        "control_source": "c_title_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblSource",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "出處"
-      },
-      {
-        "name": "c_addr_id",
-        "control_type": 109,
-        "control_source": "c_addr_id",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtTitlePY",
-        "control_type": 109,
-        "control_source": "c_title",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtActChn",
-        "control_type": 109,
-        "control_source": "c_possession_act_desc_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblAct",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "行為(擁有、捐出等)"
-      },
-      {
-        "name": "TxtActEng",
-        "control_type": 109,
-        "control_source": "c_possession_act_desc",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtUnitChn",
-        "control_type": 109,
-        "control_source": "c_measure_desc_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblUnit",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "度量單位"
-      },
-      {
-        "name": "TxtUnitEng",
-        "control_type": 109,
-        "control_source": "c_measure_desc",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtRangeChn",
-        "control_type": 109,
-        "control_source": "c_range_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblRange",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "時限"
-      },
-      {
-        "name": "TxtRangeEng",
-        "control_type": 109,
-        "control_source": "c_range",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      }
-    ],
-    "code_error": "<unknown>.CodeModule"
-  },
-  {
-    "name": "KIN_DATA_2 Subform",
-    "properties": {
-      "RecordSource": "SELECT ZZ_SCRATCH_KIN.c_kin_id, ZZ_SCRATCH_KIN.c_kin_name, ZZ_SCRATCH_KIN.c_kin_chn, ZZ_SCRATCH_KIN.c_kin_code, ZZ_SCRATCH_KIN.c_kin_rel_total, ZZ_SCRATCH_KIN.c_kin_rel, ZZ_SCRATCH_KIN.c_person_id, ZZ_SCRATCH_KIN.c_source, ZZ_SCRATCH_KIN.c_source_text, ZZ_SCRATCH_KIN.c_source_text_chn, ZZ_SCRATCH_KIN.c_notes, ZZ_SCRATCH_KIN.c_up, ZZ_SCRATCH_KIN.c_down, ZZ_SCRATCH_KIN.c_marriage, ZZ_SCRATCH_KIN.c_collateral, ZZ_SCRATCH_KIN.c_pages FROM ZZ_SCRATCH_KIN;",
-      "Filter": "",
-      "OrderBy": "",
-      "Caption": "KIN_DATA Subform1",
-      "DefaultView": 1,
-      "AllowEdits": false,
-      "AllowAdditions": false,
-      "AllowDeletions": false,
-      "DataEntry": false
-    },
-    "controls": [
       {
         "name": "c_kin_id",
         "control_type": 109,
@@ -13353,106 +12378,16 @@
         "caption": null
       },
       {
-        "name": "c_kin_code",
-        "control_type": 109,
-        "control_source": "c_kin_code",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_source",
-        "control_type": 109,
-        "control_source": "c_source",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_pages",
-        "control_type": 109,
-        "control_source": "c_pages",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblPages",
+        "name": "c_kin_id_Label",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "頁碼/條目"
+        "caption": "Kin ID"
       },
       {
-        "name": "c_notes",
-        "control_type": 109,
-        "control_source": "c_notes",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblNotes",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "注"
-      },
-      {
-        "name": "TxtTitle_CHN",
-        "control_type": 109,
-        "control_source": "c_source_text_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblSource",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "出處"
-      },
-      {
-        "name": "TxtKinNM",
-        "control_type": 109,
-        "control_source": "c_kin_name",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblKinName",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "親戚姓名"
-      },
-      {
-        "name": "TxtKinNM_CHN",
-        "control_type": 109,
-        "control_source": "c_kin_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtKinRel",
+        "name": "c_kin_rel",
         "control_type": 109,
         "control_source": "c_kin_rel_total",
         "row_source": null,
@@ -13461,31 +12396,13 @@
         "caption": null
       },
       {
-        "name": "LblKinrel",
+        "name": "c_kin_rel_Label",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "親屬關係類別"
-      },
-      {
-        "name": "TxtKinRel_CHN",
-        "control_type": 109,
-        "control_source": "c_kin_rel",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtSourcePY",
-        "control_type": 109,
-        "control_source": "c_source_text",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
+        "caption": "KinRel to Self"
       },
       {
         "name": "c_up",
@@ -13497,31 +12414,13 @@
         "caption": null
       },
       {
-        "name": "Lbl_c_up",
+        "name": "c_up_Label",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": "Up"
-      },
-      {
-        "name": "c_collateral",
-        "control_type": 109,
-        "control_source": "c_collateral",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Lbl_c_collateral",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Collateral"
       },
       {
         "name": "c_down",
@@ -13533,7 +12432,7 @@
         "caption": null
       },
       {
-        "name": "Lbl_c_down",
+        "name": "c_down_Label",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
@@ -13551,99 +12450,121 @@
         "caption": null
       },
       {
-        "name": "Lbl_c_marriage",
+        "name": "c_marriage_Label",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "Marriage"
-      }
-    ],
-    "code_error": "<unknown>.CodeModule"
-  },
-  {
-    "name": "KIN_DATA Subform",
-    "properties": {
-      "RecordSource": "SELECT KIN_DATA.c_kin_id, KIN_DATA.c_kin_code, KIN_DATA.c_source, KIN_DATA.c_pages, KIN_DATA.c_notes, KINSHIP_CODES.c_kinrel, KINSHIP_CODES.c_kinrel_chn, KIN_DATA.c_personid, KIN_DATA.c_autogen_notes FROM KINSHIP_CODES INNER JOIN KIN_DATA ON KINSHIP_CODES.c_kincode = KIN_DATA.c_kin_code;",
-      "Filter": "",
-      "OrderBy": "",
-      "Caption": "KIN_DATA Subform1",
-      "DefaultView": 0,
-      "AllowEdits": true,
-      "AllowAdditions": true,
-      "AllowDeletions": true,
-      "DataEntry": false
-    },
-    "controls": [
+        "caption": "Mar."
+      },
       {
-        "name": "c_kin_id",
+        "name": "c_collateral",
         "control_type": 109,
-        "control_source": "c_kin_id",
+        "control_source": "c_collateral",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "c_kin_code",
-        "control_type": 109,
-        "control_source": "c_kin_code",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "c_source",
-        "control_type": 109,
-        "control_source": "c_source",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "CmdPickKinID",
-        "control_type": 104,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "親戚姓名",
-        "events": {
-          "OnClick": "[Event Procedure]"
-        }
-      },
-      {
-        "name": "CmdPickKinRel",
-        "control_type": 104,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "親屬關係類別",
-        "events": {
-          "OnClick": "[Event Procedure]"
-        }
-      },
-      {
-        "name": "c_pages",
-        "control_type": 109,
-        "control_source": "c_pages",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblPages",
+        "name": "c_collateral_Label",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "頁碼/條目"
+        "caption": "Col."
+      },
+      {
+        "name": "c_addr_id",
+        "control_type": 109,
+        "control_source": "c_addr_id",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_addr_id_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Addr ID"
+      },
+      {
+        "name": "c_addr_name",
+        "control_type": 109,
+        "control_source": "c_kin_addr_name",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_addr_name_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Kin Index Place"
+      },
+      {
+        "name": "c_addr_chn",
+        "control_type": 109,
+        "control_source": "c_kin_addr_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_addr_chn_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "親戚指數地址"
+      },
+      {
+        "name": "c_xcoord",
+        "control_type": 109,
+        "control_source": "kin_x_coord",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_xcoord_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "X"
+      },
+      {
+        "name": "c_ycoord",
+        "control_type": 109,
+        "control_source": "kin_y_coord",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_ycoord_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Y"
       },
       {
         "name": "c_notes",
@@ -13655,87 +12576,90 @@
         "caption": null
       },
       {
-        "name": "LblNotes",
+        "name": "c_notes_Label",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "注"
+        "caption": "Notes"
       },
       {
-        "name": "TxtTitle_CHN",
+        "name": "Text36",
         "control_type": 109,
-        "control_source": "",
+        "control_source": "c_kin_rel_0",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "CmdPickSource",
-        "control_type": 104,
+        "name": "Label37",
+        "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "出處",
-        "events": {
-          "OnClick": "[Event Procedure]"
-        }
+        "caption": "KinRel calculation"
       },
       {
-        "name": "TxtKinNM",
+        "name": "Text38",
         "control_type": 109,
-        "control_source": "",
+        "control_source": "c_kin_index_year",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "TxtKinNM_CHN",
-        "control_type": 109,
-        "control_source": "",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtKinRel",
-        "control_type": 109,
-        "control_source": "",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "TxtKinRel_CHN",
-        "control_type": 109,
-        "control_source": "",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "CmdDelete",
-        "control_type": 104,
+        "name": "Label39",
+        "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "刪除親屬！",
-        "events": {
-          "OnClick": "[Event Procedure]"
-        }
+        "caption": "Index Year"
       },
       {
-        "name": "TxtDelPersonID",
+        "name": "TxtXYCount",
         "control_type": 109,
-        "control_source": "",
+        "control_source": "xy_count",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Label41",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "XY Count"
+      },
+      {
+        "name": "TxtAddrDesc",
+        "control_type": 109,
+        "control_source": "c_kin_addr_desc",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Label43",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Kin Addr. desc:"
+      },
+      {
+        "name": "TxtAddrDescChn",
+        "control_type": 109,
+        "control_source": "c_kin_addr_desc_chn",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
@@ -13748,151 +12672,162 @@
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "TxtDelPersonID:"
+        "caption": "Kin Addr. desc:"
       },
       {
-        "name": "TxtDelKinID",
+        "name": "c_distance",
         "control_type": 109,
-        "control_source": "",
+        "control_source": "c_distance",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "Label47",
+        "name": "LblDistance",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "TxtDelKinID:"
+        "caption": "Distance 距離"
       },
       {
-        "name": "TxtDelKinCode",
+        "name": "c_kin_index_year_type_desc",
         "control_type": 109,
-        "control_source": "",
+        "control_source": "c_kin_index_year_type_desc",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "Label49",
+        "name": "LblIndexYearTypeDesc",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "TxtDelKinCode:"
+        "caption": "IY Type"
       },
       {
-        "name": "TxtDelSource",
+        "name": "c_kin_index_year_type_hz",
         "control_type": 109,
-        "control_source": "",
+        "control_source": "c_kin_index_year_type_hz",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "Label51",
+        "name": "LblIndexYearTypeHZ",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "TxtDelSource:"
+        "caption": "指數年類別"
       },
       {
-        "name": "TxtDelPages",
+        "name": "c_kin_index_year_type_code",
         "control_type": 109,
-        "control_source": "",
+        "control_source": "c_kin_index_year_type_code",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "Label53",
+        "name": "LblIndexYearTypeCode",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "TxtDelPages:"
+        "caption": "IY Type Code"
       },
       {
-        "name": "TxtDelNotes",
+        "name": "c_kin_sex",
         "control_type": 109,
-        "control_source": "",
+        "control_source": "c_kin_sex",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "Label55",
+        "name": "c_kin_sex_lbl",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "TxtDelNotes:"
+        "caption": "Kin Sex"
       },
       {
-        "name": "CmdAddNew",
-        "control_type": 104,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "添加新的親屬",
-        "events": {
-          "OnClick": "[Event Procedure]"
-        }
-      },
-      {
-        "name": "CmdAutoGen",
-        "control_type": 104,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Autogen",
-        "events": {
-          "OnClick": "[Event Procedure]"
-        }
-      },
-      {
-        "name": "c_autogen_notes",
+        "name": "c_kin_dy",
         "control_type": 109,
-        "control_source": "c_autogen_notes",
+        "control_source": "c_kin_dy",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "Label58",
+        "name": "Lbl_c_kin_dy",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "AutoGen notes"
+        "caption": "Kin Dynasty Code"
+      },
+      {
+        "name": "c_kin_dynasty",
+        "control_type": 109,
+        "control_source": "c_kin_dynasty",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Lbl_c_kin_dynasty",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Kin Dynasty"
+      },
+      {
+        "name": "c_kin_dynasty_chn",
+        "control_type": 109,
+        "control_source": "c_kin_dynasty_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Lbl_c_kin_dynasty_chn",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "親戚朝代"
       }
-    ],
-    "code_error": "<unknown>.CodeModule"
+    ]
   },
   {
-    "name": "EVENT_ADDR_2 Subform",
+    "name": "ZZ_SOCIAL_NETWORK",
     "properties": {
-      "RecordSource": "View_EventAddrData",
+      "RecordSource": "ZZ_SOCIAL_NETWORK",
       "Filter": "",
-      "OrderBy": "",
-      "Caption": "POST_ADDR Subform2",
-      "DefaultView": 0,
+      "OrderBy": "[ZZ_SOCIAL_NETWORK].[c_name]",
+      "Caption": "ZZZ_SOCIAL_NETWORK",
+      "DefaultView": 2,
       "AllowEdits": true,
       "AllowAdditions": true,
       "AllowDeletions": true,
@@ -13900,16 +12835,25 @@
     },
     "controls": [
       {
-        "name": "c_addr_id",
+        "name": "c_name",
         "control_type": 109,
-        "control_source": "c_addr_id",
+        "control_source": "c_name",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "TxtAddrCHN",
+        "name": "c_name_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Name"
+      },
+      {
+        "name": "c_name_chn",
         "control_type": 109,
         "control_source": "c_name_chn",
         "row_source": null,
@@ -13918,75 +12862,787 @@
         "caption": null
       },
       {
-        "name": "LblName",
+        "name": "c_name_chn_Label",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "地名"
+        "caption": "姓名"
       },
       {
-        "name": "TxtAddrPY",
+        "name": "c_node_name",
         "control_type": 109,
-        "control_source": "c_name",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      }
-    ],
-    "code_error": "<unknown>.CodeModule"
-  },
-  {
-    "name": "POSTED_TO_ADDR_DATA_2 Subform",
-    "properties": {
-      "RecordSource": "View_PostingAddrData",
-      "Filter": "",
-      "OrderBy": "",
-      "Caption": "POSTING_ADDR_DATA Subform",
-      "DefaultView": 0,
-      "AllowEdits": false,
-      "AllowAdditions": false,
-      "AllowDeletions": false,
-      "DataEntry": false
-    },
-    "controls": [
-      {
-        "name": "c_addr_id",
-        "control_type": 109,
-        "control_source": "c_addr_id",
+        "control_source": "c_node_name",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
       },
       {
-        "name": "TxtAddrChn",
-        "control_type": 109,
-        "control_source": "c_office_addr_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "LblPlace",
+        "name": "c_node_name_Label",
         "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "Place"
+        "caption": "Linked to"
       },
       {
-        "name": "TxtAddr",
+        "name": "c_node_chn",
         "control_type": 109,
-        "control_source": "c_office_addr_name",
+        "control_source": "c_node_chn",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
         "caption": null
+      },
+      {
+        "name": "c_node_chn_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "社會關係人姓名"
+      },
+      {
+        "name": "c_link_type",
+        "control_type": 109,
+        "control_source": "c_link_type",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblKinNonkin",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Kin/Non"
+      },
+      {
+        "name": "c_link_desc",
+        "control_type": 109,
+        "control_source": "c_link_desc",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_link_desc_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Link"
+      },
+      {
+        "name": "c_link_chn",
+        "control_type": 109,
+        "control_source": "c_link_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_link_chn_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "聯繫"
+      },
+      {
+        "name": "c_addr_name",
+        "control_type": 109,
+        "control_source": "c_addr_name",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_addr_name_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Index Place"
+      },
+      {
+        "name": "c_addr_chn",
+        "control_type": 109,
+        "control_source": "c_addr_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_addr_chn_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "指數地址"
+      },
+      {
+        "name": "TxtIndexYear",
+        "control_type": 109,
+        "control_source": "c_index_year",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblIndexYear",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Index Year"
+      },
+      {
+        "name": "TxtNodeIndexYear",
+        "control_type": 109,
+        "control_source": "c_node_index_year",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblNodeIndexYear",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Node's Index Year"
+      },
+      {
+        "name": "TxtPersonID",
+        "control_type": 109,
+        "control_source": "c_person_id",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Label35",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "PersonID"
+      },
+      {
+        "name": "TxtNodeID",
+        "control_type": 109,
+        "control_source": "c_node_id",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Label36",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "NodeID"
+      },
+      {
+        "name": "TxtXCoord",
+        "control_type": 109,
+        "control_source": "x_coord",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Label37",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "X"
+      },
+      {
+        "name": "TxtYCoord",
+        "control_type": 109,
+        "control_source": "y_coord",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Label38",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Y"
+      },
+      {
+        "name": "TxtNodeXCoord",
+        "control_type": 109,
+        "control_source": "node_xcoord",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblNodeX",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Node X"
+      },
+      {
+        "name": "TxtNodeYCoord",
+        "control_type": 109,
+        "control_source": "node_ycoord",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblNodeY",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Node Y"
+      },
+      {
+        "name": "TxtEdgeDist",
+        "control_type": 109,
+        "control_source": "c_edge_dist",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblEdgeDist",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Edge Dist.:"
+      },
+      {
+        "name": "c_node_addr_chn",
+        "control_type": 109,
+        "control_source": "c_node_addr_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Label33",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "社會關係人籍貫"
+      },
+      {
+        "name": "c_node_addr_name",
+        "control_type": 109,
+        "control_source": "c_node_addr_name",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Label34",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Node Index Place"
+      },
+      {
+        "name": "TxtAddrDesc",
+        "control_type": 109,
+        "control_source": "c_addr_desc",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Label42",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Addr. Type"
+      },
+      {
+        "name": "TxtAddrDescChn",
+        "control_type": 109,
+        "control_source": "c_addr_desc_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Label44",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "指數地址類"
+      },
+      {
+        "name": "TxtNodeAddrType",
+        "control_type": 109,
+        "control_source": "c_node_addr_desc",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Label46",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Node Addr. Type"
+      },
+      {
+        "name": "TxtNodeAddrDescChn",
+        "control_type": 109,
+        "control_source": "c_node_addr_desc_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Label48",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "關係人指數地址類"
+      },
+      {
+        "name": "c_link_count",
+        "control_type": 109,
+        "control_source": "c_link_count",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Label50",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Count"
+      },
+      {
+        "name": "TxtTextTitle",
+        "control_type": 109,
+        "control_source": "c_text_title",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Label52",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Text Title: "
+      },
+      {
+        "name": "c_distance",
+        "control_type": 109,
+        "control_source": "c_distance",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblDistance",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Distance 距離"
+      },
+      {
+        "name": "c_index_year_type_desc",
+        "control_type": 109,
+        "control_source": "c_index_year_type_desc",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblIndexYearTypeDesc",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Index Year Type"
+      },
+      {
+        "name": "c_index_year_type_hz",
+        "control_type": 109,
+        "control_source": "c_index_year_type_hz",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblIndexYearTypeHZ",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "指數年類別"
+      },
+      {
+        "name": "c_index_year_type_code",
+        "control_type": 109,
+        "control_source": "c_index_year_type_code",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblIndexYearTypeCode",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Index Year Type Code"
+      },
+      {
+        "name": "c_node_index_year_type_desc",
+        "control_type": 109,
+        "control_source": "c_node_index_year_type_desc",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblNodeIndexYearTypeDesc",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Node Index Year Type"
+      },
+      {
+        "name": "c_node_index_year_type_hz",
+        "control_type": 109,
+        "control_source": "c_node_index_year_type_hz",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblNodeIndexYearTypeHZ",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "關係人指數年類別"
+      },
+      {
+        "name": "c_node_index_year_type_code",
+        "control_type": 109,
+        "control_source": "c_node_index_year_type_code",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "LblNodeIndexYearTypeCode",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Node Index Year Type Code"
+      },
+      {
+        "name": "c_dynasty",
+        "control_type": 109,
+        "control_source": "c_dynasty",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_dynasty_lbl",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Dynasty"
+      },
+      {
+        "name": "c_dynasty_chn",
+        "control_type": 109,
+        "control_source": "c_dynasty_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_dynasty_chn_lbl",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "朝代"
+      },
+      {
+        "name": "c_dy",
+        "control_type": 109,
+        "control_source": "c_dy",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_dy_lbl",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Dynasty Code"
+      },
+      {
+        "name": "c_node_dynasty",
+        "control_type": 109,
+        "control_source": "c_node_dynasty",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_node_dynasty_lbl",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Node Dynasty"
+      },
+      {
+        "name": "c_node_dynasty_chn",
+        "control_type": 109,
+        "control_source": "c_node_dynasty_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_node_dynasty_chn_lbl",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "關係人朝代"
+      },
+      {
+        "name": "c_node_dy",
+        "control_type": 109,
+        "control_source": "c_node_dy",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "c_node_dy_lbl",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Node Dynasty Code"
+      },
+      {
+        "name": "c_source_text",
+        "control_type": 109,
+        "control_source": "c_source_text",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Label81",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Source"
+      },
+      {
+        "name": "c_source_txt_chn",
+        "control_type": 109,
+        "control_source": "c_source_txt_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Label83",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "出處"
+      },
+      {
+        "name": "c_link_addr_name",
+        "control_type": 109,
+        "control_source": "c_link_addr_name",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Lbl_c_link_addr_name",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Assoc. Place"
+      },
+      {
+        "name": "c_link_addr_chn",
+        "control_type": 109,
+        "control_source": "c_link_addr_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Lbl_c_link_addr_chn",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "關係地址"
+      },
+      {
+        "name": "c_link_first_year",
+        "control_type": 109,
+        "control_source": "c_link_first_year",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Lbl_c_link_first_year",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Assoc. First Year"
+      },
+      {
+        "name": "c_link_last_year",
+        "control_type": 109,
+        "control_source": "c_link_last_year",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Lbl_c_link_last_year",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Assoc. Last Year"
       }
     ],
     "code_error": "<unknown>.CodeModule"
@@ -15037,6 +14693,74 @@
     "code_error": "<unknown>.CodeModule"
   },
   {
+    "name": "frmImportNewPlaceList",
+    "properties": {
+      "RecordSource": "",
+      "Filter": "",
+      "OrderBy": "",
+      "Caption": "Import New List?",
+      "DefaultView": 0,
+      "AllowEdits": true,
+      "AllowAdditions": true,
+      "AllowDeletions": true,
+      "DataEntry": false
+    },
+    "controls": [
+      {
+        "name": "Label0",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "You already have a list of selected places."
+      },
+      {
+        "name": "Label1",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Do you want to replace it?"
+      },
+      {
+        "name": "CmdYes",
+        "control_type": 104,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Yes",
+        "events": {
+          "OnClick": "[Event Procedure]"
+        }
+      },
+      {
+        "name": "c_list",
+        "control_type": 109,
+        "control_source": "",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "CmdCancel",
+        "control_type": 104,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Cancel",
+        "events": {
+          "OnClick": "[Event Procedure]"
+        }
+      }
+    ],
+    "code_error": "<unknown>.CodeModule"
+  },
+  {
     "name": "LookAtAssociations",
     "properties": {
       "RecordSource": "",
@@ -15858,12 +15582,12 @@
     "code_error": "<unknown>.CodeModule"
   },
   {
-    "name": "frmImportNewPlaceList",
+    "name": "ZZZ_Data_Dump_Import",
     "properties": {
       "RecordSource": "",
       "Filter": "",
       "OrderBy": "",
-      "Caption": "Import New List?",
+      "Caption": "",
       "DefaultView": 0,
       "AllowEdits": true,
       "AllowAdditions": true,
@@ -15872,52 +15596,37 @@
     },
     "controls": [
       {
-        "name": "Label0",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "You already have a list of selected places."
-      },
-      {
-        "name": "Label1",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Do you want to replace it?"
-      },
-      {
-        "name": "CmdYes",
+        "name": "cmdAddCol",
         "control_type": 104,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "Yes",
+        "caption": "2. Add Columns",
         "events": {
           "OnClick": "[Event Procedure]"
         }
       },
       {
-        "name": "c_list",
-        "control_type": 109,
-        "control_source": "",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "CmdCancel",
+        "name": "CmdDropCol",
         "control_type": 104,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "Cancel",
+        "caption": "3. Drop Columns",
+        "events": {
+          "OnClick": "[Event Procedure]"
+        }
+      },
+      {
+        "name": "cmdClear",
+        "control_type": 104,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "1. Clear Existing Data",
         "events": {
           "OnClick": "[Event Procedure]"
         }
@@ -16041,54 +15750,72 @@
     "code_error": "<unknown>.CodeModule"
   },
   {
-    "name": "ZZZ_Data_Dump_Import",
+    "name": "frmPeopleLookup2",
     "properties": {
-      "RecordSource": "",
-      "Filter": "",
+      "RecordSource": "BIOG_MAIN",
+      "Filter": "([BIOG_MAIN].[c_personid]=3135)",
       "OrderBy": "",
-      "Caption": "",
-      "DefaultView": 0,
-      "AllowEdits": true,
-      "AllowAdditions": true,
-      "AllowDeletions": true,
+      "Caption": "frmPeopleLookup",
+      "DefaultView": 2,
+      "AllowEdits": false,
+      "AllowAdditions": false,
+      "AllowDeletions": false,
       "DataEntry": false
     },
     "controls": [
       {
-        "name": "cmdAddCol",
-        "control_type": 104,
-        "control_source": null,
+        "name": "c_name",
+        "control_type": 109,
+        "control_source": "c_name",
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "2. Add Columns",
-        "events": {
-          "OnClick": "[Event Procedure]"
-        }
+        "caption": null
       },
       {
-        "name": "CmdDropCol",
-        "control_type": 104,
+        "name": "Label8",
+        "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "3. Drop Columns",
-        "events": {
-          "OnClick": "[Event Procedure]"
-        }
+        "caption": "Name"
       },
       {
-        "name": "cmdClear",
-        "control_type": 104,
+        "name": "c_name_chn",
+        "control_type": 109,
+        "control_source": "c_name_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Label9",
+        "control_type": 100,
         "control_source": null,
         "row_source": null,
         "row_source_type": null,
         "tag": "",
-        "caption": "1. Clear Existing Data",
-        "events": {
-          "OnClick": "[Event Procedure]"
-        }
+        "caption": "姓名/別名"
+      },
+      {
+        "name": "c_personid",
+        "control_type": 109,
+        "control_source": "c_personid",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Label10",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "ID"
       }
     ],
     "code_error": "<unknown>.CodeModule"
@@ -17524,77 +17251,6 @@
     ]
   },
   {
-    "name": "frmPeopleLookup2",
-    "properties": {
-      "RecordSource": "BIOG_MAIN",
-      "Filter": "([BIOG_MAIN].[c_personid]=3135)",
-      "OrderBy": "",
-      "Caption": "frmPeopleLookup",
-      "DefaultView": 2,
-      "AllowEdits": false,
-      "AllowAdditions": false,
-      "AllowDeletions": false,
-      "DataEntry": false
-    },
-    "controls": [
-      {
-        "name": "c_name",
-        "control_type": 109,
-        "control_source": "c_name",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label8",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Name"
-      },
-      {
-        "name": "c_name_chn",
-        "control_type": 109,
-        "control_source": "c_name_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label9",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "姓名/別名"
-      },
-      {
-        "name": "c_personid",
-        "control_type": 109,
-        "control_source": "c_personid",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null
-      },
-      {
-        "name": "Label10",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "ID"
-      }
-    ],
-    "code_error": "<unknown>.CodeModule"
-  },
-  {
     "name": "frmTEXTS",
     "properties": {
       "RecordSource": "TEXT_CODES",
@@ -17849,6 +17505,86 @@
     "code_error": "<unknown>.CodeModule"
   },
   {
+    "name": "frmSTATUS_CODES",
+    "properties": {
+      "RecordSource": "STATUS_CODES",
+      "Filter": "",
+      "OrderBy": "[STATUS_CODES].[c_status_desc]",
+      "Caption": "frmSTATUS_CODES",
+      "DefaultView": 2,
+      "AllowEdits": false,
+      "AllowAdditions": false,
+      "AllowDeletions": false,
+      "DataEntry": false
+    },
+    "controls": [
+      {
+        "name": "c_status_desc",
+        "control_type": 109,
+        "control_source": "c_status_desc",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null,
+        "events": {
+          "OnClick": "[Event Procedure]"
+        }
+      },
+      {
+        "name": "c_status_desc_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Status"
+      },
+      {
+        "name": "c_status_desc_chn",
+        "control_type": 109,
+        "control_source": "c_status_desc_chn",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null,
+        "events": {
+          "OnClick": "[Event Procedure]"
+        }
+      },
+      {
+        "name": "c_status_desc_chn_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "社會區分"
+      },
+      {
+        "name": "c_status_code",
+        "control_type": 109,
+        "control_source": "c_status_code",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null,
+        "events": {
+          "OnClick": "[Event Procedure]"
+        }
+      },
+      {
+        "name": "c_status_code_Label",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Status Code"
+      }
+    ],
+    "code_error": "<unknown>.CodeModule"
+  },
+  {
     "name": "frmPickDynasty",
     "properties": {
       "RecordSource": "",
@@ -17927,86 +17663,6 @@
         "row_source_type": null,
         "tag": "",
         "caption": "查詢朝代 Search for Dynasty"
-      }
-    ],
-    "code_error": "<unknown>.CodeModule"
-  },
-  {
-    "name": "frmSTATUS_CODES",
-    "properties": {
-      "RecordSource": "STATUS_CODES",
-      "Filter": "",
-      "OrderBy": "[STATUS_CODES].[c_status_desc]",
-      "Caption": "frmSTATUS_CODES",
-      "DefaultView": 2,
-      "AllowEdits": false,
-      "AllowAdditions": false,
-      "AllowDeletions": false,
-      "DataEntry": false
-    },
-    "controls": [
-      {
-        "name": "c_status_desc",
-        "control_type": 109,
-        "control_source": "c_status_desc",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null,
-        "events": {
-          "OnClick": "[Event Procedure]"
-        }
-      },
-      {
-        "name": "c_status_desc_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Status"
-      },
-      {
-        "name": "c_status_desc_chn",
-        "control_type": 109,
-        "control_source": "c_status_desc_chn",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null,
-        "events": {
-          "OnClick": "[Event Procedure]"
-        }
-      },
-      {
-        "name": "c_status_desc_chn_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "社會區分"
-      },
-      {
-        "name": "c_status_code",
-        "control_type": 109,
-        "control_source": "c_status_code",
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": null,
-        "events": {
-          "OnClick": "[Event Procedure]"
-        }
-      },
-      {
-        "name": "c_status_code_Label",
-        "control_type": 100,
-        "control_source": null,
-        "row_source": null,
-        "row_source_type": null,
-        "tag": "",
-        "caption": "Status Code"
       }
     ],
     "code_error": "<unknown>.CodeModule"
@@ -28971,6 +28627,81 @@
       },
       {
         "name": "Box93",
+        "control_type": 101,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "CmdGIS",
+        "control_type": 104,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "Save to GIS",
+        "events": {
+          "OnClick": "[Event Procedure]"
+        }
+      },
+      {
+        "name": "GISFrame",
+        "control_type": 107,
+        "control_source": "",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Opt_UTF8",
+        "control_type": 105,
+        "control_source": "",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Label97",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "UTF-8"
+      },
+      {
+        "name": "Opt_GB18030",
+        "control_type": 105,
+        "control_source": "",
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Label99",
+        "control_type": 100,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": "GB18030"
+      },
+      {
+        "name": "Box100",
+        "control_type": 101,
+        "control_source": null,
+        "row_source": null,
+        "row_source_type": null,
+        "tag": "",
+        "caption": null
+      },
+      {
+        "name": "Box101",
         "control_type": 101,
         "control_source": null,
         "row_source": null,

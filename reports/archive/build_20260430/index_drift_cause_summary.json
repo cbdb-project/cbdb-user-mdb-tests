@@ -1,0 +1,227 @@
+{
+  "_about": "Machine-readable mirror of analysis/index_drift_cause_analysis.md (PR Y).  Per-bucket cause hypotheses + confidence + next action; no bucket is labelled a confirmed CBDB bug.  See the .md for prose.",
+  "inputs_synthesised": [
+    "analysis/index_year_rule_comparison.md (PR N)",
+    "reports/index_year_drift_rule_classification.json (K1)",
+    "reports/index_year_drift_rule_groups.json (K2)",
+    "reports/index_addr_drift_classification.json (PR L)",
+    "reports/index_addr_same_candidates_deep_dive.json (PR S)",
+    "analysis/index_drift_algorithm_notes.md (PR G/M/X)"
+  ],
+  "framing": {
+    "pr_n_rule_level_verdict": {
+      "matched": 22,
+      "matched_minor_diff": 8,
+      "logic_diff": 0,
+      "access_only": 3,
+      "php_only": 0,
+      "needs_manual_review": 0
+    },
+    "no_live_sign_flip_finding": true,
+    "remaining_drift_seams": [
+      "rule_coverage_gaps",
+      "runtime_priority_or_iteration_order",
+      "tie_break_or_aggregation_detail",
+      "sentinel_or_null_handling",
+      "evidence_or_source_data_drift",
+      "stale_derived_state_release_process"
+    ]
+  },
+  "c_index_year": {
+    "total_rows": 69,
+    "buckets": [
+      {
+        "bucket": "php_returned_sentinel",
+        "count": 1,
+        "likely_cause": "PHP wrote a sentinel / overflow value (>= 9999); Access wrote a real computed year.",
+        "supporting_algorithm_evidence": "Per PR N runtime Access has no matching sentinel branch.",
+        "supporting_row_evidence": "K1 bucket holds 1 row with php_index_year carrying the sentinel.",
+        "confidence": "high",
+        "next_action": "Forward upstream as candidate sentinel-write bug in cbdb-online-main-server PHP rebuild.  Out of scope for this repo."
+      },
+      {
+        "bucket": "php_did_not_compute",
+        "count": 19,
+        "k2_subgroups": [
+          {"access_tcode": "05", "count": 7, "candidate_label": "candidate_php_entry_code_mapping_gap (6) + candidate_php_entry_data_year_missing (1)", "pr_z_verdict": "supported_by_focused_probe"},
+          {"access_tcode": "11", "count": 5, "candidate_label": "candidate_php_validyear_gate_excluded_father"},
+          {"access_tcode": "14", "count": 4, "candidate_label": "candidate_php_rule_coverage_gap"},
+          {"access_tcode": "20", "count": 1, "candidate_label": "candidate_php_rule_coverage_gap"},
+          {"access_tcode": "2304", "count": 1, "candidate_label": "candidate_php_rule_coverage_gap"},
+          {"access_tcode": "07", "count": 1, "candidate_label": "candidate_missing_php_rule_07_xc"}
+        ],
+        "likely_cause": "PHP rule chain didn't reach a value for these persons.  PR Z confirmed for the tcode='05' × 7 sub-group that the cause is PHP-side upstream data (6 mapping gaps in ENTRY_CODE_TYPE_REL, 1 ENTRY_DATA.c_year = 0).  Other sub-groups remain candidate coverage gaps.",
+        "supporting_algorithm_evidence": "PR N pairs Access tcodes 05/11/14/20 with matched PHP rules; for 2304 and 07 the pairing is partial.  PR Z (analysis/probe_index_year_tcode05_entry_mapping.py) walked all 7 tcode='05' rows and confirmed Access fires Rule 05 correctly in every case.",
+        "supporting_row_evidence": "K1 bucket holds 19 rows; K2 groups by Access tcode with 3 example personids per group plus all_personids list.  PR Z carries per-personid ENTRY_DATA + ENTRY_CODE_TYPE_REL dump in reports/index_year_tcode05_entry_mapping_probe.json.",
+        "confidence": "tcode='05' × 7: supported_by_focused_probe (PR Z).  tcode='11' × 5: medium.  Phase-C tcodes (14/20/2304): medium.  tcode='07' × 1: medium (vestigial-vs-intentional unresolved).",
+        "next_action": "tcode='05': done by PR Z; forward to cbdb-online-main-server / SQLite-snapshot-build team as upstream data candidates.  tcode='11': confirm father validYear gate.  Phase-C tcodes: runtime-rule trace.  tcode='07': triage Rule 07 XC."
+      },
+      {
+        "bucket": "access_did_not_compute",
+        "count": 7,
+        "likely_cause": "Mirror of php_did_not_compute.  Runtime Access rule chain didn't surface evidence rows that PHP found.",
+        "supporting_algorithm_evidence": "PR N rule-level pairing shows PHP has matching rule definitions; gap is upstream in evidence-table path.",
+        "supporting_row_evidence": "K1 bucket holds 7 rows (no K2 sub-grouping yet — smaller bucket).",
+        "confidence": "medium",
+        "next_action": "Per-row evidence walk: pull each person's ENTRY_DATA / KIN_DATA on the User-MDB side and check why the staging-step inserts didn't surface a row."
+      },
+      {
+        "bucket": "iteration_order_diff",
+        "count": 5,
+        "likely_cause": "Both sides CONCAT loop-rule type_codes the same way and both cap at 2 Phase-C loops; residual divergence is the order rules fire WITHIN each loop pass.",
+        "supporting_algorithm_evidence": "PR N has the loop structure and cap matched; within-loop firing order is undocumented either side.",
+        "supporting_row_evidence": "5 rows whose Access tcode is a strict prefix-extension of PHP's.",
+        "confidence": "medium",
+        "next_action": "Runtime-rule triage of GetBirthIndexYearSQL Phase-C body to enumerate within-loop firing order; cross-reference PHP IndexYearRebuildService Phase-C loop body."
+      },
+      {
+        "bucket": "consistent_within_rule",
+        "count": 14,
+        "k2_subgroups": [
+          {"signature": "('11','11', 1)", "count": 5, "candidate_label": "source_data_drift_kin_data_or_biog_main_birthyear_between_sides", "pr_aj_verdict": "supported_by_focused_probe (4 KIN_DATA drift + 1 BIOG_MAIN drift)"},
+          {"signature": "('19','19', -20)", "count": 3, "candidate_label": "source_data_drift_biog_main_birthyear_between_sides", "pr_ai_verdict": "supported_by_focused_probe"},
+          {"signature": "('13','13', -20)", "count": 2, "candidate_label": "source_data_drift_biog_main_birthyear_between_sides", "pr_ai_verdict": "supported_by_focused_probe"},
+          {"signature": "('15','15', -20)", "count": 2, "candidate_label": "source_data_drift_biog_main_birthyear_between_sides", "pr_ai_verdict": "supported_by_focused_probe"},
+          {"signature": "('11','11', -20)", "count": 2, "candidate_label": "source_data_drift_biog_main_birthyear_between_sides", "pr_ai_verdict": "supported_by_focused_probe"}
+        ],
+        "likely_cause": "Upstream source-data drift between User MDB and SQLite snapshot for the EVIDENCE persons that the rule reads from — NOT algorithm divergence.  Per PR AI's per-row probe (-20 sub-cluster, 9 rows): 7/9 are BIOG_MAIN.c_birthyear differing by exactly the index_year diff for the same evidence person; 2/9 are KIN_DATA evidence-pid set differing.  Per PR AJ (+1 sub-cluster, 5 rows): 4/5 are KIN_DATA evidence-pid drift, 1/5 is BIOG_MAIN birthyear drift.  All 14 / 14 rows are PHP-side / SQLite-snapshot upstream data drift; same general class as PR Z's tcode='05' candidate_php_entry_code_mapping_gap.  The Access vs PHP rule body is identical and runs correctly on both sides.",
+        "supporting_algorithm_evidence": "PR N pairs each of rules 11/13/15/19 as matched (or matched_minor_diff on staging-vs-subquery aggregate).  PR AI (analysis/probe_index_year_diff_minus_20_cluster.py) and PR AJ (analysis/probe_index_year_diff_plus_1_cluster.py) walked all 14 rows individually and confirmed the upstream-data-drift mechanism.",
+        "supporting_row_evidence": "Concrete example (PR AI): c_personid=228114 (王淑抃), father=王圖 (123710); User MDB BIOG_MAIN.c_birthyear(123710)=1557, SQLite=1577; Access fires 1557+30=1587, PHP fires 1577+30=1607, diff=-20 explained 100% by upstream birthyear drift.  Per-personid breakdown in reports/index_year_diff_minus_20_cluster_probe.json + reports/index_year_diff_plus_1_cluster_probe.json.",
+        "confidence": "supported_by_focused_probe (PR AI + AJ)",
+        "next_action": "PHP-side / SQLite-snapshot data quality issue, not a CBDB User MDB algorithm bug.  Forward findings to cbdb-online-main-server / SQLite-snapshot-build team as upstream data-drift candidates.  Out-of-scope for this repo."
+      },
+      {
+        "bucket": "candidate_algorithm_divergence",
+        "count": 5,
+        "likely_cause": "Row's signature matches one of K1's dormant historical probes (e.g. entry-rule 2N-diff) but the supporting evidence row can't be reconstructed.  Most plausibly: each side picked a different ENTRY_DATA row whose c_years happen to differ by 2N.",
+        "supporting_algorithm_evidence": "PR N rule definition matched; signature still fires because the diff numerically matches a historical hypothesis.",
+        "supporting_row_evidence": "5 rows; K1 records the signature but flags evidence-row reconstruction failed.",
+        "confidence": "low-medium",
+        "next_action": "Per-row evidence walk: pull ENTRY_DATA candidates for each side and identify which row was picked."
+      },
+      {
+        "bucket": "blocked_by_runtime_priority_triage_pending",
+        "count": 17,
+        "subset_of": "K1 unclassified (× 18; 17 fall into this blocker, 1 doesn't)",
+        "likely_cause": "Different rules picked on each side (PHP tcode != Access tcode); divergence is at the rule-selection / priority layer rather than the rule-body layer.",
+        "supporting_algorithm_evidence": "PR M dumped GetBirthIndexYearSQL inside frmBaseMaintenance — the source IS in repo.  Blocker is now the per-row priority/iteration walk, not missing source.  Label was renamed by PR X from blocked_by_missing_frmBaseMaintenance_vba.",
+        "supporting_row_evidence": "17 rows with both sides' tcodes + intent strings in K2 unclassified_diagnostics.  Examples: PHP '15' (mother) vs Access '03' (wife) — different relationship anchors picked.",
+        "confidence": "low (per-row causes); high (category label)",
+        "next_action": "Largest remaining unknown.  Pick most-recurring (PHP_tcode, Access_tcode) pairs and walk GetBirthIndexYearSQL priority order; document whether each side's choice is intentional or a coverage miss."
+      },
+      {
+        "bucket": "explained_by_birthyear_offset",
+        "count": 0,
+        "likely_cause": "PR I-era hypothesis (Access used c_birthyear + 59 for tcode 01); PR N showed runtime Access uses raw c_birthyear.  Dormant in this data sweep.",
+        "supporting_algorithm_evidence": "PR N matched verdict on rule 01.",
+        "supporting_row_evidence": "0 rows.",
+        "confidence": "high (probe is dormant)",
+        "next_action": "Keep as historical probe; reactivate if a future commit reintroduces the pattern."
+      },
+      {
+        "bucket": "explained_by_entry_sign_flip",
+        "count": 0,
+        "likely_cause": "PR I-era hypothesis (Access +N vs PHP -N for entry rules 05-10); PR N showed both use -N.  Dormant.",
+        "supporting_algorithm_evidence": "PR N matched verdict on rules 05-10.",
+        "supporting_row_evidence": "0 rows.",
+        "confidence": "high (probe is dormant)",
+        "next_action": "Keep as historical probe."
+      },
+      {
+        "bucket": "explained_by_husband_formula",
+        "count": 0,
+        "likely_cause": "PR I-era hypothesis (Access husband.c_birthyear + 62 vs PHP husband.c_index_year + 3); PR N showed runtime Access uses husband.c_index_year + 3.  Dormant.",
+        "supporting_algorithm_evidence": "PR N matched verdict on rules 03/17.",
+        "supporting_row_evidence": "0 rows.",
+        "confidence": "high (probe is dormant)",
+        "next_action": "Keep as historical probe."
+      }
+    ]
+  },
+  "c_index_addr_id": {
+    "total_rows": 488,
+    "rank_table_status": "BIOG_ADDR_CODES is identical between User MDB and SQLite for all 22 addr_types (verified by PR L) — none of these buckets are explained by rank-table mismatch.",
+    "buckets": [
+      {
+        "bucket": "mdb_stale_index_addr",
+        "count": 412,
+        "likely_cause": "User MDB shipped with a c_index_addr_id that was never re-run after BIOG_ADDR_DATA was updated.  PHP re-runs weekly; the User MDB release process apparently doesn't re-run frmBaseMaintenance.CmdIndexAddress before shipping.",
+        "supporting_algorithm_evidence": "PR L's recompute (rank-priority + MAX(c_sequence)) on User-MDB-side BIOG_ADDR_DATA matches what SQLite stores for all 412 rows; User MDB stores something else.  Maintenance code that would re-run this exists in PR M's frmBaseMaintenance dump.",
+        "supporting_row_evidence": "412 rows in PR L's mdb_stale_index_addr bucket.",
+        "confidence": "high",
+        "next_action": "Add release-process step: run frmBaseMaintenance.CmdIndexYear then CmdIndexAddress against the DATA mdb before shipping a new User MDB.  candidate_release_process_step; not labelled confirmed bug because maintainer may have intentional reasons."
+      },
+      {
+        "bucket": "mdb_value_php_null",
+        "count": 47,
+        "likely_cause": "User MDB has stored c_index_addr_id; PR L's PHP recompute returns NULL (no eligible BIOG_ADDR_DATA row of any rank-priority addr_type for this person).  Mirror direction of php_did_not_compute on the year side.",
+        "supporting_algorithm_evidence": "PR L's recompute returns NULL for all 47.",
+        "supporting_row_evidence": "47 rows.",
+        "confidence": "medium",
+        "next_action": "Sample 5 rows; check whether the User-MDB-stored addr_id still exists in User-MDB BIOG_ADDR_DATA; if so, why does the rank+MAX recompute reject it?  Could be a rank exclusion not in BIOG_ADDR_CODES."
+      },
+      {
+        "bucket": "same_candidates_diff_winner",
+        "count": 10,
+        "likely_cause": "All 10 are addr_type=1.  Per PR S deep dive: 10/10 have MAX(c_sequence) ties (multiple rows of same (person, addr_type) sharing same max sequence); 10/10 have 3 distinct picks among the tied rows (User stored vs SQLite stored vs PR L recompute).  No explicit secondary tie-break; storage-engine row order picks the winner non-deterministically (MariaDB / Microsoft JET / SQLite via pyodbc all order rows differently).",
+        "supporting_algorithm_evidence": "PR S byte-level deep dive (reports/index_addr_same_candidates_deep_dive.json); both sides implement the documented rule (rank-priority + MAX(c_sequence)) — neither is wrong.",
+        "supporting_row_evidence": "10/10 rows show the MAX-tie + distinct-picks pattern explicitly.",
+        "confidence": "high",
+        "next_action": "Candidate algorithm improvement: add explicit secondary tie-break (e.g. MIN(c_addr_id)) to both implementations.  Either side could implement independently to reduce divergence.  candidate_release_process_or_algorithm_improvement; not a confirmed bug."
+      },
+      {
+        "bucket": "both_stale_recompute_mismatch",
+        "count": 10,
+        "likely_cause": "Both sides store a value that doesn't match the rank+MAX(c_sequence) recompute on either side — both stale.  Whatever maintenance step produced these is older than the current BIOG_ADDR_DATA on both sides.",
+        "supporting_algorithm_evidence": "PR L's recompute disagrees with both stored values for all 10 rows.",
+        "supporting_row_evidence": "10 rows.",
+        "confidence": "medium-high",
+        "next_action": "Re-run maintenance on both sides and re-classify; if these rows move into a cleaner bucket, framing is confirmed."
+      },
+      {
+        "bucket": "both_sides_match_recomputed",
+        "count": 6,
+        "likely_cause": "Both sides' recomputes agree, yet stored values differ — most plausibly cross-pollination from a previous data exchange (one side stores the OTHER side's recompute) or stale release on one side stored against the other side's evidence at the time.",
+        "supporting_algorithm_evidence": "PR L's recompute on each side gives the same answer; both stored values are valid recomputes but of different underlying datasets.",
+        "supporting_row_evidence": "6 rows.",
+        "confidence": "low-medium",
+        "next_action": "Pick 2 rows; trace BIOG_ADDR_DATA row-set difference between sides for those persons; check whether one side's stored value matches the other side's current BIOG_ADDR_DATA recompute."
+      },
+      {
+        "bucket": "sqlite_stale_index_addr",
+        "count": 2,
+        "likely_cause": "Mirror of mdb_stale_index_addr from the SQLite side — possibly a transient state in the weekly PHP rebuild (a row in flight at snapshot time).",
+        "supporting_algorithm_evidence": "PR L's recompute on SQLite-side BIOG_ADDR_DATA disagrees with what SQLite stored.",
+        "supporting_row_evidence": "2 rows.",
+        "confidence": "medium",
+        "next_action": "Re-pull a fresh SQLite snapshot; if these 2 persist, escalate to cbdb-online-main-server."
+      },
+      {
+        "bucket": "mdb_null_php_value",
+        "count": 1,
+        "likely_cause": "User MDB stored NULL but PHP has a value.  PR L's recompute on User-MDB-side BIOG_ADDR_DATA returns NULL — User MDB has no eligible row for this person; PHP must be drawing on a BIOG_ADDR_DATA row that exists on the SQLite side but not on the User MDB side.  Source-data drift.",
+        "supporting_algorithm_evidence": "PR L's per-side recompute divergence.",
+        "supporting_row_evidence": "1 row.",
+        "confidence": "medium-high",
+        "next_action": "Compare the two sides' BIOG_ADDR_DATA for the affected personid; confirm the missing row."
+      },
+      {
+        "bucket": "unclassified",
+        "count": 0,
+        "likely_cause": "PR L bucketed every row.  No residual.",
+        "supporting_algorithm_evidence": "n/a",
+        "supporting_row_evidence": "0 rows.",
+        "confidence": "n/a",
+        "next_action": "n/a"
+      }
+    ]
+  },
+  "no_bucket_is_a_confirmed_bug": true,
+  "suggested_next_investigations_in_priority_order": [
+    {"id": 1, "task": "B1 release-process step (CmdIndexYear → CmdIndexAddress before shipping User MDB)", "would_close_rows": 412, "engineering_cost": "zero (process change)"},
+    {"id": 2, "task": "B3 secondary tie-break (MIN(c_addr_id)) added to both implementations", "would_close_rows": 10, "engineering_cost": "small algorithm tweak per side"},
+    {"id": 3, "task": "A2 tcode 05 entry-code-mapping check — DONE by PR Z (6 mapping gaps + 1 c_year=0 gap; all PHP-side upstream data)", "would_close_rows": 7, "engineering_cost": "single SQL probe (already run)", "status": "done"},
+    {"id": 4, "task": "A5 -20 cluster deep-dive (single staging-step row pick may explain 9 rows across 4 signature groups)", "would_close_rows": 9, "engineering_cost": "PR-S-style per-row evidence walk"},
+    {"id": 5, "task": "A7 priority-order triage (largest remaining unknown; 17 rows; needs a runtime trace)", "would_close_rows": 17, "engineering_cost": "non-trivial — runtime-rule walk"}
+  ]
+}

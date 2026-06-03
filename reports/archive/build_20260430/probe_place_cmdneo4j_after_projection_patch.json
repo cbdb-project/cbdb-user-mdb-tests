@@ -1,0 +1,249 @@
+{
+  "schema_version": 1,
+  "generated_date": "2026-05-08",
+  "probe_branch": "driver/place-cmdneo4j-trstpeople-projection-rewrite",
+  "fixture": "place_matrix_first_fixture",
+  "config": {
+    "click_via_timer_timeout_sec": 180,
+    "per_probe_outer_timeout_sec": 300,
+    "promote_gates_strict": [
+      "file_count >= 1",
+      "no ':ERR' markers in ZZ_TEST_DEBUG",
+      "watchdog dialog count == 0",
+      "chain_observed_done == True",
+      "chain_elapsed_sec <= 180"
+    ]
+  },
+  "result": {
+    "form": "LookAtPlace",
+    "fixture_name": "place_addr_7213",
+    "fixture_picker_ids": [],
+    "fixture_addr_ids": [
+      7213
+    ],
+    "fixture_controls": {
+      "ChkIndividual": true,
+      "ChkOffice": false,
+      "ChkAssoc": false,
+      "ChkPosting": false,
+      "ChkEntry": false
+    },
+    "fixture_expected_min_rows": 50,
+    "markers": [
+      {
+        "t": 0.0,
+        "marker": "constructing_session"
+      },
+      {
+        "t": 5.43,
+        "marker": "session_opened_attempt_1"
+      },
+      {
+        "t": 5.69,
+        "marker": "filedialog_patched"
+      },
+      {
+        "t": 6.5,
+        "marker": "form_opened"
+      },
+      {
+        "t": 6.51,
+        "marker": "tab_places_set_to_0"
+      },
+      {
+        "t": 6.53,
+        "marker": "set_control_ChkAssoc_fail: com_error(-2147352567, 'Exception occurred.', (0, None, \"Welcome to CBDB! can't find the field 'ChkAssoc' referred to in your expression.\", 'acmain11.chm', 11730, -2146825823), None)"
+      },
+      {
+        "t": 6.53,
+        "marker": "set_control_ChkPosting_fail: com_error(-2147352567, 'Exception occurred.', (0, None, \"Welcome to CBDB! can't find the field 'ChkPosting' referred to in your expression.\", 'acmain11.chm', 11730, -2146825823), None)"
+      },
+      {
+        "t": 6.54,
+        "marker": "addr_picker_seeded_1_codes"
+      },
+      {
+        "t": 6.54,
+        "marker": "fixture_seeded"
+      },
+      {
+        "t": 6.54,
+        "marker": "form_tag_set_chain_CmdQuery_CmdNeo4j"
+      },
+      {
+        "t": 6.54,
+        "marker": "chain_fire_t_start"
+      },
+      {
+        "t": 12.58,
+        "marker": "click_via_timer_returned_5962"
+      },
+      {
+        "t": 17.58,
+        "marker": "chain_quiescent_files_6_stable_for_5s"
+      },
+      {
+        "t": 17.58,
+        "marker": "chain_elapsed_11.04s"
+      },
+      {
+        "t": 17.58,
+        "marker": "files_inventoried_6"
+      },
+      {
+        "t": 17.59,
+        "marker": "row_counts_captured"
+      },
+      {
+        "t": 17.59,
+        "marker": "zz_test_debug_captured"
+      }
+    ],
+    "outcome": "patch_verified_chain_clean",
+    "elapsed_sec": 20.17,
+    "exception": null,
+    "row_counts": {
+      "ZZ_SCRATCH_STATUS": 17,
+      "ZZ_SCRATCH_PLACE_PEOPLE": 5764,
+      "ZZ_SCRATCH_PLACE_AGG": 5764,
+      "ZZ_SCRATCH_PEOPLE": 5764,
+      "ZZ_SCRATCH_ADDR": 1,
+      "ZZ_TEST_DEBUG": 3
+    },
+    "files": [
+      {
+        "name": "f12.out.csv",
+        "size": 409721,
+        "header_first_col": "PersonID",
+        "header_n_cols": 9,
+        "header_preview": "PersonID,PlaceID,AssocID,PersoPlaceRelFirstYear,PersonPlaceRelLastYear,PersonPlaceRelType,PersonPlaceRelCode,PersonPlaceRelDesc,PersonPlaceRelHZ",
+        "data_row_count": 5961
+      },
+      {
+        "name": "f15.out.csv",
+        "size": 4383,
+        "header_first_col": "PersonPlaceRelCode",
+        "header_n_cols": 4,
+        "header_preview": "PersonPlaceRelCode,PersonPlaceRelType,PersonPlaceRelDesc,PersonPlaceRelHZ",
+        "data_row_count": 103
+      },
+      {
+        "name": "f18.out.csv",
+        "size": 199,
+        "header_first_col": "IndexAddrTypeCode",
+        "header_n_cols": 3,
+        "header_preview": "IndexAddrTypeCode,IndexAddrTypeDesc,IndexAddrTypeDescHZ",
+        "data_row_count": 4
+      },
+      {
+        "name": "f3.out.csv",
+        "size": 233329,
+        "header_first_col": "NameID",
+        "header_n_cols": 6,
+        "header_preview": "NameID,NameHZ,NamePY,IndexYear,Dynasty,Sex",
+        "data_row_count": 5764
+      },
+      {
+        "name": "f6.out.csv",
+        "size": 84255,
+        "header_first_col": "NameID",
+        "header_n_cols": 3,
+        "header_preview": "NameID,PlaceID,PersonPlaceCode",
+        "data_row_count": 5642
+      },
+      {
+        "name": "f9.out.csv",
+        "size": 14476,
+        "header_first_col": "PlaceID",
+        "header_n_cols": 5,
+        "header_preview": "PlaceID,PlacePY,PlaceHZ,PlaceX,PlaceY",
+        "data_row_count": 286
+      }
+    ],
+    "file_count": 6,
+    "click_via_timer_returned": 5962,
+    "chain_elapsed_sec": 11.04,
+    "chain_observed_done": true,
+    "msgbox_observed": [],
+    "zz_test_debug_msgs": [
+      "LookAtPlace:ENTER",
+      "LookAtPlace:MSGBOX",
+      "LookAtPlace:DONE"
+    ]
+  },
+  "verdict": "patch_verified_chain_clean",
+  "verdict_note": "**Strict clean.**  Chain produced 6 files in 11.04s with 0 :ERR markers AND 0 watchdog-dismissed dialogs.  This is the strongest available signal that the SELECT projection rewrite is the only blocker on this fixture for LookAtPlace × CmdNeo4j.  Per the brief, do NOT open a coverage PR off this verdict alone — the coverage PR is a separate brief.",
+  "answers": {
+    "Q1_jet_3265_disappeared": {
+      "has_jet_3265_marker": false,
+      "all_err_markers_observed": [],
+      "interpretation": "If has_jet_3265_marker is False, the patch successfully prevented the JET 3265 'Item not found in this collection.' that PR #120's probe observed.  If True, the rewrite did not take effect."
+    },
+    "Q2_chain_writes_files": {
+      "file_count": 6,
+      "chain_observed_done": true,
+      "chain_elapsed_sec": 11.04,
+      "interpretation": "PR #120 observed 0 files; this probe expects file_count >= 1 if the rewrite took effect AND the rest of the chain runs to its natural end."
+    },
+    "Q3_file_shape": {
+      "file_count": 6,
+      "files": [
+        {
+          "name": "f12.out.csv",
+          "size": 409721,
+          "n_cols": 9,
+          "first_col": "PersonID",
+          "data_rows": 5961
+        },
+        {
+          "name": "f15.out.csv",
+          "size": 4383,
+          "n_cols": 4,
+          "first_col": "PersonPlaceRelCode",
+          "data_rows": 103
+        },
+        {
+          "name": "f18.out.csv",
+          "size": 199,
+          "n_cols": 3,
+          "first_col": "IndexAddrTypeCode",
+          "data_rows": 4
+        },
+        {
+          "name": "f3.out.csv",
+          "size": 233329,
+          "n_cols": 6,
+          "first_col": "NameID",
+          "data_rows": 5764
+        },
+        {
+          "name": "f6.out.csv",
+          "size": 84255,
+          "n_cols": 3,
+          "first_col": "NameID",
+          "data_rows": 5642
+        },
+        {
+          "name": "f9.out.csv",
+          "size": 14476,
+          "n_cols": 5,
+          "first_col": "PlaceID",
+          "data_rows": 286
+        }
+      ]
+    },
+    "Q4_next_blocker_exposed": {
+      "outcome_bucket": "patch_verified_chain_clean",
+      "other_err_markers": [],
+      "msgbox_watchdog_count": 0,
+      "interpretation": "If outcome == patch_verified_chain_clean: no next blocker on this fixture.  If outcome == patch_partial_jet_3265_still_observed: rewrite did not take effect.  If outcome == next_blocker_exposed_runtime_err: rewrite worked but a different runtime error class appeared.  If outcome == patch_resolved_issue24_but_exposed_msgbox_blocker: rewrite worked AND chain wrote files BUT a watchdog-dismissed dialog appeared (analog of PR #116's MsgBox-blocker layer for Associations CmdNeo4j).  If outcome == patch_resolved_jet_3265_but_zero_files: rewrite worked AND no :ERR but no files either."
+    },
+    "pre_chain_observations": {
+      "set_control_failures": [
+        "set_control_ChkAssoc_fail: com_error(-2147352567, 'Exception occurred.', (0, None, \"Welcome to CBDB! can't find the field 'ChkAssoc' referred to in your expression.\", 'acmain11.chm', 11730, -2146825823), None)",
+        "set_control_ChkPosting_fail: com_error(-2147352567, 'Exception occurred.', (0, None, \"Welcome to CBDB! can't find the field 'ChkPosting' referred to in your expression.\", 'acmain11.chm', 11730, -2146825823), None)"
+      ],
+      "interpretation": "These are pre-chain failures from the matrix _make_place_fixtures controls dict (ChkAssoc / ChkPosting NOT controls on Form_LookAtPlace). Preserved per brief — NOT silently swallowed. They do NOT cause the JET 3265 (which fires later inside CmdNeo4j_Click body) and do NOT cause any post-patch failure.  Fixing the fixture is out-of-scope for this probe."
+    }
+  }
+}
