@@ -78,21 +78,16 @@ python -m pytest tests/ --regenerate-goldens
 
 ## 给其余 9 个 LookAt 表单补测试
 
-这一版只完整实现了 `LookAtEntry`。其余 9 个 (`LookAtAssociations`,
-`LookAtKinship`, `LookAtOffice`, `LookAtPlace`, `LookAtStatus`,
-`LookAtTexts`, `LookAtAssociationPairs`, `LookAtNetworks`,
-`LookAtGroupData`) 的步骤：
+⛔ **严禁翻译 VBA 成 Python。** `cbdb_replay/` 是历史遗留，不应扩展。
 
-1. 复制 `tests/cbdb_replay/TEMPLATE_lookat.py` 为
-   `tests/cbdb_replay/lookat<formname>.py`
-2. 打开对应的 VBA dump：`analysis/dump/vba/Form_LookAt<Formname>.vb`
-3. 找到 `Private Sub CmdQuery_Click`，把它生成的所有 SQL 分支翻译成
-   Python（参考 `tests/cbdb_replay/lookatentry.py` 作为完整范本）
-4. 复制 `tests/test_lookatentry.py` 为 `tests/test_lookat<formname>.py`，
-   写至少 3 个 fixture（不同代码路径）
-5. 运行 `python -m pytest tests/test_lookat<formname>.py --regenerate-goldens`
-   写出第一份 golden
-6. 人工抽查 golden CSV 确认数据合理后 commit
+正确的新测试方法是通过 Access COM 驱动真实 VBA（`--include-vba`）：
+
+1. 在 `tests/test_vba_matrix_all_forms.py` 中为目标 form 添加 fixture
+2. 使用 `VbaSession` + `click_via_timer` 调用真实的 `CmdQuery_Click`
+3. 从 `ZZ_SCRATCH_*` 结果表断言行数和列集合
+4. 参考 `tests/test_vba_matrix.py` 作为完整范本
+
+详见 `docs/skills/access-vba-probe.md` 中的 "pure-SQL-first principle"。
 
 ## 故障排查
 
