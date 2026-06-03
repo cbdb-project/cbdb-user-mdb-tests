@@ -60,6 +60,8 @@ looking at.
    `python analysis/dump_metadata.py && python analysis/dump_vba.py`
 5. **Run tests**: `python -m pytest tests/ -W ignore --include-vba`
    Monitor the session — Access dialogs can block unhandled (see landmine #3b).
+   All MSACCESS.EXE processes are killed automatically by `pytest_sessionfinish`
+   when the session ends (even after a crash or Ctrl-C).
 6. **Capture screenshots**: `python reports/capture_screenshots.py`
 7. **Rebuild ISSUES dict from scratch**: clear `ISSUES = [` … `]` in
    `reports/generate_report.py`, then write one entry per FAILED test,

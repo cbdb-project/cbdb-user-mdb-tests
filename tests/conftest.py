@@ -171,6 +171,27 @@ def _data_mdb_relink_needed(user_mdb: Path, data_mdb: Path | None) -> bool:
         return False
 
 
+def pytest_sessionfinish(session, exitstatus):
+    """Kill all MSACCESS.EXE processes left open by the test session.
+
+    The com_app and VbaSession fixtures call close() in their teardowns,
+    but if a test is interrupted (dialog blocks, Ctrl-C, crash) the
+    teardown may not run and Access windows are left on screen.  This
+    hook runs unconditionally after every session — including crashes —
+    so the desktop is always clean when pytest exits.
+
+    Only active on Windows (subprocess.run with taskkill).  Silent no-op
+    on other platforms.
+    """
+    if sys.platform != "win32":
+        return
+    import subprocess
+    subprocess.run(
+        ["taskkill", "/F", "/IM", "MSACCESS.EXE"],
+        capture_output=True,   # suppress "not found" output when none are open
+    )
+
+
 def pytest_configure(config):
     """Register markers, relink DATA mdb if stale, refresh test_inputs.json.
 
