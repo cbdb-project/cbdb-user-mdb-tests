@@ -1712,7 +1712,7 @@
 16937,Fang Fengzhen,方逢振,1232.0,05,15.0,M,12736.0,10494,shan fang ji (Fang Fengzhen),山房集(方逢振),0,unknown,未詳,
 16939,Fang Yikui,方一夔,1281.0,27,18.0,M,18318.0,7579,fu shan yi gao,富山遺稿:三十卷,0,unknown,未詳,
 16940,Fang Daorui,方道叡,1300.0,05,18.0,M,18318.0,38264,Yu quan ji,愚泉集,0,unknown,未詳,
-16944,Fang Youkai,方有開,1124.0,01,15.0,M,12852.0,10488,xi tang ji (Fang Youkai),溪堂集(方有開),0,unknown,未詳,
+16944,Fang Youkai,方有開,1124.0,01,15.0,M,12736.0,10488,xi tang ji (Fang Youkai),溪堂集(方有開),0,unknown,未詳,
 16945,Fang Zhongmou,方仲謀,1027.0,05,15.0,M,12734.0,7899,zhi shan ji,雉山集,0,unknown,未詳,
 16962,Shao Guizi,邵桂子,1241.0,05,18.0,M,18264.0,5656,Yongan xiaoji,慵菴小集,0,unknown,未詳,
 16962,Shao Guizi,邵桂子,1241.0,05,18.0,M,18264.0,8861,xue zhou cuo gao,雪舟脞稿,0,unknown,未詳,
@@ -1900,8 +1900,8 @@
 19713,Li Qingzhao,李清照,1084.0,01,15.0,F,11192.0,36435,Li yi an ji: shi er juan,李易安集:十二卷,0,unknown,未詳,0.0
 19713,Li Qingzhao,李清照,1084.0,01,15.0,F,11192.0,36738,Shu yu ci: yi juan,漱玉詞:一卷,0,unknown,未詳,0.0
 19763,Li Zhan,李占,1108.0,29,15.0,M,100480.0,10652,wen ji (Li Zhan),文集(李占):五十卷,0,unknown,未詳,
-19771,Li Peng,李彭,,,15.0,M,100185.0,5501,Rishe yuan ji,日涉園集,0,unknown,未詳,
-19771,Li Peng,李彭,,,15.0,M,100185.0,5502,Yujian xiaoji,玉澗小集,0,unknown,未詳,
+19771,Li Peng,李彭,1253.0,11,15.0,M,100185.0,5501,Rishe yuan ji,日涉園集,0,unknown,未詳,
+19771,Li Peng,李彭,1253.0,11,15.0,M,100185.0,5502,Yujian xiaoji,玉澗小集,0,unknown,未詳,
 19830,Wei Gu,危固,1019.0,0512,15.0,M,100055.0,8141,zi zhen ji,自珍集,0,unknown,未詳,
 19840,Lv Nangong,呂南公,,,15.0,M,100055.0,3533,guan yuan ji,灌園集:二十卷,0,unknown,未詳,
 19842,Fu Ye (2),傅野,1017.0,01,15.0,M,100055.0,9700,tong gao,通稿:二十四卷,0,unknown,未詳,
@@ -2538,7 +2538,7 @@
 28826,Zhang Shiche,張時徹,1500.0,01,19.0,M,5407.0,18763,Zhi yuan quan ji,芝園全集:八十五卷,0,unknown,未詳,
 28826,Zhang Shiche,張時徹,1500.0,01,19.0,M,5407.0,18764,Zhi yuan ding ji,芝園定集,0,unknown,未詳,
 28826,Zhang Shiche,張時徹,1500.0,01,19.0,M,5407.0,18765,Zhi yuan ji (Zhang Shiche),芝園集(張時徹):五十六卷,0,unknown,未詳,
-28839,Wei Chu (2),魏初,1232.0,01,18.0,M,16867.0,4115,Qingyai ji,青崖集,0,unknown,未詳,
+28839,Wei Chu,魏初,1232.0,01,18.0,M,16867.0,4115,Qingyai ji,青崖集,0,unknown,未詳,
 28845,Zhang Zhihan,張之翰,1243.0,01,18.0,M,16995.0,2340,Xiyan ji,西巖集,0,unknown,未詳,
 28846,Zhao Bingwen,趙秉文,1159.0,01,17.0,M,3307.0,2044,Fushui ji,滏水集,0,unknown,未詳,
 28934,Liu Bingzhong,劉秉忠,1216.0,01,18.0,M,16977.0,6089,Cangchun ji,藏春集,0,unknown,未詳,
@@ -3664,9 +3664,9 @@
 34529,Wu Yubi,吳與弼,1391.0,01,19.0,M,5473.0,7202,Kangzhai wenji,康齋文集,0,unknown,未詳,
 34529,Wu Yubi,吳與弼,1391.0,01,19.0,M,5473.0,28033,Kang zhai xian sheng wen ji: shi er juan,康齋先生文集:十二卷,0,unknown,未詳,
 34530,Zhu Cunli,朱存理,1444.0,01,19.0,M,4594.0,7203,Louju zazhu,樓居雜著,0,unknown,未詳,
-34531,Luo Lun,羅倫,1431.0,01,19.0,M,5482.0,7204,Yifeng ji,一峰集,0,unknown,未詳,
-34531,Luo Lun,羅倫,1431.0,01,19.0,M,5482.0,23575,Yi feng ji,一峯集:十卷,0,unknown,未詳,
-34531,Luo Lun,羅倫,1431.0,01,19.0,M,5482.0,28034,Yi feng xian sheng wen ji: shi si juan,一峰先生文集:十四卷,0,unknown,未詳,
+34531,Luo Lun,羅倫,1431.0,01,19.0,M,5452.0,7204,Yifeng ji,一峰集,0,unknown,未詳,
+34531,Luo Lun,羅倫,1431.0,01,19.0,M,5452.0,23575,Yi feng ji,一峯集:十卷,0,unknown,未詳,
+34531,Luo Lun,羅倫,1431.0,01,19.0,M,5452.0,28034,Yi feng xian sheng wen ji: shi si juan,一峰先生文集:十四卷,0,unknown,未詳,
 34532,Zhang Mao,章懋,1436.0,01,19.0,M,5372.0,7205,Fengshan ji,楓山集,0,unknown,未詳,
 34532,Zhang Mao,章懋,1436.0,01,19.0,M,5372.0,23581,Wen ji (Zhang Mao),文集(章懋):九卷,0,unknown,未詳,
 34532,Zhang Mao,章懋,1436.0,01,19.0,M,5372.0,23584,An ran zi ji,闇然子集,0,unknown,未詳,
@@ -3870,8 +3870,8 @@
 34789,Shi Qisong,釋契嵩,1007.0,01,15.0,M,14166.0,7322,tan jin ji,鐔津集,0,unknown,未詳,
 34789,Shi Qisong,釋契嵩,1007.0,01,15.0,M,14166.0,12305,zhi ping ji,治平集,0,unknown,未詳,
 34791,Shi Zhuhong,釋袾宏,1535.0,01,19.0,M,5334.0,66676,Yun lou da shi yi gao: san juan,雲棲大師遺稿3卷,1,author,撰著者,
-34792,Shi Kefa,史可法,1602.0,01,19.0,M,7213.0,3732,Shi zhongzheng gong ji,史忠正公集:四卷首1卷末1卷,0,unknown,未詳,
-34792,Shi Kefa,史可法,1602.0,01,19.0,M,7213.0,22464,Shi zhong zheng ji,史忠正集:二卷,0,unknown,未詳,
+34792,Shi Kefa,史可法,1602.0,01,19.0,M,5029.0,3732,Shi zhongzheng gong ji,史忠正公集:四卷首1卷末1卷,0,unknown,未詳,
+34792,Shi Kefa,史可法,1602.0,01,19.0,M,5029.0,22464,Shi zhong zheng ji,史忠正集:二卷,0,unknown,未詳,
 34797,Shi Wenying,釋文瑩,,,15.0,M,12672.0,12353,wen ji (Shi Wenying),文集(釋文瑩),0,unknown,未詳,
 34800,Sun Chengze,孫承澤,1594.0,01,20.0,M,7978.0,20711,Shan ju xiao jian,山居小箋,0,unknown,未詳,
 34800,Sun Chengze,孫承澤,1594.0,01,20.0,M,7978.0,20713,Ji hai cun gao,己亥存稿:一卷,0,unknown,未詳,
@@ -4559,9 +4559,9 @@
 44259,Sun Fa,孫發,1058.0,05,15.0,M,12916.0,9288,fu shan ji,敷山集,0,unknown,未詳,
 44261,Yuan Quhua,袁去華,1115.0,05,15.0,M,12915.0,9289,Yuanxuanqing Ci,袁宣卿詞,0,unknown,未詳,
 44261,Yuan Quhua,袁去華,1115.0,05,15.0,M,12915.0,11859,yuan yi qing ci,袁宜卿詞:一卷,0,unknown,未詳,
-44295,Ma Renzhong,馬壬仲,1160.0,05,15.0,M,13890.0,9299,de zhai ji,得齋集,0,unknown,未詳,
-44295,Ma Renzhong,馬壬仲,1160.0,05,15.0,M,13890.0,12781,zou yi (Ma Renzhong),奏議(馬壬仲),0,unknown,未詳,
-44295,Ma Renzhong,馬壬仲,1160.0,05,15.0,M,13890.0,12782,za zhu (Ma Renzhong),雜著(馬壬仲),0,unknown,未詳,
+44295,Ma Renzhong,馬壬仲,1160.0,05,15.0,M,12786.0,9299,de zhai ji,得齋集,0,unknown,未詳,
+44295,Ma Renzhong,馬壬仲,1160.0,05,15.0,M,12786.0,12781,zou yi (Ma Renzhong),奏議(馬壬仲),0,unknown,未詳,
+44295,Ma Renzhong,馬壬仲,1160.0,05,15.0,M,12786.0,12782,za zhu (Ma Renzhong),雜著(馬壬仲),0,unknown,未詳,
 44303,Gao Fu,高賦,1009.0,01,15.0,M,11733.0,9295,Baiyun ji,白雲集,0,unknown,未詳,
 44303,Gao Fu,高賦,1009.0,01,15.0,M,11733.0,12828,dao bi (Gao Fu),刀筆(高賦):二十卷,0,unknown,未詳,
 44303,Gao Fu,高賦,1009.0,01,15.0,M,11733.0,12829,zou yi (Gao Fu),奏議(高賦):五卷,0,unknown,未詳,
@@ -5223,12 +5223,12 @@
 54187,Ma  Shiqi,馬士琪,1662.0,01,20.0,F,,35232,Guo chao gui ge shi chao: yi bai zhong yi bai juan,國朝閨閣詩鈔:一百種一百卷,0,unknown,未詳,
 54187,Ma  Shiqi,馬士琪,1662.0,01,20.0,F,,36187,Pian shi zhai jin yu cao: yi juan,片石齋燼餘草:一卷,0,unknown,未詳,
 54187,Ma  Shiqi,馬士琪,1662.0,01,20.0,F,,36736,Shu quan ji: er juan,漱泉集:二卷,0,unknown,未詳,
-54191,Zhang Zao,張藻,1723.0,01,20.0,F,,35232,Guo chao gui ge shi chao: yi bai zhong yi bai juan,國朝閨閣詩鈔:一百種一百卷,0,unknown,未詳,
-54191,Zhang Zao,張藻,1723.0,01,20.0,F,,35898,Pei yuan tang shi: si juan,培遠堂詩:四卷,0,unknown,未詳,
+54191,Zhang Zao,張藻,1723.0,01,20.0,F,7538.0,35232,Guo chao gui ge shi chao: yi bai zhong yi bai juan,國朝閨閣詩鈔:一百種一百卷,0,unknown,未詳,
+54191,Zhang Zao,張藻,1723.0,01,20.0,F,7538.0,35898,Pei yuan tang shi: si juan,培遠堂詩:四卷,0,unknown,未詳,
 54192,He Gui,賀桂,,,20.0,F,,35232,Guo chao gui ge shi chao: yi bai zhong yi bai juan,國朝閨閣詩鈔:一百種一百卷,0,unknown,未詳,
 54192,He Gui,賀桂,,,20.0,F,,35330,Zhu yin lou shi cao: yi juan,竹隱樓詩草:一卷,0,unknown,未詳,
 54192,He Gui,賀桂,,,20.0,F,,37097,Zhu yin lou cao,竹隱樓草,0,unknown,未詳,
-54196,Gu Ying,顧英,1696.0,15,20.0,F,,36303,Yi cui ge shi chao,挹翠閣詩鈔,0,unknown,未詳,
+54196,Gu Ying,顧英,1696.0,15,20.0,F,7540.0,36303,Yi cui ge shi chao,挹翠閣詩鈔,0,unknown,未詳,
 54198,Miao Zhusun,繆珠蓀,1851.0,01,20.0,F,,35275,Xiao tan luan shi hui ke gui xiu ci: shi ji yi bai zhong yi bai juan,小檀欒室彙刻閨秀詞:十集一百種一百卷,0,unknown,未詳,
 54198,Miao Zhusun,繆珠蓀,1851.0,01,20.0,F,,35461,Xia zhen ci: yi juan,霞珍詞:一卷,0,unknown,未詳,
 54201,Wan Mengdan,萬夢丹,1819.0,03,20.0,F,,35232,Guo chao gui ge shi chao: yi bai zhong yi bai juan,國朝閨閣詩鈔:一百種一百卷,0,unknown,未詳,
@@ -5798,10 +5798,10 @@
 54839,Qin Yun,秦雲,1833.0,01,20.0,F,7540.0,35997,Mei qing lou ?? shi ci cao,媚晴樓​​詩詞草,0,unknown,未詳,
 54840,Gao Mei,高篃,1796.0,01,20.0,F,,35232,Guo chao gui ge shi chao: yi bai zhong yi bai juan,國朝閨閣詩鈔:一百種一百卷,0,unknown,未詳,
 54840,Gao Mei,高篃,1796.0,01,20.0,F,,37686,Xiu qie xiao ji: yi juan,繡篋小集:一卷,0,unknown,未詳,
-54845,Xu Can,徐燦,1610.0,01,20.0,F,,35275,Xiao tan luan shi hui ke gui xiu ci: shi ji yi bai zhong yi bai juan,小檀欒室彙刻閨秀詞:十集一百種一百卷,0,unknown,未詳,
-54845,Xu Can,徐燦,1610.0,01,20.0,F,,35352,Zhuo zheng yuan shi yu: san juan,拙政園詩餘:三卷,0,unknown,未詳,
-54845,Xu Can,徐燦,1610.0,01,20.0,F,,36285,Zhuo zheng yuan shi ji: er juan,拙政園詩集:二卷,0,unknown,未詳,
-54845,Xu Can,徐燦,1610.0,01,20.0,F,,40342,xu yang xi ji liu juan,徐陽溪集六卷,1,author,撰著者,
+54845,Xu Can,徐燦,1610.0,01,20.0,F,7539.0,35275,Xiao tan luan shi hui ke gui xiu ci: shi ji yi bai zhong yi bai juan,小檀欒室彙刻閨秀詞:十集一百種一百卷,0,unknown,未詳,
+54845,Xu Can,徐燦,1610.0,01,20.0,F,7539.0,35352,Zhuo zheng yuan shi yu: san juan,拙政園詩餘:三卷,0,unknown,未詳,
+54845,Xu Can,徐燦,1610.0,01,20.0,F,7539.0,36285,Zhuo zheng yuan shi ji: er juan,拙政園詩集:二卷,0,unknown,未詳,
+54845,Xu Can,徐燦,1610.0,01,20.0,F,7539.0,40342,xu yang xi ji liu juan,徐陽溪集六卷,1,author,撰著者,
 54846,Tan Ziying,譚紫瓔,1796.0,01,20.0,F,,35232,Guo chao gui ge shi chao: yi bai zhong yi bai juan,國朝閨閣詩鈔:一百種一百卷,0,unknown,未詳,
 54846,Tan Ziying,譚紫瓔,1796.0,01,20.0,F,,37812,Xiu yin lou shi chao: yi juan,繡吟樓詩鈔:一卷,0,unknown,未詳,
 54854,Chen Zhilin,陳之遴,1605.0,01,20.0,M,7604.0,20848,Fu yun ji,浮雲集:十一卷,0,unknown,未詳,
@@ -6095,7 +6095,7 @@
 55282,Ying Xueyun,應學韞,,,20.0,F,,37491,Zi yu cao,自娛草,0,unknown,未詳,
 55284,Wu Shangxi,吳尚熹,1796.0,01,20.0,F,,35275,Xiao tan luan shi hui ke gui xiu ci: shi ji yi bai zhong yi bai juan,小檀欒室彙刻閨秀詞:十集一百種一百卷,0,unknown,未詳,
 55284,Wu Shangxi,吳尚熹,1796.0,01,20.0,F,,35436,Xie jun lou ci: yi juan,寫均樓詞:一卷,0,unknown,未詳,
-55285,Qian Renhui,錢紉蕙,1662.0,01,20.0,F,,36700,Qing yin ge ji: yi juan,清蔭閣集:一卷,0,unknown,未詳,
+55285,Qian Renhui,錢紉蕙,1662.0,01,20.0,F,7539.0,36700,Qing yin ge ji: yi juan,清蔭閣集:一卷,0,unknown,未詳,
 55286,Wu Rongguang,吳榮光,1773.0,01,20.0,M,8386.0,21522,Bai yun shan ren shi gao,白雲山人詩稿,0,unknown,未詳,
 55286,Wu Rongguang,吳榮光,1773.0,01,20.0,M,8386.0,21523,Shi yun shan ren wen gao,石雲山人文稿,0,unknown,未詳,
 55286,Wu Rongguang,吳榮光,1773.0,01,20.0,M,8386.0,21524,Shi yun shan ren shi ji,石雲山人詩集,0,unknown,未詳,
@@ -6132,7 +6132,7 @@
 55324,Pu Wenqi,濮文綺,1831.0,01,20.0,F,,35411,Dan lv ci: yi juan,彈綠詞:一卷,0,unknown,未詳,
 55324,Pu Wenqi,濮文綺,1831.0,01,20.0,F,,36186,Dan lv nv shi shi gao,彈綠女史詩稿,0,unknown,未詳,
 55327,Pu Wenxian,濮文暹,1830.0,01,20.0,M,7560.0,20830,Jian zai kan wen ji,見在龕文集,0,unknown,未詳,
-55330,Han Yunyu,韓韞玉,1662.0,01,20.0,F,,36090,Cun cao xuan shi gao,寸草軒詩稿,0,unknown,未詳,
+55330,Han Yunyu,韓韞玉,1662.0,01,20.0,F,7540.0,36090,Cun cao xuan shi gao,寸草軒詩稿,0,unknown,未詳,
 55335,Sun Yunhe,孫雲鶴,1766.0,01,20.0,F,7603.0,35230,Sui yuan nv di zi shi xuan: liu juan,隨園女弟子詩選:六卷,0,unknown,未詳,
 55335,Sun Yunhe,孫雲鶴,1766.0,01,20.0,F,7603.0,35275,Xiao tan luan shi hui ke gui xiu ci: shi ji yi bai zhong yi bai juan,小檀欒室彙刻閨秀詞:十集一百種一百卷,0,unknown,未詳,
 55335,Sun Yunhe,孫雲鶴,1766.0,01,20.0,F,7603.0,35413,Ting yu lou ci: er juan,聽雨樓詞:二卷,0,unknown,未詳,
@@ -6418,7 +6418,7 @@
 55858,You Dong,尤侗,1618.0,01,20.0,M,7540.0,20305,He qi tang ji,鶴棲堂集:十卷,0,unknown,未詳,
 55860,Wen Pu,聞璞,,,20.0,F,,37458,Wen xiao nv shi chao,聞孝女詩鈔,0,unknown,未詳,
 55860,Wen Pu,聞璞,,,20.0,F,,37891,Zui he lou ji,醉鶴樓集,0,unknown,未詳,
-55863,Fang Jing,方京,1667.0,11,20.0,F,,36190,Cai lin ji: er juan,彩林集:二卷,0,unknown,未詳,
+55863,Fang Jing,方京,1667.0,11,20.0,F,7538.0,36190,Cai lin ji: er juan,彩林集:二卷,0,unknown,未詳,
 55865,Fang Dianyuan,方殿元,1637.0,01,20.0,M,6069.0,24100,Jiu gu ji,九谷集:六卷,0,unknown,未詳,
 55865,Fang Dianyuan,方殿元,1637.0,01,20.0,M,6069.0,24101,Da gu ji,大谷集:六卷,0,unknown,未詳,
 55865,Fang Dianyuan,方殿元,1637.0,01,20.0,M,6069.0,24102,Wen,文:一卷,0,unknown,未詳,
@@ -6496,11 +6496,11 @@
 55985,Zhang Yuzhen,張玉珍,1766.0,01,20.0,F,,35462,Wan xiang ju ci: er juan,晚香居詞:二卷,0,unknown,未詳,
 55985,Zhang Yuzhen,張玉珍,1766.0,01,20.0,F,,36196,De shu lou ji (zhang yu zhen),得樹樓集(張玉珍),0,unknown,未詳,
 55985,Zhang Yuzhen,張玉珍,1766.0,01,20.0,F,,36388,Wan xiang ju shi chao: si juan,晚香居詩鈔:四卷,0,unknown,未詳,
-55986,Wu Qi,吳琪,,,19.0,F,,35566,Fo mei xin jiu shi,佛眉新舊詩,0,unknown,未詳,
-55986,Wu Qi,吳琪,,,19.0,F,,35812,Wu rui xian shi ji ben,吳蕊仙詩輯本,0,unknown,未詳,
-55986,Wu Qi,吳琪,,,19.0,F,,35813,Wu rui xian shi xuan,吳蕊仙詩選,0,unknown,未詳,
-55986,Wu Qi,吳琪,,,19.0,F,,36897,Suo xiang yan ci,瑣香菴詞,0,unknown,未詳,
-55986,Wu Qi,吳琪,,,19.0,F,,38166,Xiang gu fen yu cao,香谷焚餘草,0,unknown,未詳,
+55986,Wu Qi,吳琪,1663.0,01,20.0,F,4382.0,35566,Fo mei xin jiu shi,佛眉新舊詩,0,unknown,未詳,
+55986,Wu Qi,吳琪,1663.0,01,20.0,F,4382.0,35812,Wu rui xian shi ji ben,吳蕊仙詩輯本,0,unknown,未詳,
+55986,Wu Qi,吳琪,1663.0,01,20.0,F,4382.0,35813,Wu rui xian shi xuan,吳蕊仙詩選,0,unknown,未詳,
+55986,Wu Qi,吳琪,1663.0,01,20.0,F,4382.0,36897,Suo xiang yan ci,瑣香菴詞,0,unknown,未詳,
+55986,Wu Qi,吳琪,1663.0,01,20.0,F,4382.0,38166,Xiang gu fen yu cao,香谷焚餘草,0,unknown,未詳,
 55990,Huang Juan,黃卷,,,20.0,F,,36801,Yan huan ge yi cao,煙鬟閣遺草,0,unknown,未詳,
 55995,Ye Fen,葉枌,,,20.0,F,,36319,Yong cui xuan chang he shi ji,擁翠軒倡和詩集,0,unknown,未詳,
 55995,Ye Fen,葉枌,,,20.0,F,,38044,Fei yu xuan shi ji,霏玉軒詩集,0,unknown,未詳,
@@ -6530,8 +6530,8 @@
 56031,Xu Songzhu,許誦珠,1797.0,01,20.0,F,,36763,Dan yin lou shi: er juan,澹吟樓詩:二卷,0,unknown,未詳,
 56031,Xu Songzhu,許誦珠,1797.0,01,20.0,F,,37224,Jing shuo,經說,0,unknown,未詳,
 56031,Xu Songzhu,許誦珠,1797.0,01,20.0,F,,38195,Yuan yang yin guan shi ci cao: yi juan,鴛鴦吟館詩詞草:一卷,0,unknown,未詳,
-56033,Xue Qiong,薛瓊,1659.0,17,20.0,F,,35358,Jiang xue ci: yi juan,絳雪詞:一卷,0,unknown,未詳,
-56033,Xue Qiong,薛瓊,1659.0,17,20.0,F,,37242,Lv chuang xiao cao (xue qiong),綠窗小草(薛瓊),0,unknown,未詳,
+56033,Xue Qiong,薛瓊,1659.0,17,20.0,F,7540.0,35358,Jiang xue ci: yi juan,絳雪詞:一卷,0,unknown,未詳,
+56033,Xue Qiong,薛瓊,1659.0,17,20.0,F,7540.0,37242,Lv chuang xiao cao (xue qiong),綠窗小草(薛瓊),0,unknown,未詳,
 56037,Zhang Qinshu,張勤淑,,,20.0,F,,37436,Cui xing zhai yin gao,翠荇齋吟稿,0,unknown,未詳,
 56039,He Cai,何采,,,20.0,F,,37313,Xiu fo ge ji,繡佛閣集,0,unknown,未詳,
 56040,Zhu Zhongmei,朱中楣,1621.0,01,20.0,F,7852.0,35232,Guo chao gui ge shi chao: yi bai zhong yi bai juan,國朝閨閣詩鈔:一百種一百卷,0,unknown,未詳,
@@ -6551,8 +6551,8 @@
 56049,Li Yuanding,李元鼎,1595.0,01,19.0,M,7918.0,17707,Guan yan zhai ji,灌研齋集:四卷,0,unknown,未詳,
 56049,Li Yuanding,李元鼎,1595.0,01,19.0,M,7918.0,60246,shi yuan ji,石園集,1,author,撰著者,2066.0
 56052,Zhang Caichai,張采茝,,,20.0,F,,36459,Song yin ge yin gao,松陰閣吟稿,0,unknown,未詳,
-56055,Zhong Yun,鍾筠,1600.0,27,20.0,F,,35468,Li yun xie ci: yi juan,梨雲榭詞:一卷,0,unknown,未詳,
-56055,Zhong Yun,鍾筠,1600.0,27,20.0,F,,36544,Li yun xie shi ci,梨雲榭詩詞,0,unknown,未詳,
+56055,Zhong Yun,鍾筠,1600.0,27,20.0,F,7602.0,35468,Li yun xie ci: yi juan,梨雲榭詞:一卷,0,unknown,未詳,
+56055,Zhong Yun,鍾筠,1600.0,27,20.0,F,7602.0,36544,Li yun xie shi ci,梨雲榭詩詞,0,unknown,未詳,
 56064,Jiang Gui,姜桂,1706.0,30,20.0,F,8067.0,35991,Jiang zhen nv shi ji,姜貞女詩集,0,unknown,未詳,
 56070,Bao Yin,鮑印,1766.0,01,20.0,F,,37260,Lv jun ting cao,綠筠亭草,0,unknown,未詳,
 56070,Bao Yin,鮑印,1766.0,01,20.0,F,,37657,Cang han lou shi gao ci: er juan,藏翰樓詩稿詞:二卷,0,unknown,未詳,
@@ -6623,7 +6623,7 @@
 56177,Yao Yijing,姚益敬,1728.0,11,20.0,F,,37521,Fen tuo li ju xiao gao: yi juan,芬陀利居小稿:一卷,0,unknown,未詳,
 56181,Shen Xiaofang,沈小芳,,,20.0,F,,37873,Yi fang xiao cao,遺芳小草,0,unknown,未詳,
 56185,Fan Zhenyi,范貞儀,,,20.0,F,,36237,Chou ye ji: yi juan,愁業集:一卷,0,unknown,未詳,
-56187,Jin Shun,金顺,1721.0,01,20.0,F,7523.0,35616,Fu shu lou gao,傅書樓稿,0,unknown,未詳,
+56187,Jin Shun,金順,1721.0,01,20.0,F,7523.0,35616,Fu shu lou gao,傅書樓稿,0,unknown,未詳,
 56203,Wang Wei,王煒,1620.0,01,20.0,F,7524.0,36808,Yan yu lou gao,燕譽樓稿,0,unknown,未詳,
 56203,Wang Wei,王煒,1620.0,01,20.0,F,7524.0,37411,Xu lie nv chuan,續烈女傳,0,unknown,未詳,
 56203,Wang Wei,王煒,1620.0,01,20.0,F,7524.0,37428,Cui wei lou ji,翠微樓集,0,unknown,未詳,
@@ -7341,10 +7341,10 @@
 61064,Meng Chaoran,孟超然,1730.0,01,20.0,M,7770.0,17890,Ping an xian sheng yi shu,瓶庵先生遺書,0,unknown,未詳,
 61064,Meng Chaoran,孟超然,1730.0,01,20.0,M,7770.0,17891,Ping an ju shi shi wen chao,瓶庵居士詩文鈔:八卷,0,unknown,未詳,
 61165,Le Fangyi,勒方錡,1816.0,01,20.0,M,7853.0,18926,Jiao lu yin,蕉鹿吟,0,unknown,未詳,
-61226,Xu Yuanwen,徐元文,1634.0,01,20.0,M,7544.0,14546,Han jing tang bie ji,含經堂別集:二卷,0,unknown,未詳,
-61226,Xu Yuanwen,徐元文,1634.0,01,20.0,M,7544.0,14548,Han jing tang ji,含經堂集:三十卷,0,unknown,未詳,
-61226,Xu Yuanwen,徐元文,1634.0,01,20.0,M,7544.0,14549,Han jing tang ji fu lu,含經堂集附錄:二卷,0,unknown,未詳,
-61226,Xu Yuanwen,徐元文,1634.0,01,20.0,M,7544.0,17655,Han wei feng zhi ji,漢魏風致集,0,unknown,未詳,
+61226,Xu Yuanwen,徐元文,1634.0,01,20.0,M,7540.0,14546,Han jing tang bie ji,含經堂別集:二卷,0,unknown,未詳,
+61226,Xu Yuanwen,徐元文,1634.0,01,20.0,M,7540.0,14548,Han jing tang ji,含經堂集:三十卷,0,unknown,未詳,
+61226,Xu Yuanwen,徐元文,1634.0,01,20.0,M,7540.0,14549,Han jing tang ji fu lu,含經堂集附錄:二卷,0,unknown,未詳,
+61226,Xu Yuanwen,徐元文,1634.0,01,20.0,M,7540.0,17655,Han wei feng zhi ji,漢魏風致集,0,unknown,未詳,
 61262,Ke Shaowen,柯劭忞,1850.0,01,21.0,M,8068.0,18914,Liao yuan ji,蓼園集,0,unknown,未詳,
 61288,Xu Shifen,徐士芬,1791.0,01,20.0,M,7623.0,17658,Shu fang ge shi wen ji,漱芳閣詩文集,0,unknown,未詳,
 61337,Chen Bangyan,陳邦彥,1678.0,01,20.0,M,7604.0,15004,Mo zhuang xiao gao,墨莊小稿,0,unknown,未詳,
@@ -7934,8 +7934,8 @@
 65936,Huang Jingren,黃景仁,1749.0,01,20.0,M,7530.0,19101,Xi li yin gao,西蠡印稿,0,unknown,未詳,
 65937,Xie Jishi,謝濟世,1689.0,01,20.0,M,8617.0,13797,Yi xue ju ye ji,以學居業集,0,unknown,未詳,
 65939,Gui Zhuang,歸莊,1613.0,01,20.0,M,4596.0,15661,Shan ju shi,山居詩,0,unknown,未詳,
-65939,Gui Zhuang,歸莊,1613.0,01,20.0,M,4596.0,16022,Heng xuan ji,恆軒集,0,unknown,未詳,
-65939,Gui Zhuang,歸莊,1613.0,01,20.0,M,4596.0,16105,Xuan gong ji,懸弓集:三十卷,0,unknown,未詳,
+65939,Gui Zhuang,歸莊,1613.0,01,20.0,M,4596.0,16022,Heng xuan ji,恆軒集,1,author,撰著者,68573.0
+65939,Gui Zhuang,歸莊,1613.0,01,20.0,M,4596.0,16105,Xuan gong ji,懸弓集:三十卷,1,author,撰著者,68573.0
 65939,Gui Zhuang,歸莊,1613.0,01,20.0,M,4596.0,17165,Gui yuan gong wen chao,歸元功文鈔,0,unknown,未詳,
 65939,Gui Zhuang,歸莊,1613.0,01,20.0,M,4596.0,17166,Gui yuan gong wen xu chao,歸元恭文續鈔:七卷,0,unknown,未詳,
 65939,Gui Zhuang,歸莊,1613.0,01,20.0,M,4596.0,17173,Gui xuan gong yi zhe,歸玄恭遺著,0,unknown,未詳,
@@ -8575,7 +8575,7 @@
 68262,Wang Bangrui,王邦瑞,1495.0,01,19.0,M,5106.0,28450,"Wang xiang yi gong ji: er shi juan, fu lu yi juan","王襄毅公集:二十卷,附錄一卷",0,unknown,未詳,
 68266,Zhang Cong,張璁,1475.0,01,19.0,M,5421.0,13441,Shi ji (Zhang Cong),詩集(張璁):三卷,0,unknown,未詳,
 68266,Zhang Cong,張璁,1475.0,01,19.0,M,5421.0,18977,Luo feng ji,蘿峰集,0,unknown,未詳,
-68267,Peng Ze,彭澤,1459.0,01,19.0,M,5622.0,15792,Xing an xing gao,幸菴行稿:十二卷,0,unknown,未詳,
+68267,Peng Ze,彭澤,1459.0,01,19.0,M,5621.0,15792,Xing an xing gao,幸菴行稿:十二卷,0,unknown,未詳,
 68269,Peng Ze,彭澤,1429.0,07,19.0,M,5631.0,18604,Lao kui ji,老葵集,0,unknown,未詳,
 68272,Zhao Shichun,趙時春,1509.0,01,19.0,M,5250.0,14129,Bie ben xun gu ji,別本浚谷集:十七卷,0,unknown,未詳,
 68272,Zhao Shichun,趙時春,1509.0,01,19.0,M,5250.0,19570,Zhao xun gu ji,趙浚谷集:十六卷,0,unknown,未詳,
@@ -8687,7 +8687,7 @@
 68417,Bao Jie,包節,1506.0,01,19.0,M,5343.0,18717,Tai zhong ji,臺中集,0,unknown,未詳,
 68424,Chen Hou,陳逅,1487.0,05,19.0,M,4598.0,28092,Sheng an man gao: si juan,省庵漫稿:四卷,0,unknown,未詳,
 68443,Wei Shangchen,韋商臣,1493.0,05,19.0,M,5355.0,14328,Nan tai ji,南苔集,0,unknown,未詳,
-68446,Peng Rushi,彭汝實,1491.0,05,19.0,M,5745.0,15929,De shan tang ji,得山堂集,0,unknown,未詳,
+68446,Peng Rushi,彭汝實,1491.0,05,19.0,M,4600.0,15929,De shan tang ji,得山堂集,0,unknown,未詳,
 68449,Liu Hui,劉繪,1509.0,01,19.0,M,5151.0,15701,Song yang xian sheng ji,嵩陽先生集:二十卷,0,unknown,未詳,
 68450,Liu Huangchang,劉黃裳,1556.0,05,19.0,M,5151.0,18943,Cang zheng guan ji,藏徵館集:十六卷,0,unknown,未詳,
 68453,Lv Huai,呂懷,1502.0,05,19.0,M,5452.0,13493,Lei gao (Lv Huai),類稿(呂懷):三十三卷,0,unknown,未詳,
@@ -8941,8 +8941,8 @@
 69391,Wang Shilan,王蒔蘭,,,20.0,M,7631.0,17521,Zhu shan wen ji,渚山文集:二卷,0,unknown,未詳,
 69391,Wang Shilan,王蒔蘭,,,20.0,M,7631.0,17522,Zhu shan shi ji,渚山詩集:二卷,0,unknown,未詳,
 69398,Wang Weide,王維德,1669.0,01,20.0,M,7539.0,15033,Wai ke quan sheng ji,外科全生集:一卷,1,author,撰著者,40328.0
-69400,Wang Jian,王戩,1645.0,29,20.0,M,8208.0,18280,Tu xing ge shi chao,突星閣詩鈔:十五卷,0,unknown,未詳,
-69400,Wang Jian,王戩,1645.0,29,20.0,M,8208.0,18281,Tu xing ge shi ji,突星閣詩集,0,unknown,未詳,
+69400,Wang Jian,王戩,1645.0,29,20.0,M,5553.0,18280,Tu xing ge shi chao,突星閣詩鈔:十五卷,0,unknown,未詳,
+69400,Wang Jian,王戩,1645.0,29,20.0,M,5553.0,18281,Tu xing ge shi ji,突星閣詩集,0,unknown,未詳,
 69402,Wang Youding,王猷定,1598.0,01,20.0,M,5430.0,14860,Si zhao tang ji,四照堂集:十六卷,0,unknown,未詳,
 69408,Wang Mingshao,王鳴韶,1732.0,01,20.0,M,7528.0,18180,Li chuan tang wen ji,禮傳堂文集,0,unknown,未詳,
 69408,Wang Mingshao,王鳴韶,1732.0,01,20.0,M,7528.0,18586,Cui wei jing lu xiao gao,翠微精廬小稿,0,unknown,未詳,
@@ -9481,6 +9481,7 @@
 82408,Fan Shu,范淑,1821.0,01,20.0,F,7863.0,36261,Yi qiu xuan shi chao,憶秋軒詩鈔,0,unknown,未詳,
 82412,Fan Lu,范路,1610.0,01,20.0,M,20021.0,40023,fan zhen jian shi ji ,范貞簡詩集,1,author,撰著者,
 82511,Mao Wei,茅維,1576.0,01,19.0,M,5354.0,28282,Shi lai tang jia ji wen bu: shi er juan,十賚堂甲集文部:十二卷,0,unknown,未詳,
+82990,Jin Kan,金侃,1640.0,29,20.0,M,7539.0,16022,Heng xuan ji,恆軒集,2,editor,編輯者,68573.0
 83087,Jin Fayan,金法筵,1651.0,01,20.0,M,7539.0,36229,Xi chun xuan shi: yi juan,惜春軒詩:一卷,0,unknown,未詳,
 83206,Zhou Qi,周綺,1814.0,01,20.0,F,7546.0,37214,Rong yu shi ji,絨餘事集,0,unknown,未詳,
 83206,Zhou Qi,周綺,1814.0,01,20.0,F,7546.0,38003,Shuang qing xian guan shi ci,雙清仙館詩詞,0,unknown,未詳,
@@ -9611,7 +9612,7 @@
 90098,Fu Wanglu,傅王露,1678.0,01,20.0,M,7686.0,60062,yu si shan fang ji,玉笥山房集,1,author,撰著者,18417.0
 90110,Fu Zhanheng,傅占衡,1608.0,01,20.0,M,7896.0,60531,xiang fan tang ji,湘帆堂集: 三十六卷,1,author,撰著者,2066.0
 90325,Zeng Yan,曾彥,1857.0,01,20.0,M,8670.0,36508,Tong feng ji: er juan,桐鳳集:二卷,0,unknown,未詳,
-90376,Zeng Yizhuan,曾異撰,1591.0,01,20.0,M,7771.0,28303,Fang shou tang ji: er shi liu juan,紡授堂集:二十六卷,0,unknown,未詳,
+90376,Zeng Yizhuan,曾異撰,1591.0,01,20.0,M,5993.0,28303,Fang shou tang ji: er shi liu juan,紡授堂集:二十六卷,0,unknown,未詳,
 90438,Wen Huang,溫璜,1608.0,01,20.0,M,7612.0,28304,Wen bao zhong xian sheng yi gao: shi er juan,溫寶忠先生遺稿:十二卷,0,unknown,未詳,
 90460,You Yu,游瑜,1736.0,01,20.0,F,7896.0,36323,Gong yi cao,攻逸草,0,unknown,未詳,
 90460,You Yu,游瑜,1736.0,01,20.0,F,7896.0,37991,Ji liao shan fang shi cao,集蓼山房詩草,0,unknown,未詳,
@@ -10535,7 +10536,7 @@
 94814,Wen Tingyun,溫廷筠,812.0,01,6.0,M,15059.0,26596,shi ji  (Wen Tingyun),詩集(溫廷筠),0,unknown,未詳,
 94814,Wen Tingyun,溫廷筠,812.0,01,6.0,M,15059.0,26793,jin quan ci,金荃詞,0,unknown,未詳,
 94814,Wen Tingyun,溫廷筠,812.0,01,6.0,M,15059.0,26794,jin quan ji,金荃集,0,unknown,未詳,
-94815,Wen Yanbo,溫彥博,575.0,01,5.0,M,15059.0,25471,wen ji  (Wen Yanbo),文集(溫彥博),0,unknown,未詳,
+94815,Wen Yanbo,溫彥博,575.0,01,5.0,M,15054.0,25471,wen ji  (Wen Yanbo),文集(溫彥博),0,unknown,未詳,
 94817,Wen Zao,溫造,766.0,01,6.0,M,15169.0,25960,wen zao ji,溫造集,0,unknown,未詳,
 94821,You Gong,游恭,883.0,13,6.0,M,16027.0,25136,xiao le li ji,小樂里集,0,unknown,未詳,
 94821,You Gong,游恭,883.0,13,6.0,M,16027.0,25223,guang dong li ji,廣東里集,0,unknown,未詳,
@@ -10570,7 +10571,7 @@
 94884,Dou Chang,竇常,747.0,01,6.0,M,14621.0,24725,nan xun ji,南薰集,0,unknown,未詳,
 94884,Dou Chang,竇常,747.0,01,6.0,M,14621.0,26229,dou chang ji,竇常集,0,unknown,未詳,
 94884,Dou Chang,竇常,747.0,01,6.0,M,14621.0,26230,dou shi lian zhu ji,竇氏聯珠集,0,unknown,未詳,
-94888,Dou Qun,竇羣,765.0,01,6.0,M,14694.0,26230,dou shi lian zhu ji,竇氏聯珠集,0,unknown,未詳,
+94888,Dou Qun,竇羣,765.0,01,6.0,M,14621.0,26230,dou shi lian zhu ji,竇氏聯珠集,0,unknown,未詳,
 94891,Chu Zai,褚載,,,6.0,M,,26506,chu zai shi,褚載詩,0,unknown,未詳,
 94891,Chu Zai,褚載,,,6.0,M,,26507,chu zai ji,褚載集,0,unknown,未詳,
 94893,Chu Cangyan,褚藏言,,,6.0,M,400072.0,26230,dou shi lian zhu ji,竇氏聯珠集,0,unknown,未詳,
@@ -10712,8 +10713,8 @@
 95348,Huang Dezhen,黃德貞,,,20.0,F,,38023,Xue jiao gao,雪椒稿,0,unknown,未詳,
 95353,Gao  Mengying,高孟瑛,,,20.0,F,,36075,Shen yun lou ji,審韻樓集,0,unknown,未詳,
 95357,Sun Lanyuan,孫蘭媛,,,20.0,F,,37020,Yan xiang ge shi ci,硯香閣詩詞,0,unknown,未詳,
-95359,Xu  Xuan,徐璇,,,20.0,F,7531.0,37663,Ou xiang xuan cao,藕香軒草,0,unknown,未詳,
-95359,Xu  Xuan,徐璇,,,20.0,F,7531.0,64436,ou xiang xuan cao,藕香軒草,1,author,撰著者,63343.0
+95359,Xu  Xuan,徐璇,,,20.0,F,7530.0,37663,Ou xiang xuan cao,藕香軒草,0,unknown,未詳,
+95359,Xu  Xuan,徐璇,,,20.0,F,7530.0,64436,ou xiang xuan cao,藕香軒草,1,author,撰著者,63343.0
 95364,Sun Huiyuan,孫蕙媛,,,20.0,F,,36240,Chou yu cao,愁餘草,0,unknown,未詳,
 95366,Jiang Shi (Wife of Chen Dunwu),蔣氏(陳敦吾妻),,,20.0,F,,36630,Huan gou yin cao,浣垢吟草,0,unknown,未詳,
 95368,Chen Yunzhai,陳蘊齋,,,20.0,F,,36275,Cheng huan ji,承歡集,0,unknown,未詳,
@@ -10806,7 +10807,7 @@
 100155,Ye  Fang,葉舫,,,20.0,F,,36532,Mei yu ting shi ji,梅語亭詩集,0,unknown,未詳,
 100157,Mu  Deyan,慕德炎,,,20.0,F,,36779,Fen yu gao,焚餘稿,0,unknown,未詳,
 100163,Zhao  Guie,趙貴娥,,,20.0,F,,37567,Ming xiang shi cao,茗香詩草,0,unknown,未詳,
-100171,Qian  Shu,錢淑,1772.0,11,20.0,F,,35643,Bing ru yi gao,冰如遺稿,0,unknown,未詳,
+100171,Qian  Shu,錢淑,1772.0,11,20.0,F,7538.0,35643,Bing ru yi gao,冰如遺稿,0,unknown,未詳,
 100175,Wu  Hui,吳蕙,1777.0,01,20.0,F,,38102,Jing xiang lou shi cao: er juan,靜香樓詩草:二卷,0,unknown,未詳,
 100177,Li Dechun,李德純,,,20.0,F,,37710,Lan yun lou cao,蘭韻樓草,0,unknown,未詳,
 100178,Jin  Shu,金淑,,,20.0,F,,35909,Mo xiang ju hua shi,墨香居畫識,0,unknown,未詳,
@@ -11009,7 +11010,7 @@
 118730,Wei Fengzhen,魏鳳珍,1766.0,01,20.0,F,,37153,Hong yu xiao cao (wei feng zhen),紅餘小草(魏鳳珍),0,unknown,未詳,
 118734,Fang  Wan,方琬,,,20.0,F,,36345,Duan chai ji (fang wan),斷釵集(方琬),0,unknown,未詳,
 118735,Jin  Zhenyu,金貞玉,,,20.0,F,,37896,Jin ru ren yi shi: er juan,金孺人遺詩:二卷,0,unknown,未詳,
-118766,Meng  Shuqing,孟淑卿,,,19.0,F,,37581,Jing shan ju shi shi: yi juan,荊山居士詩:一卷,0,unknown,未詳,
+118766,Meng  Shuqing,孟淑卿,,,19.0,F,4592.0,37581,Jing shan ju shi shi: yi juan,荊山居士詩:一卷,0,unknown,未詳,
 118768,Chen Shi (Wife of Pan Zhonghui),陳氏(潘仲徽妻),,,19.0,F,,35878,Guo cai ji,國才集,0,unknown,未詳,
 118768,Chen Shi (Wife of Pan Zhonghui),陳氏(潘仲徽妻),,,19.0,F,,37955,Gui zhong ji,閨中集,0,unknown,未詳,
 118769,Shen Qionglian,沈瓊蓮,1488.0,01,19.0,F,,35979,Nv ge lao ji,女閣老集,0,unknown,未詳,
@@ -11104,7 +11105,7 @@
 119295,Hua  Yi,華宜,,,20.0,F,,36567,Cha xiang ci,槎香詞,0,unknown,未詳,
 119301,Deng  Taimiao,鄧太妙,1620.0,01,20.0,F,,35497,San chu xi jiao ji,三出西郊記,0,unknown,未詳,
 119301,Deng  Taimiao,鄧太妙,1620.0,01,20.0,F,,35864,Jia lian ge ji,嘉蓮閣集,0,unknown,未詳,
-119309,Zhuang Suxin,莊素馨,1768.0,01,20.0,F,,35929,Meng chu ge ji,夢楚閣集,0,unknown,未詳,
+119309,Zhuang Suxin,莊素馨,1768.0,01,20.0,F,7538.0,35929,Meng chu ge ji,夢楚閣集,0,unknown,未詳,
 119312,Yao Wenyu,姚文玉,1820.0,01,20.0,F,,35801,Han zhang ji,含章集,0,unknown,未詳,
 119314,Jin shi (Wife of Li Zhuguan),金氏(李柱官妻),,,20.0,F,,36584,Jian jian yin cao: yi juan,檢閒吟草:一卷,0,unknown,未詳,
 119315,Xie  Caifan,謝采蘩,1787.0,11,20.0,F,,35642,Bing hu ji,冰壺集,0,unknown,未詳,
@@ -11150,7 +11151,7 @@
 120311,Shen Hui,申蕙,1644.0,01,20.0,F,,37522,Hua xia yin,花下吟,0,unknown,未詳,
 120315,Lei Yuying,雷玉映,,,20.0,F,,35709,Ban yin lou shi cun,半吟樓詩存,0,unknown,未詳,
 120316,Wang Shaohua,王少華,1755.0,11,20.0,F,,36640,Huan xiang ci,浣薌詞,0,unknown,未詳,
-120329,Cheng Fu’e,程茯娥,,,20.0,F,,37994,Shuang song ci,雙松詞,0,unknown,未詳,
+120329,Cheng Fue,程茯娥,,,20.0,F,,37994,Shuang song ci,雙松詞,0,unknown,未詳,
 120330,Li Xiangluan,李湘鸞,,,20.0,F,,36287,Zhao cui lou shi sheng,招翠樓詩賸,0,unknown,未詳,
 120342,Wang Rui,王睿,1621.0,03,20.0,F,,37974,Lou xuan ci,陋軒詞,0,unknown,未詳,
 120344,Mao Guoji,毛國姬,,,20.0,F,,37189,Su lan shi ji,素蘭詩集,0,unknown,未詳,
@@ -11807,6 +11808,7 @@
 126574,Wang Shangjiong,王尚絅,1478.0,01,19.0,M,5025.0,28488,"Cang gu quan ji: shi er juan, fu lu yi juan","蒼谷全集:十二卷,附錄一卷",0,unknown,未詳,
 126578,Wang Shuguo,王叔果,1516.0,01,19.0,M,5421.0,28492,"Ban shan cang gao: er shi juan, fu yi juan","半山藏稿:二十卷,附一卷",0,unknown,未詳,
 126579,Wang Shugao,王叔杲,1517.0,01,19.0,M,5421.0,28336,Yu jie yuan cun gao: shi ba juan,玉介園存稿:十八卷,0,unknown,未詳,
+126590,Wang Hong,王洪,1379.0,01,19.0,M,5333.0,62252,yi zhai shi wen ji,毅齋詩文集: 八卷,1,author,撰著者,3610.0
 126627,Wang Jiaping,王家屛,1536.0,01,19.0,M,4808.0,28194,Fu su shan fang ji: si shi juan,復宿山房集:四十卷,0,unknown,未詳,
 126634,Wang Tingzhuan,王庭譔,1554.0,01,19.0,M,5205.0,57979,Song men gao:  ba juan fu lu yi juan,松門稿:八卷附錄一卷,1,author,撰著者,
 126637,Wang Xiang,王珦,1448.0,05,19.0,M,4691.0,65109,zhu po xiao gao,竹坡小稿,1,author,撰著者,57941.0
@@ -11932,6 +11934,7 @@
 129211,Yu Anqi,俞安期,1151.0,01,19.0,M,4599.0,28213,Lu lu ji: si shi juan,翏翏集:四十卷,0,unknown,未詳,0.0
 129330,Yao Shunmu,姚舜牧,1543.0,01,19.0,M,,28215,Lai en tang cao: shi liu juan,來恩堂草:十六卷,0,unknown,未詳,
 129336,Yao Xuemin,姚學閔,1541.0,05,19.0,M,5654.0,28121,Jiang dao lin xian sheng wen cui: jiu juan,蔣道林先生文粹:九卷,0,unknown,未詳,
+129404,Gao Deyang,高德暘,1352.0,01,19.0,M,,62456,jie an ji,節菴集: 八卷;續藁: 一卷,1,author,撰著者,3610.0
 129447,Tang Shisheng,唐時升,1551.0,01,19.0,M,,28291,San yi ji: er shi juan,三易集:二十卷,0,unknown,未詳,
 129455,Tang Gao,唐臯,,,19.0,M,4688.0,66644,xin an wen ji,心菴文集,1,author,撰著者,65192.0
 129467,Tang Ze,唐澤,1469.0,05,19.0,M,4688.0,65200,nan gang ji,南岡集,1,author,撰著者,65192.0
@@ -12557,7 +12560,7 @@
 513054,Lu Duo,魯鐸,,,19.0,M,303513.0,19070,Xi xiang ji,西廂集,1,author,撰著者,9602.0
 513054,Lu Duo,魯鐸,,,19.0,M,303513.0,19176,Xu lu zhai ci tang bei,許魯齋祠堂碑,1,author,撰著者,9602.0
 513054,Lu Duo,魯鐸,,,19.0,M,303513.0,20278,Lu duo wen ji,魯鐸文集:十卷,1,author,撰著者,9602.0
-513097,Zhu Zhao,朱㫤,,,19.0,M,4625.0,67359,xue jiang ji,雪江集,1,author,撰著者,2067.0
+513097,Zhu Zhao,朱㫤,,,19.0,M,4616.0,67359,xue jiang ji,雪江集,1,author,撰著者,2067.0
 513808,Hong Jing,洪璟,1670.0,14,20.0,M,7755.0,68672,huang shan you cao,黃山遊草,1,author,撰著者,57941.0
 513808,Hong Jing,洪璟,1670.0,14,20.0,M,7755.0,68673,bei you cao,北遊草,1,author,撰著者,57941.0
 515127,Cheng Ronggong,程榮功,1806.0,11,20.0,M,7755.0,67631,jie hua guan shi ji,潔華館詩集,1,author,撰著者,65192.0
@@ -12732,8 +12735,8 @@
 559955,Xie Bochun,謝伯春,1810.0,07,20.0,M,8174.0,67034,qi yun shan fang shi gao,憩雲山房詩稿,1,author,撰著者,59645.0
 559957,Zhang Baozhen,張葆眞,1852.0,0712,20.0,M,8174.0,67036,yi chun shan fang ji,憶蒓山房集,1,author,撰著者,59645.0
 559960,Huang Fa,黃筏,,,20.0,M,7755.0,61994,xu chuan shi wen ji,虛船詩文集,1,author,撰著者,57941.0
-559963,Zhang Qingyun,張淸運,1852.0,0712,20.0,M,8174.0,67038,zhe yuan yi gao,蟄園藝稿,1,author,撰著者,59645.0
-559963,Zhang Qingyun,張淸運,1852.0,0712,20.0,M,8174.0,67039,bi shan fang shi chao ci cao,碧山房詩鈔詞草,1,author,撰著者,59645.0
+559963,Zhang Qingyun,張清運,1852.0,0712,20.0,M,8174.0,67038,zhe yuan yi gao,蟄園藝稿,1,author,撰著者,59645.0
+559963,Zhang Qingyun,張清運,1852.0,0712,20.0,M,8174.0,67039,bi shan fang shi chao ci cao,碧山房詩鈔詞草,1,author,撰著者,59645.0
 559969,Zhu Cai,朱綵,,,20.0,M,7756.0,61995,mei bai ji,眉白集,1,author,撰著者,57941.0
 560025,Yu Ding,余鼎,,,19.0,M,,60840,nan po wen ji,南坡文集,1,author,撰著者,2066.0
 560028,Shao Song,邵嵩,,,19.0,M,5455.0,60841,hu shan ji,湖山集,1,author,撰著者,2066.0
@@ -13368,7 +13371,7 @@
 565741,Shen Xuanxiu,沈宣修,,,19.0,M,,62975,xiang xue yin,香雪吟: 一卷,1,author,撰著者,63342.0
 565742,Shi Shichan,釋釋禪,,,19.0,M,,62976,ji zu shan xi tan si ben wu chan shi feng xiang ji,雞足山悉檀寺本無禪師風響集: 四卷,1,author,撰著者,63342.0
 565743,Zhang Shundian,張舜典,,,19.0,M,,62977,zhang ji shan ji,張雞山集: ,1,author,撰著者,63342.0
-565744,Yan Diaoyu,嚴調御,,,19.0,M,,62978,zuo peng ji,作朋集: 一卷,1,author,撰著者,63342.0
+565744,Yan Diaoyu,嚴調御,1566.0,11,19.0,M,5333.0,62978,zuo peng ji,作朋集: 一卷,1,author,撰著者,63342.0
 565745,Li Pengling,黎彭齡,,,19.0,M,,62979,fu hang ji,芙航集: 一卷,1,author,撰著者,63342.0
 565746,Sui Mingyong,眭明永,,,19.0,M,,62980,sui song nian shi yi juan,眭嵩年詩一卷: 一卷,1,author,撰著者,63342.0
 565747,Li Chunxian,黎淳先,,,19.0,M,,62981,kuo yan,鞟言: 一卷,1,author,撰著者,63342.0
@@ -14549,7 +14552,7 @@
 568331,Shen Yuyue,沈禦月,,,20.0,F,4381.0,64161,kong cui xuan gao,空翠軒稿,1,author,撰著者,63343.0
 568332,Shen Shunzhen,沈順貞,,,20.0,F,7533.0,64162,jing zha yi yun,鏡査遺韻,1,author,撰著者,63343.0
 568335,Shen Shulian,沈淑廉,,,20.0,F,303083.0,64163,wan mian yin,婉娩吟,1,author,撰著者,63343.0
-568336,Shen Shusun,沈淑孫,,,20.0,F,7538.0,64164,chun gui shi,春閨詩,1,author,撰著者,63343.0
+568336,Shen Shusun,沈淑孫,1753.0,0528,20.0,F,7538.0,64164,chun gui shi,春閨詩,1,author,撰著者,63343.0
 568339,Shen Xiuyun,沈岫雲,,,20.0,F,303083.0,64165,shuang qing ge ji,雙清閣集,1,author,撰著者,63343.0
 568344,Shen Ruiyu,沈瑞玉,,,20.0,F,4381.0,63494,xiu yu yin gao,繡餘吟稿,1,author,撰著者,63343.0
 568346,Shen Mengheng,沈夢蘅,,,20.0,F,7601.0,64167,wei yang yin she gao,維揚吟社稿,1,author,撰著者,63343.0
@@ -14725,8 +14728,8 @@
 568792,Wang Puren,王樸人,,,20.0,F,7875.0,64339,ling xu ge shi ji,淩虛閣詩集,1,author,撰著者,63343.0
 568794,Wang Zhaoluan,王肇鸞,,,20.0,F,7551.0,64340,xiu xian cao,繡閑草,1,author,撰著者,63343.0
 568795,Wang Mulan,王慕蘭,,,20.0,F,7083.0,64341,sui han tang shi ji,歲寒堂詩集,1,author,撰著者,63343.0
-568797,Wang Luqing,王璐卿,,,20.0,F,7565.0,64342,yuan yang she cao,鴛鴦社草,1,author,撰著者,63343.0
-568797,Wang Luqing,王璐卿,,,20.0,F,7565.0,64343,jin xiang tang,錦香堂,1,author,撰著者,63343.0
+568797,Wang Luqing,王璐卿,,,20.0,F,7538.0,64342,yuan yang she cao,鴛鴦社草,1,author,撰著者,63343.0
+568797,Wang Luqing,王璐卿,,,20.0,F,7538.0,64343,jin xiang tang,錦香堂,1,author,撰著者,63343.0
 568799,Wang Yunxiang,王韻湘,,,20.0,F,7686.0,64344,wan qing ji,晚晴集,1,author,撰著者,63343.0
 568801,Wang Jingyu,王鏡萸,,,20.0,F,7548.0,64345,zi zhi guan yin cao,紫芝館吟草,1,author,撰著者,63343.0
 568803,Wang Yunhui,王韞徽,,,20.0,F,7516.0,64346,huan qing ge shi gao,環青閣詩稿,1,author,撰著者,63343.0
@@ -15651,7 +15654,7 @@
 692776,Zhang Zhichu,張之楚,,,20.0,M,7626.0,68421,sao yan zhai ji,埽雁齋集,1,author,撰著者,68002.0
 692799,Tang Xu,湯敘,,,,M,7626.0,68429,jin tai ji,金臺集,1,author,撰著者,68002.0
 692799,Tang Xu,湯敘,,,,M,7626.0,68430,bai xia ji,白下集,1,author,撰著者,68002.0
-692800,Gu Yiqing,顧一淸,1743.0,07,20.0,M,7626.0,68431,er lv xuan shi ji,邇綠軒詩集,1,author,撰著者,68002.0
+692800,Gu Yiqing,顧一清,1743.0,07,20.0,M,7626.0,68431,er lv xuan shi ji,邇綠軒詩集,1,author,撰著者,68002.0
 692805,Wu Weilong,吳爲龍,1639.0,0712,20.0,M,7626.0,68440,shu xuan xuan shi wen ji,樹萱軒詩文集,1,author,撰著者,68002.0
 692807,Wu Chaoquan,吳朝銓,1669.0,071212,20.0,M,7626.0,68442,yi wan ting shi ji,已晚亭詩集: 二十八卷,1,author,撰著者,68002.0
 692813,Cui Jinglu,崔京錄,,,20.0,M,7626.0,68454,meng zhai shi gao,蒙齋詩稿,1,author,撰著者,68002.0

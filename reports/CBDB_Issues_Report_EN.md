@@ -40,9 +40,7 @@ The issues are ordered by severity (P0 highest). Each entry includes a concise d
   - [Issue #11 — EVENTS_DATA_2's c_event_record_id control bound to a non-existent column — but the control is hidden (LATENT)](#issue-11--events_data_2s-c_event_record_id-control-bound-to-a-non-existent-column--but-the-control-is-hidden-latent)
   - [Issue #12 — POSTED_TO_OFFICE_DATA_2's c_appt_type_code control bound to a non-projected column — but the control is hidden AND the user-facing appointment-type controls work (LATENT)](#issue-12--posted_to_office_data_2s-c_appt_type_code-control-bound-to-a-non-projected-column--but-the-control-is-hidden-and-the-user-facing-appointment-type-controls-work-latent)
 - [Severity legend](#severity-legend)
-- [Appendix A — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (differences need per-row classification before being filed as bugs)](#appendix-a--c_index_year--c_index_addr_id-drift-vs-the-cbdb-online-main-server-snapshot-differences-need-per-row-classification-before-being-filed-as-bugs)
-- [Appendix B — TablesFields: documentation vs. actual structure](#appendix-b--tablesfields-documentation-vs-actual-structure)
-- [Appendix C — ForeignKeys: documentation vs. actual structure](#appendix-c--foreignkeys-documentation-vs-actual-structure)
+- [Appendix — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (differences need per-row classification before being filed as bugs)](#appendix--c_index_year--c_index_addr_id-drift-vs-the-cbdb-online-main-server-snapshot-differences-need-per-row-classification-before-being-filed-as-bugs)
 - [Closing note](#closing-note)
 
 ## Severity legend
@@ -168,10 +166,6 @@ Two complementary fixes, both worth doing:
 
 #### Steps to reproduce
 
-**Recommended demo person:** `c_personid=1` (安惇, An Dun)
-
-Use person 1 (安惇, An Dun) as the import list (small: only 2 entry row, fast to reproduce). In LookAtGroupData, leave only the **Entry** checkbox ticked, click **Run**. _Picked by `reports/probe_demo_persons.py`; a SQL probe selected this person because their row counts genuinely satisfy the precondition the bug needs._
-
 1. In **LookAtGroupData**, populate the import list with one entry — c_personid = 1 (An Dun 安惇) is enough; he has exactly 2 ENTRY_DATA rows so the broken queryEntry SQL will run on a tiny well-known sample.
 2. Tick **only** the **Entry** checkbox (leave Status / Office / Text / Addr unchecked so the unrelated query branches don't fire).
 3. Click **Run**.
@@ -204,10 +198,6 @@ When the user clicks the `c_fl_ey_notes` field on a person's biographical detail
 Likely cause: a picker form was renamed or consolidated in an earlier refactor, and this caller wasn't updated.
 
 #### Steps to reproduce
-
-**Recommended demo person:** `c_personid=5` (查籥, Zha Yue)
-
-Open person 5 (查籥, Zha Yue). Their `c_fl_ey_notes` field has actual text in it (sample: '紹興二十一年進士。…'), so clicking it actually triggers the broken Sub. _Picked by `reports/probe_demo_persons.py`; a SQL probe selected this person because their row counts genuinely satisfy the precondition the bug needs._
 
 1. Open the biographical detail form for **c_personid = 5 (Zha Yue 查籥)** — picked because his BIOG_MAIN row has a non-empty `c_fl_ey_notes` value, so the field is interactable (clicking an empty field doesn't fire the Sub).
 2. On the BIOG_MAIN_2 subform, click the `c_fl_ey_notes` field — that fires the `c_fl_ey_notes_Click` Sub.
@@ -274,7 +264,7 @@ Defensive scope option (not required to close this issue): adding the same guard
 
 **Affected sub:** `Form_LookAtAssociations.CmdUCINet_Click`
 
-**Severity:** P1 — Visible crash on a normal user click.  Any user attempting `LookAtAssociations × CmdUCINet` will hit a Run-time error 5 popup and lose the export whenever their query result set includes a person with a CJK Han ideograph in `c_name`.  On the current dump that's at least the 8087-row scratch table produced by the probe fixture verified with c_assoc_code = 437; the broader prevalence across CBDB persons depends on how many BIOG_MAIN rows have Han ideographs in their ostensibly-Latin `c_name` field — at minimum 2 such rows appear in that result set, and any query whose result set contains even one such row is affected.
+**Severity:** P1 — Visible crash on a normal user click.  Any user attempting `LookAtAssociations × CmdUCINet` whose 1st-order association network happens to include a person with a CJK Han ideograph in their `c_name` will hit a Run-time error 5 popup and lose the export.  On the current dump that's at least the 8087-row scratch table for person 437 (the verified fixture); the broader prevalence across CBDB persons depends on how many BIOG_MAIN rows have Han ideographs in their ostensibly-Latin `c_name` field — at minimum 2 such rows reach person 437's network, and any person with even one such 1st-order neighbour is affected.
 
 #### Description
 
@@ -296,7 +286,7 @@ User-visible symptom: a Run-time error 5 popup blocks the user; the exported `.v
 
 1. Open CBDB_BJ_User.mdb in Microsoft Access.
 2. Open the **LookAtAssociations** form (F11 → navigation pane → forms → double-click `LookAtAssociations`).
-3. Use the association-code picker (**CmdPickAssoc**) to select **c_assoc_code = 437 (Presented literary composition as gift to)** — on the current dump this code's result set includes person 445395 (c_name = `Hu Fa稜`), whose name contains a CJK Han ideograph (U+7A1C 稜) with no cp1252 mapping and no FSO substitution.
+3. Use the person picker to select **c_personid = 437 (Jia Zhaoming 賈昭明)** — one of the people whose 1st-order association network contains a person with a Han ideograph in their `c_name` field on the current dump (specifically pid 445395, c_name = `Hu Fa稜`).
 4. Click **Run** (CmdQuery) and wait for it to finish populating ZZ_SCRATCH_ASSOC + ZZ_SCRATCH_P_ASSOC.
 5. Click the **UCINet** export button (CmdUCINet) and choose any save location for the `.vna` file.
 6. A popup appears: `Run-time error '5': Invalid procedure call or argument`.  The export aborts.  The partial `.vna` file on disk has the complete `*node data` section but a truncated `*node properties` section and no `*tie data` section at all — unusable as a UCINET / Visone import.
@@ -458,10 +448,6 @@ On the EVENT_ADDR_2 sub-form (events with addresses), the two address controls a
 But the form's RecordSource is the saved query `View_EventAddrData`, which aliases ADDR_CODES.c_name_chn as `c_event_addr_chn` and ADDR_CODES.c_name as `c_event_addr_name`. Neither `c_name` nor `c_name_chn` is in the projection, so both controls silently render blank for every row.
 
 #### Steps to reproduce
-
-**Recommended demo person:** `c_personid=44872` (孫才, Sun Cai)
-
-Open person 44872 (孫才, Sun Cai). The EVENTS sub-datasheet shows 1 event row(s); 1 of them have an associated address. That's where the bound controls render blank on every row. _Picked by `reports/probe_demo_persons.py`; a SQL probe selected this person because their row counts genuinely satisfy the precondition the bug needs._
 
 1. Open CBDB_Browser_2 and navigate to **c_personid = 44872 (Sun Cai 孫才)** — picked because he has 1 EVENTS_DATA row with an associated EVENT_ADDR row pointing at `c_addr_id = 12603` (Anfeng / 安豐 in ADDR_CODES).  Switch to the **Events** sub-tab.
 2. Look at the small EVENT_ADDR_2 sub-form embedded inside the event row (it's nested below the main event line).  The two address textboxes there — `TxtAddrCHN` and `TxtAddrPY` — render blank.
@@ -643,11 +629,6 @@ The saved query `View_StatusData` joins `YEAR_RANGE_CODES` twice (once aliased a
 
 #### Steps to reproduce
 
-⚠ **Currently UI-dormant on this data snapshot — see note below**
-
-On this data snapshot the bug is **DORMANT** — STATUS_DATA has 70,761 rows, but only 13 have c_fy_range > 0 and 0 have c_ly_range > 0; 0 have both populated AND different. So no person currently surfaces the alias swap through the UI.  The SQL bug still exists; the moment a future data refresh adds a STATUS_DATA row with both fy/ly range codes set differently, the corresponding sub-datasheet line will display the wrong text.  To verify the bug today, run the SQL directly:
-  SELECT c_personid, c_fy_range, c_fy_range_desc, c_ly_range, c_ly_range_desc FROM View_StatusData WHERE c_fy_range > 0 OR c_ly_range > 0;
-
 1. Because no STATUS_DATA row in the current dump has both c_fy_range AND c_ly_range populated, this bug cannot be demonstrated through the UI today.  Verify it directly in SQL instead:
 2. Open the .mdb in Access.  Press F11 to show the navigation pane, then double-click query **View_StatusData**.
 3. Inspect the SELECT clause: every `c_fy_range_*` alias is pulled from `YEAR_RANGE_CODES_1`, but the FROM clause joins that alias on the LAST-year range.  That's the swap.
@@ -770,10 +751,6 @@ Because no user-facing navigation reaches the picker button, users cannot trigge
 
 #### Steps to reproduce
 
-**Recommended demo person:** `c_personid=1` (安惇, An Dun)
-
-Open person 1 (安惇, An Dun). The KIN_DATA sub-datasheet shows 5 kinship row(s) — click any one's kinship-code picker to trigger the broken Sub. _Picked by `reports/probe_demo_persons.py`; a SQL probe selected this person because their row counts genuinely satisfy the precondition the bug needs._
-
 1. Verification path is **static-only** — the runtime click cannot be reproduced in the current .mdb because no parent form embeds the affected sub-form.
 2. Static evidence (1): open `analysis/dump/vba/Form_KIN_DATA_Subform.vb` line 52 — confirms the Sub calls `DoCmd.OpenForm "frmPickKINSHIP_CODES"`.
 3. Static evidence (2): open `analysis/dump/control_inventory.json` and search for `"frmPickKINSHIP_CODES"` as a key — absent. The picker form does not exist.
@@ -796,10 +773,6 @@ Same as Issue #13: restore the picker form (or update the caller to its replacem
 **Why LATENT.**  A live COM probe of the rendered form (`analysis/probe_bug_10_11_12_visibility.py`) reports the control as `Visible = False`, with width = 240 twips (~4mm) and height = 270 twips — i.e. a hidden internal control, almost certainly a leftover join-key field that was never meant to be shown.  Real users won't see a blank column because they don't see the control at all.  Reclassed from P2 to P5 on 2026-05-03.
 
 #### Steps to reproduce
-
-**Recommended demo person:** `c_personid=44872` (孫才, Sun Cai)
-
-Open person 44872 (孫才, Sun Cai). The EVENTS sub-datasheet shows 1 event row(s); 1 of them have an associated address. That's where the bound controls render blank on every row. _Picked by `reports/probe_demo_persons.py`; a SQL probe selected this person because their row counts genuinely satisfy the precondition the bug needs._
 
 1. Verification path is **static + COM probe only** — there's no UI symptom to demonstrate.
 2. Static evidence: `SELECT c_event_record_id FROM View_EventsData` against the user mdb raises `Too few parameters. Expected 1.`, confirming the column is not in the projection.
@@ -828,10 +801,6 @@ Reclassed from P2 to P5 on 2026-05-03 — the original P2 claim that 'the appoin
 
 #### Steps to reproduce
 
-**Recommended demo person:** `c_personid=2` (安邡, An Fang)
-
-Open person 2 (安邡, An Fang). The POSTED-TO-OFFICE sub-datasheet shows 1 posting row(s) with non-null c_appt_code — yet the appointment-type column on every row is blank. _Picked by `reports/probe_demo_persons.py`; a SQL probe selected this person because their row counts genuinely satisfy the precondition the bug needs._
-
 1. Verification path is **static + COM probe only** — there's no UI symptom to demonstrate.
 2. Static evidence: `SELECT c_appt_type_code FROM View_PostingOfficeData` raises `Too few parameters. Expected 1.`, confirming the column is not projected.
 3. Visibility evidence: run `python analysis/probe_bug_10_11_12_visibility.py` and look at the entry for bug #12 in `analysis/dump/bug_10_11_12_visibility.json` — `control_summary.visible` is `False` and width = 180 twips.
@@ -840,445 +809,6 @@ Open person 2 (安邡, An Fang). The POSTED-TO-OFFICE sub-datasheet shows 1 post
 #### Suggested fix
 
 If the hidden control isn't needed, delete it.  If it's an intentional hidden join-key holder, change its ControlSource to a real column (e.g. `c_appt_code`).  Either way the change is invisible to users; this is code-hygiene only.
-
-## Appendix A — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (differences need per-row classification before being filed as bugs)
-
-When we compare BIOG_MAIN's `c_index_year` and `c_index_addr_id` between this User MDB and the weekly cbdb-online-main-server SQLite snapshot, a small fraction of persons disagree.
-
-**The two sides are independent implementations.**  The SQLite snapshot's `c_index_year` is produced by cbdb-online-main-server's PHP `IndexYearRebuildService.php` and its `c_index_addr_id` by `IndexAddressRebuildService.php` (both at <https://github.com/cbdb-project/cbdb-online-main-server>); the User MDB-side: `c_index_addr_id` rebuilt by VBA in `Form_frmIndexAddr` (front-end mdb); `c_index_year` rebuilt by **37 saved QueryDefs named `BM IY Rule …`** in the linked-tables backend `data/CBDB_<YYYYMMDD>_DATA.mdb`, driven by `frmBaseMaintenance`.  Both algorithms now extracted to `analysis/dump_data/querydefs_index/*.sql`; form / module driver VBA still needs an interactive Access SaveAsText pass.  PHP is intended to mirror the VBA but they are separate code paths.  Per-row differences can come from at least four sources, and a diff alone doesn't tell us which: (1) source-data snapshot drift; (2) algorithm / porting divergence between PHP and VBA; (3) priority / tie-break differences; (4) null / default handling differences.
-
-**We have not classified the steady ~575 / 657 246 diffs we currently observe.**  The examples below are a small sample (currently 13 rows across 3 buckets, from `reports/index_drift_examples.json`) — illustrative of the shapes of disagreement, not statistically representative.  They are a starting point for per-row triage, not a verdict.
-
-### Classification summary
-
-Compared **657,245** personids common to both databases (User MDB total 657,784; SQLite total 657,478; User-only 539; SQLite-only 233).
-
-| Bucket | Count | % of common | Meaning |
-|---|---:|---:|---|
-| `exact_match` | 656,682 | 99.914% | exact match on all four compared fields |
-| `source_drift_index_agrees` | 2 | 0.000% | source drift but indices agreed |
-| `source_drift_index_diffs_too` | 14 | 0.002% | source drift AND ≥1 index differs |
-| `index_year_only_diff` | 59 | 0.009% | source matched, only c_index_year differs — needs follow-up |
-| `index_addr_only_diff` | 478 | 0.073% | source matched, only c_index_addr_id differs — needs follow-up |
-| `index_both_diff` | 10 | 0.002% | source matched, both indices differ — strongest signal |
-
-Net diffs: **563** of 657,245 (0.086 %).  Of those, **16** are clearly attributable to source drift in birthyear / deathyear; **547** need per-row follow-up.  These could be PHP↔VBA divergence, or drift in evidence tables (BIOG_ADDR_DATA / ENTRY_DATA / NIAN_HAO etc.) that this classifier does not compare.  Full output: `reports/index_drift_classification.json`; algorithm pointers: `analysis/index_drift_algorithm_notes.md`.
-
-### Year-only diffs — per-row rule classification
-
-Of the **69** year-only diffs, each row was bucketed against PR N's rule-level runtime-vs-PHP comparison (`analysis/index_year_rule_comparison.md`).  Conservative buckets (rows count once each):
-
-| Bucket | Count |
-|---|---:|
-| `php_returned_sentinel` | 1 |
-| `php_did_not_compute` | 19 |
-| `access_did_not_compute` | 7 |
-| `iteration_order_diff` | 5 |
-| `consistent_within_rule` | 14 |
-| `candidate_algorithm_divergence` | 5 |
-| `unclassified` | 18 |
-
-None of these are confirmed bugs.  Full per-row output is in `reports/index_year_drift_rule_classification.json`.
-
-Deeper triage (PR K2, `analysis/triage_index_year_drift_groups.py` → `reports/index_year_drift_rule_groups.json`) named the leftover buckets:
-
-- `consistent_within_rule` × 14 → 5 signature groups.  PR AI + AJ probes reversed the prior tie-break hypothesis: all 14 rows are `source_data_drift_biog_main_or_kin_data_between_sides` (8 BIOG_MAIN birthyear drift + 6 KIN_DATA evidence-pid drift).  Upstream PHP-side / SQLite-snapshot data issue, not a CBDB algorithm divergence.
-- `unclassified` × 18 → 18 named, 17 flagged `blocked_by_runtime_priority_triage_pending` (PR M dumped frmBaseMaintenance, so the source is in repo; resolving each row still needs a per-row walk of the runtime priority/iteration order).
-- `php_did_not_compute` × 19 → 6 groups by Access tcode; biggest is `access_tcode='05'` × 7 (`candidate_php_entry_code_mapping_gap` for jinshi).
-
-### c_index_addr_id diffs — per-row classification
-
-Of the **488** c_index_addr diffs (478 `index_addr_only_diff` + 10 `index_both_diff` from PR G), each row was classified by re-simulating the rank-priority + MAX(c_sequence) algorithm against each side's BIOG_ADDR_DATA + the shared BIOG_ADDR_CODES rank table.
-
-| Bucket | Count |
-|---|---:|
-| `mdb_stale_index_addr` | 412 |
-| `mdb_value_php_null` | 47 |
-| `same_candidates_diff_winner` | 10 |
-| `both_stale_recompute_mismatch` | 10 |
-| `both_sides_match_recomputed` | 6 |
-| `sqlite_stale_index_addr` | 2 |
-| `mdb_null_php_value` | 1 |
-
-None of these are confirmed bugs.  The 412 `mdb_stale_index_addr` rows are a maintenance-cadence diff (the User MDB needs its frmBaseMaintenance rebuild re-run before the next release).  The 10 `same_candidates_diff_winner` rows are the only candidate algorithm-divergence rows.  Full per-row output: `reports/index_addr_drift_classification.json`.
-
-PR M (`analysis/dump_data_mdb_vba.py`) extracted `frmBaseMaintenance.CmdIndexAddress_Click` from the DATA mdb.  It does NOT explicitly `MAX(c_sequence)`-aggregate the way PHP does — a candidate algorithmic divergence on top of the maintenance-cadence issue.  Suggested release-checklist mitigation: run `CmdIndexYear` then `CmdIndexAddress` on the DATA mdb before shipping a new User MDB.
-
-PR S (`analysis/deep_dive_addr_same_candidates.py`) confirmed the 10 `same_candidates_diff_winner` rows are all driven by MAX(c_sequence) ties (multiple BIOG_ADDR_DATA rows of the same (person, addr_type) sharing the same max c_sequence).  PHP, Access, and our recompute each pick non-deterministically.  Both sides follow the same documented rule; neither is wrong.  Candidate mitigation: add an explicit secondary tie-break (e.g. MIN(c_addr_id)) to both implementations.  Per-row evidence in `reports/index_addr_same_candidates_deep_dive.json`.
-
-### What currently explains the drift
-
-Per-bucket cause / supporting evidence / confidence / next action lives in `analysis/index_drift_cause_analysis.md`.  This section just summarises headline counts and confidence; no bucket is labelled a confirmed CBDB bug.
-
-**c_index_year cause buckets**
-
-| Bucket | Count | Confidence |
-|---|---:|---|
-| `php_returned_sentinel` | 1 | high |
-| `php_did_not_compute` | 19 | tcode='05' × 7: supported_by_focused_probe (PR Z).  tcode='11' × 5: medium.  Phase-C tcodes (14/20/2304): medium.  tcode='07' × 1: medium (vestigial-vs-intentional unresolved). |
-| `access_did_not_compute` | 7 | medium |
-| `iteration_order_diff` | 5 | medium |
-| `consistent_within_rule` | 14 | supported_by_focused_probe (PR AI + AJ) |
-| `candidate_algorithm_divergence` | 5 | low-medium |
-| `blocked_by_runtime_priority_triage_pending` | 17 | low (per-row causes); high (category label) |
-
-**c_index_addr_id cause buckets**
-
-| Bucket | Count | Confidence |
-|---|---:|---|
-| `mdb_stale_index_addr` | 412 | high |
-| `mdb_value_php_null` | 47 | medium |
-| `same_candidates_diff_winner` | 10 | high |
-| `both_stale_recompute_mismatch` | 10 | medium-high |
-| `both_sides_match_recomputed` | 6 | low-medium |
-| `sqlite_stale_index_addr` | 2 | medium |
-| `mdb_null_php_value` | 1 | medium-high |
-
-Top suggested next investigations (full list in the cause-analysis md):
-
-1. B1 release-process step (CmdIndexYear → CmdIndexAddress before shipping User MDB) — would close 412 rows; engineering cost: zero (process change).
-2. B3 secondary tie-break (MIN(c_addr_id)) added to both implementations — would close 10 rows; engineering cost: small algorithm tweak per side.
-3. A2 tcode 05 entry-code-mapping check — DONE by PR Z (6 mapping gaps + 1 c_year=0 gap; all PHP-side upstream data) — would close 7 rows; engineering cost: single SQL probe (already run).
-
-### Examples where only c_index_year disagrees
-
-**`c_personid = 3501` — 李孝稱 (Li Xiaocheng)**
-
-| Field | User MDB | cbdb-online-main-server snapshot |
-|---|---|---|
-| `c_index_year` | 1018 | 1028 |
-| `c_index_addr_id` | 100658 | 100658 |
-| `c_birthyear` | 0 | 0 |
-| `c_deathyear` | 0 | 0 |
-| `c_index_year_type_code` | 19 | 1912 |
-| `c_index_year_source_id` | 19149 | 3479 |
-
-**`c_personid = 16266` — 錢孟回 (Qian Menghui)**
-
-| Field | User MDB | cbdb-online-main-server snapshot |
-|---|---|---|
-| `c_index_year` | 1004 | 992 |
-| `c_index_addr_id` | 12723 | 12723 |
-| `c_birthyear` | 0 | 0 |
-| `c_deathyear` | 0 | 0 |
-| `c_index_year_type_code` | 13 | 0512 |
-| `c_index_year_source_id` | 700103 | 3035 |
-
-**`c_personid = 16267` — 錢知雄 (Qian Zhixiong)**
-
-| Field | User MDB | cbdb-online-main-server snapshot |
-|---|---|---|
-| `c_index_year` | 1034 | 1071 |
-| `c_index_addr_id` | 12723 | 12723 |
-| `c_birthyear` | 0 | 0 |
-| `c_deathyear` | 0 | 0 |
-| `c_index_year_type_code` | 1312 | 14 |
-| `c_index_year_source_id` | 16266 | 16269 |
-
-### Examples where only c_index_addr_id disagrees
-
-**`c_personid = 1` — 安惇 (An Dun)**
-
-| Field | User MDB | cbdb-online-main-server snapshot |
-|---|---|---|
-| `c_index_year` | 1042 | 1042 |
-| `c_index_addr_id` | 101117 |  |
-| `c_birthyear` | 1042 | 1042 |
-| `c_deathyear` | 1104 | 1104 |
-| `c_index_year_type_code` | 01 | 01 |
-| `c_index_year_source_id` |  |  |
-
-**`c_personid = 470` — 金君卿 (Jin Junqing)**
-
-| Field | User MDB | cbdb-online-main-server snapshot |
-|---|---|---|
-| `c_index_year` | 1012 | 1012 |
-| `c_index_addr_id` | 12879 | 12785 |
-| `c_birthyear` | 0 | 0 |
-| `c_deathyear` | 0 | 0 |
-| `c_index_year_type_code` | 05 | 05 |
-| `c_index_year_source_id` |  |  |
-
-**`c_personid = 481` — 周秩 (Zhou Zhi)**
-
-| Field | User MDB | cbdb-online-main-server snapshot |
-|---|---|---|
-| `c_index_year` | 1043 | 1043 |
-| `c_index_addr_id` | 100416 | 12785 |
-| `c_birthyear` | 0 | 0 |
-| `c_deathyear` | 0 | 0 |
-| `c_index_year_type_code` | 05 | 05 |
-| `c_index_year_source_id` |  |  |
-
-**`c_personid = 485` — 周穜 (Zhou Tong)**
-
-| Field | User MDB | cbdb-online-main-server snapshot |
-|---|---|---|
-| `c_index_year` | 1046 | 1046 |
-| `c_index_addr_id` | 100416 | 12785 |
-| `c_birthyear` | 0 | 0 |
-| `c_deathyear` | 0 | 0 |
-| `c_index_year_type_code` | 05 | 05 |
-| `c_index_year_source_id` |  |  |
-
-**`c_personid = 562` — 范沖 (Fan Chong)**
-
-| Field | User MDB | cbdb-online-main-server snapshot |
-|---|---|---|
-| `c_index_year` | 1067 | 1067 |
-| `c_index_addr_id` | 100658 | 13292 |
-| `c_birthyear` | 1067 | 1067 |
-| `c_deathyear` | 1141 | 1141 |
-| `c_index_year_type_code` | 01 | 01 |
-| `c_index_year_source_id` |  |  |
-
-### Examples where the SOURCE data itself differs (birthyear / deathyear)
-
-**`c_personid = 1455` — 沈邈 (Shen Miao)**
-
-| Field | User MDB | cbdb-online-main-server snapshot |
-|---|---|---|
-| `c_index_year` | 1001 | 1008 |
-| `c_index_addr_id` | 12887 | 12887 |
-| `c_birthyear` | 1001 | 0 |
-| `c_deathyear` | 1047 | 0 |
-| `c_index_year_type_code` | 01 | 05 |
-| `c_index_year_source_id` |  |  |
-
-**`c_personid = 19149` — 李孝基 (Li Xiaoji)**
-
-| Field | User MDB | cbdb-online-main-server snapshot |
-|---|---|---|
-| `c_index_year` | 1016 | 1026 |
-| `c_index_addr_id` | 100658 | 100658 |
-| `c_birthyear` | 1016 | 0 |
-| `c_deathyear` | 1076 | 0 |
-| `c_index_year_type_code` | 01 | 11 |
-| `c_index_year_source_id` |  | 41030 |
-
-## Appendix B — TablesFields: documentation vs. actual structure
-
-This section compares the contents of the `TablesFields` table in `CBDB_20260430_DATA.mdb` against the database schema reconstructed from Access DAO (TableDefs) by `reports/collect_schema_diffs.py`. Discrepancies indicate the documentation table may be out of date.
-
-Total rows in TablesFields: 875. Reconstructed from DB: 996.
-
-Reconstructed schema: [tables_fields_regen.csv](tables_fields_regen.csv)
-
-### Rows in TablesFields not found in actual DB (stale)
-
-| AccessTblNm | AccessFldNm |
-|---|---|
-| ADMIN_CAT_CODE_TYPE_REL | c_admin_type_code |
-| ADMIN_CAT_TYPES | c_admin_type_code |
-| ADMIN_CAT_TYPES | c_admin_type_hz |
-| ADMIN_CAT_TYPES | c_admin_type_trans |
-| ENTRY_DATA | c_addr_id |
-| ENTRY_DATA | c_posting_id |
-| MERGED_PERSON_DATA | c_merged_to_personid |
-| PersonIDSource | LineNum |
-| PersonIDSource | SourceTable |
-| TMP_ADDR_C | Max_c_belongs_first_year |
-
-### Columns in actual DB not documented in TablesFields
-
-| AccessTblNm | AccessFldNm | DataFormat | NULL_allowed |
-|---|---|---|---|
-| ADDRESSES | belongs1_ID | Long | True |
-| ADDRESSES | belongs1_Name | Text | True |
-| ADDRESSES | belongs2_ID | Long | True |
-| ADDRESSES | belongs2_Name | Text | True |
-| ADDRESSES | belongs3_ID | Long | True |
-| ADDRESSES | belongs3_Name | Text | True |
-| ADDRESSES | belongs4_ID | Long | True |
-| ADDRESSES | belongs4_Name | Text | True |
-| ADDRESSES | belongs5_ID | Long | True |
-| ADDRESSES | belongs5_Name | Text | True |
-| ADDRESSES | c_addr_cbd | Text | True |
-| ADDRESSES | c_addr_id | Long | True |
-| ADDRESSES | c_admin_type | Text | True |
-| ADDRESSES | c_firstyear | Integer | True |
-| ADDRESSES | c_lastyear | Integer | True |
-| ADDRESSES | c_name | Text | True |
-| ADDRESSES | c_name_chn | Text | True |
-| ADDRESSES | x_coord | Double | True |
-| ADDRESSES | y_coord | Double | True |
-| ADMIN_CAT_CODE_TYPE_REL | c_admin_cat_type_code | Text | False |
-| ADMIN_CAT_TYPES | c_admin_cat_type_code | Text | False |
-| ADMIN_CAT_TYPES | c_admin_cat_type_hz | Text | False |
-| ADMIN_CAT_TYPES | c_admin_cat_type_trans | Text | False |
-| ASSOC_DATA | c_tertiary_type_notes | Text | True |
-| BIOG_ADDR_DATA | c_delete | Integer | True |
-| CopyTables | NotProcessed | Yes/No | True |
-| CopyTables | TableName | Text | False |
-| CopyTablesDefault | ID | Long | True |
-| CopyTablesDefault | TableName | Text | True |
-| ENTRY_DATA | c_entry_addr_id | Long | True |
-| ETHNICITY_TRIBE_CODES | c_sortorder | Integer | True |
-| ForeignKeys | AccessFldNm | Text | True |
-| ForeignKeys | AccessTblNm | Text | True |
-| ForeignKeys | DataFormat | Text | True |
-| ForeignKeys | FKName | Text | True |
-| ForeignKeys | FKString | Text | True |
-| ForeignKeys | ForeignKey | Text | True |
-| ForeignKeys | ForeignKeyBaseField | Text | True |
-| ForeignKeys | IndexOnField | Text | True |
-| ForeignKeys | NULL_allowed | Yes/No | True |
-| ForeignKeys | skip | Integer | True |
-| FormLabels | c_english | Text | True |
-| FormLabels | c_fanti | Text | True |
-| FormLabels | c_form | Text | True |
-| FormLabels | c_jianti | Text | True |
-| FormLabels | c_label_id | Integer | True |
-| MERGED_PERSON_DATA | c_merged_from_personid | Long | False |
-| OFFICE_CODES_CONVERSION | c_office_chn | Text | True |
-| OFFICE_CODES_CONVERSION | c_office_chn_backup | Text | True |
-| OFFICE_CODES_CONVERSION | c_office_id | Long | True |
-| OFFICE_CODES_CONVERSION | c_office_id_backup | Long | True |
-| OFFICE_TYPE_TREE_backup | c_office_type_desc | Text | True |
-| OFFICE_TYPE_TREE_backup | c_office_type_desc_chn | Text | True |
-| OFFICE_TYPE_TREE_backup | c_office_type_node_id | Text | True |
-| OFFICE_TYPE_TREE_backup | c_parent_id | Text | True |
-| OFFICE_TYPE_TREE_backup | c_tts_node_id | Text | True |
-| Paste Errors | c_bibl_cat_code | Long | True |
-| Paste Errors | c_created_by | Text | True |
-| Paste Errors | c_created_date | Date/Time | True |
-| Paste Errors | c_extant | Long | True |
-| Paste Errors | c_modified_by | Text | True |
-| Paste Errors | c_modified_date | Date/Time | True |
-| Paste Errors | c_notes | Memo | True |
-| Paste Errors | c_pages | Text | True |
-| Paste Errors | c_source | Long | True |
-| Paste Errors | c_textid | Long | True |
-| Paste Errors | c_text_country | Long | True |
-| Paste Errors | c_text_dy | Long | True |
-| Paste Errors | c_text_nh_code | Long | True |
-| Paste Errors | c_text_nh_year | Long | True |
-| Paste Errors | c_text_range_code | Long | True |
-| Paste Errors | c_text_type_id | Text | True |
-| Paste Errors | c_text_year | Long | True |
-| Paste Errors | c_title | Text | True |
-| Paste Errors | c_title_alt_chn | Text | True |
-| Paste Errors | c_title_chn | Text | True |
-| Paste Errors | c_title_trans | Text | True |
-| Paste Errors | c_url_api | Text | True |
-| Paste Errors | c_url_api_coda | Text | True |
-| Paste Errors | c_url_homepage | Text | True |
-| POSTED_TO_OFFICE_DATA | c_posting_id_old | Long | True |
-| SOCIAL_INSTITUTION_ALTNAME_CODES | c_inst_altname_chn | Text | True |
-| SOCIAL_INSTITUTION_ALTNAME_CODES | c_inst_altname_desc | Text | True |
-| SOCIAL_INSTITUTION_ALTNAME_CODES | c_inst_altname_type | Integer | True |
-| SOCIAL_INSTITUTION_ALTNAME_CODES | c_notes | Text | True |
-| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_altname_hz | Text | False |
-| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_altname_py | Text | True |
-| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_altname_type | Integer | False |
-| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_code | Integer | False |
-| SOCIAL_INSTITUTION_ALTNAME_DATA | c_inst_name_code | Integer | False |
-| SOCIAL_INSTITUTION_ALTNAME_DATA | c_notes | Memo | True |
-| SOCIAL_INSTITUTION_ALTNAME_DATA | c_pages | Text | True |
-| SOCIAL_INSTITUTION_ALTNAME_DATA | c_source | Long | True |
-| SOCIAL_INSTITUTION_CODES | c_inst_end_dy | Integer | True |
-| SOCIAL_INSTITUTION_CODES | c_inst_end_year | Integer | True |
-| SOCIAL_INSTITUTION_CODES_CONVERSION | c_inst_code | Long | True |
-| SOCIAL_INSTITUTION_CODES_CONVERSION | c_inst_code_new | Integer | True |
-| SOCIAL_INSTITUTION_CODES_CONVERSION | c_inst_name_code | Integer | True |
-| SOCIAL_INSTITUTION_CODES_CONVERSION | c_new_new_code | Long | True |
-| STATUS_TYPES | c_status_type_parent_code | Text | True |
-| TablesFields | AccessFldNm | Text | False |
-| TablesFields | AccessTblNm | Text | False |
-| TablesFields | DataFormat | Text | True |
-| TablesFields | DumpFldNm | Text | True |
-| TablesFields | DumpTblNm | Text | True |
-| TablesFields | ForeignKey | Text | True |
-| TablesFields | ForeignKeyBaseField | Text | True |
-| TablesFields | IndexOnField | Text | True |
-| TablesFields | NULL_allowed | Yes/No | True |
-| TablesFields | RowNum | Long | True |
-| TablesFieldsChanges | Change | Text | True |
-| TablesFieldsChanges | ChangeDate | Text | True |
-| TablesFieldsChanges | ChangeNotes | Text | True |
-| TablesFieldsChanges | FieldName | Text | True |
-| TablesFieldsChanges | TableName | Text | True |
-| TEXT_BIBLCAT_CODES | c_text_cat_level | Text | True |
-| TEXT_BIBLCAT_CODES | c_text_cat_parent_id | Text | True |
-| TEXT_CODES | c_text_type_id | Text | True |
-| TMP_ADDR_C | Min_c_belongs_first_year | Integer | True |
-| TMP_ADDR_D | c_addr_cbd | Text | True |
-| TMP_ADDR_E | c_addr_cbd | Text | True |
-| TMP_DISTANCE_DATA | assoc_xcoord | Double | True |
-| TMP_DISTANCE_DATA | assoc_ycoord | Double | True |
-| TMP_DISTANCE_DATA | c_assoc_id | Long | False |
-| TMP_DISTANCE_DATA | c_distance | Double | True |
-| TMP_DISTANCE_DATA | c_personid | Long | False |
-| TMP_DISTANCE_DATA | c_t_dist | Double | True |
-| TMP_DISTANCE_DATA | x_coord | Double | True |
-| TMP_DISTANCE_DATA | y_coord | Double | True |
-| ZZZ_DY_DATA | c_dy | Integer | False |
-| ZZZ_DY_DATA | c_personid | Long | False |
-
-### Attribute mismatches
-
-Full list: `reports/schema_diff_tables_fields_mismatches.csv` (143 rows)
-
-## Appendix C — ForeignKeys: documentation vs. actual structure
-
-This section covers the `ForeignKeys` table and the FK relationships it documents.
-
-Total rows in ForeignKeys: 188. Reconstructed from DB (via Access.Application DAO): 223.
-
-Reconstructed FK list: [foreign_keys_regen.csv](foreign_keys_regen.csv)
-
-### Rows in ForeignKeys not found in actual DB (stale)
-
-| AccessTblNm | AccessFldNm | ForeignKey | ForeignKeyBaseField |
-|---|---|---|---|
-| ADDR_BELONGS_DATA | c_source | TEXT_CODES | c_textid |
-| assoc_data | c_assoc_day_gz | GANZHI_CODES | c_ganzhi_code |
-| assoc_data | c_assoc_nh_code | nian_hao | c_nianhao_id |
-| assoc_data | c_assoc_range | year_range_codes | c_range_code |
-| assoc_data | c_inst_name_code | SOCIAL_INSTITUTION_NAME_CODES | c_inst_name_code |
-| assoc_data | c_inst_name_code,c_inst_code | SOCIAL_INSTITUTION_CODES | c_inst_code |
-| biog_addr_data | c_addr_id | ADDR_CODES | c_addr_id |
-| biog_addr_data | c_fy_day_gz | GANZHI_CODES | c_ganzhi_code |
-| biog_addr_data | c_fy_nh_code | nian_hao | c_nianhao_id |
-| biog_addr_data | c_fy_range | year_range_codes | c_range_code |
-| biog_addr_data | c_ly_day_gz | GANZHI_CODES | c_ganzhi_code |
-| biog_addr_data | c_ly_nh_code | nian_hao | c_nianhao_id |
-| biog_addr_data | c_ly_range | year_range_codes | c_range_code |
-| biog_addr_data | c_personid | BIOG_MAIN | c_personid |
-| biog_addr_data | c_source | TEXT_CODES | c_textid |
-| BIOG_INST_DATA | c_inst_name_code | SOCIAL_INSTITUTION_NAME_CODES | c_inst_name_code |
-| BIOG_INST_DATA | c_inst_name_code,c_inst_code | SOCIAL_INSTITUTION_CODES | c_inst_code |
-| biog_main | c_death_age_range | year_range_codes | c_range_code |
-| biog_main | c_index_year_source_id | BIOG_MAIN | c_personid |
-| biog_main | c_index_year_type_code | INDEXYEAR_TYPE_CODES | c_index_year_type_code |
-| ENTRY_DATA | c_entry_dy | DYNASTIES | c_dy |
-| ENTRY_DATA | c_inst_name_code | SOCIAL_INSTITUTION_NAME_CODES | c_inst_name_code |
-| ENTRY_DATA | c_inst_name_code,c_inst_code | SOCIAL_INSTITUTION_CODES | c_inst_code |
-| EVENTS_ADDR | c_event_code | EVENT_CODES | c_event_code |
-| EVENTS_ADDR | c_personid | BIOG_MAIN | c_personid |
-| EVENTS_ADDR | c_personid,c_sequence,c_event_code | EVENTS_DATA | c_event_code |
-| POSTED_TO_OFFICE_DATA | c_inst_name_code,c_inst_code | SOCIAL_INSTITUTION_CODES | c_inst_code |
-| SOCIAL_INSTITUTION_ADDR | c_inst_name_code,c_inst_code | SOCIAL_INSTITUTION_CODES | c_inst_code |
-
-### Columns in actual DB not documented in ForeignKeys
-
-| AccessTblNm | AccessFldNm | ForeignKey | ForeignKeyBaseField |
-|---|---|---|---|
-| ADDRESSES | c_addr_id | ADDR_CODES | c_addr_id |
-| ASSOC_CODES | c_assoc_pair | ASSOC_CODES | c_assoc_code |
-| Assoc_data | c_assoc_fy_day_gz | GANZHI_CODES | c_ganzhi_code |
-| Assoc_data | c_assoc_fy_nh_code | NIAN_HAO | c_nianhao_id |
-| Assoc_data | c_assoc_fy_range | YEAR_RANGE_CODES | c_range_code |
-| ASSOC_TYPES | c_assoc_type_parent_id | ASSOC_TYPES | c_assoc_type_code |
-| ENTRY_DATA | c_entry_addr_id | ADDR_CODES | c_addr_id |
-| EVENTS_DATA | c_event_code | EVENTS_ADDR | c_event_code |
-| EVENTS_DATA | c_personid | EVENTS_ADDR | c_personid |
-| EVENTS_DATA | c_sequence | EVENTS_ADDR | c_sequence |
-| POSTED_TO_OFFICE_DATA | c_inst_code | SOCIAL_INSTITUTION_CODES | c_inst_code |
-| POSTED_TO_OFFICE_DATA | c_inst_name_code | SOCIAL_INSTITUTION_CODES | c_inst_name_code |
-| SOCIAL_INSTITUTION_ADDR | c_inst_code | SOCIAL_INSTITUTION_CODES | c_inst_code |
-| SOCIAL_INSTITUTION_ADDR | c_inst_name_code | SOCIAL_INSTITUTION_CODES | c_inst_name_code |
-| SOCIAL_INSTITUTION_CODES | c_inst_end_dy | DYNASTIES | c_dy |
 
 ## Closing note
 
