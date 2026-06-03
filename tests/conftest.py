@@ -138,14 +138,51 @@ def _refresh_decision(
     return ("skip", "fresh")
 
 
+def _data_mdb_relink_needed(user_mdb: Path, data_mdb: Path | None) -> bool:
+    """Return True if LinkedTables in user_mdb are stale vs. data_mdb.
+
+    Reads LinkListInit.c_dataset from the user mdb via pyodbc (a local
+    table — readable even if the linked DATA tables are broken) and
+    compares it against the YYYYMMDD embedded in data_mdb's filename.
+
+    Returns False on any error (no pyodbc, no user mdb, etc.) so that
+    the fast path never blocks headless / Linux collection.
+    """
+    if data_mdb is None or not user_mdb.exists():
+        return False
+    try:
+        import pyodbc as _pyodbc
+        conn = _pyodbc.connect(
+            "DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};"
+            f"DBQ={user_mdb};ReadOnly=True;",
+            autocommit=True,
+        )
+        cur = conn.cursor()
+        cur.execute("SELECT c_dataset FROM LinkListInit")
+        row = cur.fetchone()
+        conn.close()
+        if row is None:
+            return True
+        stored = (row[0] or "").strip()
+        parts = data_mdb.stem.split("_")  # ["CBDB", "YYYYMMDD", "DATA"]
+        current = parts[1] if len(parts) >= 2 else ""
+        return stored != current
+    except Exception:
+        return False
+
+
 def pytest_configure(config):
-    """Register markers AND refresh test_inputs.json if stale.
+    """Register markers, relink DATA mdb if stale, refresh test_inputs.json.
 
-    Discovery failures hard-exit pytest — running matrix tests against
-    a stale fixture file silently masks data-version drift, which
-    looks like 'pass' but is actually 'tested with the wrong data'.
+    Step 1 — DATA mdb relink: if LinkListInit.c_dataset in the User mdb
+    doesn't match the YYYYMMDD of the DATA mdb found in data/, the linked
+    tables are stale.  We call analysis/relink_data_mdb.py to fix them
+    before any test can open the User mdb.  Stale links silently corrupt
+    every pyodbc-based test (SQL replay, saved-view checks, etc.).
 
-    Disable refresh with: pytest --no-discover-inputs
+    Step 2 — test_inputs.json refresh (existing logic).
+
+    Disable both steps with: pytest --no-discover-inputs
     """
     config.addinivalue_line(
         "markers",
@@ -154,34 +191,48 @@ def pytest_configure(config):
     )
     if config.getoption("--no-discover-inputs"):
         return
-    inputs_json = ROOT / "analysis" / "dump" / "test_inputs.json"
-    mdb = ROOT / "data" / "CBDB_BJ_User.mdb"
+
+    import subprocess
+
+    # Respect --user-mdb if provided (mirrors user_mdb_path fixture logic).
+    raw_user_mdb = config.getoption("--user-mdb")
+    mdb = Path(raw_user_mdb).resolve() if raw_user_mdb else ROOT / "data" / "CBDB_BJ_User.mdb"
     data_mdb = _resolve_data_mdb(ROOT)
+
+    # --- Step 1: relink if c_dataset is stale ---
+    if _data_mdb_relink_needed(mdb, data_mdb):
+        print(f"\n[conftest] LinkListInit.c_dataset stale; "
+              f"relinking to {data_mdb.name} ...")
+        rc = subprocess.run(
+            [sys.executable, str(ROOT / "analysis" / "relink_data_mdb.py")],
+            capture_output=True, text=True,
+            timeout=120,  # DAO/ACE can hang; don't block pytest forever
+        )
+        if rc.returncode != 0:
+            pytest.exit(
+                f"[conftest] relink_data_mdb.py FAILED (rc={rc.returncode})."
+                f"\nStale linked tables would silently corrupt all SQL-replay"
+                f" tests.  Fix the relink error or pass `--no-discover-inputs`"
+                f" to skip.\n\n  stderr:\n{rc.stderr[-1000:]}"
+            )
+        print(f"[conftest] relink complete.")
+
+    # --- Step 2: refresh test_inputs.json if stale ---
+    inputs_json = ROOT / "analysis" / "dump" / "test_inputs.json"
     action, reason = _refresh_decision(inputs_json, mdb, data_mdb)
     if action == "skip":
         if reason == "fresh":
-            # Short single-line ack so the gate is visible in
-            # CI logs without adding measurable cost.
             print(f"\n[conftest] {inputs_json.name} fresh; "
                   f"skipping discovery")
-        # ("skip", "no_user_mdb") stays silent — preserves the
-        # pre-refactor behaviour for environments without the
-        # user mdb (e.g. headless / non-Windows collection).
         return
     # action == "refresh"
     print(f"\n[conftest] refreshing {inputs_json.name} "
           f"(reason: {reason}) ...")
-    import subprocess
     rc = subprocess.run(
         [sys.executable, str(ROOT / "analysis" / "discover_test_inputs.py")],
         capture_output=True, text=True,
     )
     if rc.returncode != 0:
-        # Hard-exit rather than continue with stale fixtures.  The
-        # original behaviour (warn + continue) would let matrix
-        # tests pass against an outdated test_inputs.json — which
-        # silently masks data-version drift and produces misleading
-        # green CI runs.
         pytest.exit(
             f"[conftest] discover_test_inputs.py FAILED (rc="
             f"{rc.returncode}).  Tests would otherwise run against "
