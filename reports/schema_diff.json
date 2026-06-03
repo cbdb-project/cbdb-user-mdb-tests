@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-05-14T11:01:27.904427+00:00",
-  "data_mdb": "CBDB_20260430_DATA.mdb",
+  "generated_at": "2026-06-03T17:44:00.361918+00:00",
+  "data_mdb": "CBDB_20260602_DATA.mdb",
   "tables_fields": {
     "total_current": 875,
-    "total_regen": 996,
+    "total_regen": 997,
     "only_in_current": [
       {
         "AccessTblNm": "ADMIN_CAT_CODE_TYPE_REL",
@@ -195,6 +195,12 @@
         "AccessTblNm": "BIOG_ADDR_DATA",
         "AccessFldNm": "c_delete",
         "DataFormat": "Integer",
+        "NULL_allowed": true
+      },
+      {
+        "AccessTblNm": "BIOG_MAIN",
+        "AccessFldNm": "c_name_fixed",
+        "DataFormat": "Text",
         "NULL_allowed": true
       },
       {
