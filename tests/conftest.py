@@ -186,11 +186,17 @@ def _data_mdb_relink_needed(user_mdb: Path, data_mdb: Path | None) -> bool:
 
 
 def pytest_sessionfinish(session, exitstatus):
-    """Kill MSACCESS.EXE processes opened by this test session.
+    """Kill all MSACCESS.EXE processes after a --include-vba session.
 
-    Only runs when --include-vba was used (the flag that opens Access).
-    Skipped otherwise to avoid killing unrelated Access sessions the
-    developer may have open with unsaved work.
+    Only runs when --include-vba was used.  Skipped otherwise (fast
+    suite never opens Access, so there is nothing to clean up).
+
+    WARNING: this kills every MSACCESS.EXE on the machine, not only
+    the ones this test session opened.  Close any unrelated Access
+    databases before running --include-vba to avoid losing unsaved work.
+    This is a known limitation: per-PID kill requires tracking PIDs
+    across fixture teardowns, which is complex; a global kill is the
+    pragmatic alternative to leaving stale windows on screen.
 
     The com_app and VbaSession fixtures call close() in their teardowns,
     but if a dialog blocks or the session is interrupted the teardown

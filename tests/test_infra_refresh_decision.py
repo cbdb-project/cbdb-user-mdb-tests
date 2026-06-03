@@ -152,13 +152,17 @@ def test_resolve_no_data_mdb_returns_none(tmp_path: Path):
     assert _resolve_data_mdb(tmp_path) is None
 
 
-def test_resolve_multiple_data_mdb_returns_none(tmp_path: Path):
-    """Brief: 'if not stable, fall back to user-mdb-only'.
-    Multiple matches = ambiguous = None."""
+def test_resolve_multiple_data_mdb_returns_newest(tmp_path: Path):
+    """Multiple matches → return newest by YYYYMMDD (consistent with
+    discover_test_inputs._find_data_mdb()).  Having multiple DATA mdbs
+    is a user error per AGENTS.md; picking newest is safer than
+    returning None and silently skipping the stale-link guard."""
     (tmp_path / "data").mkdir()
     (tmp_path / "data" / "CBDB_20260430_DATA.mdb").write_text("")
     (tmp_path / "data" / "CBDB_20260501_DATA.mdb").write_text("")
-    assert _resolve_data_mdb(tmp_path) is None
+    result = _resolve_data_mdb(tmp_path)
+    assert result is not None
+    assert result.name == "CBDB_20260501_DATA.mdb"
 
 
 def test_resolve_no_data_dir_returns_none(tmp_path: Path):
