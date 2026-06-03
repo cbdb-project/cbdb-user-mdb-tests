@@ -102,26 +102,23 @@ def _resolve_data_mdb(root: Path) -> Path | None:
     # Import _find_data_mdb from the repo's analysis/ directory (always the
     # same location regardless of the `root` parameter, which can be a
     # tmp_path in tests).
+    # _data_mdb_finder is a side-effect-free module (no pyodbc, no
+    # module-level file access) — safe to import at conftest time on
+    # any platform.  It is the single source of truth for DATA-mdb
+    # selection, shared with analysis/discover_test_inputs.py.
     _analysis = TESTS_DIR.parent / "analysis"
     if str(_analysis) not in sys.path:
         sys.path.insert(0, str(_analysis))
     try:
-        from discover_test_inputs import _find_data_mdb  # type: ignore[import]
-        return _find_data_mdb(root)
+        from _data_mdb_finder import find_data_mdb  # type: ignore[import]
+        return find_data_mdb(root)
     except FileNotFoundError:
         return None
-    except Exception:
-        # Import failed (e.g. pyodbc missing on headless) — fall back to
-        # simple single-match glob so collection stays clean.
+    except ImportError:
+        # Module not found — shouldn't happen in a normal repo checkout.
+        # Fall back to single-match-only glob so collection stays clean.
         matches = list((root / "data").glob("CBDB_*_DATA.mdb"))
-        if not matches:
-            return None
-        if len(matches) == 1:
-            return matches[0]
-        def _date_key(p: Path) -> str:
-            parts = p.stem.split("_")
-            return parts[1] if len(parts) >= 2 else p.stem
-        return sorted(matches, key=_date_key)[-1]
+        return matches[0] if len(matches) == 1 else None
 
 
 def _refresh_decision(
