@@ -1,0 +1,226 @@
+{
+  "_comment": "Coverage matrix: form × button → test node-id substring patterns. The builder aggregates all matching tests into one cell outcome (worst of: FAIL > ERROR > SKIP > PASS > NOT_RUN).",
+  "forms": [
+    "LookAtEntry", "LookAtStatus", "LookAtTexts", "LookAtPlace",
+    "LookAtAssociations", "LookAtOffice", "LookAtKinship",
+    "LookAtNetworks", "LookAtGroupData", "LookAtAssocPairs"
+  ],
+  "buttons": [
+    "CmdQuery", "CmdGIS", "CmdNeo4j", "CmdPajek",
+    "CmdGephi", "CmdUCINet", "CmdKML", "CmdGUESS", "CmdRun"
+  ],
+  "na": {
+    "_comment": "Buttons that do not exist on the form (no VBA handler).",
+    "LookAtEntry":        ["CmdPajek", "CmdGephi", "CmdUCINet", "CmdGUESS", "CmdRun"],
+    "LookAtStatus":       ["CmdGIS", "CmdNeo4j", "CmdKML", "CmdGUESS", "CmdRun"],
+    "LookAtTexts":        ["CmdGIS", "CmdNeo4j", "CmdPajek", "CmdGephi", "CmdUCINet", "CmdKML", "CmdGUESS", "CmdRun"],
+    "LookAtPlace":        ["CmdPajek", "CmdGephi", "CmdUCINet", "CmdKML", "CmdGUESS", "CmdRun"],
+    "LookAtAssociations": ["CmdPajek", "CmdGephi", "CmdKML", "CmdGUESS", "CmdRun"],
+    "LookAtOffice":       ["CmdNeo4j", "CmdPajek", "CmdGephi", "CmdUCINet", "CmdKML", "CmdRun"],
+    "LookAtKinship":      ["CmdNeo4j", "CmdGephi", "CmdKML", "CmdQuery"],
+    "LookAtNetworks":     ["CmdQuery", "CmdGIS", "CmdPajek", "CmdGephi", "CmdUCINet", "CmdKML", "CmdGUESS"],
+    "LookAtGroupData":    ["CmdQuery", "CmdGIS", "CmdPajek", "CmdGephi", "CmdUCINet", "CmdKML", "CmdGUESS"],
+    "LookAtAssocPairs":   ["CmdGIS", "CmdGephi", "CmdUCINet", "CmdKML", "CmdGUESS", "CmdRun"]
+  },
+  "mapping": {
+    "_comment": "Patterns are substrings of pytest node_id. All matching tests are aggregated; worst outcome wins.",
+    "LookAtEntry": {
+      "CmdQuery": {
+        "patterns": [
+          "test_vba_matrix.py::test_vba_full_matrix[",
+          "test_vba_matrix_all_forms.py::test_cross_form_matrix[entry_"
+        ]
+      },
+      "CmdGIS": {
+        "patterns": [
+          "test_vba_export.py::test_lookatentry_cmd_gis"
+        ]
+      },
+      "CmdNeo4j": {
+        "patterns": [
+          "test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtEntry]",
+          "test_vba_bug_behaviors.py::test_bug9_lookat_entry_cmdneo4j"
+        ]
+      },
+      "CmdKML": {
+        "patterns": []
+      }
+    },
+    "LookAtStatus": {
+      "CmdQuery": {
+        "patterns": [
+          "test_vba_matrix_all_forms.py::test_cross_form_matrix[status_"
+        ]
+      },
+      "CmdPajek": {
+        "_comment": "Bug #16: button missing from form. pajek_gephi test is skipped; bug_design_time test verifies absence; bug_behaviors tests behavior when manually invoked.",
+        "patterns": [
+          "test_vba_pajek_gephi_cross_form.py::test_export_button_produces_file[LookAtStatus_CmdPajek]",
+          "test_vba_bug_design_time.py::test_orphan_export_button_truly_missing[bug16_LookAtStatus_CmdPajek]",
+          "test_vba_bug_behaviors.py::test_bug5_lookat_status_cmdpajek"
+        ]
+      },
+      "CmdGephi": {
+        "_comment": "Bug #17: button missing from form.",
+        "patterns": [
+          "test_vba_pajek_gephi_cross_form.py::test_export_button_produces_file[LookAtStatus_CmdGephi]",
+          "test_vba_bug_design_time.py::test_orphan_export_button_truly_missing[bug17_LookAtStatus_CmdGephi]"
+        ]
+      },
+      "CmdUCINet": {
+        "_comment": "Bug #18: CmdUCINet button is missing from the form. test_orphan_export_button_truly_missing verifies this regression.",
+        "patterns": [
+          "test_vba_bug_design_time.py::test_orphan_export_button_truly_missing[bug18_LookAtStatus_CmdUCINet]"
+        ]
+      }
+    },
+    "LookAtTexts": {
+      "CmdQuery": {
+        "patterns": [
+          "test_vba_matrix_all_forms.py::test_cross_form_matrix[biblcat_"
+        ]
+      }
+    },
+    "LookAtPlace": {
+      "CmdQuery": {
+        "patterns": [
+          "test_vba_matrix_all_forms.py::test_cross_form_matrix[place_"
+        ]
+      },
+      "CmdGIS": {
+        "_comment": "Bug #15: CmdGIS button missing from form. bug_design_time verifies absence; bug_behaviors tests underlying VBA error.",
+        "patterns": [
+          "test_vba_cmdgis_other_forms.py::test_cmd_gis_produces_file[place_",
+          "test_vba_bug_design_time.py::test_orphan_export_button_truly_missing[bug15_LookAtPlace_CmdGIS]",
+          "test_vba_bug_behaviors.py::test_bug4_lookat_place_cmdgis"
+        ]
+      },
+      "CmdNeo4j": {
+        "patterns": [
+          "test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtPlace]",
+          "test_vba_bug_behaviors.py::test_bug7_lookat_place_cmdneo4j"
+        ]
+      }
+    },
+    "LookAtAssociations": {
+      "CmdQuery": {
+        "patterns": [
+          "test_vba_matrix_all_forms.py::test_cross_form_matrix[assoc_"
+        ]
+      },
+      "CmdGIS": {
+        "patterns": [
+          "test_vba_cmdgis_other_forms.py::test_cmd_gis_produces_file[assoc_"
+        ]
+      },
+      "CmdNeo4j": {
+        "patterns": [
+          "test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtAssociations]"
+        ]
+      },
+      "CmdUCINet": {
+        "patterns": [
+          "test_vba_bug_behaviors.py::test_bug22_associations_cmducinet"
+        ]
+      }
+    },
+    "LookAtOffice": {
+      "CmdQuery": {
+        "patterns": [
+          "test_vba_matrix_all_forms.py::test_cross_form_matrix[office_"
+        ]
+      },
+      "CmdGIS": {
+        "patterns": [
+          "test_vba_cmdgis_other_forms.py::test_cmd_gis_produces_file[office_",
+          "test_vba_cmdgispeople_office.py::test_cmd_gis_people_produces_file"
+        ]
+      },
+      "CmdGUESS": {
+        "_comment": "Bug #19: CmdGUESS button missing from form.",
+        "patterns": [
+          "test_vba_cmdguess_cross_form.py::test_cmd_guess_produces_file[office_",
+          "test_vba_bug_design_time.py::test_orphan_export_button_truly_missing[bug19_LookAtOffice_CmdGUESS]"
+        ]
+      }
+    },
+    "LookAtKinship": {
+      "_comment": "Primary entry point is CmdRun (kinship-tree query); CmdQuery is N/A.",
+      "CmdRun": {
+        "patterns": [
+          "test_vba_matrix_all_forms.py::test_cross_form_matrix[kinship_"
+        ]
+      },
+      "CmdGIS": {
+        "patterns": [
+          "test_vba_cmdgis_other_forms.py::test_cmd_gis_produces_file[kinship_"
+        ]
+      },
+      "CmdPajek": {
+        "patterns": [
+          "test_vba_pajek_gephi_cross_form.py::test_export_button_produces_file[LookAtKinship_CmdPajek]"
+        ]
+      },
+      "CmdUCINet": {
+        "patterns": [
+          "test_vba_cmducinet_kinship.py::test_cmducinet_kinship",
+          "test_vba_bug_behaviors.py::test_bug22_kinship_cmducinet"
+        ]
+      },
+      "CmdGUESS": {
+        "patterns": [
+          "test_vba_cmdguess_cross_form.py::test_cmd_guess_produces_file[kinship_"
+        ]
+      }
+    },
+    "LookAtNetworks": {
+      "_comment": "Primary entry point is CmdRun. CmdQuery and CmdGIS are N/A.",
+      "CmdNeo4j": {
+        "patterns": [
+          "test_vba_bug_behaviors.py::test_bug8_lookat_networks"
+        ]
+      },
+      "CmdRun": {
+        "patterns": [
+          "test_vba_networks_small_fixture.py::test_cmdrun_smoke_cao_zhi",
+          "test_vba_matrix_all_forms.py::test_cross_form_matrix[network_"
+        ]
+      }
+    },
+    "LookAtGroupData": {
+      "CmdNeo4j": {
+        "patterns": [
+          "test_vba_bug_behaviors.py::test_bug21_lookat_groupdata_cmdneo4j",
+          "test_vba_bug_behaviors.py::test_bug6_lookat_groupdata_query_entry"
+        ]
+      },
+      "CmdRun": {
+        "patterns": [
+          "test_vba_matrix_all_forms.py::test_cross_form_matrix[groupdata_",
+          "test_vba_matrix_hard_forms.py::test_hard_form_query_small_fixture[groupdata_"
+        ]
+      }
+    },
+    "LookAtAssocPairs": {
+      "CmdQuery": {
+        "_comment": "Use exact test names (not prefix) to avoid matching the cmdquery_then_cmdpajek chain test.",
+        "patterns": [
+          "test_vba_matrix_all_forms.py::test_cross_form_matrix[assocpair_",
+          "test_vba_associationpairs_probe.py::test_associationpairs_cmdquery_setfocus_patch_unblocks_inserts",
+          "test_vba_matrix_hard_forms.py::test_hard_form_query_small_fixture[assocpair_"
+        ]
+      },
+      "CmdNeo4j": {
+        "patterns": [
+          "test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtAssociationPairs]"
+        ]
+      },
+      "CmdPajek": {
+        "patterns": [
+          "test_vba_pajek_gephi_cross_form.py::test_export_button_produces_file[LookAtAssociationPairs_CmdPajek]",
+          "test_vba_associationpairs_probe.py::test_associationpairs_cmdquery_then_cmdpajek"
+        ]
+      }
+    }
+  }
+}

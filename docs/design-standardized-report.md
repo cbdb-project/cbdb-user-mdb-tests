@@ -73,8 +73,8 @@ rewrite of buggy VBA has the same bug, producing false-green test results.
 | LookAtPlace        | ✓ | ✓ | ✓ | — | — | — | — | — | — |
 | LookAtAssociations | ✓ | ✓ | ✓ | — | — | ✓ | — | — | — |
 | LookAtOffice       | ✓ | ✓ | — | — | — | — | — | ✓ | — |
-| LookAtKinship      | ✓ | — | — | — | — | ✓ | — | — | — |
-| LookAtNetworks     | ✓ | — | ✓ | — | — | — | — | — | ✓ |
+| LookAtKinship      | — | ✓ | — | ✓ | — | ✓ | — | ✓ | ✓ |
+| LookAtNetworks     | — | — | ✓ | — | — | — | — | — | ✓ |
 | LookAtGroupData    | — | — | ✓ | — | — | — | — | — | ✓ |
 | LookAtAssocPairs   | ✓ | — | ✓ | ✓ | — | — | — | — | — |
 
