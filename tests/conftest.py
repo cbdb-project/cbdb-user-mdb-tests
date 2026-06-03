@@ -102,10 +102,9 @@ def _resolve_data_mdb(root: Path) -> Path | None:
     # Import _find_data_mdb from the repo's analysis/ directory (always the
     # same location regardless of the `root` parameter, which can be a
     # tmp_path in tests).
-    # _data_mdb_finder is a side-effect-free module (no pyodbc, no
-    # module-level file access) — safe to import at conftest time on
-    # any platform.  It is the single source of truth for DATA-mdb
-    # selection, shared with analysis/discover_test_inputs.py.
+    # Delegates to analysis/_data_mdb_finder.find_data_mdb — a
+    # side-effect-free module (no pyodbc, no module-level file access)
+    # that is the single source of truth shared with discover_test_inputs.
     _analysis = TESTS_DIR.parent / "analysis"
     if str(_analysis) not in sys.path:
         sys.path.insert(0, str(_analysis))
