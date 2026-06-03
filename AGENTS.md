@@ -151,6 +151,21 @@ debugging detail.
    working-copy path.  `VbaSession.open()` already handles this;
    manual probes that bypass `VbaSession` MUST do it themselves
    (snippet in skill).
+3b. **DATA mdb swap requires a linked-table relink before tests.**
+   After replacing `data/CBDB_*_DATA.mdb` with a newer build, the
+   linked tables in `CBDB_BJ_User.mdb` still point to the OLD path.
+   Every pyodbc-based test (`test_lookatentry`, `test_saved_views`,
+   `test_schema`, etc.) silently fails until the tables are relinked.
+   **Automatic**: `conftest.pytest_configure` detects the mismatch by
+   comparing `LinkListInit.c_dataset` against the DATA mdb date and
+   calls `analysis/relink_data_mdb.py` automatically.
+   **Manual**: `python analysis/relink_data_mdb.py`.
+   How VBA derives the DATA mdb path (Form_NAVIGATION_PANE line 291):
+   `Left(CurrentProject.FullName, Len - 12) + "_" + c_dataset + "_DATA.mdb"`
+   i.e. strips `"BJ_User.mdb"` suffix (12 chars) and appends the date.
+   The conftest bypass (`c_path = work_mdb_path`) skips VBA relink for
+   COM tests; the correct table connections are inherited from the User
+   mdb AFTER the DAO relink has been run.
 4. **LookAtNetworks Form_Open deadlocks under default
    `_inject_autodetect`** because any sibling `Form_LookAt*`
    modification dirties the VBA project and Networks's Form_Open
