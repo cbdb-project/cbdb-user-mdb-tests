@@ -1,0 +1,385 @@
+{
+  "schema_version": 1,
+  "generated_date": "2026-05-08",
+  "probe_branch": "investigate/status-direct-invoke",
+  "main_at_probe": "5f100b4_then_rebased",
+  "form": "LookAtStatus",
+  "buttons_probed": [
+    "CmdPajek",
+    "CmdGephi"
+  ],
+  "shape_under_test": {
+    "candidate": "direct invoke via Access COM Application.Run through a Public wrapper sub injected per-session",
+    "no_public_driver_edit": true,
+    "scope": "probe script + per-session VBA wrapper (in working MDB copy only, never committed)",
+    "wrapper_pattern": "Public Sub RunExport<X>(): Call Cmd<X>_Click: End Sub  -- needed because Cmd<X>_Click is Private and Application.Run can't reach Private subs from external COM",
+    "phase_a": "CmdQuery via standard click_via_timer",
+    "between_phases": "DELETE FROM ZZ_TEST_DEBUG; set Form.Tag for export path; Python time.sleep(1.5)",
+    "phase_b": "app.Run('Form_LookAtStatus.RunExport<X>') -- synchronous COM call; bypasses Form_Timer"
+  },
+  "config": {
+    "phase_a_cmdquery_timeout_sec": 180,
+    "phase_b_outer_timeout_sec": 120,
+    "per_phase_outer_timeout_sec": 360,
+    "object_required_text": "Object required",
+    "PR127_baseline_scratch_status": 17023,
+    "PR127_baseline_scratch_p_status": 17022
+  },
+  "total_wall_elapsed_sec": 44.68,
+  "phases": {
+    "CmdPajek": {
+      "phase": {
+        "button": "CmdPajek",
+        "wrapper_name": "RunExportPajek",
+        "fixture_name": "status_40_unfiltered",
+        "fixture_picker_ids": [
+          40
+        ],
+        "fixture_controls": {
+          "FrameFilterYears": 1
+        },
+        "com_sleep_sec": 1.5,
+        "markers": [
+          {
+            "t": 0.0,
+            "marker": "constructing_session"
+          },
+          {
+            "t": 5.29,
+            "marker": "session_opened_attempt_1"
+          },
+          {
+            "t": 5.53,
+            "marker": "filedialog_patched"
+          },
+          {
+            "t": 6.27,
+            "marker": "form_opened"
+          },
+          {
+            "t": 6.28,
+            "marker": "wrapper_inject_OK: wrapper RunExportPajek injected OK"
+          },
+          {
+            "t": 6.3,
+            "marker": "picker_seeded_1_codes"
+          },
+          {
+            "t": 6.3,
+            "marker": "fixture_seeded"
+          },
+          {
+            "t": 6.3,
+            "marker": "phase_a_form_tag_set_cmdquery_only"
+          },
+          {
+            "t": 6.3,
+            "marker": "phase_a_chain_fire_t_start"
+          },
+          {
+            "t": 8.33,
+            "marker": "phase_a_click_via_timer_returned_17023"
+          },
+          {
+            "t": 8.33,
+            "marker": "phase_a_chain_elapsed_2.03s"
+          },
+          {
+            "t": 8.35,
+            "marker": "phase_a_state_captured"
+          },
+          {
+            "t": 8.35,
+            "marker": "zz_test_debug_cleared"
+          },
+          {
+            "t": 8.36,
+            "marker": "phase_b_form_tag_set_export_path"
+          },
+          {
+            "t": 8.36,
+            "marker": "com_sleep_start_1.5s"
+          },
+          {
+            "t": 9.86,
+            "marker": "com_sleep_done_1.5s"
+          },
+          {
+            "t": 9.86,
+            "marker": "phase_b_direct_invoke_start_Application.Run('Form_LookAtStatus.RunExportPajek')"
+          },
+          {
+            "t": 9.86,
+            "marker": "phase_b_direct_invoke_FAIL_0.01s"
+          },
+          {
+            "t": 9.86,
+            "marker": "phase_b_direct_invoke_error: attempt 1 'Form_LookAtStatus.RunExportPajek': com_error(-2147352567, 'Exception occurred.', (0, None, \"Welcome to CBDB! cannot find the procedure 'Form_LookAtStatus.RunExportPajek.'\", None, -1, -2146825771), None) | attempt 2 'RunExportPajek' (unqualified): com_error(-2147352567, 'Exception occurred.', (0, None, \"Welcome to CBDB! cannot find the procedure 'RunExportPajek.'\", None, -1, -2146825771), None)"
+          },
+          {
+            "t": 16.87,
+            "marker": "phase_b_chain_quiescent_zero_files_stable_for_5s"
+          },
+          {
+            "t": 16.87,
+            "marker": "phase_b_files_inventoried_0"
+          },
+          {
+            "t": 16.87,
+            "marker": "phase_b_state_captured"
+          }
+        ],
+        "elapsed_sec": 19.25,
+        "exception": null,
+        "wrapper_inject_ok": true,
+        "wrapper_inject_msg": "wrapper RunExportPajek injected OK",
+        "phase_a_click_via_timer_returned": 17023,
+        "phase_a_zz_test_debug_msgs": [
+          "LookAtStatus:ENTER",
+          "LookAtStatus:DONE"
+        ],
+        "phase_a_row_counts": {
+          "ZZ_SCRATCH_STATUS": 17023,
+          "ZZ_SCRATCH_P_STATUS": 17022,
+          "ZZ_TEST_DEBUG": 2
+        },
+        "phase_a_chain_elapsed_sec": 2.03,
+        "phase_b_direct_invoke_returned_ok": false,
+        "phase_b_direct_invoke_error": "attempt 1 'Form_LookAtStatus.RunExportPajek': com_error(-2147352567, 'Exception occurred.', (0, None, \"Welcome to CBDB! cannot find the procedure 'Form_LookAtStatus.RunExportPajek.'\", None, -1, -2146825771), None) | attempt 2 'RunExportPajek' (unqualified): com_error(-2147352567, 'Exception occurred.', (0, None, \"Welcome to CBDB! cannot find the procedure 'RunExportPajek.'\", None, -1, -2146825771), None)",
+        "phase_b_invoke_elapsed_sec": 0.01,
+        "phase_b_zz_test_debug_msgs": [],
+        "phase_b_row_counts": {
+          "ZZ_SCRATCH_STATUS": 17023,
+          "ZZ_SCRATCH_P_STATUS": 17022,
+          "ZZ_TEST_DEBUG": 0
+        },
+        "phase_b_chain_observed_done": true,
+        "files": [],
+        "file_count": 0,
+        "msgbox_observed": []
+      },
+      "outcome": "direct_invoke_app_run_rejected"
+    },
+    "CmdGephi": {
+      "phase": {
+        "button": "CmdGephi",
+        "wrapper_name": "RunExportGephi",
+        "fixture_name": "status_40_unfiltered",
+        "fixture_picker_ids": [
+          40
+        ],
+        "fixture_controls": {
+          "FrameFilterYears": 1
+        },
+        "com_sleep_sec": 1.5,
+        "markers": [
+          {
+            "t": 0.0,
+            "marker": "constructing_session"
+          },
+          {
+            "t": 5.05,
+            "marker": "session_opened_attempt_1"
+          },
+          {
+            "t": 5.3,
+            "marker": "filedialog_patched"
+          },
+          {
+            "t": 6.03,
+            "marker": "form_opened"
+          },
+          {
+            "t": 6.04,
+            "marker": "wrapper_inject_OK: wrapper RunExportGephi injected OK"
+          },
+          {
+            "t": 6.06,
+            "marker": "picker_seeded_1_codes"
+          },
+          {
+            "t": 6.06,
+            "marker": "fixture_seeded"
+          },
+          {
+            "t": 6.06,
+            "marker": "phase_a_form_tag_set_cmdquery_only"
+          },
+          {
+            "t": 6.06,
+            "marker": "phase_a_chain_fire_t_start"
+          },
+          {
+            "t": 7.59,
+            "marker": "phase_a_click_via_timer_returned_17023"
+          },
+          {
+            "t": 7.59,
+            "marker": "phase_a_chain_elapsed_1.53s"
+          },
+          {
+            "t": 7.59,
+            "marker": "phase_a_state_captured"
+          },
+          {
+            "t": 7.59,
+            "marker": "zz_test_debug_cleared"
+          },
+          {
+            "t": 7.6,
+            "marker": "phase_b_form_tag_set_export_path"
+          },
+          {
+            "t": 7.6,
+            "marker": "com_sleep_start_1.5s"
+          },
+          {
+            "t": 9.1,
+            "marker": "com_sleep_done_1.5s"
+          },
+          {
+            "t": 9.1,
+            "marker": "phase_b_direct_invoke_start_Application.Run('Form_LookAtStatus.RunExportGephi')"
+          },
+          {
+            "t": 9.11,
+            "marker": "phase_b_direct_invoke_FAIL_0.01s"
+          },
+          {
+            "t": 9.11,
+            "marker": "phase_b_direct_invoke_error: attempt 1 'Form_LookAtStatus.RunExportGephi': com_error(-2147352567, 'Exception occurred.', (0, None, \"Welcome to CBDB! cannot find the procedure 'Form_LookAtStatus.RunExportGephi.'\", None, -1, -2146825771), None) | attempt 2 'RunExportGephi' (unqualified): com_error(-2147352567, 'Exception occurred.', (0, None, \"Welcome to CBDB! cannot find the procedure 'RunExportGephi.'\", None, -1, -2146825771), None)"
+          },
+          {
+            "t": 16.11,
+            "marker": "phase_b_chain_quiescent_zero_files_stable_for_5s"
+          },
+          {
+            "t": 16.11,
+            "marker": "phase_b_files_inventoried_0"
+          },
+          {
+            "t": 16.12,
+            "marker": "phase_b_state_captured"
+          }
+        ],
+        "elapsed_sec": 18.63,
+        "exception": null,
+        "wrapper_inject_ok": true,
+        "wrapper_inject_msg": "wrapper RunExportGephi injected OK",
+        "phase_a_click_via_timer_returned": 17023,
+        "phase_a_zz_test_debug_msgs": [
+          "LookAtStatus:ENTER",
+          "LookAtStatus:DONE"
+        ],
+        "phase_a_row_counts": {
+          "ZZ_SCRATCH_STATUS": 17023,
+          "ZZ_SCRATCH_P_STATUS": 17022,
+          "ZZ_TEST_DEBUG": 2
+        },
+        "phase_a_chain_elapsed_sec": 1.53,
+        "phase_b_direct_invoke_returned_ok": false,
+        "phase_b_direct_invoke_error": "attempt 1 'Form_LookAtStatus.RunExportGephi': com_error(-2147352567, 'Exception occurred.', (0, None, \"Welcome to CBDB! cannot find the procedure 'Form_LookAtStatus.RunExportGephi.'\", None, -1, -2146825771), None) | attempt 2 'RunExportGephi' (unqualified): com_error(-2147352567, 'Exception occurred.', (0, None, \"Welcome to CBDB! cannot find the procedure 'RunExportGephi.'\", None, -1, -2146825771), None)",
+        "phase_b_invoke_elapsed_sec": 0.01,
+        "phase_b_zz_test_debug_msgs": [],
+        "phase_b_row_counts": {
+          "ZZ_SCRATCH_STATUS": 17023,
+          "ZZ_SCRATCH_P_STATUS": 17022,
+          "ZZ_TEST_DEBUG": 0
+        },
+        "phase_b_chain_observed_done": true,
+        "files": [],
+        "file_count": 0,
+        "msgbox_observed": []
+      },
+      "outcome": "direct_invoke_app_run_rejected"
+    }
+  },
+  "verdict": "direct_invoke_sub_did_not_run",
+  "verdict_note": "**Direct-invoke via `Application.Run` is technically not feasible in this environment for form-module subs.**  Wrapper injection succeeded — Public Sub `RunExport<X>` was added to `Form_LookAtStatus` and the AddFromString call returned without error.  But `Application.Run` rejected BOTH name forms tried per phase:\n  - `Form_LookAtStatus.RunExport<X>` (qualified):     \"cannot find the procedure ...\"\n  - `RunExport<X>` (unqualified): same error.\n\n**Implication: this is the well-known Access limitation that `Application.Run` only resolves Public subs in STANDARD modules, not class (form/report) modules.**  The wrapper exists but is not addressable via the Application.Run name-resolution path.  The brief's question — \"would the export sub run cleanly post-CmdQuery if invoked outside the Form_Timer dispatch path?\" — **cannot be answered via this mechanism**.\n\nPhase A still verified the prior infrastructure is intact: scratch counts match PR #127 baseline on both phases (17023 / 17022); CmdQuery body was non-destructive.\n\n**Per brief: do NOT silently fallback to a different mechanism.**  Documented honestly as a probe finding.  Next brief candidate space:\n  - **wrapper in a STANDARD module** — inject the Public wrapper into a new Module (not the form's class module).  The wrapper would call into the form via `[Forms]![LookAtStatus].SetFocus` then `SendKeys` or `DoCmd`, OR by re-using `_inject_timer_trigger` from a standard-module context.  Adds complexity but keeps invocation off Form_Timer's re-dispatch path.\n  - **pywinauto button click** — UI-driven; depends on form/button visibility + focus.  Brief explicitly listed this as a fallback option (\"focused non-chain UI trigger path if that is the narrowest viable equivalent\").\n  - **driver-infra fix to `click_via_timer`** — investigate why PR #135's second-call dispatch didn't fire.  Possibly close+reopen form between dispatches.\n  - **maintainer-line / canonical Issue** — file the upstream CBDB pattern (Dim'd-local Set rebind in CmdQuery cleanup) as a defect; leave Status × CmdPajek + CmdGephi skipped pending upstream fix.",
+  "answers": {
+    "Q_export_step_actually_triggered_per_button": {
+      "CmdPajek": false,
+      "CmdGephi": false,
+      "both": false
+    },
+    "Q1_object_required_zero_per_button": {
+      "CmdPajek": true,
+      "CmdGephi": true,
+      "both": true
+    },
+    "Q2_files_written_per_button": {
+      "CmdPajek": false,
+      "CmdGephi": false,
+      "CmdPajek_count": 0,
+      "CmdGephi_count": 0,
+      "both_started_writing": false
+    },
+    "Q3_watchdog_dialogs_zero_per_button": {
+      "CmdPajek": true,
+      "CmdGephi": true,
+      "both_zero": true
+    },
+    "Q4_phase_b_zz_test_debug_per_button": {
+      "CmdPajek_msgs": [],
+      "CmdGephi_msgs": []
+    },
+    "Q5_baseline_preserved": {
+      "scratch_status_phase_b_per_button": {
+        "CmdPajek": 17023,
+        "CmdGephi": 17023,
+        "PR127_baseline": 17023
+      },
+      "scratch_p_status_phase_b_per_button": {
+        "CmdPajek": 17022,
+        "CmdGephi": 17022,
+        "PR127_baseline": 17022
+      },
+      "both_match_baseline": true
+    },
+    "per_phase_signatures": {
+      "CmdPajek": {
+        "outcome": "direct_invoke_app_run_rejected",
+        "wrapper_inject_ok": true,
+        "phase_b_direct_invoke_returned_ok": false,
+        "phase_b_direct_invoke_error": "attempt 1 'Form_LookAtStatus.RunExportPajek': com_error(-2147352567, 'Exception occurred.', (0, None, \"Welcome to CBDB! cannot find the procedure 'Form_LookAtStatus.RunExportPajek.'\", None, -1, -2146825771), None) | attempt 2 'RunExportPajek' (unqualified): com_error(-2147352567, 'Exception occurred.', (0, None, \"Welcome to CBDB! cannot find the procedure 'RunExportPajek.'\", None, -1, -2146825771), None)",
+        "phase_b_invoke_elapsed_sec": 0.01,
+        "file_count": 0,
+        "phase_a_zz_test_debug": [
+          "LookAtStatus:ENTER",
+          "LookAtStatus:DONE"
+        ],
+        "phase_b_zz_test_debug": [],
+        "phase_b_zz_test_debug_err_texts": [],
+        "object_required_in_phase_b": false,
+        "watchdog_dialog_count": 0,
+        "watchdog_dialog_texts_sample": [],
+        "phase_a_scratch_status": 17023,
+        "phase_a_scratch_p_status": 17022,
+        "phase_b_scratch_status": 17023,
+        "phase_b_scratch_p_status": 17022
+      },
+      "CmdGephi": {
+        "outcome": "direct_invoke_app_run_rejected",
+        "wrapper_inject_ok": true,
+        "phase_b_direct_invoke_returned_ok": false,
+        "phase_b_direct_invoke_error": "attempt 1 'Form_LookAtStatus.RunExportGephi': com_error(-2147352567, 'Exception occurred.', (0, None, \"Welcome to CBDB! cannot find the procedure 'Form_LookAtStatus.RunExportGephi.'\", None, -1, -2146825771), None) | attempt 2 'RunExportGephi' (unqualified): com_error(-2147352567, 'Exception occurred.', (0, None, \"Welcome to CBDB! cannot find the procedure 'RunExportGephi.'\", None, -1, -2146825771), None)",
+        "phase_b_invoke_elapsed_sec": 0.01,
+        "file_count": 0,
+        "phase_a_zz_test_debug": [
+          "LookAtStatus:ENTER",
+          "LookAtStatus:DONE"
+        ],
+        "phase_b_zz_test_debug": [],
+        "phase_b_zz_test_debug_err_texts": [],
+        "object_required_in_phase_b": false,
+        "watchdog_dialog_count": 0,
+        "watchdog_dialog_texts_sample": [],
+        "phase_a_scratch_status": 17023,
+        "phase_a_scratch_p_status": 17022,
+        "phase_b_scratch_status": 17023,
+        "phase_b_scratch_p_status": 17022
+      }
+    },
+    "family_bucket": "direct_invoke_sub_did_not_run"
+  }
+}

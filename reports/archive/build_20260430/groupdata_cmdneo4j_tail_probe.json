@@ -1,0 +1,442 @@
+{
+  "schema_version": 1,
+  "generated_date": "2026-05-05",
+  "probe_branch": "investigate/groupdata-cmdneo4j-tail",
+  "follow_up_to": "PR probe/groupdata-cmdneo4j commit 4ace85b",
+  "fixture": "groupdata_person_1_small (c_personid = 1)",
+  "results": [
+    {
+      "iter": "iter1_baseline_chain_chkentry_off",
+      "config": {
+        "name": "iter1_baseline_chain_chkentry_off",
+        "enable_chk": [
+          "ChkStatus",
+          "ChkOffice",
+          "ChkAddr",
+          "ChkGisStatus",
+          "ChkGisOffice",
+          "ChkGisAddr"
+        ],
+        "chain_neo4j": true,
+        "seed_entry_row": false,
+        "expected_outcome": "8 files + LookAtGroupData:ERR 'No current record.' + ZZ_SCRATCH_ENTRY=0 (reproduces PR probe/groupdata-cmdneo4j commit 4ace85b finding)"
+      },
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session"
+        },
+        {
+          "t": 3.5,
+          "marker": "session_open_attempt_1_fail: com_error(-2147023170, 'The remote procedure call failed.', None, None)"
+        },
+        {
+          "t": 94.18,
+          "marker": "session_open_attempt_2_fail: com_error(-2146959355, 'Server execution failed', None, None)"
+        },
+        {
+          "t": 155.41,
+          "marker": "session_open_attempt_3_fail: com_error(-2147023170, 'The remote procedure call failed.', None, None)"
+        }
+      ],
+      "outcome": "exception_uncaught",
+      "elapsed_sec": 218.0,
+      "exception": "RuntimeError('session open failed after 3 attempts')\nTraceback (most recent call last):\n  File \"C:\\Users\\how612\\Documents\\GitHub\\cbdb-user-mdb-tests\\analysis\\probe_groupdata_cmdneo4j_tail.py\", line 345, in _worker\n    raise RuntimeError(\nRuntimeError: session open failed after 3 attempts\n",
+      "row_counts_after_cmdrun": {},
+      "row_counts_after_cmdneo4j": {},
+      "debug_transcript": [],
+      "files": [],
+      "file_count": 0,
+      "click_via_timer_returned": null,
+      "seed_insert_succeeded": null
+    },
+    {
+      "iter": "iter2_chain_chkentry_on",
+      "config": {
+        "name": "iter2_chain_chkentry_on",
+        "enable_chk": [
+          "ChkStatus",
+          "ChkOffice",
+          "ChkAddr",
+          "ChkGisStatus",
+          "ChkGisOffice",
+          "ChkGisAddr",
+          "ChkEntry"
+        ],
+        "chain_neo4j": true,
+        "seed_entry_row": false,
+        "expected_outcome": "Issue #6 (JET 3061) fires in queryEntry during CmdRun.  Outcome of CmdNeo4j depends on whether ZZ_SCRATCH_ENTRY ends up populated (transactional behaviour of the failing INSERT)."
+      },
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session"
+        },
+        {
+          "t": 5.08,
+          "marker": "session_opened_attempt_1"
+        },
+        {
+          "t": 5.71,
+          "marker": "filedialog_patched"
+        },
+        {
+          "t": 6.59,
+          "marker": "form_opened"
+        },
+        {
+          "t": 6.6,
+          "marker": "picker_seeded_pid_1"
+        },
+        {
+          "t": 6.7,
+          "marker": "chk_state_set_enable_ChkStatus,ChkOffice,ChkAddr,ChkGisStatus,ChkGisOffice,ChkGisAddr,ChkEntry"
+        },
+        {
+          "t": 6.7,
+          "marker": "form_tag_set_chain"
+        },
+        {
+          "t": 7.23,
+          "marker": "click_via_timer_returned_2"
+        },
+        {
+          "t": 9.23,
+          "marker": "chain_quiesce_files_8_reason_done_marker"
+        },
+        {
+          "t": 9.24,
+          "marker": "files_inventoried_8"
+        },
+        {
+          "t": 9.24,
+          "marker": "debug_captured"
+        }
+      ],
+      "outcome": "no_current_record_with_files",
+      "elapsed_sec": 11.55,
+      "exception": null,
+      "row_counts_after_cmdrun": {
+        "ZZ_SCRATCH_STATUS": 2,
+        "ZZ_SCRATCH_OFFICE": 12,
+        "ZZ_SCRATCH_ENTRY": 0,
+        "ZZ_SCRATCH_BIOG_ADDR_DATA": 0,
+        "ZZ_SCRATCH_BIOG_TEXT_DATA": 0,
+        "ZZ_SCRATCH_P_TEXT": 2,
+        "ZZ_SCRATCH_IMPORT_PEOPLE": 1,
+        "ZZ_ADDRESSES": 7,
+        "ZZ_PLACE": 1
+      },
+      "row_counts_after_cmdneo4j": {
+        "ZZ_SCRATCH_STATUS": 2,
+        "ZZ_SCRATCH_OFFICE": 12,
+        "ZZ_SCRATCH_ENTRY": 0,
+        "ZZ_SCRATCH_BIOG_ADDR_DATA": 0,
+        "ZZ_SCRATCH_BIOG_TEXT_DATA": 0,
+        "ZZ_SCRATCH_P_TEXT": 2,
+        "ZZ_SCRATCH_IMPORT_PEOPLE": 1,
+        "ZZ_ADDRESSES": 7,
+        "ZZ_PLACE": 1
+      },
+      "debug_transcript": [
+        {
+          "id": 1,
+          "msg": "LookAtGroupData:ENTER"
+        },
+        {
+          "id": 2,
+          "msg": "LookAtGroupData:ERR No value given for one or more required parameters."
+        },
+        {
+          "id": 3,
+          "msg": "LookAtGroupData:ERR No current record."
+        },
+        {
+          "id": 4,
+          "msg": "LookAtGroupData:DONE"
+        }
+      ],
+      "files": [
+        {
+          "name": "f12.out.csv",
+          "size": 93,
+          "header_first_col": "personPlaceCode",
+          "header_n_cols": 3,
+          "header_preview": "personPlaceCode,personPlaceTrans,personPlaceHZ"
+        },
+        {
+          "name": "f15.out.csv",
+          "size": 61,
+          "header_first_col": "NameID",
+          "header_n_cols": 4,
+          "header_preview": "NameID,StatusCode,FirstYear,LastYear"
+        },
+        {
+          "name": "f18.out.csv",
+          "size": 108,
+          "header_first_col": "StatusCode",
+          "header_n_cols": 3,
+          "header_preview": "StatusCode,StatusDesc,StatusDescHZ"
+        },
+        {
+          "name": "f21.out.csv",
+          "size": 379,
+          "header_first_col": "NameID",
+          "header_n_cols": 8,
+          "header_preview": "NameID,OfficeCode,OfficeAddrID,SocialInstID,SocialInstID,PostingFirstYear,PostingLastYear,PostingDynasty"
+        },
+        {
+          "name": "f24.out.csv",
+          "size": 711,
+          "header_first_col": "OfficeCode",
+          "header_n_cols": 4,
+          "header_preview": "OfficeCode,OfficeTrans,OfficePinyin,OfficeHZ"
+        },
+        {
+          "name": "f3.out.csv",
+          "size": 225,
+          "header_first_col": "NameID",
+          "header_n_cols": 9,
+          "header_preview": "NameID,NameHZ,NamePY,IndexYear,IndexYearTypeCode,IndexYearTypeDesc,IndexYearTypeDescHZ,Dynasty,Sex"
+        },
+        {
+          "name": "f6.out.csv",
+          "size": 342,
+          "header_first_col": "PlaceID",
+          "header_n_cols": 5,
+          "header_preview": "PlaceID,PlacePY,PlaceHZ,PlaceX,PlaceY"
+        },
+        {
+          "name": "f9.out.csv",
+          "size": 47,
+          "header_first_col": "NameID",
+          "header_n_cols": 3,
+          "header_preview": "NameID,PlaceID,PersonPlaceCode"
+        }
+      ],
+      "file_count": 8,
+      "click_via_timer_returned": 2,
+      "seed_insert_succeeded": null,
+      "chain_observed_done": true,
+      "chain_quiesce_reason": "done_marker",
+      "err_messages": [
+        "LookAtGroupData:ERR No value given for one or more required parameters.",
+        "LookAtGroupData:ERR No current record."
+      ]
+    },
+    {
+      "iter": "iter3_split_then_seed",
+      "config": {
+        "name": "iter3_split_then_seed",
+        "enable_chk": [
+          "ChkStatus",
+          "ChkOffice",
+          "ChkAddr",
+          "ChkGisStatus",
+          "ChkGisOffice",
+          "ChkGisAddr"
+        ],
+        "chain_neo4j": false,
+        "seed_entry_row": true,
+        "expected_outcome": "If hypothesis A holds: 10-11 files + no 'No current record.' ERR (only InstitutionCodes block may be skipped via its tRecDeleted gate; PeopleEntry + EntryCode should now succeed against the seeded row)."
+      },
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session"
+        },
+        {
+          "t": 5.07,
+          "marker": "session_opened_attempt_1"
+        },
+        {
+          "t": 5.71,
+          "marker": "filedialog_patched"
+        },
+        {
+          "t": 6.59,
+          "marker": "form_opened"
+        },
+        {
+          "t": 6.6,
+          "marker": "picker_seeded_pid_1"
+        },
+        {
+          "t": 6.69,
+          "marker": "chk_state_set_enable_ChkStatus,ChkOffice,ChkAddr,ChkGisStatus,ChkGisOffice,ChkGisAddr"
+        },
+        {
+          "t": 6.7,
+          "marker": "form_tag_set_cmdrun_alone"
+        },
+        {
+          "t": 7.23,
+          "marker": "cmdrun_alone_returned_2"
+        },
+        {
+          "t": 9.23,
+          "marker": "row_counts_after_cmdrun_captured_entry_0"
+        },
+        {
+          "t": 9.23,
+          "marker": "seed_insert_succeeded"
+        },
+        {
+          "t": 9.23,
+          "marker": "zz_scratch_entry_after_seed_1"
+        },
+        {
+          "t": 9.23,
+          "marker": "form_tag_set_cmdneo4j_alone"
+        },
+        {
+          "t": 9.77,
+          "marker": "cmdneo4j_alone_returned_3"
+        },
+        {
+          "t": 11.77,
+          "marker": "cmdneo4j_quiesce_files_10_reason_done_marker"
+        },
+        {
+          "t": 11.78,
+          "marker": "files_inventoried_10"
+        },
+        {
+          "t": 11.78,
+          "marker": "debug_captured"
+        }
+      ],
+      "outcome": "clean_no_err_files_produced",
+      "elapsed_sec": 14.13,
+      "exception": null,
+      "row_counts_after_cmdrun": {
+        "ZZ_SCRATCH_STATUS": 2,
+        "ZZ_SCRATCH_OFFICE": 12,
+        "ZZ_SCRATCH_ENTRY": 0,
+        "ZZ_SCRATCH_BIOG_ADDR_DATA": 1,
+        "ZZ_SCRATCH_BIOG_TEXT_DATA": 0,
+        "ZZ_SCRATCH_P_TEXT": 0,
+        "ZZ_SCRATCH_IMPORT_PEOPLE": 1,
+        "ZZ_ADDRESSES": 24,
+        "ZZ_PLACE": 9788
+      },
+      "row_counts_after_cmdneo4j": {
+        "ZZ_SCRATCH_STATUS": 2,
+        "ZZ_SCRATCH_OFFICE": 12,
+        "ZZ_SCRATCH_ENTRY": 1,
+        "ZZ_SCRATCH_BIOG_ADDR_DATA": 1,
+        "ZZ_SCRATCH_BIOG_TEXT_DATA": 0,
+        "ZZ_SCRATCH_P_TEXT": 3,
+        "ZZ_SCRATCH_IMPORT_PEOPLE": 1,
+        "ZZ_ADDRESSES": 8,
+        "ZZ_PLACE": 2
+      },
+      "debug_transcript": [
+        {
+          "id": 1,
+          "msg": "LookAtGroupData:ENTER"
+        },
+        {
+          "id": 2,
+          "msg": "LookAtGroupData:DONE"
+        },
+        {
+          "id": 3,
+          "msg": "LookAtGroupData:MSGBOX"
+        }
+      ],
+      "files": [
+        {
+          "name": "f12.out.csv",
+          "size": 93,
+          "header_first_col": "personPlaceCode",
+          "header_n_cols": 3,
+          "header_preview": "personPlaceCode,personPlaceTrans,personPlaceHZ"
+        },
+        {
+          "name": "f15.out.csv",
+          "size": 61,
+          "header_first_col": "NameID",
+          "header_n_cols": 4,
+          "header_preview": "NameID,StatusCode,FirstYear,LastYear"
+        },
+        {
+          "name": "f18.out.csv",
+          "size": 108,
+          "header_first_col": "StatusCode",
+          "header_n_cols": 3,
+          "header_preview": "StatusCode,StatusDesc,StatusDescHZ"
+        },
+        {
+          "name": "f21.out.csv",
+          "size": 379,
+          "header_first_col": "NameID",
+          "header_n_cols": 8,
+          "header_preview": "NameID,OfficeCode,OfficeAddrID,SocialInstID,SocialInstID,PostingFirstYear,PostingLastYear,PostingDynasty"
+        },
+        {
+          "name": "f24.out.csv",
+          "size": 711,
+          "header_first_col": "OfficeCode",
+          "header_n_cols": 4,
+          "header_preview": "OfficeCode,OfficeTrans,OfficePinyin,OfficeHZ"
+        },
+        {
+          "name": "f27.out.csv",
+          "size": 156,
+          "header_first_col": "NameID",
+          "header_n_cols": 11,
+          "header_preview": "NameID,EntryCode,EntryPlaceID,KinID,KinRelCode,AssocPersonID,AssocRelCode,SocialInstID,SocialInstNameID,EntryYear,EntryDynasty"
+        },
+        {
+          "name": "f3.out.csv",
+          "size": 286,
+          "header_first_col": "NameID",
+          "header_n_cols": 9,
+          "header_preview": "NameID,NameHZ,NamePY,IndexYear,IndexYearTypeCode,IndexYearTypeDesc,IndexYearTypeDescHZ,Dynasty,Sex"
+        },
+        {
+          "name": "f30.out.csv",
+          "size": 59,
+          "header_first_col": "EntryCode",
+          "header_n_cols": 3,
+          "header_preview": "EntryCode,EntryDesc,EntryDescHZ"
+        },
+        {
+          "name": "f6.out.csv",
+          "size": 342,
+          "header_first_col": "PlaceID",
+          "header_n_cols": 5,
+          "header_preview": "PlaceID,PlacePY,PlaceHZ,PlaceX,PlaceY"
+        },
+        {
+          "name": "f9.out.csv",
+          "size": 47,
+          "header_first_col": "NameID",
+          "header_n_cols": 3,
+          "header_preview": "NameID,PlaceID,PersonPlaceCode"
+        }
+      ],
+      "file_count": 10,
+      "click_via_timer_returned": 2,
+      "seed_insert_succeeded": true,
+      "zz_scratch_entry_after_seed": 1,
+      "cmdneo4j_alone_returned": 3,
+      "chain_observed_done": true,
+      "chain_quiesce_reason": "done_marker",
+      "err_messages": []
+    }
+  ],
+  "conclusion": "A_new_bug_candidate_empty_recordset_guard",
+  "rationale": "Baseline corroborated by `iter2` (iter2 chain with ChkEntry on; ZZ_SCRATCH_ENTRY ended up 0 because Issue #6 (JET 3061) blocked queryEntry inserts): ZZ_SCRATCH_ENTRY=0 produced 8 files + `LookAtGroupData:ERR No current record.`.  Iter 3 then split the chain (CmdRun alone with ChkEntry off, then a manual INSERT of 1 synthetic row into ZZ_SCRATCH_ENTRY, then CmdNeo4j alone).  Result: ZZ_SCRATCH_ENTRY=1, 10 files produced, NO `No current record.` ERR.  The 2 extra files are the missing PeopleEntry + EntryCode shapes (see the per-file detail).  InstitutionCodes (block #11) correctly remained skipped because its `If tRecDeleted > 0` gate evaluates to False for the synthetic row.\n\nThis isolates the failure cause to: `Form_LookAtGroupData.CmdNeo4j_Click` blocks #9 (PeopleEntry, line 1243-1245) and #10 (EntryCode, line 1383-1385) call `.MoveFirst` on their recordset without first checking `.EOF` or `.RecordCount > 0`.  When ZZ_SCRATCH_ENTRY is empty the recordset opens with `.EOF=True` and `.MoveFirst` raises DAO 3021.\n\nThis is a NEW bug candidate distinct from Issue #6 (which is a column-typo JET 3061 in `Form_LookAtGroupData.queryEntry` that prevents ZZ_SCRATCH_ENTRY from being populated at all when ChkEntry is true).  The two bugs interact — Issue #6 is the upstream cause that leaves ZZ_SCRATCH_ENTRY=0 even on the ChkEntry-on path, which then exposes this downstream missing-guard bug — but they are different code-level defects and should be filed separately.\n\nStatic evidence corroborates: ALL 11 CmdNeo4j blocks share the same unguarded `.MoveFirst` pattern.  Blocks #1-#8 only \"work\" because their feeder scratch tables (ZZ_SCRATCH_STATUS, ZZ_SCRATCH_OFFICE, ZZ_PLACE, ZZ_SCRATCH_P_TEXT, ZZ_ADDRESSES) are non-empty under the probe's enable scope.  This is a systemic missing-guard pattern; PeopleEntry and EntryCode happen to be the first blocks that hit the empty-feeder case under any normal user enable scope.",
+  "metadata": {
+    "iter1_baseline_reproduced": false,
+    "iter2_baseline_corroborates": true,
+    "baseline_source": "iter2",
+    "iter3_files": 10,
+    "iter3_seed_succeeded": true,
+    "iter3_entry_count_after_seed": 1,
+    "iter3_no_no_current_record_err": true
+  },
+  "_reclassified_only": true
+}

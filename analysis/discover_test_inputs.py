@@ -36,12 +36,38 @@ from pathlib import Path
 import pyodbc
 
 ROOT = Path(__file__).resolve().parent.parent
-USER_MDB = ROOT / "data" / "CBDB_BJ_User.mdb"
 OUT = Path(__file__).resolve().parent / "dump" / "test_inputs.json"
 
+
+def _find_data_mdb(root: Path) -> Path:
+    """Find the DATA mdb in data/.
+
+    All discovery queries target linked tables that live in the DATA mdb.
+    Connecting to the DATA mdb directly avoids stale linked-table path
+    errors when the DATA mdb has been replaced with a newer build.
+
+    If multiple CBDB_*_DATA.mdb files exist (e.g. old build not cleaned up),
+    pick the one with the latest YYYYMMDD in the filename so the script is
+    still usable without manual cleanup.
+    """
+    matches = list((root / "data").glob("CBDB_*_DATA.mdb"))
+    if not matches:
+        raise FileNotFoundError("No CBDB_*_DATA.mdb found in data/")
+    if len(matches) == 1:
+        return matches[0]
+    # Multiple matches: sort by embedded date (CBDB_YYYYMMDD_DATA.mdb) and pick newest
+    def _date_key(p: Path) -> str:
+        parts = p.stem.split("_")  # ["CBDB", "YYYYMMDD", "DATA"]
+        return parts[1] if len(parts) >= 2 else p.stem
+    chosen = sorted(matches, key=_date_key)[-1]
+    print(f"[discover] multiple DATA mdbs found; using newest: {chosen.name}")
+    return chosen
+
+
+DATA_MDB = _find_data_mdb(ROOT)
 CONN_STR = (
     "DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};"
-    f"DBQ={USER_MDB};ReadOnly=True;"
+    f"DBQ={DATA_MDB};ReadOnly=True;"
 )
 
 
@@ -318,7 +344,7 @@ def discover_lookatassociationpairs(conn) -> dict:
 
 
 def main() -> None:
-    print(f"discovering test inputs from {USER_MDB.name} ...")
+    print(f"discovering test inputs from {DATA_MDB.name} ...")
     conn = pyodbc.connect(CONN_STR, autocommit=True)
     out = {
         "lookatentry": discover_lookatentry(conn),
@@ -343,7 +369,11 @@ def main() -> None:
         for key, rows in data.items():
             print(f"  {key}: {len(rows)} candidates")
             if rows:
-                print(f"    e.g. top: {dict(list(rows[0].items())[:5])}")
+                try:
+                    summary = repr(dict(list(rows[0].items())[:5]))
+                    print(f"    e.g. top: {summary}")
+                except UnicodeEncodeError:
+                    print(f"    e.g. top: (contains non-ASCII chars)")
 
 
 if __name__ == "__main__":

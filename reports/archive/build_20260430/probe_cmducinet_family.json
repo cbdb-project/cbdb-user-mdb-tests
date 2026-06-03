@@ -1,0 +1,329 @@
+{
+  "schema_version": 1,
+  "generated_date": "2026-05-06",
+  "probe_branch": "investigate/cmducinet-family-shape",
+  "forms_probed": [
+    "LookAtAssociations",
+    "LookAtKinship"
+  ],
+  "results": [
+    {
+      "form": "LookAtAssociations",
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session"
+        },
+        {
+          "t": 6.45,
+          "marker": "session_opened_attempt_1"
+        },
+        {
+          "t": 6.82,
+          "marker": "filedialog_patched"
+        },
+        {
+          "t": 6.9,
+          "marker": "fixture_picked_assoc_437_unfiltered"
+        },
+        {
+          "t": 7.69,
+          "marker": "form_seeded"
+        },
+        {
+          "t": 7.69,
+          "marker": "tag_set_for_cmdquery_CmdQuery"
+        },
+        {
+          "t": 10.23,
+          "marker": "cmdquery_returned_11867"
+        },
+        {
+          "t": 10.23,
+          "marker": "row_counts_after_cmdquery_captured"
+        },
+        {
+          "t": 10.23,
+          "marker": "tag_set_for_cmducinet"
+        },
+        {
+          "t": 12.27,
+          "marker": "cmducinet_fired_no_wait"
+        },
+        {
+          "t": 12.27,
+          "marker": "file_appeared_True"
+        },
+        {
+          "t": 12.27,
+          "marker": "file_shape_captured"
+        },
+        {
+          "t": 12.27,
+          "marker": "debug_captured"
+        }
+      ],
+      "outcome": "err_with_file",
+      "elapsed_sec": 14.72,
+      "exception": null,
+      "row_counts": {},
+      "debug_transcript": [
+        {
+          "id": 1,
+          "msg": "LookAtAssociations:ENTER"
+        },
+        {
+          "id": 2,
+          "msg": "LookAtAssociations:DONE"
+        },
+        {
+          "id": 3,
+          "msg": "LookAtAssociations:ERR Invalid procedure call or argument"
+        }
+      ],
+      "file_shape": {
+        "size_bytes": 275526,
+        "decoded_with": "cp1252",
+        "has_bom": false,
+        "first_200_bytes_repr": "b'*node data\\r\\nID index_year sex x_coord y_coord\\r\\n13 1049 \"M\" 116.08870697 35.396209717 \\r\\n146 969 \"M\" 0 0 \\r\\n191 1121 \"M\" 0 0 \\r\\n217 1007 \"M\" 115.646072 34.447662 \\r\\n291 1035 \"M\" 108.077988 35.039658 \\r\\n332 '",
+        "n_lines": 12065,
+        "sections": [
+          {
+            "marker_line": 1,
+            "marker_text": "*node data",
+            "header_text": "ID index_year sex x_coord y_coord",
+            "header_n_cols": 5,
+            "data_row_count": 8087,
+            "first_data_row": "13 1049 \"M\" 116.08870697 35.396209717"
+          },
+          {
+            "marker_line": 8090,
+            "marker_text": "*node properties",
+            "header_text": "ID shape size shortlabel",
+            "header_n_cols": 4,
+            "data_row_count": 3973,
+            "first_data_row": "13 2 1 \"Chao Buzhi\""
+          }
+        ],
+        "section_markers_in_order": [
+          "*node data",
+          "*node properties"
+        ]
+      },
+      "file_path": "C:\\Users\\how612\\Documents\\GitHub\\cbdb-user-mdb-tests\\analysis\\_probe_cmducinet_out_LookAtAssociations\\cmducinet_LookAtAssociations.vna",
+      "fixture_name": "assoc_437_unfiltered",
+      "fixture_controls": {
+        "FrameFilterYears": 1
+      },
+      "fixture_picker_ids": [
+        437
+      ],
+      "row_counts_after_cmdquery": {
+        "ZZ_SCRATCH_ASSOC": 11867,
+        "ZZ_SCRATCH_P_ASSOC": 8087,
+        "ZZ_SCRATCH_KIN": 0,
+        "ZZ_SCRATCH_KINNET": 0,
+        "ZZ_SCRATCH_PEOPLE": 0,
+        "ZZ_SOCIAL_NETWORK": 0
+      },
+      "err_messages": [
+        "LookAtAssociations:ERR Invalid procedure call or argument"
+      ]
+    },
+    {
+      "form": "LookAtKinship",
+      "markers": [
+        {
+          "t": 0.0,
+          "marker": "constructing_session"
+        },
+        {
+          "t": 5.75,
+          "marker": "session_opened_attempt_1"
+        },
+        {
+          "t": 6.28,
+          "marker": "filedialog_patched"
+        },
+        {
+          "t": 6.38,
+          "marker": "fixture_picked_kinship_person_3211"
+        },
+        {
+          "t": 7.18,
+          "marker": "form_seeded"
+        },
+        {
+          "t": 7.18,
+          "marker": "tag_set_for_cmdquery_CmdRun"
+        },
+        {
+          "t": 9.22,
+          "marker": "cmdquery_returned_949"
+        },
+        {
+          "t": 9.22,
+          "marker": "row_counts_after_cmdquery_captured"
+        },
+        {
+          "t": 9.22,
+          "marker": "tag_set_for_cmducinet"
+        },
+        {
+          "t": 11.25,
+          "marker": "cmducinet_fired_no_wait"
+        },
+        {
+          "t": 11.25,
+          "marker": "file_appeared_True"
+        },
+        {
+          "t": 11.26,
+          "marker": "file_shape_captured"
+        },
+        {
+          "t": 11.26,
+          "marker": "debug_captured"
+        }
+      ],
+      "outcome": "clean_file_produced",
+      "elapsed_sec": 13.76,
+      "exception": null,
+      "row_counts": {},
+      "debug_transcript": [
+        {
+          "id": 1,
+          "msg": "LookAtKinship:ENTER"
+        },
+        {
+          "id": 2,
+          "msg": "LookAtKinship:DONE"
+        }
+      ],
+      "file_shape": {
+        "size_bytes": 100572,
+        "decoded_with": "cp1252",
+        "has_bom": false,
+        "first_200_bytes_repr": "b'*node data\\r\\nID index_year dy_code dynasty sex x_coord y_coord kindist\\r\\n142 1007 15 \"Song\" \"M\" 114.34333 34.785477 5\\r\\n192 975 15 \"Song\" \"M\" 114.34333 34.785477 6\\r\\n232 940 15 \"Song\" \"M\" 114.34333 34.785'",
+        "n_lines": 3165,
+        "sections": [
+          {
+            "marker_line": 1,
+            "marker_text": "*node data",
+            "header_text": "ID index_year dy_code dynasty sex x_coord y_coord kindist",
+            "header_n_cols": 8,
+            "data_row_count": 949,
+            "first_data_row": "142 1007 15 \"Song\" \"M\" 114.34333 34.785477 5"
+          },
+          {
+            "marker_line": 952,
+            "marker_text": "*node properties",
+            "header_text": "ID color shape size shortlabel",
+            "header_n_cols": 5,
+            "data_row_count": 949,
+            "first_data_row": "142 255 2 1 \"Qian Ai\""
+          },
+          {
+            "marker_line": 1903,
+            "marker_text": "*tie data",
+            "header_text": "from to \"EdgeWeight\" \"edgetype\" \"edgelist\"",
+            "header_n_cols": 5,
+            "data_row_count": 1260,
+            "first_data_row": "192 7149 1 \"F\" 0"
+          }
+        ],
+        "section_markers_in_order": [
+          "*node data",
+          "*node properties",
+          "*tie data"
+        ]
+      },
+      "file_path": "C:\\Users\\how612\\Documents\\GitHub\\cbdb-user-mdb-tests\\analysis\\_probe_cmducinet_out_LookAtKinship\\cmducinet_LookAtKinship.vna",
+      "fixture_name": "kinship_person_3211",
+      "fixture_controls": {},
+      "fixture_picker_ids": [
+        3211
+      ],
+      "row_counts_after_cmdquery": {
+        "ZZ_SCRATCH_ASSOC": 0,
+        "ZZ_SCRATCH_P_ASSOC": 0,
+        "ZZ_SCRATCH_KIN": 949,
+        "ZZ_SCRATCH_KINNET": 1260,
+        "ZZ_SCRATCH_PEOPLE": 921,
+        "ZZ_SOCIAL_NETWORK": 0
+      },
+      "err_messages": []
+    }
+  ],
+  "aggregate": {
+    "extensions": {
+      "LookAtAssociations": ".vna",
+      "LookAtKinship": ".vna"
+    },
+    "section_markers": {
+      "LookAtAssociations": [
+        "*node data",
+        "*node properties"
+      ],
+      "LookAtKinship": [
+        "*node data",
+        "*node properties",
+        "*tie data"
+      ]
+    },
+    "section_headers": {
+      "LookAtAssociations": [
+        {
+          "marker": "*node data",
+          "header_n_cols": 5,
+          "header_text": "ID index_year sex x_coord y_coord",
+          "data_row_count": 8087
+        },
+        {
+          "marker": "*node properties",
+          "header_n_cols": 4,
+          "header_text": "ID shape size shortlabel",
+          "data_row_count": 3973
+        }
+      ],
+      "LookAtKinship": [
+        {
+          "marker": "*node data",
+          "header_n_cols": 8,
+          "header_text": "ID index_year dy_code dynasty sex x_coord y_coord kindist",
+          "data_row_count": 949
+        },
+        {
+          "marker": "*node properties",
+          "header_n_cols": 5,
+          "header_text": "ID color shape size shortlabel",
+          "data_row_count": 949
+        },
+        {
+          "marker": "*tie data",
+          "header_n_cols": 5,
+          "header_text": "from to \"EdgeWeight\" \"edgetype\" \"edgelist\"",
+          "data_row_count": 1260
+        }
+      ]
+    },
+    "encodings": {
+      "LookAtAssociations": "cp1252",
+      "LookAtKinship": "cp1252"
+    },
+    "bom": {
+      "LookAtAssociations": false,
+      "LookAtKinship": false
+    },
+    "family_uniform_section_markers": false,
+    "family_extension_uniform": true,
+    "family_encoding_uniform": true,
+    "clean_forms": [
+      "LookAtKinship"
+    ],
+    "err_forms": [
+      "LookAtAssociations"
+    ],
+    "cheapest_first_coverage_form": "LookAtKinship"
+  }
+}

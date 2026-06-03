@@ -1,0 +1,997 @@
+{
+  "schema_version": 1,
+  "generated_utc": "2026-05-06T07:45:51+00:00",
+  "forms": [
+    "LookAtEntry",
+    "LookAtTexts",
+    "LookAtAssociations",
+    "LookAtOffice",
+    "LookAtPlace",
+    "LookAtKinship",
+    "LookAtStatus",
+    "LookAtAssociationPairs",
+    "LookAtNetworks",
+    "LookAtGroupData"
+  ],
+  "buttons": [
+    "CmdGIS",
+    "CmdNeo4j",
+    "CmdPajek",
+    "CmdGephi",
+    "CmdGUESS",
+    "CmdKML",
+    "CmdUCINet",
+    "CmdGISPeople"
+  ],
+  "matrix": {
+    "LookAtEntry": {
+      "CmdGIS": {
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
+        "test_entries": [
+          {
+            "form": "LookAtEntry",
+            "button": "CmdGIS",
+            "test_module": "tests/test_vba_export.py",
+            "test_node": "test_lookatentry_cmd_gis",
+            "status": "covered",
+            "notes": "byte-level golden compare; the original CmdGIS test"
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdNeo4j": {
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
+        "test_entries": [
+          {
+            "form": "LookAtEntry",
+            "button": "CmdNeo4j",
+            "test_module": "tests/test_vba_cmdneo4j_cross_form.py",
+            "test_node": "test_cmd_neo4j_produces_files[LookAtEntry]",
+            "status": "covered",
+            "notes": "min_files=7 + per-shape depth + LookAtEntry-specific structural assertion that the file set is exactly {People, PeopleEntry, Places, PeoplePlaces, PersonPlaceCodes, EntryCodes, AssocCodes} AND no InstitutionCodes file (Issue #9 LATENT-gate pin: `ENTRY_DATA.c_inst_code > 0 = 0` on this dump).  Promoted from skip 2026-05-04 after the Issue #9 reverification probe verified the chain end-to-end with c_entry_code=101."
+          }
+        ],
+        "static_test_notes": [
+          "tests/test_known_bugs.py::test_bug9_lookat_entry_cmdneo4j_with_wrong_var — pins source typo + LATENT-gate (Issue #9)",
+          "tests/test_vba_bug_behaviors.py::test_bug9_lookat_entry_cmdneo4j_with_institutions_fixture — runtime: chain finishes cleanly without ERR for non-inst fixture"
+        ],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdPajek": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdGephi": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdGUESS": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdKML": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdUCINet": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdGISPeople": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      }
+    },
+    "LookAtTexts": {
+      "CmdGIS": {
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
+        "test_entries": [
+          {
+            "form": "LookAtTexts",
+            "button": "CmdGIS",
+            "test_module": "tests/test_vba_cmdgis_other_forms.py",
+            "test_node": "test_cmd_gis_produces_file",
+            "status": "covered",
+            "notes": "structural"
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdNeo4j": {
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
+        "test_entries": [
+          {
+            "form": "LookAtTexts",
+            "button": "CmdNeo4j",
+            "test_module": "tests/test_vba_cmdneo4j_cross_form.py",
+            "test_node": "test_cmd_neo4j_produces_files[LookAtTexts]",
+            "status": "covered",
+            "notes": "min_files=4 + per-shape depth"
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdPajek": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdGephi": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdGUESS": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdKML": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdUCINet": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdGISPeople": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      }
+    },
+    "LookAtAssociations": {
+      "CmdGIS": {
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
+        "test_entries": [
+          {
+            "form": "LookAtAssociations",
+            "button": "CmdGIS",
+            "test_module": "tests/test_vba_cmdgis_other_forms.py",
+            "test_node": "test_cmd_gis_produces_file",
+            "status": "covered",
+            "notes": "structural"
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdNeo4j": {
+        "status": "real_vba_skipped",
+        "explanation": "Real-VBA test exists but is currently skipped.  See skip_reason on each manifest entry.",
+        "test_entries": [
+          {
+            "form": "LookAtAssociations",
+            "button": "CmdNeo4j",
+            "test_module": "tests/test_vba_cmdneo4j_cross_form.py",
+            "test_node": "test_cmd_neo4j_produces_files[LookAtAssociations]",
+            "status": "skipped",
+            "skip_reason": "produces 0 files in directory mode — needs investigation alongside Place"
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdPajek": {
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
+        "test_entries": [
+          {
+            "form": "LookAtAssociations",
+            "button": "CmdPajek",
+            "test_module": "tests/test_vba_pajek_gephi_cross_form.py",
+            "test_node": "test_export_produces_file[LookAtAssociations-CmdPajek]",
+            "status": "covered",
+            "notes": "shape: .net / *vertices header"
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdGephi": {
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
+        "test_entries": [
+          {
+            "form": "LookAtAssociations",
+            "button": "CmdGephi",
+            "test_module": "tests/test_vba_pajek_gephi_cross_form.py",
+            "test_node": "test_export_produces_file[LookAtAssociations-CmdGephi]",
+            "status": "covered",
+            "notes": "shape: .gdf / nodedef header"
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdGUESS": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdKML": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdUCINet": {
+        "status": "gap",
+        "explanation": "Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.",
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdGISPeople": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      }
+    },
+    "LookAtOffice": {
+      "CmdGIS": {
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
+        "test_entries": [
+          {
+            "form": "LookAtOffice",
+            "button": "CmdGIS",
+            "test_module": "tests/test_vba_cmdgis_other_forms.py",
+            "test_node": "test_cmd_gis_produces_file",
+            "status": "covered",
+            "notes": "structural"
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdNeo4j": {
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
+        "test_entries": [
+          {
+            "form": "LookAtOffice",
+            "button": "CmdNeo4j",
+            "test_module": "tests/test_vba_cmdneo4j_cross_form.py",
+            "test_node": "test_cmd_neo4j_produces_files[LookAtOffice]",
+            "status": "covered",
+            "notes": "min_files=4 + per-shape depth.  Promoted from `real_vba_failing` 2026-05-04 in PR cover/lookatoffice-cmdneo4j-peopleoffice: added `(NameID, OfficeCode) -> PeopleOffice` 2-col entry to `_NEO4J_SHAPES_BY_TWO_COLS` with required cols `[NameID, OfficeCode, OfficeAddrID, SocialInstID, PostingFirstYear, PostingLastYear, PostingDynasty]`.  Header literal verified at `Form_LookAtOffice.vb:947`.  Live-verified end-to-end with --include-vba: 6 files produced (People, PeopleOffice, Places, PeoplePlaces, PersonPlaceCodes, OfficeCode-codes-via-loose-check), 5/6 classified strictly via the depth check; the 6th (`OfficeCode_*.csv`, header `OfficeCode,OfficeTrans,OfficePinyin[,OfficeHZ]` per `Form_LookAtOffice.vb:1324-1326`) passes via the loose-check fallback because the classifier doesn't have a single-column entry for `OfficeCode` yet — non-failing today; tightening it is a future hygiene follow-up if needed.  InstitutionCodes block (line 1399) is gated like LookAtEntry's and is absent on this dump (no `c_inst_code > 0` rows in the office-relevant scratch table).  Inventory previously (PR 89d9a63) had marked this `covered` based on an assumption from the test file's _SPECS list; PR fix/cmdneo4j-classifier-lookattexts surfaced the actual classifier-side failure and correctly downgraded to `real_vba_failing`; this PR fixes the classifier and honestly re-promotes after live verification."
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdPajek": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdGephi": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdGUESS": {
+        "status": "real_vba_covered_via_handler_dispatch",
+        "explanation": "Handler exists in source but the form has no control with this name (P3 missing-UI family).  The cross-form test exercises the handler via Form_Timer dispatch (no UI click needed), so handler logic IS covered; the missing UI button is documented separately as a P3 issue.",
+        "test_entries": [
+          {
+            "form": "LookAtOffice",
+            "button": "CmdGUESS",
+            "test_module": "tests/test_vba_cmdguess_cross_form.py",
+            "test_node": "test_cmd_guess_produces_file[LookAtOffice]",
+            "status": "covered",
+            "notes": ".gdf shape"
+          }
+        ],
+        "static_test_notes": [
+          "(plus Issue #19: P3 missing UI button)"
+        ],
+        "handler_present": true,
+        "button_present": false
+      },
+      "CmdKML": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdUCINet": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdGISPeople": {
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
+        "test_entries": [
+          {
+            "form": "LookAtOffice",
+            "button": "CmdGISPeople",
+            "test_module": "tests/test_vba_cmdgispeople_office.py",
+            "test_node": "test_cmd_gis_people",
+            "status": "covered",
+            "notes": "only host; people-side GIS export distinct from office-side CmdGIS"
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      }
+    },
+    "LookAtPlace": {
+      "CmdGIS": {
+        "status": "real_vba_covered_via_handler_dispatch",
+        "explanation": "Handler exists in source but the form has no control with this name (P3 missing-UI family).  The cross-form test exercises the handler via Form_Timer dispatch (no UI click needed), so handler logic IS covered; the missing UI button is documented separately as a P3 issue.",
+        "test_entries": [
+          {
+            "form": "LookAtPlace",
+            "button": "CmdGIS",
+            "test_module": "tests/test_vba_cmdgis_other_forms.py",
+            "test_node": "test_cmd_gis_produces_file",
+            "status": "covered",
+            "notes": "structural; passes only thanks to driver-side _PER_FORM_CMDGIS_PATCHES rewrite of GISFrame -> CodeFrame (Issue #4 latent typo workaround)"
+          }
+        ],
+        "static_test_notes": [
+          "(plus Issue #15: P3 missing UI button — covered by tests/test_known_bugs.py::test_bugs_15_to_19_orphan_export_handlers)"
+        ],
+        "handler_present": true,
+        "button_present": false
+      },
+      "CmdNeo4j": {
+        "status": "real_vba_skipped",
+        "explanation": "Real-VBA test exists but is currently skipped.  See skip_reason on each manifest entry.",
+        "test_entries": [
+          {
+            "form": "LookAtPlace",
+            "button": "CmdNeo4j",
+            "test_module": "tests/test_vba_cmdneo4j_cross_form.py",
+            "test_node": "test_cmd_neo4j_produces_files[LookAtPlace]",
+            "status": "skipped",
+            "skip_reason": "fires 'Item not found in this collection' mid-body — Issue #7 (real CBDB bug)"
+          }
+        ],
+        "static_test_notes": [
+          "tests/test_known_bugs.py::test_bug7_lookat_place_cmdneo4j_select_missing_dynasty_female — pins source SELECT (Issue #7)"
+        ],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdPajek": {
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
+        "test_entries": [
+          {
+            "form": "LookAtPlace",
+            "button": "CmdPajek",
+            "test_module": "tests/test_vba_pajek_gephi_cross_form.py",
+            "test_node": "test_export_produces_file[LookAtPlace-CmdPajek]",
+            "status": "covered",
+            "notes": "shape: .net / *vertices header"
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdGephi": {
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
+        "test_entries": [
+          {
+            "form": "LookAtPlace",
+            "button": "CmdGephi",
+            "test_module": "tests/test_vba_pajek_gephi_cross_form.py",
+            "test_node": "test_export_produces_file[LookAtPlace-CmdGephi]",
+            "status": "covered",
+            "notes": "shape: .gdf / nodedef header"
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdGUESS": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdKML": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdUCINet": {
+        "status": "gap",
+        "explanation": "Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.",
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdGISPeople": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      }
+    },
+    "LookAtKinship": {
+      "CmdGIS": {
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
+        "test_entries": [
+          {
+            "form": "LookAtKinship",
+            "button": "CmdGIS",
+            "test_module": "tests/test_vba_cmdgis_other_forms.py",
+            "test_node": "test_cmd_gis_produces_file",
+            "status": "covered",
+            "notes": "structural; subform requery via _SUBFORMS_TO_REQUERY"
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdNeo4j": {
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
+        "test_entries": [
+          {
+            "form": "LookAtKinship",
+            "button": "CmdNeo4j",
+            "test_module": "tests/test_vba_cmdneo4j_cross_form.py",
+            "test_node": "test_cmd_neo4j_produces_files[LookAtKinship]",
+            "status": "covered",
+            "notes": "min_files=4 + per-shape depth"
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdPajek": {
+        "status": "real_vba_covered_via_handler_dispatch",
+        "explanation": "Handler exists in source but the form has no control with this name (P3 missing-UI family).  The cross-form test exercises the handler via Form_Timer dispatch (no UI click needed), so handler logic IS covered; the missing UI button is documented separately as a P3 issue.",
+        "test_entries": [
+          {
+            "form": "LookAtKinship",
+            "button": "CmdPajek",
+            "test_module": "tests/test_vba_pajek_gephi_cross_form.py",
+            "test_node": "test_export_produces_file[LookAtKinship-CmdPajek]",
+            "status": "covered",
+            "notes": "shape: .net / *vertices header"
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": false
+      },
+      "CmdGephi": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdGUESS": {
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
+        "test_entries": [
+          {
+            "form": "LookAtKinship",
+            "button": "CmdGUESS",
+            "test_module": "tests/test_vba_cmdguess_cross_form.py",
+            "test_node": "test_cmd_guess_produces_file[LookAtKinship]",
+            "status": "covered",
+            "notes": ".gdf shape"
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdKML": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdUCINet": {
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
+        "test_entries": [
+          {
+            "form": "LookAtKinship",
+            "button": "CmdUCINet",
+            "test_module": "tests/test_vba_cmducinet_kinship.py",
+            "test_node": "test_cmducinet_kinship_writes_vna_with_three_sections",
+            "status": "covered",
+            "notes": ".vna shape; 3 sections (*node data / *node properties / *tie data); cp1252 no BOM; row counts cross-checked vs ZZ_SCRATCH_KIN + ZZ_SCRATCH_KINNET.  Family shape established by probe investigate/cmducinet-family-shape (commit 4e8e0d2); coverage is Kinship-only because Associations CmdUCINet is blocked by VBA error 5 mid-write and Place uses ADO Stream rather than FSO.  Test uses split-fire (CmdRun via timer, then CmdUCINet alone with file-poll) because CmdUCINet is not in _TIMER_DISPATCH_SUBS -- test-side workaround; no driver change in that PR.  KNOWN FIXTURE-FRAGILE per Issue #22's Kinship sibling-form confirmation (probe investigate/kinship-cmducinet-sibling-risk commit 154bb4b): this test passes only because the matrix-supplied person 3211's kin network happens to contain no Han-character c_name values; switching to a fixture whose network reaches a Han-name person reproduces the same VBA error 5 documented in canonical Issue #22.  Coverage status remains 'covered' because the test does pass on the current matrix fixture, but maintainers should treat this cell as Issue-#22-vulnerable for future fixture / dump changes."
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdGISPeople": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      }
+    },
+    "LookAtStatus": {
+      "CmdGIS": {
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
+        "test_entries": [
+          {
+            "form": "LookAtStatus",
+            "button": "CmdGIS",
+            "test_module": "tests/test_vba_cmdgis_other_forms.py",
+            "test_node": "test_cmd_gis_produces_file",
+            "status": "covered",
+            "notes": "structural assertion (header + non-empty cols)"
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdNeo4j": {
+        "status": "real_vba_skipped",
+        "explanation": "Real-VBA test exists but is currently skipped.  See skip_reason on each manifest entry.",
+        "test_entries": [
+          {
+            "form": "LookAtStatus",
+            "button": "CmdNeo4j",
+            "test_module": "tests/test_vba_cmdneo4j_cross_form.py",
+            "test_node": "test_cmd_neo4j_produces_files[LookAtStatus]",
+            "status": "skipped",
+            "skip_reason": "chain post-cleanup invalidates subform recordset rebind; downstream CmdNeo4j reads RecordCount=0 (same family as Pajek/Gephi Status skip)"
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdPajek": {
+        "status": "real_vba_skipped_via_handler_dispatch",
+        "explanation": "Handler exists in source but the form has no control with this name (P3 missing-UI family).  The cross-form test exercises the handler via Form_Timer dispatch (no UI click needed), so handler logic IS covered; the missing UI button is documented separately as a P3 issue.",
+        "test_entries": [
+          {
+            "form": "LookAtStatus",
+            "button": "CmdPajek",
+            "test_module": "tests/test_vba_pajek_gephi_cross_form.py",
+            "test_node": "test_export_produces_file[LookAtStatus-CmdPajek]",
+            "status": "skipped",
+            "skip_reason": "chain to CmdPajek/CmdGephi reads RecordCount=0 after subform rebind cleanup; same as Status Neo4j skip"
+          }
+        ],
+        "static_test_notes": [
+          "(plus Issue #16: P3 missing UI button)"
+        ],
+        "handler_present": true,
+        "button_present": false
+      },
+      "CmdGephi": {
+        "status": "real_vba_skipped_via_handler_dispatch",
+        "explanation": "Handler exists in source but the form has no control with this name (P3 missing-UI family).  The cross-form test exercises the handler via Form_Timer dispatch (no UI click needed), so handler logic IS covered; the missing UI button is documented separately as a P3 issue.",
+        "test_entries": [
+          {
+            "form": "LookAtStatus",
+            "button": "CmdGephi",
+            "test_module": "tests/test_vba_pajek_gephi_cross_form.py",
+            "test_node": "test_export_produces_file[LookAtStatus-CmdGephi]",
+            "status": "skipped",
+            "skip_reason": "same chain-cleanup family as Status CmdPajek"
+          }
+        ],
+        "static_test_notes": [
+          "(plus Issue #17: P3 missing UI button)"
+        ],
+        "handler_present": true,
+        "button_present": false
+      },
+      "CmdGUESS": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdKML": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdUCINet": {
+        "status": "missing_ui_button",
+        "explanation": "Handler exists in source but the form has no control with this name (P3 missing-UI family — Issues #15-19 documented).  No real-VBA test exercises this handler.",
+        "static_test_notes": [
+          "(plus Issue #18: P3 missing UI button)"
+        ],
+        "handler_present": true,
+        "button_present": false
+      },
+      "CmdGISPeople": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      }
+    },
+    "LookAtAssociationPairs": {
+      "CmdGIS": {
+        "status": "gap",
+        "explanation": "Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.",
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdNeo4j": {
+        "status": "gap",
+        "explanation": "Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.",
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdPajek": {
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
+        "test_entries": [
+          {
+            "form": "LookAtAssociationPairs",
+            "button": "CmdPajek",
+            "test_module": "tests/test_vba_pajek_gephi_cross_form.py",
+            "test_node": "test_export_button_produces_file[LookAtAssociationPairs_CmdPajek]",
+            "status": "covered",
+            "notes": "shape: .net / *vertices header.  Uses custom 1×3 known-edged person pair (NOT matrix's default 4×5; see _assocpairs_1x3_fixture in the test).  Unblocked by the AssociationPairs SetFocus driver patch in _PER_FORM_CMDGIS_PATCHES."
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdGephi": {
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
+        "test_entries": [
+          {
+            "form": "LookAtAssociationPairs",
+            "button": "CmdGephi",
+            "test_module": "tests/test_vba_pajek_gephi_cross_form.py",
+            "test_node": "test_export_button_produces_file[LookAtAssociationPairs_CmdGephi]",
+            "status": "covered",
+            "notes": "shape: .gdf / nodedef header.  Uses custom 1×3 known-edged person pair (NOT matrix's default 4×5; see _assocpairs_1x3_fixture in the test).  Unblocked by the AssociationPairs SetFocus driver patch in _PER_FORM_CMDGIS_PATCHES."
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdGUESS": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdKML": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdUCINet": {
+        "status": "gap",
+        "explanation": "Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.",
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdGISPeople": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      }
+    },
+    "LookAtNetworks": {
+      "CmdGIS": {
+        "status": "gap",
+        "explanation": "Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.",
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdNeo4j": {
+        "status": "real_vba_skipped",
+        "explanation": "Real-VBA test exists but is currently skipped.  See skip_reason on each manifest entry.",
+        "test_entries": [
+          {
+            "form": "LookAtNetworks",
+            "button": "CmdNeo4j",
+            "test_module": "tests/test_vba_cmdneo4j_cross_form.py",
+            "test_node": "(implicit — LookAtNetworks is in _FORMS_WITH_CMDGUESS-style skip family; no explicit Spec entry in _SPECS)",
+            "status": "skipped",
+            "skip_reason": "matrix CmdRun skipped (high-degree anchor expansion) + default full injection Form_Open deadlock (AGENTS landmine #3.5; minimal injection works for Form_Open per tests/test_vba_networks_small_fixture.py)"
+          }
+        ],
+        "static_test_notes": [
+          "tests/test_known_bugs.py::test_bug8_lookat_networks_cmdneo4j_select_missing_xy — pins source SELECT (Issue #8)"
+        ],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdPajek": {
+        "status": "gap",
+        "explanation": "Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.",
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdGephi": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdGUESS": {
+        "status": "real_vba_skipped",
+        "explanation": "Real-VBA test exists but is currently skipped.  See skip_reason on each manifest entry.",
+        "test_entries": [
+          {
+            "form": "LookAtNetworks",
+            "button": "CmdGUESS",
+            "test_module": "tests/test_vba_cmdguess_cross_form.py",
+            "test_node": "test_cmd_guess_produces_file[LookAtNetworks]",
+            "status": "skipped",
+            "skip_reason": "CmdRun times out on high-degree anchors (AGENTS landmine #3.5)"
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdKML": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdUCINet": {
+        "status": "gap",
+        "explanation": "Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.",
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdGISPeople": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      }
+    },
+    "LookAtGroupData": {
+      "CmdGIS": {
+        "status": "real_vba_covered",
+        "explanation": "Real-VBA test exists and passes for this cell.",
+        "test_entries": [
+          {
+            "form": "LookAtGroupData",
+            "button": "CmdGIS",
+            "test_module": "tests/test_vba_cmdgis_other_forms.py",
+            "test_node": "test_cmd_gis_groupdata_clean_branches",
+            "status": "covered",
+            "notes": "Clean-branches coverage (Status / Office / Addr) using matrix_hard_forms's groupdata_person_1_small fixture.  Explicitly excludes Entry (Issue #6 P1 fires JET 3061; pinned by tests/test_known_bugs.py::test_bug6_groupdata_query_entry_wrong_field [static] AND tests/test_vba_bug_behaviors.py::test_bug6_lookat_groupdata_query_entry_fires_no_such_field [runtime]).  Excludes Text (person_1 has 0 BIOG_TEXT_DATA rows -> WriteGIS_Text bails on RecCount=0; benign 0-files state, not a coverage gap).  Excludes ChkGisOfficePeople (the Office_OfficeOffice variant alone exercises queryOffice -> WriteGIS_OfficeOffice cleanly; OfficePeople adds a second writer without coverage value).  Probe evidence: analysis/probe_groupdata_cmdgis_subcalls.py + analysis/groupdata_cmdgis_subcall_trace.md."
+          }
+        ],
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdNeo4j": {
+        "status": "gap",
+        "explanation": "Button + handler both present, no entry in the real-VBA test manifest, no static-only test note either.",
+        "static_test_notes": [],
+        "handler_present": true,
+        "button_present": true
+      },
+      "CmdPajek": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdGephi": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdGUESS": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdKML": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdUCINet": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      },
+      "CmdGISPeople": {
+        "status": "not_applicable",
+        "explanation": "No handler in source AND no button in inventory.",
+        "static_test_notes": [],
+        "handler_present": false,
+        "button_present": false
+      }
+    }
+  },
+  "summary": {
+    "n_forms": 10,
+    "n_buttons": 8,
+    "n_cells": 80,
+    "by_status": {
+      "real_vba_covered": 20,
+      "not_applicable": 40,
+      "real_vba_skipped": 5,
+      "gap": 9,
+      "real_vba_covered_via_handler_dispatch": 3,
+      "real_vba_skipped_via_handler_dispatch": 2,
+      "missing_ui_button": 1
+    }
+  },
+  "manifest_drift_findings": [],
+  "low_hanging_skips": [],
+  "recommended_next_slices": [
+    {
+      "form": "LookAtAssociationPairs",
+      "button": "CmdGIS",
+      "score": 1,
+      "static_test_notes": []
+    },
+    {
+      "form": "LookAtNetworks",
+      "button": "CmdGIS",
+      "score": 1,
+      "static_test_notes": []
+    },
+    {
+      "form": "LookAtNetworks",
+      "button": "CmdPajek",
+      "score": 3,
+      "static_test_notes": []
+    },
+    {
+      "form": "LookAtAssociationPairs",
+      "button": "CmdNeo4j",
+      "score": 5,
+      "static_test_notes": []
+    },
+    {
+      "form": "LookAtGroupData",
+      "button": "CmdNeo4j",
+      "score": 5,
+      "static_test_notes": []
+    },
+    {
+      "form": "LookAtAssociationPairs",
+      "button": "CmdUCINet",
+      "score": 6,
+      "static_test_notes": []
+    },
+    {
+      "form": "LookAtAssociations",
+      "button": "CmdUCINet",
+      "score": 6,
+      "static_test_notes": []
+    },
+    {
+      "form": "LookAtNetworks",
+      "button": "CmdUCINet",
+      "score": 6,
+      "static_test_notes": []
+    },
+    {
+      "form": "LookAtPlace",
+      "button": "CmdUCINet",
+      "score": 6,
+      "static_test_notes": []
+    }
+  ]
+}

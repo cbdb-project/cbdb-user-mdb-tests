@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "generated_date": "2026-05-06",
+  "probe_branch": "investigate/kinship-cmducinet-sibling-risk",
+  "follow_up_to": "Issue #22 (canonical, merged via PR chore/file-issue-22-cmducinet-fso-ansi commit 60d9733) -- specifically the 'sibling-form risk: NOT yet probed' paragraph for LookAtKinship.CmdUCINet",
+  "result": {
+    "form": "LookAtKinship",
+    "picker_pid": 152930,
+    "expected_trigger_kin_pid": 140733,
+    "expected_trigger_char": "取",
+    "expected_trigger_codepoint": "U+53D6",
+    "markers": [
+      {
+        "t": 0.0,
+        "marker": "constructing_session"
+      },
+      {
+        "t": 6.3,
+        "marker": "session_opened_attempt_1"
+      },
+      {
+        "t": 6.81,
+        "marker": "filedialog_patched"
+      },
+      {
+        "t": 7.6,
+        "marker": "picker_seeded_pid_152930"
+      },
+      {
+        "t": 8.17,
+        "marker": "cmdrun_returned_6"
+      },
+      {
+        "t": 8.17,
+        "marker": "row_counts_kin_6_kinnet_5"
+      },
+      {
+        "t": 8.17,
+        "marker": "scratch_kin_scan_done_total_6_bad_1_trigger_in_scratch_True"
+      },
+      {
+        "t": 10.21,
+        "marker": "cmducinet_fired_no_wait"
+      },
+      {
+        "t": 10.21,
+        "marker": "file_appeared_True"
+      },
+      {
+        "t": 10.21,
+        "marker": "partial_file_parsed"
+      },
+      {
+        "t": 10.21,
+        "marker": "debug_captured"
+      }
+    ],
+    "outcome": "reproduced_invalid_procedure_call",
+    "elapsed_sec": 12.67,
+    "exception": null,
+    "row_counts_after_cmdrun": {
+      "ZZ_SCRATCH_KIN": 6,
+      "ZZ_SCRATCH_KINNET": 5
+    },
+    "scratch_kin_scan": {
+      "scanned_rows": 6,
+      "rows_with_non_cp1252_no_substitute_c_kin_name": 1,
+      "first_bad_index_kid_asc_0based": 0,
+      "samples": [
+        {
+          "kid_order_index_0based": 0,
+          "c_kin_id": 140733,
+          "c_kin_name": "He Mou 取",
+          "non_cp1252_chars": [
+            {
+              "offset": 7,
+              "char": "取",
+              "codepoint_hex": "U+53D6"
+            }
+          ]
+        }
+      ],
+      "trigger_pid_in_scratch_kin": true
+    },
+    "debug_transcript": [
+      {
+        "id": 1,
+        "msg": "LookAtKinship:ENTER"
+      },
+      {
+        "id": 2,
+        "msg": "LookAtKinship:DONE"
+      },
+      {
+        "id": 3,
+        "msg": "LookAtKinship:ERR Invalid procedure call or argument"
+      }
+    ],
+    "file_path": "C:\\Users\\how612\\Documents\\GitHub\\cbdb-user-mdb-tests\\analysis\\_probe_kin_ucinet_sibling_out\\cmducinet_kinship_sibling.vna",
+    "file_size": 343,
+    "partial_file_parse": {
+      "sections": [
+        {
+          "marker": "*node data",
+          "header": "ID index_year dy_code dynasty sex x_coord y_coord kindist",
+          "total_rows": 6,
+          "last_row": "152934 699 6 \"Tang\" \"M\" 0 0 3",
+          "last_row_first_token": "152934"
+        },
+        {
+          "marker": "*node properties",
+          "header": "ID color shape size shortlabel",
+          "total_rows": 0,
+          "last_row": null,
+          "last_row_first_token": null
+        }
+      ],
+      "section_markers_in_order": [
+        "*node data",
+        "*node properties"
+      ]
+    },
+    "row_after_last_written": null,
+    "err_messages": [
+      "LookAtKinship:ERR Invalid procedure call or argument"
+    ]
+  },
+  "classification": {
+    "conclusion": "same_bug_family_runtime_confirmed",
+    "rationale": "Kinship.CmdUCINet reproduces the SAME failure mode as Issue #22's Associations case: `LookAtKinship:ERR Invalid procedure call or argument` (VBA error 5) fires mid-write, leaving a partial `.vna` file with `*node data` complete + `*node properties` truncated (header written but ZERO data rows -- bail on the FIRST WriteLine attempt) + `*tie data` never written.\n\nWhy the iteration-order 'next row' lookup is moot here: when *node properties* bails on the very first row, there is no last-written anchor to compute the 'next row' against.  But the substantive evidence is just as conclusive: ZZ_SCRATCH_KIN has 1 non-cp1252-without-substitute c_kin_name row(s); the FIRST row in c_kin_id ASC order IS a trigger (c_kin_id 140733, c_kin_name 'He Mou 取' with non-cp1252 char(s) [('取', 'U+53D6')]); the bail happens on row 0's WriteLine.  Combined with the matching partial-file shape and the matching VBA error 5 wording, this is the same bug class as Issue #22 -- only the specific row at which the bail fires differs (Associations bailed at row 3974 of 8087; Kinship bailed at row 1 of 6).\n\nThe current Kinship × CmdUCINet coverage (`tests/test_vba_cmducinet_kinship.py`) passes only because the chosen fixture (person 3211) happens to have no Han-name members in its kin network -- switching to a fixture that DOES (this probe used picker = 152930, He Jing 何淨, whose sole 1-hop kin is pid 140733 He Mou 取) reproduces the same VBA error 5.  The Issue #22 canonical entry's 'sibling-form risk' paragraph for Kinship is now runtime-verified, not just statically inferred.",
+    "reproduced_invalid_procedure_call": true,
+    "trigger_pid_in_scratch_kin": true,
+    "n_non_cp1252_rows_in_scratch_kin": 1,
+    "partial_file_matches_issue_22_shape": true,
+    "next_row_has_non_cp1252_no_substitute": false
+  },
+  "_reclassified_only": true
+}

@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "generated_date": "2026-05-05",
+  "agents_md_total_lines": 731,
+  "scope": "read-only triage of where AGENTS.md (post round-1 shrink, 731 lines) might safely shrink further; no edits to AGENTS.md or other files in this PR",
+  "buckets": {
+    "A_safe_to_extract": "stable workflow, can move to skill or dedicated doc; AGENTS.md only needs 1-3 line summary + pointer",
+    "B_watch_first": "theoretically extractable but recently load-bearing or actively-evolving; observe before deciding",
+    "C_keep_inline": "global hard constraint, single source of truth, or default risk note any agent must internalize"
+  },
+  "sections": [
+    {
+      "title": "Header + What this project is",
+      "line_start": 1, "line_end": 23, "lines": 23,
+      "bucket": "C_keep_inline",
+      "reason": "Foundation; first thing every agent reads.  Project purpose + maintainer pain points."
+    },
+    {
+      "title": "Single source of truth + skill pointers",
+      "line_start": 24, "line_end": 67, "lines": 44,
+      "bucket": "C_keep_inline",
+      "reason": "The single most-important rule in the repo (two authoritative documents + no bug-content duplication).  Already optimised in round 1 to link to both skills for on-demand expansion."
+    },
+    {
+      "title": "Repo layout",
+      "line_start": 69, "line_end": 116, "lines": 48,
+      "bucket": "B_watch_first",
+      "reason": "Tree itself useful default; per-file annotations duplicate file docstrings + README structure.  Trim to path-only would save ~20 lines but loses at-a-glance anchors.",
+      "estimated_savings_lines": 20,
+      "if_extracted_migrate_to": "docs/repo-tour.md (annotations only; tree stays)",
+      "agents_md_remainder": "Tree structure unchanged; pointer to docs/repo-tour.md for per-file purpose annotations."
+    },
+    {
+      "title": "Mission-critical landmines (already shrunk in round 1)",
+      "line_start": 118, "line_end": 214, "lines": 97,
+      "bucket": "C_keep_inline",
+      "reason": "Round 1 shrank this 195 -> 97; further shrinking would regress the deliberate floor of 15 must-internalize conclusions.  The skill carries code/details on demand."
+    },
+    {
+      "title": "Confirmed bugs intro + tier definitions",
+      "line_start": 216, "line_end": 238, "lines": 23,
+      "bucket": "C_keep_inline",
+      "reason": "Tier defs (P0-P5) are 13 lines and globally shared between report, README, test_known_bugs, and both skills.  Extracting creates duplication risk."
+    },
+    {
+      "title": "Static-audit list (14 audits enumerated)",
+      "line_start": 239, "line_end": 323, "lines": 85,
+      "bucket": "A_safe_to_extract",
+      "reason": "Stable (audit set rarely changes), encyclopedic (most agents never read every audit's blurb), load-bearing only when extending audits or triaging a release.  The single best round-2 candidate.",
+      "estimated_savings_lines": 75,
+      "if_extracted_migrate_to": "new dedicated doc docs/static-audits.md (catalogue, not skill -- skills are workflow-focused, this is a catalogue)",
+      "agents_md_remainder": "1-3 line summary: 'Static audits live in analysis/audit_*.py and are run by python analysis/run_all_audits.py; catalogue (per-audit description + bugs each found) lives in docs/static-audits.md.  Re-run on every CBDB release.'  Plus the bug-attribution sentence 'audits found Bugs #5 / #6 / #7-9 / #10-12 / #13-14 / #15-19' so the bug -> audit causal chain stays default-visible.",
+      "risk": "low",
+      "rank": 1
+    },
+    {
+      "title": "Marker-failure policy paragraph (already shrunk in round 1)",
+      "line_start": 324, "line_end": 334, "lines": 11,
+      "bucket": "C_keep_inline",
+      "reason": "Round 1 shrank this; further shrink would lose the (a)/(b)/(c) candidate enumeration agents need to interpret a failing marker test."
+    },
+    {
+      "title": "Index-year cross-check",
+      "line_start": 336, "line_end": 591, "lines": 256,
+      "bucket": "B_watch_first",
+      "reason": "Single biggest section (35% of file).  User explicitly excluded from skill-ification ('still evolving').  The CONCLUSIONS (~5 lines) belong by default; the PR-history walk (PR G/K1/K2/L/M/N/S/X/Y/Z/AI/AJ, ~175 lines) is encyclopedic but a moving target.  Wait for triage to stabilise.",
+      "estimated_savings_lines": 175,
+      "if_extracted_migrate_to": "round 3 candidate -- not now -- would land in analysis/index_drift_cause_analysis.md (already partly there per the section's own pointers) + a thin 5-line conclusion in AGENTS.md",
+      "risk_now": "medium",
+      "rank": "round-3 candidate, NOT round-2"
+    },
+    {
+      "title": "Test inventory snapshot",
+      "line_start": 593, "line_end": 608, "lines": 16,
+      "bucket": "C_keep_inline",
+      "reason": "Two compact pytest commands; operationally useful by default."
+    },
+    {
+      "title": "Data-driven testing principle",
+      "line_start": 609, "line_end": 647, "lines": 39,
+      "bucket": "C_keep_inline",
+      "reason": "User's explicit directive ('DO follow it') shaping every test in the suite.  Compact already."
+    },
+    {
+      "title": "Standard workflow after .mdb update",
+      "line_start": 648, "line_end": 678, "lines": 31,
+      "bucket": "C_keep_inline",
+      "reason": "7-step release recipe; operationally critical when maintainer ships a new .mdb."
+    },
+    {
+      "title": "Open issues / TODOs",
+      "line_start": 679, "line_end": 698, "lines": 20,
+      "bucket": "B_watch_first",
+      "reason": "Items partly stale: 1-2 done, 3 partly landed, 4 partly addressed (Networks small fixture), 5 done (test_vba_pickers_smoke.py), 6 mostly landed (CmdNeo4j/Pajek/Gephi/GUESS/GISPeople cross-form tests).  Refresh-don't-extract; refreshing against current inventory + roadmap is a separate scope from shrink.",
+      "estimated_savings_lines": 10,
+      "if_extracted_migrate_to": "refresh against current inventory + roadmap; if refreshed list duplicates README's roadmap, collapse to a 5-line 'see README §Roadmap' pointer; otherwise keep as a coding-task-shaped sibling to README's product-shaped roadmap.",
+      "risk": "medium (operational miscommunication if items go stale or get duplicated badly)",
+      "rank": 2
+    },
+    {
+      "title": "Operating principles",
+      "line_start": 699, "line_end": 720, "lines": 22,
+      "bucket": "C_keep_inline",
+      "reason": "Six numbered first-principles each reduce the rest of the file's specifics.  Tiny + essential."
+    },
+    {
+      "title": "Key contacts + Memory",
+      "line_start": 721, "line_end": 731, "lines": 11,
+      "bucket": "C_keep_inline",
+      "reason": "Schema docs paths + memory system pointer; trivial size."
+    }
+  ],
+  "summary": {
+    "total_sections": 14,
+    "by_bucket": {
+      "A_safe_to_extract": 1,
+      "B_watch_first": 3,
+      "C_keep_inline": 10
+    },
+    "top_3_round2_candidates": [
+      {"rank": 1, "title": "Static-audit list (239-323)", "bucket": "A", "estimated_savings": 75, "migrate_to": "docs/static-audits.md", "risk": "low"},
+      {"rank": 2, "title": "Open issues / TODOs (679-698)", "bucket": "B (refresh-then-trim)", "estimated_savings": 10, "migrate_to": "refresh against current state, possibly point at README roadmap", "risk": "medium"},
+      {"rank": 3, "title": "Repo layout per-file annotations (69-116, comments only)", "bucket": "B", "estimated_savings": 20, "migrate_to": "docs/repo-tour.md (tree stays in AGENTS)", "risk": "low-medium"}
+    ],
+    "do_not_touch_in_round_2": [
+      {"title": "Single source of truth + skill pointers (24-67)", "why": "single most-important rule in the repo; already optimised in round 1"},
+      {"title": "Mission-critical landmines (118-214)", "why": "already shrunk in round 1; further would regress the deliberate floor of 15 must-internalize conclusions"},
+      {"title": "Index-year cross-check (336-591)", "why": "biggest potential saving but user explicitly excluded ('still evolving'); skill-ifying a moving target forces re-extraction every PR"}
+    ],
+    "round_2_size_guidance": {
+      "principle": "take ONE bucket-A item per round; cap round 2 at ~100 lines net reduction; refresh-but-keep beats extract-and-pointer for B items right now",
+      "recommended_round_2_scope": "audit-list extraction only (~75 lines saved)",
+      "after_round_2_predicted_size": "~656 lines (731 -> 656)",
+      "round_3_potential": "index-year trim (175) + TODO refresh (10) + repo-layout trim (20); requires 2-3 PRs of observation first",
+      "floor_after_round_3": "450-500 lines (single source of truth + tier defs + landmine index + global workflow + first-principles + skill pointers)"
+    }
+  },
+  "constraints_honoured": [
+    "did NOT propose moving single source of truth, P0-P5 tier defs, or any global landmine conclusion",
+    "did NOT propose skill-ifying index-drift triage",
+    "did NOT propose large-scale rewrites; ranked list is one-item-at-a-time",
+    "conservative observation-biased classification (bucket B for anything ambiguous)",
+    "read-only -- no AGENTS.md / README / test / report / driver / skill edits in this PR"
+  ]
+}
