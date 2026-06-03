@@ -1,5 +1,5 @@
 {
-  "_comment": "Coverage matrix: form × button → test node-id substring patterns. The builder aggregates all matching tests into one cell outcome (worst of: FAIL > ERROR > SKIP > PASS > NOT_RUN).",
+  "_comment": "Coverage matrix: form × button → test node-id substring patterns. The builder aggregates all matching tests into one cell outcome. Worst-of priority: FAIL > ERROR > SKIP > PASS > NOT_RUN (SKIP outranks PASS: a skipped test leaves an unverified path).",
   "forms": [
     "LookAtEntry", "LookAtStatus", "LookAtTexts", "LookAtPlace",
     "LookAtAssociations", "LookAtOffice", "LookAtKinship",
