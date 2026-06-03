@@ -1,6 +1,6 @@
 # Report screenshot consistency audit
 
-**Generated:** 2026-06-03T07:51:39+00:00
+**Generated:** 2026-06-03T09:56:10+00:00
 **Generator:** `analysis/audit_report_screenshot_consistency.py`
 **Companion JSON:** `reports/report_screenshot_audit.json`
 
@@ -21,9 +21,9 @@ This audit cross-checks every screenshot caption in `reports/generate_report.py:
 
 | Metric | Value |
 |---|---:|
-| Issues total | 23 |
-| Issues with at least one screenshot | 11 |
-| Screenshots inspected | 14 |
+| Issues total | 0 |
+| Issues with at least one screenshot | 0 |
+| Screenshots inspected | 0 |
 | Rule A violations (P5) | 0 |
 | Rule B violations (all) | 0 |
 | **Mismatches** | **0** |
@@ -36,17 +36,3 @@ This audit cross-checks every screenshot caption in `reports/generate_report.py:
 
 | Issue | Tier | Filename | Filename trigger | Caption hedge | Active phrase | Issue latent? | Rule A | Rule B |
 |---:|---|---|---|---|---|---|---|---|
-| #7 | `P0_silent_data` | `bug7_step1_annotated.png` | annotated | — | — | — | ✓ | ✓ |
-| #7 | `P0_silent_data` | `bug7_step2_faux_popup.png` | popup | — | users see, popup users see, the popup users see | — | ✓ | ✓ |
-| #8 | `P0_silent_data` | `bug8_faux_popup.png` | popup | — | — | — | ✓ | ✓ |
-| #4 | `P5_dormant_or_latent` | `bug4_step3_faux_popup.png` | popup | Hypothetical, latent, can't trigger, users currently CAN'T trigger | — | LATENT, 潛伏 | ✓ | ✓ |
-| #6 | `P1_visible_crash` | `bug6_form_annotated.png` | annotated | — | — | — | ✓ | ✓ |
-| #6 | `P1_visible_crash` | `bug6_faux_popup.png` | popup | — | users see, popup users see | — | ✓ | ✓ |
-| #13 | `P1_visible_crash` | `bug13_browser_annotated.png` | annotated | — | — | — | ✓ | ✓ |
-| #13 | `P1_visible_crash` | `bug13_faux_popup.png` | popup | — | users see, popup users see, the popup users see | — | ✓ | ✓ |
-| #10 | `P2_silent_display` | `bug10_subform_annotated.png` | annotated | — | — | — | ✓ | ✓ |
-| #15 | `P3_missing_ui` | `bug15_LookAtPlace_no_CmdGIS_annotated.png` | annotated | — | — | — | ✓ | ✓ |
-| #16 | `P3_missing_ui` | `bug16_LookAtStatus_no_CmdPajek_annotated.png` | annotated | — | — | — | ✓ | ✓ |
-| #17 | `P3_missing_ui` | `bug17_LookAtStatus_no_CmdGephi_annotated.png` | annotated | — | — | — | ✓ | ✓ |
-| #18 | `P3_missing_ui` | `bug18_LookAtStatus_no_CmdUCINet_annotated.png` | annotated | — | — | — | ✓ | ✓ |
-| #19 | `P3_missing_ui` | `bug19_LookAtOffice_no_CmdGUESS_annotated.png` | annotated | — | — | — | ✓ | ✓ |
