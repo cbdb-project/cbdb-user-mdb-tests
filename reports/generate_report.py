@@ -46,7 +46,176 @@ OUT_ZH_MD = REPO / "reports" / "CBDB_Issues_Report_ZH-Hant.md"
 # Ordered by severity (highest first within each tier).
 # ---------------------------------------------------------------------
 
-ISSUES = []
+ISSUES = [
+    # ---- build-20260518 / data-20260602 test run findings ----
+    # Only entries confirmed by test failures in THIS run.
+    # No carry-forward from previous builds.
+
+    {
+        "id": 1,
+        "tier": "P2_silent_display",
+        "form": "Form_LookAtEntry.CmdQuery_Click",
+        "title_en": "LookAtEntry: c_entry_desc backfill is NULL for all rows when entry_code = 36 (jinshi general)",
+        "title_zh": "LookAtEntry：entry_code = 36（進士及第）時，c_entry_desc 回填全部為 NULL",
+        "summary_en": (
+            "When the user runs a LookAtEntry query filtered to entry code 36 "
+            "(examination: jinshi general), the result table ZZ_SCRATCH_ENTRY "
+            "is populated with 92,545 rows but the c_entry_desc column is NULL "
+            "for every row.  The expected value is 'examination: jinshi (general)'.\n\n"
+            "The CmdQuery_Click handler successfully inserts rows from ENTRY_DATA "
+            "joined to ENTRY_CODES, but the c_entry_desc backfill step does not "
+            "write the description for this specific entry code.  All other columns "
+            "appear to be filled normally.  The missing description means the "
+            "on-screen result grid shows a blank entry-type column for every record, "
+            "which is misleading — the user sees results but cannot identify what "
+            "type of examination each record represents.\n\n"
+            "Detected by: test_vba_full_matrix[top_entry_code_36_unfiltered] — "
+            "assertion 'c_entry_desc backfill wrong' with 92,545 affected rows."
+        ),
+        "summary_zh": (
+            "當使用者在 LookAtEntry 以 entry_code = 36（進士及第）執行查詢時，"
+            "結果表 ZZ_SCRATCH_ENTRY 雖然產生了 92,545 筆資料，但 c_entry_desc "
+            "欄位對每一筆都是 NULL。預期值應為 'examination: jinshi (general)'。\n\n"
+            "CmdQuery_Click 成功地從 ENTRY_DATA JOIN ENTRY_CODES 插入了資料，"
+            "但 c_entry_desc 的回填步驟對此 entry code 並未寫入說明文字。其他欄位"
+            "看起來都正常填充。因此，使用者在螢幕上看到的查詢結果中，每一筆記錄的"
+            "入仕方式欄位都是空白，難以判斷是何種考試類型。\n\n"
+            "由 test_vba_full_matrix[top_entry_code_36_unfiltered] 偵測到，"
+            "斷言 'c_entry_desc backfill wrong'，影響 92,545 筆。"
+        ),
+        "steps_en": (
+            "1. Open CBDB_BJ_User.mdb in Microsoft Access.\n"
+            "2. From the Navigation Pane, open the form **LookAtEntry**.\n"
+            "3. In the Entry Code picker, select entry code **36** "
+            "(label: 'examination: jinshi (general)').\n"
+            "4. Leave dynasty, address, and year filters blank.\n"
+            "5. Click **Run Query** (CmdQuery button).\n"
+            "6. When the query completes, inspect the result grid: the "
+            "entry-type description column (c_entry_desc) is blank for "
+            "every row.\n"
+            "7. SQL verification: "
+            "`SELECT TOP 5 c_entry_code, c_entry_desc FROM ZZ_SCRATCH_ENTRY` "
+            "returns (36, NULL) for all rows."
+        ),
+        "steps_zh": (
+            "1. 以 Microsoft Access 開啟 CBDB_BJ_User.mdb。\n"
+            "2. 從導覽窗格開啟 **LookAtEntry** 表單。\n"
+            "3. 在 Entry Code 選擇器中，選取 entry code **36**（標籤：'examination: "
+            "jinshi (general)'）。\n"
+            "4. 朝代、地址、年份篩選器留空。\n"
+            "5. 點擊 **Run Query**（CmdQuery 按鈕）。\n"
+            "6. 查詢完成後，檢視結果格：每一筆記錄的入仕方式說明欄（c_entry_desc）"
+            "皆為空白。\n"
+            "7. SQL 驗證：`SELECT TOP 5 c_entry_code, c_entry_desc FROM "
+            "ZZ_SCRATCH_ENTRY` 對所有列回傳 (36, NULL)。"
+        ),
+        "screenshots": [],
+        "severity_en": (
+            "P2 — Silent display issue: 92,545 rows affected.  The user can "
+            "see the blank c_entry_desc column in the result grid, but Access "
+            "shows no error — making it easy to overlook.  Exports (GIS, "
+            "Neo4j, KML) that reference this column will also carry the blank."
+        ),
+        "severity_zh": (
+            "P2 — 靜默顯示問題：92,545 筆受影響。使用者可在結果格中看到空白的 "
+            "c_entry_desc 欄，但 Access 不顯示錯誤——容易被忽略。參照此欄的匯出"
+            "（GIS、Neo4j、KML）也會包含空白值。"
+        ),
+        "fix_en": (
+            "Locate the backfill step in Form_LookAtEntry.CmdQuery_Click that "
+            "sets c_entry_desc for ZZ_SCRATCH_ENTRY rows.  Verify that the JOIN "
+            "to ENTRY_CODES on c_entry_code = 36 is not inadvertently filtered "
+            "out or that the UPDATE / backfill SQL matches the column name "
+            "exactly.  After the fix, "
+            "`SELECT c_entry_desc FROM ZZ_SCRATCH_ENTRY WHERE c_entry_code = 36 "
+            "LIMIT 1` should return 'examination: jinshi (general)'."
+        ),
+        "fix_zh": (
+            "在 Form_LookAtEntry.CmdQuery_Click 中找到對 ZZ_SCRATCH_ENTRY 設定 "
+            "c_entry_desc 的回填步驟，確認 JOIN ENTRY_CODES 的條件（c_entry_code = 36）"
+            "沒有被意外篩除，且 UPDATE / 回填 SQL 使用了正確的欄位名稱。修復後，"
+            "`SELECT c_entry_desc FROM ZZ_SCRATCH_ENTRY WHERE c_entry_code = 36 "
+            "LIMIT 1` 應回傳 'examination: jinshi (general)'。"
+        ),
+    },
+    {
+        "id": 2,
+        "tier": "P2_silent_display",
+        "form": "Form_LookAtGroupData.CmdRun_Click",
+        "title_en": "LookAtGroupData: CmdRun does not backfill c_name from BIOG_MAIN",
+        "title_zh": "LookAtGroupData：CmdRun 未從 BIOG_MAIN 回填 c_name",
+        "summary_en": (
+            "When the user seeds a person ID into LookAtGroupData and clicks "
+            "CmdRun, the handler is expected to run an UPDATE query that joins "
+            "ZZ_SCRATCH_IMPORT_PEOPLE to BIOG_MAIN and fills in c_name (and "
+            "c_dynasty) for each seeded row.  In this build the UPDATE does "
+            "not execute successfully: after CmdRun completes, c_name remains "
+            "NULL in ZZ_SCRATCH_IMPORT_PEOPLE.\n\n"
+            "The result is that the group-data import display shows empty name "
+            "cells.  The user has no indication that the backfill failed — "
+            "CmdRun does not surface an error.\n\n"
+            "Detected by: test_hard_form_query_small_fixture[groupdata_person_1_small] — "
+            "assertion 'CmdRun didn't backfill c_name for c_person_id=1', "
+            "c_name is None after CmdRun completes."
+        ),
+        "summary_zh": (
+            "當使用者在 LookAtGroupData 中填入一個 person ID 並點擊 CmdRun 時，"
+            "handler 應執行 UPDATE 查詢，將 ZZ_SCRATCH_IMPORT_PEOPLE JOIN BIOG_MAIN，"
+            "並為每一筆填入 c_name（及 c_dynasty）。在此版本中，UPDATE 未成功執行："
+            "CmdRun 完成後，ZZ_SCRATCH_IMPORT_PEOPLE 的 c_name 仍為 NULL。\n\n"
+            "結果是群組資料匯入畫面顯示空白的姓名欄位，且使用者不會看到任何錯誤訊息，"
+            "CmdRun 靜默地失敗了。\n\n"
+            "由 test_hard_form_query_small_fixture[groupdata_person_1_small] 偵測到："
+            "斷言 'CmdRun didn't backfill c_name for c_person_id=1'，CmdRun "
+            "完成後 c_name 仍為 None。"
+        ),
+        "steps_en": (
+            "1. Open CBDB_BJ_User.mdb in Microsoft Access.\n"
+            "2. From the Navigation Pane, open the form **LookAtGroupData**.\n"
+            "3. In the import person list, enter a valid person ID (e.g. **1**).\n"
+            "4. Click **Run** (CmdRun button).\n"
+            "5. When CmdRun completes, inspect the result: the Name column "
+            "is blank.\n"
+            "6. SQL verification: "
+            "`SELECT c_person_id, c_name FROM ZZ_SCRATCH_IMPORT_PEOPLE` "
+            "returns (1, NULL) — c_name was not backfilled from BIOG_MAIN."
+        ),
+        "steps_zh": (
+            "1. 以 Microsoft Access 開啟 CBDB_BJ_User.mdb。\n"
+            "2. 從導覽窗格開啟 **LookAtGroupData** 表單。\n"
+            "3. 在匯入人員清單中，輸入一個有效的 person ID（例如 **1**）。\n"
+            "4. 點擊 **Run**（CmdRun 按鈕）。\n"
+            "5. CmdRun 完成後，檢視結果：姓名欄為空白。\n"
+            "6. SQL 驗證：`SELECT c_person_id, c_name FROM "
+            "ZZ_SCRATCH_IMPORT_PEOPLE` 回傳 (1, NULL)——c_name 未從 BIOG_MAIN "
+            "回填。"
+        ),
+        "screenshots": [],
+        "severity_en": (
+            "P2 — Silent display issue: CmdRun completes without any error "
+            "message, but the c_name column in the result is blank.  The user "
+            "has no indication that the backfill failed."
+        ),
+        "severity_zh": (
+            "P2 — 靜默顯示問題：CmdRun 完成時沒有任何錯誤訊息，但結果中的 "
+            "c_name 欄位為空白。使用者無從得知回填已失敗。"
+        ),
+        "fix_en": (
+            "Locate the UPDATE statement in Form_LookAtGroupData.CmdRun_Click "
+            "that joins ZZ_SCRATCH_IMPORT_PEOPLE to BIOG_MAIN and sets c_name. "
+            "Check that the JOIN condition matches the correct key column and "
+            "that the UPDATE target column name is spelled correctly.  After "
+            "the fix, running CmdRun with any valid person ID should populate "
+            "c_name in ZZ_SCRATCH_IMPORT_PEOPLE."
+        ),
+        "fix_zh": (
+            "在 Form_LookAtGroupData.CmdRun_Click 中找到將 ZZ_SCRATCH_IMPORT_PEOPLE "
+            "JOIN BIOG_MAIN 並設定 c_name 的 UPDATE 語句，確認 JOIN 條件使用了正確的"
+            "主鍵欄位，且 UPDATE 目標欄位名稱拼寫正確。修復後，以任意有效 person ID "
+            "執行 CmdRun，c_name 應能在 ZZ_SCRATCH_IMPORT_PEOPLE 中被填入。"
+        ),
+    },
+]
 
 
 # ---------------------------------------------------------------------
@@ -941,6 +1110,28 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
         "对不齐的比例非常小，其中地点偏差占多数。"
     )
     doc.add_paragraph(Z(note))
+
+
+_VALID_TIERS = frozenset([
+    "P0_silent_data", "P1_visible_crash", "P2_silent_display",
+    "P3_missing_ui", "P4_setup", "P5_dormant_or_latent", "resolved",
+])
+
+
+def _validate_issues() -> None:
+    """Fail loudly if any ISSUES entry has an unknown tier.
+
+    A typo in 'tier' silently drops the issue from all rendered outputs
+    (it won't appear in tier_order).  Run this once before building so
+    the error surfaces immediately instead of producing a quietly
+    incomplete report.
+    """
+    for it in ISSUES:
+        if it.get("tier") not in _VALID_TIERS:
+            raise ValueError(
+                f"ISSUES id={it.get('id')}: unknown tier {it.get('tier')!r}. "
+                f"Valid tiers: {sorted(_VALID_TIERS)}"
+            )
 
 
 def _build(lang: str, out_path: Path) -> None:
@@ -2292,6 +2483,7 @@ def _build_md(lang: str, out_path: Path) -> None:
 
 
 def main() -> int:
+    _validate_issues()  # fail fast on unknown tier before writing any files
     # Always emit all four formats together so the docx and md never
     # drift apart.
     _build("en", OUT_EN)
