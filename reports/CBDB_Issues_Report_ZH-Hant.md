@@ -8,6 +8,23 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
 
 問題按嚴重程度排序（P0 最高）。每一條都包括：簡明描述、使用者端一步一步的復現步驟、（在介面上能看到時）相關截圖，以及一份建議的修復方案。這些問題並不緊急，整理在此只是為了方便您在合適的時候逐一處理。
 
+## 覆蓋矩陣 —— 表單 × 按鈕測試結果
+
+| Form | CmdQuery | CmdGIS | CmdNeo4j | CmdPajek | CmdGephi | CmdUCINet | CmdKML | CmdGUESS | CmdRun |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| LookAtEntry | ✗ FAIL | ✓ | ⚠ ERR | — | — | — | —? | — | — |
+| LookAtStatus | ⚠ ERR | — | — | ✗ FAIL | ⚠ ERR | ⚠ ERR | — | — | — |
+| LookAtTexts | ⚠ ERR | — | — | — | — | — | — | — | — |
+| LookAtPlace | ⚠ ERR | ✗ FAIL | ⚠ ERR | — | — | — | — | — | — |
+| LookAtAssociations | ⚠ ERR | ⚠ ERR | ⚠ ERR | — | — | ⚠ ERR | — | — | — |
+| LookAtOffice | ⚠ ERR | ⚠ ERR | — | — | — | — | — | ⚠ ERR | — |
+| LookAtKinship | — | ⚠ ERR | — | ✓ | — | ⚠ ERR | — | ⚠ ERR | ⚠ ERR |
+| LookAtNetworks | — | — | ~ SKIP | — | — | — | — | — | ~ SKIP |
+| LookAtGroupData | — | — | ⚠ ERR | — | — | — | — | — | ✗ FAIL |
+| LookAtAssocPairs | ⚠ ERR | — | ⚠ ERR | ⚠ ERR | — | — | — | — | — |
+
+_PASS: 2 · FAIL: 4 · ERROR: 22 · SKIP: 2 · NOT RUN: 1 · N/A: 59_
+
 ## 目錄
 
 - [P2 — 靜默顯示問題](#p2--靜默顯示問題)
@@ -82,6 +99,10 @@ CmdQuery_Click 成功地從 ENTRY_DATA JOIN ENTRY_CODES 插入了資料，但 c_
 #### 建議修復方案
 
 在 Form_LookAtGroupData.CmdRun_Click 中找到將 ZZ_SCRATCH_IMPORT_PEOPLE JOIN BIOG_MAIN 並設定 c_name 的 UPDATE 語句，確認 JOIN 條件使用了正確的主鍵欄位，且 UPDATE 目標欄位名稱拼寫正確。修復後，以任意有效 person ID 執行 CmdRun，c_name 應能在 ZZ_SCRATCH_IMPORT_PEOPLE 中被填入。
+
+## 附錄 A —— c_index_year / c_index_addr_id 與 cbdb-online-main-server 快照之間的偏差（差異需要逐筆分類後才能判定是否為缺陷）
+
+> 附錄數據尚未生成。請執行第 5c 步：`python reports/collect_index_year_diffs.py`
 
 ## 結語
 

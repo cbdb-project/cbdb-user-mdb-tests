@@ -8,6 +8,23 @@ Below is a summary of the issues we uncovered while building an automated regres
 
 The issues are ordered by severity (P0 highest). Each entry includes a concise description, step-by-step user reproduction, screenshots where the issue is visible in the Access UI, and a suggested fix. None of these are urgent; they are documented so they can be addressed at the maintainer's convenience.
 
+## Coverage Matrix — Form × Button Test Results
+
+| Form | CmdQuery | CmdGIS | CmdNeo4j | CmdPajek | CmdGephi | CmdUCINet | CmdKML | CmdGUESS | CmdRun |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| LookAtEntry | ✗ FAIL | ✓ | ⚠ ERR | — | — | — | —? | — | — |
+| LookAtStatus | ⚠ ERR | — | — | ✗ FAIL | ⚠ ERR | ⚠ ERR | — | — | — |
+| LookAtTexts | ⚠ ERR | — | — | — | — | — | — | — | — |
+| LookAtPlace | ⚠ ERR | ✗ FAIL | ⚠ ERR | — | — | — | — | — | — |
+| LookAtAssociations | ⚠ ERR | ⚠ ERR | ⚠ ERR | — | — | ⚠ ERR | — | — | — |
+| LookAtOffice | ⚠ ERR | ⚠ ERR | — | — | — | — | — | ⚠ ERR | — |
+| LookAtKinship | — | ⚠ ERR | — | ✓ | — | ⚠ ERR | — | ⚠ ERR | ⚠ ERR |
+| LookAtNetworks | — | — | ~ SKIP | — | — | — | — | — | ~ SKIP |
+| LookAtGroupData | — | — | ⚠ ERR | — | — | — | — | — | ✗ FAIL |
+| LookAtAssocPairs | ⚠ ERR | — | ⚠ ERR | ⚠ ERR | — | — | — | — | — |
+
+_PASS: 2 · FAIL: 4 · ERROR: 22 · SKIP: 2 · NOT RUN: 1 · N/A: 59_
+
 ## Table of Contents
 
 - [P2 — Silent display](#p2--silent-display)
@@ -82,6 +99,10 @@ Detected by: test_hard_form_query_small_fixture[groupdata_person_1_small] — as
 #### Suggested fix
 
 Locate the UPDATE statement in Form_LookAtGroupData.CmdRun_Click that joins ZZ_SCRATCH_IMPORT_PEOPLE to BIOG_MAIN and sets c_name. Check that the JOIN condition matches the correct key column and that the UPDATE target column name is spelled correctly.  After the fix, running CmdRun with any valid person ID should populate c_name in ZZ_SCRATCH_IMPORT_PEOPLE.
+
+## Appendix A — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (differences need per-row classification before being filed as bugs)
+
+> Appendix data not yet generated.  Run step 5c: `python reports/collect_index_year_diffs.py`
 
 ## Closing note
 

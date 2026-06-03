@@ -266,6 +266,31 @@ ADDR_CLASSIFICATION_JSON = REPO / "reports" / "index_addr_drift_classification.j
 CAUSE_SUMMARY_JSON = REPO / "reports" / "index_drift_cause_summary.json"
 DEMO_PERSONS_JSON = REPO / "reports" / "demo_persons.json"
 KNOWN_BUGS_STATUS_JSON = REPO / "reports" / "known_bugs_status.json"
+COVERAGE_MATRIX_JSON = REPO / "reports" / "coverage_matrix.json"
+
+# Cell display labels — used by both docx and markdown renderers
+_CELL_DISPLAY = {
+    "PASS":    ("✓ PASS",   "✓"),
+    "FAIL":    ("✗ FAIL",   "✗ FAIL"),
+    "ERROR":   ("⚠ ERROR",  "⚠ ERR"),
+    "SKIP":    ("~ SKIP",   "~ SKIP"),
+    "NOT_RUN": ("(not run)", "—?"),
+    "N/A":     ("—",        "—"),
+}
+
+
+def _load_coverage_matrix() -> dict | None:
+    """Return parsed coverage_matrix.json, or None if not generated / unreadable."""
+    import json as _json
+    if not COVERAGE_MATRIX_JSON.exists():
+        return None
+    try:
+        data = _json.loads(COVERAGE_MATRIX_JSON.read_text(encoding="utf-8"))
+        # Basic schema check so a truncated/stale file doesn't crash rendering
+        _ = data["forms"]; _ = data["buttons"]; _ = data["matrix"]
+        return data
+    except Exception:
+        return None
 
 
 def _load_demo_persons() -> dict:
@@ -356,24 +381,173 @@ def _load_bug_test_status() -> dict[int, dict]:
     return out
 
 
-def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
-    """Render the 'index_year / index_addr drift, NOT a bug' chapter
-    using the examples collected by collect_index_year_diffs.py."""
-    import json as _json
-    if not DRIFT_JSON.exists():
+def _add_coverage_matrix_docx(doc, is_en: bool, Z, data: dict | None) -> None:
+    """Render the form × button coverage matrix as a Word table.
+
+    Always present: if data is None (builder not run yet), shows a
+    placeholder message directing the user to run step 5b.
+    """
+    title = (
+        "Coverage Matrix — Form × Button Test Results"
+        if is_en else
+        "覆蓋矩陣 —— 表單 × 按鈕測試結果"
+    )
+    _h(doc, 1, Z(title))
+
+    if data is None:
+        placeholder = (
+            "Coverage matrix not yet generated.  Run step 5b of the "
+            "build-test workflow:\n"
+            "    python analysis/build_coverage_matrix.py "
+            "--report reports/pytest_report_<build>.json"
+            if is_en else
+            "覆蓋矩陣尚未生成。請執行 build-test 工作流程第 5b 步：\n"
+            "    python analysis/build_coverage_matrix.py "
+            "--report reports/pytest_report_<build>.json"
+        )
+        doc.add_paragraph(Z(placeholder))
         return
-    data = _json.loads(DRIFT_JSON.read_text(encoding="utf-8"))
+
+    forms = data["forms"]
+    buttons = data["buttons"]
+    matrix = data["matrix"]
+
+    # Build table: header row + one row per form
+    tbl = doc.add_table(rows=1 + len(forms), cols=1 + len(buttons))
+    tbl.style = "Table Grid"
+
+    # Header row
+    hdr = tbl.rows[0].cells
+    hdr[0].text = Z("Form" if is_en else "表單")
+    for j, btn in enumerate(buttons):
+        hdr[j + 1].text = btn
+
+    # Data rows
+    for i, form in enumerate(forms):
+        row_cells = tbl.rows[i + 1].cells
+        row_cells[0].text = Z(form)
+        for j, btn in enumerate(buttons):
+            outcome = matrix.get(form, {}).get(btn, "NOT_RUN")
+            label = _CELL_DISPLAY.get(outcome, (outcome, outcome))[0]
+            row_cells[j + 1].text = Z(label)
+
+    doc.add_paragraph("")
+    summary = data.get("summary", {})
+    note = (
+        f"PASS: {summary.get('PASS', 0)}  |  "
+        f"FAIL: {summary.get('FAIL', 0)}  |  "
+        f"ERROR: {summary.get('ERROR', 0)}  |  "
+        f"SKIP: {summary.get('SKIP', 0)}  |  "
+        f"NOT RUN: {summary.get('NOT_RUN', 0)}  |  "
+        f"N/A: {summary.get('N/A', 0)}"
+    )
+    p = doc.add_paragraph(Z(note))
+    p.runs[0].italic = True
+
+
+def _add_coverage_matrix_md(lines: list, is_en: bool, Z, data: dict | None) -> None:
+    """Append the coverage matrix as a GitHub-flavoured markdown table.
+
+    Always appended: placeholder shown when builder has not been run.
+    """
+    title = (
+        "Coverage Matrix — Form × Button Test Results"
+        if is_en else
+        "覆蓋矩陣 —— 表單 × 按鈕測試結果"
+    )
+    lines.append(f"## {Z(title)}")
+    lines.append("")
+
+    if data is None:
+        lines.append(
+            "> Coverage matrix not yet generated.  "
+            "Run step 5b: `python analysis/build_coverage_matrix.py "
+            "--report reports/pytest_report_<build>.json`"
+            if is_en else
+            "> 覆蓋矩陣尚未生成。請執行第 5b 步：`python "
+            "analysis/build_coverage_matrix.py "
+            "--report reports/pytest_report_<build>.json`"
+        )
+        lines.append("")
+        return
+
+    forms = data["forms"]
+    buttons = data["buttons"]
+    matrix = data["matrix"]
+
+    # Header
+    header = "| Form | " + " | ".join(buttons) + " |"
+    sep = "| --- |" + " --- |" * len(buttons)
+    lines.append(Z(header))
+    lines.append(sep)
+
+    for form in forms:
+        cells = []
+        for btn in buttons:
+            outcome = matrix.get(form, {}).get(btn, "NOT_RUN")
+            short = _CELL_DISPLAY.get(outcome, (outcome, outcome))[1]
+            cells.append(Z(short))
+        lines.append(f"| {Z(form)} | " + " | ".join(cells) + " |")
+
+    lines.append("")
+    summary = data.get("summary", {})
+    note = (
+        f"_PASS: {summary.get('PASS',0)}"
+        f" · FAIL: {summary.get('FAIL',0)}"
+        f" · ERROR: {summary.get('ERROR',0)}"
+        f" · SKIP: {summary.get('SKIP',0)}"
+        f" · NOT RUN: {summary.get('NOT_RUN',0)}"
+        f" · N/A: {summary.get('N/A',0)}_"
+    )
+    lines.append(Z(note))
+    lines.append("")
+
+
+def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
+    """Render the 'index_year / index_addr drift, NOT a bug' chapter.
+
+    Always renders: shows a placeholder directing the user to run
+    collect_index_year_diffs.py when the source JSON files are missing.
+    """
+    import json as _json
 
     title = (
-        "Appendix — `c_index_year` / `c_index_addr_id` drift "
+        "Appendix A — `c_index_year` / `c_index_addr_id` drift "
         "vs the cbdb-online-main-server snapshot "
         "(differences need per-row classification before being filed as bugs)"
         if is_en else
-        "附錄 —— `c_index_year` / `c_index_addr_id` 與 "
+        "附錄 A —— `c_index_year` / `c_index_addr_id` 與 "
         "cbdb-online-main-server 快照之間的偏差"
         "（差異需要逐筆分類後才能判定是否為缺陷）"
     )
     _h(doc, 1, Z(title))
+
+    if not DRIFT_JSON.exists():
+        placeholder = (
+            "Appendix data not yet generated.  Run step 5c of the "
+            "build-test workflow:\n"
+            "    python reports/collect_index_year_diffs.py\n"
+            "This queries the DATA mdb via pyodbc and emits "
+            "reports/index_drift_*.json."
+            if is_en else
+            "附錄數據尚未生成。請執行 build-test 工作流程第 5c 步：\n"
+            "    python reports/collect_index_year_diffs.py\n"
+            "此腳本透過 pyodbc 查詢 DATA mdb，並輸出 "
+            "reports/index_drift_*.json。"
+        )
+        doc.add_paragraph(Z(placeholder))
+        return
+
+    try:
+        data = _json.loads(DRIFT_JSON.read_text(encoding="utf-8"))
+    except Exception as e:
+        doc.add_paragraph(Z(
+            f"Appendix data could not be loaded ({e}). "
+            "Re-run: python reports/collect_index_year_diffs.py"
+            if is_en else
+            f"附錄數據載入失敗（{e}）。請重新執行：python reports/collect_index_year_diffs.py"
+        ))
+        return
 
     intro = (
         "When we compare BIOG_MAIN's `c_index_year` and "
@@ -1188,6 +1362,10 @@ def _build(lang: str, out_path: Path) -> None:
 
     doc.add_page_break()
 
+    # ---- Coverage matrix (always present) ----
+    _add_coverage_matrix_docx(doc, is_en, Z, _load_coverage_matrix())
+    doc.add_page_break()
+
     # ---- Table of contents ----
     _h(doc, 1, Z("Table of Contents" if is_en else "目录"))
     _add_toc(doc, lang)
@@ -1550,6 +1728,9 @@ def _build_md(lang: str, out_path: Path) -> None:
         lines.append(Z(para))
         lines.append("")
 
+    # ---- Coverage matrix (always present) ----
+    _add_coverage_matrix_md(lines, is_en, Z, _load_coverage_matrix())
+
     # ---- TOC: GitHub auto-generates anchors from heading text. ----
     lines.append(f"## {Z('Table of Contents' if is_en else '目录')}")
     lines.append("")
@@ -1857,11 +2038,28 @@ def _build_md(lang: str, out_path: Path) -> None:
                 lines.append(Z(para))
                 lines.append("")
 
-    # ---- Index drift appendix ----
+    # ---- Index drift appendix (always present) ----
     import json as _json
-    if DRIFT_JSON.exists():
-        lines.append(f"## {Z(appendix_title)}")
+    appendix_a_title = (
+        "Appendix A — c_index_year / c_index_addr_id drift "
+        "vs the cbdb-online-main-server snapshot "
+        "(differences need per-row classification before being filed as bugs)"
+        if is_en else
+        "附錄 A —— c_index_year / c_index_addr_id 與 "
+        "cbdb-online-main-server 快照之間的偏差"
+        "（差異需要逐筆分類後才能判定是否為缺陷）"
+    )
+    lines.append(f"## {Z(appendix_a_title)}")
+    lines.append("")
+    if not DRIFT_JSON.exists():
+        lines.append(
+            "> Appendix data not yet generated.  "
+            "Run step 5c: `python reports/collect_index_year_diffs.py`"
+            if is_en else
+            "> 附錄數據尚未生成。請執行第 5c 步：`python reports/collect_index_year_diffs.py`"
+        )
         lines.append("")
+    if DRIFT_JSON.exists():
         intro_drift = (
             "When we compare BIOG_MAIN's `c_index_year` and "
             "`c_index_addr_id` between this User MDB and the weekly "
