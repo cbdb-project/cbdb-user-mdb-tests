@@ -82,10 +82,19 @@ looking at.
    `python analysis/relink_data_mdb.py`
 4. **Re-dump** metadata (after relink, so column defs are complete):
    `python analysis/dump_metadata.py && python analysis/dump_vba.py`
-5. **Run tests**: `python -m pytest tests/ -W ignore --include-vba`
+5. **Run tests** (with JSON report — needed by step 5b):
+   `python -m pytest tests/ -W ignore --include-vba --json-report --json-report-file=reports/pytest_report_<build>.json`
    Monitor the session — Access dialogs can block unhandled (see landmine #3b).
    All MSACCESS.EXE processes are killed automatically by `pytest_sessionfinish`
    when the session ends (even after a crash or Ctrl-C).
+5b. **Build coverage matrix** (reads step 5 JSON, emits `reports/coverage_matrix.json`):
+   `python analysis/build_coverage_matrix.py --report reports/pytest_report_<build>.json`
+   The coverage matrix is always included in the report; a placeholder is shown
+   if this step is skipped.
+5c. **Regenerate index-year drift appendix** (queries DATA mdb via pyodbc):
+   `python reports/collect_index_year_diffs.py`
+   Emits `reports/index_drift_examples.json`.  The appendix heading is always in the
+   report; a placeholder is shown if this step is skipped.
 6. **Capture screenshots**: `python reports/capture_screenshots.py`
 7. **Rebuild ISSUES dict from scratch**: clear `ISSUES = [` … `]` in
    `reports/generate_report.py`, then write one entry per FAILED test,
@@ -95,6 +104,7 @@ looking at.
    - Infrastructure failures (dialog cascade, orphan Access process) →
      fix infra, do NOT add to ISSUES.
 8. **Regenerate** report: `python reports/generate_report.py`
+   The report now always contains: Coverage Matrix | Issues | Appendix A | Closing.
 
 **Bug-fixing is the maintainer team's responsibility — not this repo's.**
 
