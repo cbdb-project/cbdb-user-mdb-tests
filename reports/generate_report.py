@@ -47,7 +47,7 @@ OUT_ZH_MD = REPO / "reports" / "CBDB_Issues_Report_ZH-Hant.md"
 # ---------------------------------------------------------------------
 
 ISSUES = [
-    # ---- build-20260518 / data-20260602 test run findings ----
+    # ---- build-20260603 / data-20260602 test run findings ----
     # Only entries confirmed by test failures in THIS run.
     # No carry-forward from previous builds.
 
@@ -267,6 +267,7 @@ CAUSE_SUMMARY_JSON = REPO / "reports" / "index_drift_cause_summary.json"
 DEMO_PERSONS_JSON = REPO / "reports" / "demo_persons.json"
 KNOWN_BUGS_STATUS_JSON = REPO / "reports" / "known_bugs_status.json"
 COVERAGE_MATRIX_JSON = REPO / "reports" / "coverage_matrix.json"
+SCHEMA_DIFF_JSON = REPO / "reports" / "schema_diff.json"
 
 # Cell display labels — used by both docx and markdown renderers
 _CELL_DISPLAY = {
@@ -1308,6 +1309,407 @@ def _validate_issues() -> None:
             )
 
 
+def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
+    """Render Appendix B (TablesFields) and Appendix C (ForeignKeys)
+    schema-diff sections using the python-docx API.
+    Consumes reports/schema_diff.json produced by collect_schema_diffs.py."""
+    import json as _json
+
+    def _table_section(title_a: str, title_b: str,
+                       only_cur_hdr: str, only_reg_hdr: str,
+                       mismatch_hdr: str,
+                       block_key: str) -> None:
+        _h(doc, 1, Z(title_a if is_en else title_b))
+
+        if not SCHEMA_DIFF_JSON.exists():
+            p = doc.add_paragraph()
+            run = p.add_run(Z(
+                "Run `python reports/collect_schema_diffs.py` to populate "
+                "this section."
+                if is_en else
+                "請先執行 `python reports/collect_schema_diffs.py` 以生成本節內容。"
+            ))
+            run.italic = True
+            return
+
+        diff = _json.loads(SCHEMA_DIFF_JSON.read_text(encoding="utf-8"))
+        mdb_label = diff.get("data_mdb", "CBDB_*_DATA.mdb")
+        blk = diff[block_key]
+        is_tf = (block_key == "tables_fields")
+
+        intro = (
+            (
+                f"This section compares the contents of the `TablesFields` table "
+                f"in `{mdb_label}` against the database schema "
+                "reconstructed from Access DAO (TableDefs) by "
+                "`reports/collect_schema_diffs.py`. Discrepancies indicate the "
+                "documentation table may be out of date."
+            ) if is_tf else (
+                "This section covers the `ForeignKeys` table and the FK "
+                "relationships it documents."
+            )
+        )
+        intro_zh = (
+            (
+                f"本節將 `{mdb_label}` 中 `TablesFields` 表的內容與"
+                "`reports/collect_schema_diffs.py` 透過 Access DAO（TableDefs）重建的資料"
+                "庫結構進行比對。若存在差異，表示文檔表可能已過時。"
+            ) if is_tf else (
+                "本節涵蓋 `ForeignKeys` 表及其所記錄的外鍵關係。"
+            )
+        )
+        doc.add_paragraph(Z(intro if is_en else intro_zh))
+
+        if not is_tf and not blk.get("fk_introspection_available"):
+            doc.add_paragraph(Z(
+                f"The `ForeignKeys` table ({blk['total_current']} rows) documents FK "
+                "relationships in the database. All referenced table/column pairs have "
+                "been verified to exist in the current dump. A catalog-level diff "
+                "(documented FK vs. all actual FK constraints) is not available for "
+                "Access databases and is omitted here."
+                if is_en else
+                f"`ForeignKeys` 表共 {blk['total_current']} 筆，記錄了資料庫中的外鍵關係。"
+                "我們已驗證所有參照的表名與欄位名均存在於當前 dump 中。"
+                "由於 Access 資料庫不支援通過標準 API 枚舉外鍵約束，"
+                "此處無法提供文件記載 FK 與實際 FK 約束的完整對比。"
+            ))
+            doc.add_paragraph(Z(
+                f"Reconstructed FK list: reports/foreign_keys_regen.csv"
+                if is_en else
+                "重建結果：reports/foreign_keys_regen.csv"
+            ))
+            return
+
+        doc_name = "TablesFields" if is_tf else "ForeignKeys"
+        regen_src = (
+            "Reconstructed from DB" if is_tf
+            else "Reconstructed from DB (via Access.Application DAO)"
+        )
+        regen_src_zh = (
+            "從資料庫重建" if is_tf
+            else "從資料庫重建（透過 Access.Application DAO）"
+        )
+        doc.add_paragraph(Z(
+            f"Total rows in {doc_name}: {blk['total_current']}. "
+            f"{regen_src}: {blk['total_regen']}."
+            if is_en else
+            f"{doc_name} 共 {blk['total_current']} 筆。"
+            f"{regen_src_zh}：{blk['total_regen']} 筆。"
+        ))
+        _regen_csv = (
+            "tables_fields_regen.csv" if is_tf else "foreign_keys_regen.csv"
+        )
+        doc.add_paragraph(Z(
+            f"Reconstructed schema: reports/{_regen_csv}"
+            if is_en else
+            f"重建結果：reports/{_regen_csv}"
+        ))
+
+        only_cur = blk["only_in_current"]
+        only_reg = blk["only_in_regen"]
+        mismatches = blk.get("mismatches", [])
+
+        if only_cur:
+            _h(doc, 2, Z(only_cur_hdr))
+            n = len(only_cur)
+            if is_tf:
+                tbl = doc.add_table(rows=n + 1, cols=2)
+                tbl.style = "Table Grid"
+                hdr = tbl.rows[0].cells
+                hdr[0].text = "AccessTblNm"; hdr[1].text = "AccessFldNm"
+                for i, row in enumerate(only_cur):
+                    r = tbl.rows[i + 1].cells
+                    r[0].text = row["AccessTblNm"]
+                    r[1].text = row["AccessFldNm"]
+            else:
+                tbl = doc.add_table(rows=n + 1, cols=4)
+                tbl.style = "Table Grid"
+                hdr = tbl.rows[0].cells
+                for ci, h in enumerate(["AccessTblNm", "AccessFldNm", "ForeignKey", "ForeignKeyBaseField"]):
+                    hdr[ci].text = h
+                for i, row in enumerate(only_cur):
+                    r = tbl.rows[i + 1].cells
+                    r[0].text = row["AccessTblNm"]
+                    r[1].text = row["AccessFldNm"]
+                    r[2].text = row.get("ForeignKey") or ""
+                    r[3].text = row.get("ForeignKeyBaseField") or ""
+
+        if only_reg:
+            _h(doc, 2, Z(only_reg_hdr))
+            n = len(only_reg)
+            if is_tf:
+                tbl = doc.add_table(rows=n + 1, cols=4)
+                tbl.style = "Table Grid"
+                hdr = tbl.rows[0].cells
+                for ci, h in enumerate(["AccessTblNm", "AccessFldNm", "DataFormat", "NULL_allowed"]):
+                    hdr[ci].text = h
+                for i, row in enumerate(only_reg):
+                    r = tbl.rows[i + 1].cells
+                    r[0].text = row["AccessTblNm"]
+                    r[1].text = row["AccessFldNm"]
+                    r[2].text = str(row.get("DataFormat") or "")
+                    r[3].text = str(row.get("NULL_allowed") or "")
+            else:
+                tbl = doc.add_table(rows=n + 1, cols=4)
+                tbl.style = "Table Grid"
+                hdr = tbl.rows[0].cells
+                for ci, h in enumerate(["AccessTblNm", "AccessFldNm", "ForeignKey", "ForeignKeyBaseField"]):
+                    hdr[ci].text = h
+                for i, row in enumerate(only_reg):
+                    r = tbl.rows[i + 1].cells
+                    r[0].text = row["AccessTblNm"]
+                    r[1].text = row["AccessFldNm"]
+                    r[2].text = row.get("ForeignKey") or ""
+                    r[3].text = row.get("ForeignKeyBaseField") or ""
+
+        if mismatches:
+            _h(doc, 2, Z(mismatch_hdr))
+            csv_file = (
+                "reports/schema_diff_tables_fields_mismatches.csv" if is_tf
+                else "reports/schema_diff_foreign_keys_mismatches.csv"
+            )
+            doc.add_paragraph(Z(
+                f"Full list: `{csv_file}` ({len(mismatches)} rows)"
+                if is_en else
+                f"完整清單：`{csv_file}`（{len(mismatches)} 筆）"
+            ))
+
+        if not only_cur and not only_reg and not mismatches:
+            doc.add_paragraph(Z(
+                f"✓ No discrepancies found — {doc_name} is in sync with the actual schema."
+                if is_en else
+                f"✓ 未發現差異 —— {doc_name} 與實際資料庫結構一致。"
+            ))
+
+    # ---- Appendix B ----
+    _table_section(
+        title_a="Appendix B — TablesFields: documentation vs. actual structure",
+        title_b="附錄 B —— TablesFields：文檔表與實際資料庫結構對比",
+        only_cur_hdr=(
+            "Rows in TablesFields not found in actual DB (stale)"
+            if is_en else
+            "TablesFields 中有但實際資料庫中不存在的欄位（過時）"
+        ),
+        only_reg_hdr=(
+            "Columns in actual DB not documented in TablesFields"
+            if is_en else
+            "實際資料庫中有但 TablesFields 未記錄的欄位"
+        ),
+        mismatch_hdr="Attribute mismatches" if is_en else "屬性不一致",
+        block_key="tables_fields",
+    )
+
+    doc.add_page_break()
+
+    # ---- Appendix C ----
+    _table_section(
+        title_a="Appendix C — ForeignKeys: documentation vs. actual structure",
+        title_b="附錄 C —— ForeignKeys：文檔表與實際資料庫結構對比",
+        only_cur_hdr=(
+            "Rows in ForeignKeys not found in actual DB (stale)"
+            if is_en else
+            "ForeignKeys 中有但實際資料庫中不存在的外鍵（過時）"
+        ),
+        only_reg_hdr=(
+            "FK relationships in actual DB not documented in ForeignKeys"
+            if is_en else
+            "實際資料庫中有但 ForeignKeys 未記錄的外鍵關係"
+        ),
+        mismatch_hdr="Attribute mismatches" if is_en else "屬性不一致",
+        block_key="foreign_keys",
+    )
+
+
+def _add_schema_diff_appendix_md(
+    lines: list,
+    block_key: str,
+    is_en: bool,
+    Z,
+    _slug,
+) -> None:
+    """Render one schema-diff appendix section (Appendix B or C) into
+    the markdown lines list.
+
+    block_key: 'tables_fields' for Appendix B, 'foreign_keys' for Appendix C.
+    """
+    import json as _json
+
+    is_tf = (block_key == "tables_fields")
+
+    heading = (
+        ("Appendix B — TablesFields: documentation vs. actual structure"
+         if is_tf else
+         "Appendix C — ForeignKeys: documentation vs. actual structure")
+        if is_en else
+        ("附錄 B —— TablesFields：文檔表與實際資料庫結構對比"
+         if is_tf else
+         "附錄 C —— ForeignKeys：文檔表與實際資料庫結構對比")
+    )
+    lines.append(f"## {Z(heading)}")
+    lines.append("")
+
+    if not SCHEMA_DIFF_JSON.exists():
+        lines.append(Z(
+            "*Run `python reports/collect_schema_diffs.py` to populate "
+            "this section.*"
+            if is_en else
+            "*請先執行 `python reports/collect_schema_diffs.py` 以生成本節內容。*"
+        ))
+        lines.append("")
+        return
+
+    diff = _json.loads(SCHEMA_DIFF_JSON.read_text(encoding="utf-8"))
+    mdb_label = diff.get("data_mdb", "CBDB_*_DATA.mdb")
+    blk = diff[block_key]
+
+    intro = (
+        (
+            f"This section compares the contents of the `TablesFields` table "
+            f"in `{mdb_label}` against the database schema "
+            "reconstructed from Access DAO (TableDefs) by "
+            "`reports/collect_schema_diffs.py`. Discrepancies indicate the "
+            "documentation table may be out of date."
+        ) if is_tf else (
+            "This section covers the `ForeignKeys` table and the FK "
+            "relationships it documents."
+        )
+    )
+    intro_zh = (
+        (
+            f"本節將 `{mdb_label}` 中 `TablesFields` 表的內容與 "
+            "`reports/collect_schema_diffs.py` 透過 Access DAO（TableDefs）重建的資料"
+            "庫結構進行比對。若存在差異，表示文檔表可能已過時。"
+        ) if is_tf else (
+            "本節涵蓋 `ForeignKeys` 表及其所記錄的外鍵關係。"
+        )
+    )
+    lines.append(Z(intro if is_en else intro_zh))
+    lines.append("")
+
+    if not is_tf and not blk.get("fk_introspection_available"):
+        lines.append(Z(
+            f"The `ForeignKeys` table ({blk['total_current']} rows) documents FK "
+            "relationships in the database. All referenced table/column pairs have "
+            "been verified to exist in the current dump. A catalog-level diff is not "
+            "available for Access databases and is omitted here."
+            if is_en else
+            f"`ForeignKeys` 表共 {blk['total_current']} 筆，記錄了資料庫中的外鍵關係。"
+            "我們已驗證所有參照的表名與欄位名均存在於當前 dump 中。"
+            "由於 Access 資料庫不支援通過標準 API 枚舉外鍵約束，"
+            "此處無法提供文件記載 FK 與實際 FK 約束的完整對比。"
+        ))
+        lines.append("")
+        lines.append(Z(
+            "Reconstructed FK list: [foreign_keys_regen.csv](foreign_keys_regen.csv)"
+            if is_en else
+            "重建結果：[foreign_keys_regen.csv](foreign_keys_regen.csv)"
+        ))
+        lines.append("")
+        return
+
+    doc_name = "TablesFields" if is_tf else "ForeignKeys"
+    regen_src = (
+        "Reconstructed from DB" if is_tf
+        else "Reconstructed from DB (via Access.Application DAO)"
+    )
+    regen_src_zh = (
+        "從資料庫重建" if is_tf
+        else "從資料庫重建（透過 Access.Application DAO）"
+    )
+    lines.append(Z(
+        f"Total rows in {doc_name}: {blk['total_current']}. "
+        f"{regen_src}: {blk['total_regen']}."
+        if is_en else
+        f"{doc_name} 共 {blk['total_current']} 筆。"
+        f"{regen_src_zh}：{blk['total_regen']} 筆。"
+    ))
+    lines.append("")
+
+    _regen_csv = "tables_fields_regen.csv" if is_tf else "foreign_keys_regen.csv"
+    _regen_label = (
+        ("Reconstructed schema" if is_tf else "Reconstructed FK list")
+        if is_en else "重建結果"
+    )
+    lines.append(Z(f"{_regen_label}: [{_regen_csv}]({_regen_csv})"))
+    lines.append("")
+
+    only_cur = blk["only_in_current"]
+    only_reg = blk["only_in_regen"]
+    mismatches = blk.get("mismatches", [])
+
+    if only_cur:
+        stale_hdr = (
+            f"Rows in {doc_name} not found in actual DB (stale)"
+            if is_en else
+            f"{doc_name} 中有但實際資料庫中不存在的記錄（過時）"
+        )
+        lines.append(f"### {Z(stale_hdr)}")
+        lines.append("")
+        if is_tf:
+            lines.append("| AccessTblNm | AccessFldNm |")
+            lines.append("|---|---|")
+            for row in only_cur:
+                lines.append(f"| {row['AccessTblNm']} | {row['AccessFldNm']} |")
+        else:
+            lines.append("| AccessTblNm | AccessFldNm | ForeignKey | ForeignKeyBaseField |")
+            lines.append("|---|---|---|---|")
+            for row in only_cur:
+                lines.append(
+                    f"| {row['AccessTblNm']} | {row['AccessFldNm']} "
+                    f"| {row.get('ForeignKey', '')} | {row.get('ForeignKeyBaseField', '')} |"
+                )
+        lines.append("")
+
+    if only_reg:
+        undoc_hdr = (
+            f"Columns in actual DB not documented in {doc_name}"
+            if is_en else
+            f"實際資料庫中有但 {doc_name} 未記錄的欄位"
+        )
+        lines.append(f"### {Z(undoc_hdr)}")
+        lines.append("")
+        if is_tf:
+            lines.append("| AccessTblNm | AccessFldNm | DataFormat | NULL_allowed |")
+            lines.append("|---|---|---|---|")
+            for row in only_reg:
+                lines.append(
+                    f"| {row['AccessTblNm']} | {row['AccessFldNm']} "
+                    f"| {row.get('DataFormat', '')} | {row.get('NULL_allowed', '')} |"
+                )
+        else:
+            lines.append("| AccessTblNm | AccessFldNm | ForeignKey | ForeignKeyBaseField |")
+            lines.append("|---|---|---|---|")
+            for row in only_reg:
+                lines.append(
+                    f"| {row['AccessTblNm']} | {row['AccessFldNm']} "
+                    f"| {row.get('ForeignKey', '')} | {row.get('ForeignKeyBaseField', '')} |"
+                )
+        lines.append("")
+
+    if mismatches:
+        mis_hdr = "Attribute mismatches" if is_en else "屬性不一致"
+        lines.append(f"### {Z(mis_hdr)}")
+        lines.append("")
+        csv_file = (
+            "reports/schema_diff_tables_fields_mismatches.csv" if is_tf
+            else "reports/schema_diff_foreign_keys_mismatches.csv"
+        )
+        lines.append(Z(
+            f"Full list: `{csv_file}` ({len(mismatches)} rows)"
+            if is_en else
+            f"完整清單：`{csv_file}`（{len(mismatches)} 筆）"
+        ))
+        lines.append("")
+
+    if not only_cur and not only_reg and not mismatches:
+        lines.append(Z(
+            f"✓ No discrepancies found — {doc_name} is in sync with the actual schema."
+            if is_en else
+            f"✓ 未發現差異 —— {doc_name} 與實際資料庫結構一致。"
+        ))
+        lines.append("")
+
+
 def _build(lang: str, out_path: Path) -> None:
     is_en = (lang == "en")
 
@@ -1642,9 +2044,13 @@ def _build(lang: str, out_path: Path) -> None:
                          else it["fix_zh"]).split("\n\n"):
                 doc.add_paragraph(Z(para))
 
-    # ---- Appendix: index_year / index_addr drift (NOT a bug) ----
+    # ---- Appendix A: index_year / index_addr drift (NOT a bug) ----
     doc.add_page_break()
     _add_index_drift_appendix(doc, is_en, Z)
+
+    # ---- Appendix B & C: schema diff ----
+    doc.add_page_break()
+    _add_schema_diff_appendix_docx(doc, is_en, Z)
 
     # ---- Closing ----
     doc.add_page_break()
@@ -1805,18 +2211,30 @@ def _build_md(lang: str, out_path: Path) -> None:
         f"- [{Z('Severity legend' if is_en else '严重等级说明')}]"
         f"(#{_slug(Z('Severity legend' if is_en else '严重等级说明'))})"
     )
-    appendix_title = (
-        "Appendix — c_index_year / c_index_addr_id drift "
+    appendix_a_toc_title = (
+        "Appendix A — c_index_year / c_index_addr_id drift "
         "vs the cbdb-online-main-server snapshot "
         "(differences need per-row classification before being filed as bugs)"
         if is_en else
-        "附錄 —— c_index_year / c_index_addr_id 與 "
+        "附錄 A —— c_index_year / c_index_addr_id 與 "
         "cbdb-online-main-server 快照之間的偏差"
         "（差異需要逐筆分類後才能判定是否為缺陷）"
     )
     lines.append(
-        f"- [{Z(appendix_title)}](#{_slug(Z(appendix_title))})"
+        f"- [{Z(appendix_a_toc_title)}](#{_slug(Z(appendix_a_toc_title))})"
     )
+    schema_appendix_b_title = (
+        "Appendix B — TablesFields: documentation vs. actual structure"
+        if is_en else
+        "附錄 B —— TablesFields：文檔表與實際資料庫結構對比"
+    )
+    schema_appendix_c_title = (
+        "Appendix C — ForeignKeys: documentation vs. actual structure"
+        if is_en else
+        "附錄 C —— ForeignKeys：文檔表與實際資料庫結構對比"
+    )
+    lines.append(f"- [{Z(schema_appendix_b_title)}](#{_slug(Z(schema_appendix_b_title))})")
+    lines.append(f"- [{Z(schema_appendix_c_title)}](#{_slug(Z(schema_appendix_c_title))})")
     lines.append(
         f"- [{Z('Closing note' if is_en else '结语')}]"
         f"(#{_slug(Z('Closing note' if is_en else '结语'))})"
@@ -2647,6 +3065,10 @@ def _build_md(lang: str, out_path: Path) -> None:
                     sv = "" if s[key] is None else str(s[key])
                     lines.append(f"| `{f_label}` | {uv} | {sv} |")
                 lines.append("")
+
+    # ---- Appendix B & C: schema diff ----
+    _add_schema_diff_appendix_md(lines, "tables_fields", is_en, Z, _slug)
+    _add_schema_diff_appendix_md(lines, "foreign_keys", is_en, Z, _slug)
 
     # ---- Closing ----
     lines.append(f"## {Z('Closing note' if is_en else '结语')}")

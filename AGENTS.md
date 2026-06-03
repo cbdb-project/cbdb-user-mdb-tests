@@ -95,6 +95,12 @@ looking at.
    `python reports/collect_index_year_diffs.py`
    Emits `reports/index_drift_examples.json`.  The appendix heading is always in the
    report; a placeholder is shown if this step is skipped.
+5d. **Regenerate schema / FK diff appendix** (compares TablesFields + ForeignKeys
+   documentation tables against actual DAO schema):
+   `python reports/collect_schema_diffs.py`
+   Emits `reports/schema_diff.json` (consumed by Appendix B + C) and six
+   `reports/schema_diff_*.csv` detail files.  The appendix headings are always in
+   the report; a placeholder is shown if this step is skipped.
 6. **Capture screenshots**: `python reports/capture_screenshots.py`
 7. **Rebuild ISSUES dict from scratch**: clear `ISSUES = [` … `]` in
    `reports/generate_report.py`, then write one entry per FAILED test,
@@ -104,7 +110,9 @@ looking at.
    - Infrastructure failures (dialog cascade, orphan Access process) →
      fix infra, do NOT add to ISSUES.
 8. **Regenerate** report: `python reports/generate_report.py`
-   The report now always contains: Coverage Matrix | Issues | Appendix A | Closing.
+   The report now always contains: Coverage Matrix | Issues |
+   Appendix A (index drift) | Appendix B (TablesFields diff) |
+   Appendix C (ForeignKeys diff) | Closing.
 
 **Bug-fixing is the maintainer team's responsibility — not this repo's.**
 
@@ -718,7 +726,12 @@ python -m pytest tests/ --regenerate-goldens
 # 6. Slow VBA-driven tests (~10-30 min) — actually run the form code
 python -m pytest tests/test_vba_*.py -W ignore -p no:cacheprovider
 
-# 7. Manual 5-min smoke (the few things tests can't cover):
+# 7. Regenerate all report artifacts
+python reports/collect_index_year_diffs.py   # step 5c: index drift appendix
+python reports/collect_schema_diffs.py       # step 5d: TablesFields / ForeignKeys diff
+python reports/generate_report.py
+
+# 8. Manual 5-min smoke (the few things tests can't cover):
 #    open Access, click each LookAt form, verify exports, see MANUAL_SMOKE.md
 ```
 

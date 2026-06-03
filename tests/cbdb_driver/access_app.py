@@ -44,17 +44,77 @@ def _pid_for_access_app(app) -> int | None:
     return int(pid) if pid else None
 
 
-def kill_access_pid(pid: int) -> bool:
-    """Force-kill exactly one MSACCESS.EXE PID.  Returns True if
-    `taskkill` reported success.  Safe to call on a PID that's
-    already gone — `taskkill` returns non-zero and we ignore that."""
+def kill_access_pid(pid: int, wait_s: float = 3.0) -> bool:
+    """Force-kill exactly one MSACCESS.EXE PID and wait for it to exit.
+
+    Returns True if the process is confirmed gone within `wait_s` seconds.
+    Safe to call on a PID that's already gone.
+
+    The wait is critical: `taskkill /F` delivers the signal synchronously
+    but the process can remain alive for 100-500 ms while Windows drains
+    its I/O completion ports and releases file handles.  Without the wait,
+    the next test's `unlink()` races against the dying process and gets
+    WinError 32 (file in use), cascading into ~120 fixture ERRORs per run.
+    """
     if not pid:
         return False
-    rc = subprocess.run(
+    subprocess.run(
         ["taskkill", "/F", "/PID", str(int(pid))],
         capture_output=True, check=False,
     )
-    return rc.returncode == 0
+    # Poll until the process exits or the deadline passes.
+    deadline = time.monotonic() + wait_s
+    try:
+        import psutil
+        while time.monotonic() < deadline:
+            if not psutil.pid_exists(pid):
+                return True
+            time.sleep(0.05)
+    except ImportError:
+        # psutil not available — fall back to win32api WaitForSingleObject
+        try:
+            import win32api
+            import win32con
+            import win32event
+            handle = win32api.OpenProcess(win32con.SYNCHRONIZE, False, pid)
+            try:
+                result = win32event.WaitForSingleObject(
+                    handle, int(wait_s * 1000)
+                )
+            finally:
+                win32api.CloseHandle(handle)
+            # WAIT_OBJECT_0 == 0 means the process exited
+            return result == 0
+        except Exception:
+            # OpenProcess raised → process already gone
+            return True
+    return False
+
+
+def _kill_file_holder(path: Path) -> None:
+    """Kill the MSACCESS.EXE process that has `path` open, then wait for it to exit.
+
+    Uses psutil to enumerate open file handles.  If psutil is unavailable or
+    the holding process cannot be identified, falls back to kill_orphan_access()
+    (which is gated on CBDB_KILL_ALL_ACCESS=1).
+    """
+    try:
+        import psutil
+        target = path.resolve()
+        for proc in psutil.process_iter(["pid", "name"]):
+            if not (proc.info["name"] or "").upper().startswith("MSACCESS"):
+                continue
+            try:
+                open_files = proc.open_files()
+            except (psutil.AccessDenied, psutil.NoSuchProcess):
+                continue
+            if any(Path(f.path).resolve() == target for f in open_files):
+                kill_access_pid(proc.pid)  # waits for exit
+                return
+    except ImportError:
+        pass
+    # psutil unavailable or holder not found — try blanket kill (env-gated)
+    kill_orphan_access()
 
 
 def kill_orphan_access():
@@ -121,18 +181,11 @@ def make_working_copy(src: str | Path, dest: str | Path) -> Path:
     if dest_p.exists():
         try:
             dest_p.unlink()
-        except PermissionError as e:
-            # An Access process is holding the working copy.  Used to
-            # recover by `taskkill /F /IM MSACCESS.EXE` here, but that
-            # also kills any Access DB the developer is editing
-            # manually.  Ask explicitly instead.
-            raise PermissionError(
-                f"cannot remove stale working copy {dest_p}: {e}.  "
-                f"Likely a previous test run left an MSACCESS.EXE "
-                f"holding it open.  Either close Access manually, or "
-                f"set CBDB_KILL_ALL_ACCESS=1 and call "
-                f"kill_orphan_access() before retrying."
-            ) from e
+        except PermissionError:
+            # An Access process is still holding the stale working copy.
+            # Identify it and kill it (waits for full exit), then retry.
+            _kill_file_holder(dest_p)
+            dest_p.unlink()  # raises PermissionError if still locked
     shutil.copy2(src_p, dest_p)
     return dest_p
 
@@ -154,7 +207,7 @@ class AccessApp:
         if self._app is not None:
             return self
         ensure_vbom_trust()  # required for VBComponents.Add / Name=
-        self._app = win32com.client.Dispatch("Access.Application")
+        self._app = win32com.client.DispatchEx("Access.Application")
         # Force-enable macros so AutoExec / Form_Open VBA can run.
         try:
             self._app.AutomationSecurity = 1  # msoAutomationSecurityLow

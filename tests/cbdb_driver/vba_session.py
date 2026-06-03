@@ -406,18 +406,14 @@ class VbaSession:
         if self.work.exists():
             try:
                 self.work.unlink()
-            except PermissionError as e:
-                # Likely a previous session crashed and left an orphan
-                # MSACCESS.EXE holding the working copy.  Surface it
-                # rather than nuke every Access window on the box.
-                raise PermissionError(
-                    f"cannot remove stale working copy {self.work}: {e}.  "
-                    f"A previous test run probably left an orphan "
-                    f"MSACCESS.EXE.  Either close it manually, or set "
-                    f"CBDB_KILL_ALL_ACCESS=1 and call "
-                    f"`from cbdb_driver.access_app import "
-                    f"kill_orphan_access; kill_orphan_access()` once."
-                ) from e
+            except PermissionError:
+                # An orphan Access process is still holding the stale
+                # working copy (e.g. previous test teardown race-lost
+                # against kill_access_pid).  Find and kill the holder,
+                # wait for it to fully exit, then retry.
+                from cbdb_driver.access_app import _kill_file_holder
+                _kill_file_holder(self.work)
+                self.work.unlink()  # re-raises PermissionError if still locked
         self.work.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(self.src, self.work)
 

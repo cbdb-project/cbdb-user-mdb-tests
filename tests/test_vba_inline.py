@@ -56,7 +56,7 @@ def inline_session():
     # don't close yet — pyodbc needs to remain open for the test
 
     # open Access VISIBLE so pywinauto can click
-    app = win32com.client.Dispatch("Access.Application")
+    app = win32com.client.DispatchEx("Access.Application")
     try:
         app.AutomationSecurity = 1
     except Exception:

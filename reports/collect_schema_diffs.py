@@ -22,7 +22,11 @@ from pathlib import Path
 import pyodbc
 
 ROOT = Path(__file__).resolve().parent.parent
-DATA_MDB = ROOT / "data" / "CBDB_20260430_DATA.mdb"
+import glob as _glob
+_data_candidates = sorted(_glob.glob(str(ROOT / "data" / "CBDB_*_DATA.mdb")))
+if not _data_candidates:
+    raise SystemExit("No CBDB_*_DATA.mdb found in data/")
+DATA_MDB = Path(_data_candidates[-1])
 REPORTS = ROOT / "reports"
 
 OUT_TF_CURRENT = REPORTS / "tables_fields_current.csv"
