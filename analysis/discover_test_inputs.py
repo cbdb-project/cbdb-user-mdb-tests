@@ -40,28 +40,18 @@ OUT = Path(__file__).resolve().parent / "dump" / "test_inputs.json"
 
 
 def _find_data_mdb(root: Path) -> Path:
-    """Find the DATA mdb in data/.
+    """Thin wrapper around _data_mdb_finder.find_data_mdb for this script.
 
-    All discovery queries target linked tables that live in the DATA mdb.
-    Connecting to the DATA mdb directly avoids stale linked-table path
-    errors when the DATA mdb has been replaced with a newer build.
-
-    If multiple CBDB_*_DATA.mdb files exist (e.g. old build not cleaned up),
-    pick the one with the latest YYYYMMDD in the filename so the script is
-    still usable without manual cleanup.
+    The shared implementation lives in analysis/_data_mdb_finder.py so
+    that conftest.py can import it without triggering pyodbc at module level.
     """
+    from _data_mdb_finder import find_data_mdb  # noqa: PLC0415
+    result = find_data_mdb(root)
+    # Mirror the old print so the caller knows when multiple were found.
     matches = list((root / "data").glob("CBDB_*_DATA.mdb"))
-    if not matches:
-        raise FileNotFoundError("No CBDB_*_DATA.mdb found in data/")
-    if len(matches) == 1:
-        return matches[0]
-    # Multiple matches: sort by embedded date (CBDB_YYYYMMDD_DATA.mdb) and pick newest
-    def _date_key(p: Path) -> str:
-        parts = p.stem.split("_")  # ["CBDB", "YYYYMMDD", "DATA"]
-        return parts[1] if len(parts) >= 2 else p.stem
-    chosen = sorted(matches, key=_date_key)[-1]
-    print(f"[discover] multiple DATA mdbs found; using newest: {chosen.name}")
-    return chosen
+    if len(matches) > 1:
+        print(f"[discover] multiple DATA mdbs found; using newest: {result.name}")
+    return result
 
 
 DATA_MDB = _find_data_mdb(ROOT)
