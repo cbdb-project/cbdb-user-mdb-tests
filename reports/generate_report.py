@@ -1109,8 +1109,13 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
 
 _VALID_TIERS = frozenset([
     "P0_silent_data", "P1_visible_crash", "P2_silent_display",
-    "P3_missing_ui", "P4_setup", "P5_dormant_or_latent", "resolved",
+    "P3_missing_ui", "P4_setup", "P5_dormant_or_latent",
 ])
+# NOTE: "resolved" is intentionally excluded.  Per AGENTS.md mandatory rule,
+# ISSUES is rebuilt from scratch each build.  Bugs that no longer reproduce
+# simply don't appear — they are not marked "resolved".  Using "resolved"
+# would pass validation but silently vanish from all rendered output (it is
+# not in tier_order), which is a silent-corruption trap.
 
 
 def _validate_issues() -> None:
