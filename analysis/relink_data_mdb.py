@@ -64,10 +64,10 @@ def relink(user_mdb: Path, data_mdb: Path) -> int:
         # Do NOT update LinkListInit — partial relink must fail hard so
         # future runs don't trust a broken state as "already fixed".
         db.Close()
-        print(f"  [relink] {len(errors)} table(s) failed:", file=sys.stderr)
-        for e in errors:
-            print(e, file=sys.stderr)
-        sys.exit(1)
+        msg = "\n".join(errors)
+        raise RuntimeError(
+            f"{len(errors)} table(s) failed to relink:\n{msg}"
+        )
 
     # All tables relinked successfully — update LinkListInit so the
     # fast-path bypass stays consistent with the new DATA mdb.
@@ -84,10 +84,22 @@ def relink(user_mdb: Path, data_mdb: Path) -> int:
     return n
 
 
-def main() -> None:
+def main(argv: list[str] | None = None) -> None:
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[1].strip())
+    parser.add_argument(
+        "--user-mdb", default=str(USER_MDB),
+        help="Path to CBDB_BJ_User.mdb to relink (default: data/CBDB_BJ_User.mdb)",
+    )
+    args = parser.parse_args(argv)
+    user_mdb = Path(args.user_mdb).resolve()
     data_mdb = find_data_mdb(ROOT)
-    print(f"[relink] linking {USER_MDB.name} → {data_mdb.name} ...")
-    n = relink(USER_MDB, data_mdb)
+    print(f"[relink] linking {user_mdb.name} -> {data_mdb.name} ...")
+    try:
+        n = relink(user_mdb, data_mdb)
+    except RuntimeError as exc:
+        print(f"[relink] FAILED: {exc}", file=sys.stderr)
+        sys.exit(1)
     print(f"[relink] done: {n} tables relinked")
 
 

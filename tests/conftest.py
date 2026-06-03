@@ -203,11 +203,20 @@ def pytest_configure(config):
     if _data_mdb_relink_needed(mdb, data_mdb):
         print(f"\n[conftest] LinkListInit.c_dataset stale; "
               f"relinking to {data_mdb.name} ...")
-        rc = subprocess.run(
-            [sys.executable, str(ROOT / "analysis" / "relink_data_mdb.py")],
-            capture_output=True, text=True,
-            timeout=120,  # DAO/ACE can hang; don't block pytest forever
-        )
+        try:
+            rc = subprocess.run(
+                [sys.executable, str(ROOT / "analysis" / "relink_data_mdb.py"),
+                 "--user-mdb", str(mdb)],  # pass resolved mdb path
+                capture_output=True, text=True,
+                timeout=120,  # DAO/ACE can hang; don't block pytest forever
+            )
+        except subprocess.TimeoutExpired:
+            pytest.exit(
+                "[conftest] relink_data_mdb.py timed out after 120s."
+                "\nDAO/ACE may be hung (another Access process holding the MDB?)."
+                "\nKill any MSACCESS.EXE processes, then re-run."
+                "\nPass `--no-discover-inputs` to skip the relink gate."
+            )
         if rc.returncode != 0:
             pytest.exit(
                 f"[conftest] relink_data_mdb.py FAILED (rc={rc.returncode})."
