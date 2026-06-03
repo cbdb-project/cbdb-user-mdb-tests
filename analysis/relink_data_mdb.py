@@ -35,12 +35,11 @@ import win32com.client  # pywin32
 ROOT = Path(__file__).resolve().parent.parent
 USER_MDB = ROOT / "data" / "CBDB_BJ_User.mdb"
 
-
-def find_data_mdb(root: Path) -> Path:
-    matches = list((root / "data").glob("CBDB_*_DATA.mdb"))
-    if not matches:
-        raise FileNotFoundError("No CBDB_*_DATA.mdb found in data/")
-    return sorted(matches, key=lambda p: p.stem.split("_")[1])[-1]
+# Use the shared finder so all callers stay in sync.
+import sys as _sys
+if str(Path(__file__).parent) not in _sys.path:
+    _sys.path.insert(0, str(Path(__file__).parent))
+from _data_mdb_finder import find_data_mdb  # noqa: E402
 
 
 def relink(user_mdb: Path, data_mdb: Path) -> int:
