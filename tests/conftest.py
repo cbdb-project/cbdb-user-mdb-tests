@@ -85,26 +85,27 @@ def user_mdb_path(request) -> Path:
 
 
 def _resolve_data_mdb(root: Path) -> Path | None:
-    """Resolve the linked DATA mdb if a single glob match exists.
+    """Resolve the DATA mdb in data/, returning the newest if multiple exist.
 
-    The Place / Kinship / etc forms read from `BIOG_ADDR_DATA`,
-    `KIN_DATA` etc. — linked tables whose backing mdb path is
-    stored in `LinkListInit.c_path`.  Resolving that at gate
-    time would require opening Access COM (heavy + flaky per
-    PR AS / PR AU findings) or pyodbc against the user mdb
-    (Windows-only ODBC dependency at gate time).
+    Uses the same pick-newest-by-YYYYMMDD strategy as
+    analysis/discover_test_inputs.py so both functions agree on which
+    DATA mdb is active.  Returns None only when the data/ directory
+    has no CBDB_*_DATA.mdb files at all.
 
-    A simple `data/CBDB_*_DATA.mdb` glob is the cheap stable
-    proxy: when there's exactly ONE such file, it's almost
-    certainly the linked DATA mdb and a stale-comparison is
-    safe.  If there are zero or multiple matches, we fall back
-    to user-mdb-only gating per the brief's "若不稳，先以
-    user mdb 为 gate" guidance.
+    Having multiple DATA mdbs is a user error (AGENTS.md: "delete old
+    one first"), but returning the newest is safer than returning None
+    and silently skipping the stale-link check.
     """
     matches = list((root / "data").glob("CBDB_*_DATA.mdb"))
+    if not matches:
+        return None
     if len(matches) == 1:
         return matches[0]
-    return None
+    # Multiple: pick newest by YYYYMMDD embedded in filename
+    def _date_key(p: Path) -> str:
+        parts = p.stem.split("_")   # ["CBDB", "YYYYMMDD", "DATA"]
+        return parts[1] if len(parts) >= 2 else p.stem
+    return sorted(matches, key=_date_key)[-1]
 
 
 def _refresh_decision(
@@ -152,6 +153,9 @@ def _data_mdb_relink_needed(user_mdb: Path, data_mdb: Path | None) -> bool:
         return False
     try:
         import pyodbc as _pyodbc
+    except ImportError:
+        return False   # pyodbc not installed (headless / Linux) — safe no-op
+    try:
         conn = _pyodbc.connect(
             "DRIVER={Microsoft Access Driver (*.mdb, *.accdb)};"
             f"DBQ={user_mdb};ReadOnly=True;",
@@ -167,28 +171,42 @@ def _data_mdb_relink_needed(user_mdb: Path, data_mdb: Path | None) -> bool:
         parts = data_mdb.stem.split("_")  # ["CBDB", "YYYYMMDD", "DATA"]
         current = parts[1] if len(parts) >= 2 else ""
         return stored != current
-    except Exception:
+    except Exception as e:
+        # On a real Windows+Access box, ODBC failures here are genuine
+        # problems (locked MDB, broken driver, unreadable LinkListInit).
+        # Warn so the user knows the relink check was skipped, rather
+        # than silently proceeding with potentially stale links.
+        print(
+            f"\n[conftest] WARNING: could not check LinkListInit.c_dataset "
+            f"({type(e).__name__}: {e}). "
+            f"If linked tables are stale, run: "
+            f"python analysis/relink_data_mdb.py"
+        )
         return False
 
 
 def pytest_sessionfinish(session, exitstatus):
-    """Kill all MSACCESS.EXE processes left open by the test session.
+    """Kill MSACCESS.EXE processes opened by this test session.
+
+    Only runs when --include-vba was used (the flag that opens Access).
+    Skipped otherwise to avoid killing unrelated Access sessions the
+    developer may have open with unsaved work.
 
     The com_app and VbaSession fixtures call close() in their teardowns,
-    but if a test is interrupted (dialog blocks, Ctrl-C, crash) the
-    teardown may not run and Access windows are left on screen.  This
-    hook runs unconditionally after every session — including crashes —
-    so the desktop is always clean when pytest exits.
-
-    Only active on Windows (subprocess.run with taskkill).  Silent no-op
-    on other platforms.
+    but if a dialog blocks or the session is interrupted the teardown
+    may not run.  This hook is the safety net.
     """
     if sys.platform != "win32":
         return
+    try:
+        if not session.config.getoption("--include-vba", default=False):
+            return
+    except ValueError:
+        return  # option not registered (e.g. early-exit before addoption)
     import subprocess
     subprocess.run(
         ["taskkill", "/F", "/IM", "MSACCESS.EXE"],
-        capture_output=True,   # suppress "not found" output when none are open
+        capture_output=True,   # suppress "not found" when none are open
     )
 
 
