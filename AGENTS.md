@@ -116,9 +116,16 @@ looking at.
 
 ### ⛔ MANDATORY: report pipeline is NOT optional — even for verification runs
 
-**Any time you run the full `--include-vba` test suite, you MUST complete
-steps 5b → 5c → 5d → 8 before closing the session, even if the run was
-only to verify an infra fix and not a new build.**
+**Any time the user asks to "run tests" (or equivalent), execute the
+full workflow via `run_tests.ps1`.  Steps 1 + 5 + 5b + 5c + 5d are
+automated by the script; step 7 (rewrite ISSUES) and step 8
+(generate_report.py) must follow immediately after.**
+
+```powershell
+# From repo root — runs steps 1 / 5 / 5b / 5c / 5d automatically:
+.\run_tests.ps1
+# Then do step 7 (rewrite ISSUES dict) + step 8 manually.
+```
 
 Rationale: a test run without a generated report leaves `reports/` in an
 incomplete state.  The reviewer cannot assess results; the coverage matrix
