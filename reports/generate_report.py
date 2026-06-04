@@ -47,92 +47,592 @@ OUT_ZH_MD = REPO / "reports" / "CBDB_Issues_Report_ZH-Hant.md"
 # ---------------------------------------------------------------------
 
 ISSUES = [
-    # ---- build-20260603 / data-20260602 test run findings ----
+    # ---- build-20260604 / data-20260602 test run findings ----
     # Only entries confirmed by test failures in THIS run.
     # No carry-forward from previous builds.
 
     {
-        "id": 3,
-        "tier": "P2_silent_display",
-        "form": "Form_LookAtEntry.CmdQuery_Click",
-        "title_en": "LookAtEntry: c_entry_desc backfill is NULL for all rows when entry_code = 36 (jinshi general)",
-        "title_zh": "LookAtEntry：entry_code = 36（進士及第）時，c_entry_desc 回填全部為 NULL",
+        "id": 21,
+        "tier": "P0_silent_data",
+        "form": "Form_LookAtOffice.CmdGIS_Click",
+        "title_en": "LookAtOffice: CmdGIS output IndexYear column is nearly empty (0.2% fill rate) — likely silent column-bind regression",
+        "title_zh": "LookAtOffice：CmdGIS 輸出的 IndexYear 欄幾乎為空（填充率 0.2%）——疑似靜默欄位綁定退化",
         "summary_en": (
-            "When the user runs a LookAtEntry query filtered to entry code 36 "
-            "(examination: jinshi general), the result table ZZ_SCRATCH_ENTRY "
-            "is populated with 92,545 rows but the c_entry_desc column is NULL "
-            "for every row.  The expected value is 'examination: jinshi (general)'.\n\n"
-            "The CmdQuery_Click handler successfully inserts rows from ENTRY_DATA "
-            "joined to ENTRY_CODES, but the c_entry_desc backfill step does not "
-            "write the description for this specific entry code.  All other columns "
-            "appear to be filled normally.  The missing description means the "
-            "on-screen result grid shows a blank entry-type column for every record, "
-            "which is misleading — the user sees results but cannot identify what "
-            "type of examination each record represents.\n\n"
-            "Detected by: test_vba_full_matrix[top_entry_code_36_unfiltered] — "
-            "assertion 'c_entry_desc backfill wrong' with 92,545 affected rows."
+            "When CmdGIS runs for LookAtOffice with person 80944 (unfiltered), the GIS output "
+            "file is produced but the IndexYear column contains non-empty values in only 64 of "
+            "36,602 rows (0.2%), well below the 80% threshold expected for a correctly-populated "
+            "GIS export.  This pattern is consistent with the silent column-bind regressions "
+            "documented in Bugs #10, #11, and #12 — a column name in the CmdGIS SELECT is "
+            "mismatched against the actual ZZ_SCRATCH table schema.\n\n"
+            "Detected by: test_cmd_gis_produces_file[office_80944_unfiltered] — assertion "
+            "[LookAtOffice] CmdGIS column 'IndexYear' is non-empty in only 64/36602 rows (0.2%), "
+            "below 80% threshold."
         ),
         "summary_zh": (
-            "當使用者在 LookAtEntry 以 entry_code = 36（進士及第）執行查詢時，"
-            "結果表 ZZ_SCRATCH_ENTRY 雖然產生了 92,545 筆資料，但 c_entry_desc "
-            "欄位對每一筆都是 NULL。預期值應為 'examination: jinshi (general)'。\n\n"
-            "CmdQuery_Click 成功地從 ENTRY_DATA JOIN ENTRY_CODES 插入了資料，"
-            "但 c_entry_desc 的回填步驟對此 entry code 並未寫入說明文字。其他欄位"
-            "看起來都正常填充。因此，使用者在螢幕上看到的查詢結果中，每一筆記錄的"
-            "入仕方式欄位都是空白，難以判斷是何種考試類型。\n\n"
-            "由 test_vba_full_matrix[top_entry_code_36_unfiltered] 偵測到，"
-            "斷言 'c_entry_desc backfill wrong'，影響 92,545 筆。"
+            "以人物 80944（無篩選）執行 LookAtOffice CmdGIS 時，GIS 輸出檔案雖已產生，"
+            "但 IndexYear 欄僅在 36,602 列中的 64 列有非空值（0.2%），遠低於正確 GIS "
+            "輸出預期的 80% 閾值。此模式與 Bug #10、#11、#12 記錄的靜默欄位綁定退化一致——"
+            "CmdGIS SELECT 中的欄位名稱與 ZZ_SCRATCH 表格的實際 schema 不符。\n\n"
+            "由 test_cmd_gis_produces_file[office_80944_unfiltered] 偵測到，斷言 "
+            "[LookAtOffice] CmdGIS 欄 IndexYear 僅 64/36602 列非空（0.2%），低於 80% 閾值。"
         ),
         "steps_en": [
             "Open CBDB_BJ_User.mdb in Microsoft Access.",
-            "From the Navigation Pane, open the form **LookAtEntry**.",
-            "In the Entry Code picker, select entry code **36** "
-            "(label: 'examination: jinshi (general)').",
-            "Leave dynasty, address, and year filters blank.",
-            "Click **Run Query** (CmdQuery button).",
-            "When the query completes, inspect the result grid: the "
-            "entry-type description column (c_entry_desc) is blank for every row.",
-            "SQL verification: `SELECT TOP 5 c_entry_code, c_entry_desc FROM "
-            "ZZ_SCRATCH_ENTRY` returns (36, NULL) for all rows.",
+            "Open the LookAtOffice form.",
+            "Set person ID to 80944 and leave all other filters blank.",
+            "Click CmdGIS.  The file is produced without an error popup.",
+            "Open the GIS output file and inspect the IndexYear column: "
+            "the vast majority of rows will be empty.",
         ],
         "steps_zh": [
             "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
-            "從導覽窗格開啟 **LookAtEntry** 表單。",
-            "在 Entry Code 選擇器中，選取 entry code **36**"
-            "（標籤：'examination: jinshi (general)'）。",
-            "朝代、地址、年份篩選器留空。",
-            "點擊 **Run Query**（CmdQuery 按鈕）。",
-            "查詢完成後，檢視結果格：每一筆記錄的入仕方式說明欄（c_entry_desc）皆為空白。",
-            "SQL 驗證：`SELECT TOP 5 c_entry_code, c_entry_desc FROM "
-            "ZZ_SCRATCH_ENTRY` 對所有列回傳 (36, NULL)。",
+            "開啟 LookAtOffice 表單。",
+            "將人物 ID 設為 80944，其餘篩選器留空。",
+            "點擊 CmdGIS。檔案產生時不會出現錯誤彈出視窗。",
+            "開啟 GIS 輸出檔並檢查 IndexYear 欄：絕大多數列將為空白。",
         ],
         "screenshots": [],
         "severity_en": (
-            "P2 — Silent display issue: 92,545 rows affected.  The user can "
-            "see the blank c_entry_desc column in the result grid, but Access "
-            "shows no error — making it easy to overlook.  Exports (GIS, "
-            "Neo4j, KML) that reference this column will also carry the blank."
+            "P0 — Silent data corruption: the GIS export appears to succeed but IndexYear "
+            "data is missing for 99.8% of rows.  Downstream GIS workflows that depend on "
+            "year-based filtering will silently receive null years."
         ),
         "severity_zh": (
-            "P2 — 靜默顯示問題：92,545 筆受影響。使用者可在結果格中看到空白的 "
-            "c_entry_desc 欄，但 Access 不顯示錯誤——容易被忽略。參照此欄的匯出"
-            "（GIS、Neo4j、KML）也會包含空白值。"
+            "P0 — 靜默資料損毀：GIS 匯出看似成功，但 99.8% 列的 IndexYear 資料遺失。"
+            "依賴年份篩選的下游 GIS 工作流程將靜默地收到空白年份。"
         ),
         "fix_en": (
-            "Locate the backfill step in Form_LookAtEntry.CmdQuery_Click that "
-            "sets c_entry_desc for ZZ_SCRATCH_ENTRY rows.  Verify that the JOIN "
-            "to ENTRY_CODES on c_entry_code = 36 is not inadvertently filtered "
-            "out or that the UPDATE / backfill SQL matches the column name "
-            "exactly.  After the fix, "
-            "`SELECT c_entry_desc FROM ZZ_SCRATCH_ENTRY WHERE c_entry_code = 36 "
-            "LIMIT 1` should return 'examination: jinshi (general)'."
+            "Inspect Form_LookAtOffice.CmdGIS_Click: locate the SELECT that populates "
+            "the IndexYear column in the GIS output and verify the source column name "
+            "matches the actual schema (check ZZ_SCRATCH_OFFICE or the equivalent table)."
         ),
         "fix_zh": (
-            "在 Form_LookAtEntry.CmdQuery_Click 中找到對 ZZ_SCRATCH_ENTRY 設定 "
-            "c_entry_desc 的回填步驟，確認 JOIN ENTRY_CODES 的條件（c_entry_code = 36）"
-            "沒有被意外篩除，且 UPDATE / 回填 SQL 使用了正確的欄位名稱。修復後，"
-            "`SELECT c_entry_desc FROM ZZ_SCRATCH_ENTRY WHERE c_entry_code = 36 "
-            "LIMIT 1` 應回傳 'examination: jinshi (general)'。"
+            "檢查 Form_LookAtOffice.CmdGIS_Click：找到填充 GIS 輸出 IndexYear 欄的 SELECT 語句，"
+            "確認來源欄位名稱與實際 schema 一致（檢查 ZZ_SCRATCH_OFFICE 或對應資料表）。"
+        ),
+    },
+    {
+        "id": 26,
+        "tier": "P0_silent_data",
+        "form": "BIOG_MAIN (c_index_addr_id)",
+        "title_en": "c_index_addr_id disagreement between User MDB and cbdb-online snapshot exceeds 0.5% threshold",
+        "title_zh": "User MDB 與 cbdb-online 快照的 c_index_addr_id 不一致率超過 0.5% 閾值",
+        "summary_en": (
+            "A cross-check of BIOG_MAIN.c_index_addr_id between the User MDB and the "
+            "cbdb-online-main-server SQLite snapshot found a disagreement rate of 0.500%, "
+            "exactly at the maximum acceptable threshold.  At the default 5,000-row sample "
+            "this means approximately 25 persons have a different c_index_addr_id in the "
+            "two systems, indicating that either the User MDB has not fully applied recent "
+            "upstream address assignments or the snapshot is ahead of the current data export.\n\n"
+            "Detected by: test_index_year_addr_xcheck_sample — assertion "
+            "c_index_addr_id disagreement 0.500% exceeds 0.5% threshold."
+        ),
+        "summary_zh": (
+            "對 User MDB 與 cbdb-online-main-server SQLite 快照之間的 BIOG_MAIN.c_index_addr_id "
+            "進行交叉核查，發現不一致率為 0.500%，恰好達到最大可接受閾值。以預設 5,000 列樣本計，"
+            "約有 25 名人物在兩個系統中的 c_index_addr_id 不同，表明 User MDB 可能尚未完全套用"
+            "近期上游地址指定，或快照領先於當前資料匯出。\n\n"
+            "由 test_index_year_addr_xcheck_sample 偵測到，斷言 "
+            "c_index_addr_id 不一致率 0.500% 超過 0.5% 閾值。"
+        ),
+        "steps_en": [
+            "Run: python reports/collect_index_year_diffs.py",
+            "Inspect reports/index_drift_examples.json for rows where the bucket is "
+            "'addr_only' — these are persons where c_index_addr_id differs between "
+            "the User MDB and the online snapshot.",
+            "For each differing person, query BIOG_MAIN.c_index_addr_id and compare "
+            "against the online server to determine which value is authoritative.",
+        ],
+        "steps_zh": [
+            "執行：python reports/collect_index_year_diffs.py",
+            "檢查 reports/index_drift_examples.json 中 bucket 為 'addr_only' 的列——"
+            "這些是 User MDB 與線上快照之間 c_index_addr_id 不同的人物。",
+            "對每個不一致的人物，查詢 BIOG_MAIN.c_index_addr_id 並與線上伺服器比較，"
+            "確認哪個值為權威值。",
+        ],
+        "screenshots": [],
+        "severity_en": (
+            "P0 — Silent data drift: ~25 persons have a different primary address ID than "
+            "the online system.  Geographic analyses and GIS exports that use c_index_addr_id "
+            "will silently place these persons at the wrong location."
+        ),
+        "severity_zh": (
+            "P0 — 靜默資料漂移：約 25 名人物的主要地址 ID 與線上系統不同。使用 c_index_addr_id "
+            "的地理分析和 GIS 匯出將靜默地將這些人物置於錯誤位置。"
+        ),
+        "fix_en": (
+            "Apply the latest c_index_addr_id assignments from the cbdb-online server to "
+            "BIOG_MAIN in the User MDB.  The differing rows are enumerated in "
+            "reports/index_drift_examples.json (bucket: 'addr_only')."
+        ),
+        "fix_zh": (
+            "將 cbdb-online 伺服器最新的 c_index_addr_id 指定套用至 User MDB 中的 BIOG_MAIN。"
+            "不一致的列已列舉於 reports/index_drift_examples.json（bucket: 'addr_only'）中。"
+        ),
+    },
+    {
+        "id": 23,
+        "tier": "P0_silent_data",
+        "form": "Form_LookAtAssociations.CmdPajek_Click",
+        "title_en": "LookAtAssociations: CmdPajek vertex section has off-by-N count — header declares 501 vertices but exports 8,093 rows",
+        "title_zh": "LookAtAssociations：CmdPajek 頂點區段數量錯誤——標頭宣告 501 個頂點，但實際匯出 8,093 列",
+        "summary_en": (
+            "The Pajek .net file produced by Form_LookAtAssociations.CmdPajek_Click declares "
+            "'*Vertices 501' in the header but the actual vertex section contains 8,093 rows "
+            "before the next `*` section marker.  Pajek and other network analysis tools that "
+            "rely on the vertex count header will either truncate the vertex list after 501 "
+            "rows or raise a parse error, silently discarding the remaining ~7,592 vertices "
+            "from the network.\n\n"
+            "Detected by: test_export_button_produces_file[LookAtAssociations_CmdPajek] — "
+            "assertion header declared 501 vertices but found 8093 vertex rows before the next "
+            "`*` section."
+        ),
+        "summary_zh": (
+            "Form_LookAtAssociations.CmdPajek_Click 產生的 Pajek .net 檔案在標頭宣告 "
+            "'*Vertices 501'，但實際頂點區段在下一個 `*` 標記之前包含 8,093 列。Pajek "
+            "及其他依賴頂點計數標頭的網路分析工具將在 501 列後截斷頂點列表或觸發解析錯誤，"
+            "靜默地丟棄其餘約 7,592 個頂點。\n\n"
+            "由 test_export_button_produces_file[LookAtAssociations_CmdPajek] 偵測到，"
+            "斷言標頭宣告 501 個頂點但在下一個 `*` 區段前找到 8,093 列頂點。"
+        ),
+        "steps_en": [
+            "Open CBDB_BJ_User.mdb in Microsoft Access.",
+            "Open LookAtAssociations, select a query that returns a large association network.",
+            "Click CmdPajek.  The .net file is written without an error popup.",
+            "Open the .net file and count the lines in the *Vertices section: "
+            "the count exceeds the number declared in the '*Vertices N' header.",
+        ],
+        "steps_zh": [
+            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
+            "開啟 LookAtAssociations，選擇一個回傳大型關聯網絡的查詢。",
+            "點擊 CmdPajek。.net 檔案寫入時不出現錯誤視窗。",
+            "開啟 .net 檔案並計算 *Vertices 區段的列數：實際數量超過 '*Vertices N' 標頭中宣告的數字。",
+        ],
+        "screenshots": [],
+        "severity_en": (
+            "P0 — Silent data corruption: the exported Pajek file is structurally invalid. "
+            "Network analyses that ingest the file will operate on a truncated vertex set, "
+            "producing incorrect centrality / community detection results without any warning."
+        ),
+        "severity_zh": (
+            "P0 — 靜默資料損毀：匯出的 Pajek 檔案在結構上無效。讀取該檔案的網路分析將在"
+            "截斷的頂點集上運行，在沒有任何警告的情況下產生不正確的中心性/社群偵測結果。"
+        ),
+        "fix_en": (
+            "In Form_LookAtAssociations.CmdPajek_Click, locate where the '*Vertices N' header "
+            "is written and ensure N is derived from the actual count of vertex rows written, "
+            "not a pre-computed estimate or a separate query result."
+        ),
+        "fix_zh": (
+            "在 Form_LookAtAssociations.CmdPajek_Click 中，找到寫入 '*Vertices N' 標頭的位置，"
+            "確保 N 來自實際寫入的頂點列數，而非預先計算的估計值或單獨的查詢結果。"
+        ),
+    },
+    {
+        "id": 24,
+        "tier": "P0_silent_data",
+        "form": "Form_LookAtKinship.CmdGUESS_Click",
+        "title_en": "LookAtKinship: CmdGUESS Gephi output has wrong field count per node row (nodedef declares 15 columns)",
+        "title_zh": "LookAtKinship：CmdGUESS Gephi 輸出每個節點列的欄位數錯誤（nodedef 宣告 15 欄）",
+        "summary_en": (
+            "The Gephi .gdf file produced by Form_LookAtKinship.CmdGUESS_Click declares 15 "
+            "columns in the nodedef header but the actual node data rows contain a different "
+            "number of fields (column/value misalignment).  Gephi and downstream tools will "
+            "either fail to load the file or silently map node attributes to the wrong columns.\n\n"
+            "Detected by: test_cmd_guess_produces_file[kinship_person_3211] — assertion "
+            "[LookAtKinship] Gephi: node rows with bad field count (nodedef has 15 cols)."
+        ),
+        "summary_zh": (
+            "Form_LookAtKinship.CmdGUESS_Click 產生的 Gephi .gdf 檔案在 nodedef 標頭宣告 "
+            "15 個欄位，但實際節點資料列包含不同數量的欄位（欄位/值錯位）。Gephi 及下游工具"
+            "將無法載入該檔案，或靜默地將節點屬性對應到錯誤的欄位。\n\n"
+            "由 test_cmd_guess_produces_file[kinship_person_3211] 偵測到，斷言 "
+            "[LookAtKinship] Gephi: node rows with bad field count (nodedef has 15 cols)。"
+        ),
+        "steps_en": [
+            "Open CBDB_BJ_User.mdb in Microsoft Access.",
+            "Open LookAtKinship.  Set a person ID that returns a kinship network.",
+            "Click CmdGUESS.  The .gdf file is written without error.",
+            "Open the .gdf file: count the columns declared in the 'nodedef>' header "
+            "and compare with the number of comma-separated values in the first node data row.",
+        ],
+        "steps_zh": [
+            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
+            "開啟 LookAtKinship，設定一個可回傳親屬網絡的人物 ID。",
+            "點擊 CmdGUESS。.gdf 檔案寫入時不出現錯誤。",
+            "開啟 .gdf 檔案：計算 'nodedef>' 標頭宣告的欄數，與第一個節點資料列中逗號分隔值的數量進行比較。",
+        ],
+        "screenshots": [],
+        "severity_en": (
+            "P0 — Silent data corruption: the Gephi file is structurally invalid. "
+            "Node attributes are silently misaligned, making all imported node metadata unreliable."
+        ),
+        "severity_zh": (
+            "P0 — 靜默資料損毀：Gephi 檔案在結構上無效。節點屬性靜默錯位，導致所有匯入的節點元資料不可靠。"
+        ),
+        "fix_en": (
+            "In Form_LookAtKinship.CmdGUESS_Click, ensure the nodedef header column list and "
+            "the per-row value list are generated from the same ordered column definition. "
+            "A mismatch typically occurs when a column is added to one list but not the other."
+        ),
+        "fix_zh": (
+            "在 Form_LookAtKinship.CmdGUESS_Click 中，確保 nodedef 標頭欄位列表與每列值列表"
+            "來自同一個有序欄位定義。不符情況通常發生在某欄位被加入一個列表但未加入另一個時。"
+        ),
+    },
+    {
+        "id": 20,
+        "tier": "P5_dormant_or_latent",
+        "form": "ADDR_CODES + Form_LookAt*.CmdGIS_Click",
+        "title_en": "BOM-prefixed address names would produce embedded TAB delimiters in GIS exports — DORMANT (BOM data cleaned upstream, 0 affected rows in this dump)",
+        "title_zh": "BOM 前綴地址名稱在 GIS 匯出中會產生嵌入的 TAB 分隔符——當前資料集靜止（BOM 資料已在上游清理，本 dump 中受影響列數為 0）",
+        "summary_en": (
+            "The ADDR_CODES table previously contained rows where c_name and c_name_chn "
+            "carried a leading U+FEFF (BOM) prefix (almost certainly from a UTF-8-with-BOM "
+            "paste at data-import time), which when passed through JET produced embedded TAB "
+            "characters in the CmdGIS output.  The key reachable example was c_addr_id = 702559 "
+            "(Wei Shi 尉氏), reachable from persons with c_status_code = 40 (civil office / "
+            "[為官者：文]).\n\n"
+            "In this build (data-20260602) the BOM data has been cleaned upstream: "
+            "test_addr_codes_has_known_bom_dirty_rows now finds 0 BOM-prefixed rows, and "
+            "test_known_reachable_dirty_addr_present also returns 0 rows.  The GIS unescaped-"
+            "write pattern remains in the code (CmdGIS of LookAtTexts / LookAtPlace / "
+            "LookAtAssociations / LookAtOffice / LookAtKinship still does no TAB escaping), "
+            "so the structural risk re-activates if future data introduces another BOM row.\n\n"
+            "GOLDEN_STALE: BOM golden tests now expect 0 rows; update goldens.  This issue "
+            "is retained as P5_dormant_or_latent because the unescaped-write code defect is "
+            "still present."
+        ),
+        "summary_zh": (
+            "ADDR_CODES 表先前有一些 c_name 和 c_name_chn 帶有前導 U+FEFF（BOM）前綴的列"
+            "（幾乎可確定是資料匯入時以帶 BOM 的 UTF-8 貼上所致），經 JET 處理後會在 CmdGIS "
+            "輸出中產生嵌入的 TAB 字元。最主要的可達範例是 c_addr_id = 702559（尉氏 Wei Shi），"
+            "可從 c_status_code = 40（[為官者：文] / civil office）的人物到達。\n\n"
+            "在此版本（data-20260602）中，BOM 資料已在上游完成清理：test_addr_codes_has_known_"
+            "bom_dirty_rows 現在找到 0 個帶 BOM 前綴的列，test_known_reachable_dirty_addr_"
+            "present 也回傳 0 列。CmdGIS 中未轉義的寫入模式仍存在於程式碼中（LookAtTexts / "
+            "LookAtPlace / LookAtAssociations / LookAtOffice / LookAtKinship 的 CmdGIS 仍未"
+            "進行 TAB 轉義），因此若未來資料引入新的 BOM 列，結構性風險將再次啟動。\n\n"
+            "GOLDEN_STALE：BOM golden 測試現在預期 0 列；請更新 goldens。此 Issue 因未轉義"
+            "寫入的程式碼缺陷仍然存在，故以 P5_dormant_or_latent 保留。"
+        ),
+        "steps_en": [
+            "In this build the bug cannot be triggered — SELECT COUNT(*) FROM ADDR_CODES "
+            "WHERE Left(c_name, 1) = ChrW(65279) returns 0.",
+            "The structural risk: open Form_LookAtOffice (or any LookAt form), run CmdGIS "
+            "with status code **40** (civil office / [為官者：文]).  "
+            "If a BOM row were present for c_addr_id = 702559 (Wei Shi 尉氏) the output "
+            "file would have an extra TAB column around row 11476.",
+            "(Dormant verification) Confirm: SELECT COUNT(*) FROM ADDR_CODES WHERE "
+            "Left(c_name, 1) = ChrW(65279) returns 0 on this dump.",
+        ],
+        "steps_zh": [
+            "在此版本中，Bug 無法觸發——SELECT COUNT(*) FROM ADDR_CODES WHERE "
+            "Left(c_name, 1) = ChrW(65279) 回傳 0。",
+            "結構性風險：開啟 Form_LookAtOffice（或任意 LookAt 表單），以狀態碼 **40**"
+            "（[為官者：文] / civil office）執行 CmdGIS。若 c_addr_id = 702559（尉氏 Wei Shi）"
+            "存在 BOM 列，輸出檔案在第 11476 列附近會出現多餘的 TAB 欄。",
+            "（靜止驗證）確認：SELECT COUNT(*) FROM ADDR_CODES WHERE Left(c_name, 1) = "
+            "ChrW(65279) 在此 dump 中回傳 0。",
+        ],
+        "screenshots": [],
+        "severity_en": (
+            "P5 — Dormant on this dump (BOM data cleaned upstream, 0 affected rows in "
+            "data-20260602).  Would re-activate as P0 silent data corruption if any future "
+            "ADDR_CODES row re-introduces a U+FEFF prefix in c_name or c_name_chn.  "
+            "The unescaped CmdGIS write code is the second half of the fix still outstanding."
+        ),
+        "severity_zh": (
+            "P5 — 在此 dump 中為靜止（BOM 資料已在上游清理，data-20260602 中受影響列數為 0）。"
+            "若未來任何 ADDR_CODES 列在 c_name 或 c_name_chn 重新引入 U+FEFF 前綴，"
+            "將重新啟動並提升為 P0 靜默資料損毀。未轉義的 CmdGIS 寫入程式碼是尚未解決的"
+            "第二部分修復。"
+        ),
+        "fix_en": (
+            "The data-side fix has been applied upstream (0 BOM rows remain).  "
+            "The code-side fix is still needed: before each tStr = tStr + value + tC append "
+            "in the CmdGIS bodies of all LookAt forms, replace any embedded Chr(9), Chr(10), "
+            "Chr(13), or U+FEFF in value with a space.  This prevents re-occurrence if "
+            "future imports bring BOM-prefixed rows."
+        ),
+        "fix_zh": (
+            "資料端修復已在上游套用（0 個 BOM 列殘留）。程式碼端修復仍需進行：在所有 "
+            "LookAt 表單 CmdGIS 主體的每個 tStr = tStr + value + tC 追加之前，將 value "
+            "中嵌入的 Chr(9)、Chr(10)、Chr(13) 或 U+FEFF 替換為空格，以防未來匯入帶 BOM "
+            "前綴列時再次發生。"
+        ),
+    },
+    {
+        "id": 22,
+        "tier": "P1_visible_crash",
+        "form": "Form_LookAtAssociations.CmdUCINet_Click / Form_LookAtKinship.CmdUCINet_Click",
+        "title_en": "LookAtAssociations / LookAtKinship: CmdUCINet crashes with 'Invalid procedure call or argument' when c_name contains CJK Han characters",
+        "title_zh": "LookAtAssociations / LookAtKinship：當 c_name 含有 CJK 漢字時，CmdUCINet 因「Invalid procedure call or argument」崩潰",
+        "summary_en": (
+            "Form_LookAtAssociations.CmdUCINet_Click and Form_LookAtKinship.CmdUCINet_Click "
+            "both call CreateTextFile with the 2-argument signature (filename, overwrite).  "
+            "VBA's CreateTextFile raises 'Invalid procedure call or argument' (runtime error 5) "
+            "when the output path contains a CJK Han character in a c_name value — the 2-arg "
+            "form does not accept a Unicode flag, so Access silently uses the system ANSI code "
+            "page, which cannot encode Han characters.  The error fires as a popup and aborts "
+            "the export.  Fixtures using association code c_assoc_code = 437 "
+            "('Presented literary composition as gift to' / '贈詩、文') reliably trigger this "
+            "because the associated persons include Han-character names.\n\n"
+            "Detected by: test_bug22_associations_cmducinet_fires_invalid_procedure_call and "
+            "test_bug22_kinship_cmducinet_sibling_form_fires_invalid_procedure_call."
+        ),
+        "summary_zh": (
+            "Form_LookAtAssociations.CmdUCINet_Click 和 Form_LookAtKinship.CmdUCINet_Click "
+            "均以 2 參數形式呼叫 CreateTextFile（filename, overwrite），未傳入 Unicode 旗標。"
+            "當輸出路徑或 c_name 值包含 CJK 漢字時，VBA 的 CreateTextFile 觸發「Invalid "
+            "procedure call or argument」（執行期錯誤 5），因系統 ANSI 字碼頁無法編碼漢字。"
+            "錯誤以彈出視窗形式出現並中止匯出。使用關聯代碼 c_assoc_code = 437"
+            "（'Presented literary composition as gift to' / '贈詩、文'）的固件能可靠觸發此問題，"
+            "因相關人物的 c_name 包含漢字。\n\n"
+            "由 test_bug22_associations_cmducinet_fires_invalid_procedure_call 及 "
+            "test_bug22_kinship_cmducinet_sibling_form_fires_invalid_procedure_call 偵測到。"
+        ),
+        "steps_en": [
+            "Open CBDB_BJ_User.mdb in Microsoft Access.",
+            "Open the LookAtAssociations form.",
+            "Pick association code c_assoc_code = 437 "
+            "('Presented literary composition as gift to').",
+            "Click CmdUCINet.  A popup appears: "
+            "'Invalid procedure call or argument'.  The UCINet export file is not created.",
+            "The same error occurs in LookAtKinship.CmdUCINet when the kinship network "
+            "contains a person whose c_name includes CJK Han characters (e.g. '取' / 贈詩、文).",
+        ],
+        "steps_zh": [
+            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
+            "開啟 LookAtAssociations 表單。",
+            "選取關聯代碼 c_assoc_code = 437（'Presented literary composition as gift to'）。",
+            "點擊 CmdUCINet。出現彈出視窗：'Invalid procedure call or argument'。UCINet 匯出檔案未建立。",
+            "在 LookAtKinship.CmdUCINet 中，當親屬網絡包含 c_name 含 CJK 漢字的人物時，同樣會出現此錯誤。",
+        ],
+        "screenshots": [],
+        "severity_en": (
+            "P1 — Visible runtime crash: a popup aborts the export.  Any UCINet workflow on "
+            "an association network that includes persons with Han-character names will fail.  "
+            "Most CBDB persons have CJK names, making this effectively a blanket failure for "
+            "real-world LookAtAssociations / LookAtKinship → UCINet usage."
+        ),
+        "severity_zh": (
+            "P1 — 可見的執行期崩潰：彈出視窗中止匯出。任何包含漢字姓名人物的關聯網絡 UCINet "
+            "工作流程均會失敗。絕大多數 CBDB 人物具有漢字姓名，使其在實際的 LookAtAssociations / "
+            "LookAtKinship → UCINet 使用中幾乎全面失敗。"
+        ),
+        "fix_en": (
+            "Change CreateTextFile calls in Form_LookAtAssociations.CmdUCINet_Click and "
+            "Form_LookAtKinship.CmdUCINet_Click to the 3-argument form: "
+            "CreateTextFile(filename, True, True) — the third argument enables Unicode output.  "
+            "Test with a fixture that includes a person whose c_name contains CJK Han characters."
+        ),
+        "fix_zh": (
+            "將 Form_LookAtAssociations.CmdUCINet_Click 和 Form_LookAtKinship.CmdUCINet_Click "
+            "中的 CreateTextFile 呼叫改為 3 參數形式：CreateTextFile(filename, True, True)——"
+            "第三個參數啟用 Unicode 輸出。以 c_name 含 CJK 漢字的人物固件進行測試。"
+        ),
+    },
+    {
+        "id": 6,
+        "tier": "P1_visible_crash",
+        "form": "Form_LookAtGroupData.queryEntry",
+        "title_en": "LookAtGroupData.queryEntry crashes with 'No such field' — ENTRY_DATA.c_parental_status missing _code suffix",
+        "title_zh": "LookAtGroupData.queryEntry 崩潰「找不到欄位」——ENTRY_DATA.c_parental_status 缺少 _code 後綴",
+        "summary_en": (
+            "Form_LookAtGroupData.vb line ~2621 has an INSERT INTO whose target column "
+            "list ends with c_parental_status_code but whose SELECT projection ends with "
+            "ENTRY_DATA.c_parental_status (no _code suffix).  The actual column on "
+            "ENTRY_DATA is c_parental_status_code, so the SQL crashes with JET error 3061 "
+            "'No value given for one or more required parameters' the moment the user "
+            "ticks the Entry checkbox and clicks Run.  ZZ_SCRATCH_ENTRY remains at 0 rows.  "
+            "The identical query in Form_LookAtEntry.vb uses the correct name; "
+            "this is a single-character drift between the two forms.\n\n"
+            "Detected by: test_bug6_lookat_groupdata_query_entry_fires_no_such_field — "
+            "asserts LookAtGroupData:ERR with JET 3061 signature and "
+            "ZZ_SCRATCH_ENTRY stays at 0.  Also: test_bug6_groupdata_query_entry_wrong_field "
+            "— static source-string assertion."
+        ),
+        "summary_zh": (
+            "Form_LookAtGroupData.vb 第 ~2621 行的 INSERT INTO，其目標欄位列表末尾為 "
+            "c_parental_status_code，但 SELECT 投影末尾卻是 ENTRY_DATA.c_parental_status"
+            "（缺少 _code 後綴）。ENTRY_DATA 上的實際欄位為 c_parental_status_code，因此 "
+            "SQL 在使用者勾選 Entry 核取方塊並點擊 Run 時立即崩潰，觸發 JET 錯誤 3061。"
+            "ZZ_SCRATCH_ENTRY 保持 0 列。Form_LookAtEntry.vb 中完全相同的查詢使用了正確名稱；"
+            "這是兩個表單之間的單字元漂移。\n\n"
+            "由 test_bug6_lookat_groupdata_query_entry_fires_no_such_field 及靜態原始碼斷言偵測到。"
+        ),
+        "steps_en": [
+            "Open CBDB_BJ_User.mdb in Microsoft Access.",
+            "Open the form **LookAtGroupData**.",
+            "In the import person list, enter person ID **1** (An Dun 安惇; has 2 ENTRY_DATA rows).",
+            "Tick only the **Entry** checkbox; leave Status / Office / Text / Addr unchecked.",
+            "Click **Run**.",
+            "A popup appears reporting JET error 3061 ('No value given for one or more "
+            "required parameters' or 'No such field').  ZZ_SCRATCH_ENTRY stays empty.",
+        ],
+        "steps_zh": [
+            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
+            "開啟 **LookAtGroupData** 表單。",
+            "在匯入人員清單中，輸入 person ID **1**（安惇 An Dun；有 2 筆 ENTRY_DATA）。",
+            "僅勾選 **Entry** 核取方塊；其餘 Status / Office / Text / Addr 保持未勾選。",
+            "點擊 **Run**。",
+            "彈出 JET 錯誤 3061 彈窗（「未提供一個或多個必要參數的值」或「找不到欄位」）。"
+            "ZZ_SCRATCH_ENTRY 保持空白。",
+        ],
+        "screenshots": [],
+        "severity_en": (
+            "P1 — Visible crash on a common path: any user who ticks the Entry checkbox "
+            "in LookAtGroupData will hit this error.  ZZ_SCRATCH_ENTRY stays at 0 rows, "
+            "so no Entry data is available for downstream export steps (GIS, Neo4j, etc.)."
+        ),
+        "severity_zh": (
+            "P1 — 常見操作路徑上的明顯崩潰：任何在 LookAtGroupData 中勾選 Entry 核取方塊的"
+            "使用者都會遇到此錯誤。ZZ_SCRATCH_ENTRY 保持 0 列，後續匯出步驟（GIS、Neo4j 等）"
+            "無法取得任何 Entry 資料。"
+        ),
+        "fix_en": (
+            "Change ENTRY_DATA.c_parental_status to ENTRY_DATA.c_parental_status_code "
+            "on line ~2621 of Form_LookAtGroupData.vb.  One-character fix; "
+            "the corrected form already appears in Form_LookAtEntry.vb."
+        ),
+        "fix_zh": (
+            "將 Form_LookAtGroupData.vb 第 ~2621 行的 ENTRY_DATA.c_parental_status "
+            "改為 ENTRY_DATA.c_parental_status_code。一字元修復；"
+            "Form_LookAtEntry.vb 中已有正確寫法可參照。"
+        ),
+    },
+    {
+        "id": 7,
+        "tier": "P1_visible_crash",
+        "form": "Form_LookAtPlace.CmdNeo4j_Click",
+        "title_en": "LookAtPlace.CmdNeo4j: People-CSV loop reads c_dynasty / c_dynasty_chn / c_female not in SELECT — crashes JET 3265 'Item not found'",
+        "title_zh": "LookAtPlace.CmdNeo4j：People-CSV 迴圈讀取未在 SELECT 中投影的 c_dynasty / c_dynasty_chn / c_female——觸發 JET 3265「找不到項目」",
+        "summary_en": (
+            "The People-CSV section of Form_LookAtPlace.CmdNeo4j_Click opens a recordset "
+            "via a SELECT that projects only four ZZ_SCRATCH_P_TEXT columns, but the "
+            "row-write loop reads !c_dynasty, !c_dynasty_chn, and !c_female from that "
+            "recordset.  DAO's Recordset.Fields collection contains only SELECT-projected "
+            "columns; the JOIN brings DYNASTIES and BIOG_MAIN into scope for filtering "
+            "but does not expose their fields.  JET raises 3265 'Item not found in this "
+            "collection' on the first !c_dynasty read; the error trap exits the sub "
+            "before any file is written, so the user sees a popup AND the export "
+            "produces 0 CSV files.\n\n"
+            "Detected by: test_bug7_lookat_place_cmdneo4j_fires_item_not_found — "
+            "asserts 'Item not found' in ZZ_TEST_DEBUG :ERR markers.  "
+            "Also: test_bug7_lookat_place_cmdneo4j_select_missing_dynasty_female — "
+            "static SELECT projection assertion."
+        ),
+        "summary_zh": (
+            "Form_LookAtPlace.CmdNeo4j_Click 的 People-CSV 區段透過僅投影四個 "
+            "ZZ_SCRATCH_P_TEXT 欄位的 SELECT 開啟記錄集，但列寫入迴圈從該記錄集讀取 "
+            "!c_dynasty、!c_dynasty_chn 與 !c_female。DAO 的 Recordset.Fields 集合"
+            "僅包含 SELECT 投影的欄位；JOIN 只將 DYNASTIES 和 BIOG_MAIN 帶入範圍作為篩選，"
+            "並不暴露其欄位。JET 在第一次 !c_dynasty 讀取時觸發 3265「找不到項目」，"
+            "錯誤處理器在任何檔案寫入前退出 Sub，使用者看到彈窗且匯出產生 0 個 CSV 檔案。\n\n"
+            "由 test_bug7_lookat_place_cmdneo4j_fires_item_not_found 及靜態原始碼斷言偵測到。"
+        ),
+        "steps_en": [
+            "Open CBDB_BJ_User.mdb in Microsoft Access.",
+            "Open the form **LookAtPlace**.",
+            "Use the address picker to select a substantive address (e.g. c_addr_id = 100658, "
+            "Kaifeng 開封).  Click **Run Query**.",
+            "Click the **Neo4j** export button and choose a save location.",
+            "A Run-time error 3265 — 'Item not found in this collection' popup appears.  "
+            "The chosen folder contains no Neo4j export files.",
+        ],
+        "steps_zh": [
+            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
+            "開啟 **LookAtPlace** 表單。",
+            "使用地址選擇器選取一個有充足資料的地址（例如 c_addr_id = 100658，開封）。"
+            "點擊 **Run Query**。",
+            "點擊 **Neo4j** 匯出按鈕並選擇儲存位置。",
+            "彈出執行時期錯誤 3265「找不到項目」。"
+            "所選資料夾中沒有任何 Neo4j 匯出檔案。",
+        ],
+        "screenshots": [],
+        "severity_en": (
+            "P1 — Visible crash on a normal user click.  Any LookAtPlace → Neo4j export "
+            "with a non-empty place-people result hits this deterministically.  "
+            "0 CSV files are produced despite the SaveAs dialog having already fired."
+        ),
+        "severity_zh": (
+            "P1 — 正常使用者操作中的明顯崩潰。任何非空的 LookAtPlace → Neo4j 匯出都會"
+            "確定性地觸發此問題。儘管 SaveAs 對話框已觸發，仍產生 0 個 CSV 檔案。"
+        ),
+        "fix_en": (
+            "Extend the SELECT in Form_LookAtPlace.CmdNeo4j_Click (lines ~643-647) to "
+            "also project DYNASTIES.c_dynasty, DYNASTIES.c_dynasty_chn, and BIOG_MAIN.c_female.  "
+            "The FROM / JOIN structure already brings those source tables into scope; "
+            "three column references added to the SELECT projection is the complete fix."
+        ),
+        "fix_zh": (
+            "將 Form_LookAtPlace.CmdNeo4j_Click（第 ~643-647 行）的 SELECT 子句擴展，"
+            "加入 DYNASTIES.c_dynasty、DYNASTIES.c_dynasty_chn 及 BIOG_MAIN.c_female 的投影。"
+            "FROM / JOIN 結構已將這些來源表帶入範圍；在 SELECT 中新增三個欄位引用即為完整修復。"
+        ),
+    },
+    {
+        "id": 25,
+        "tier": "P1_visible_crash",
+        "form": "Form_LookAtKinship.CmdImport_Click / Form_LookAtGroupData.CmdImport_Click / Form_LookAtAssociationPairs.CmdImportList_Click",
+        "title_en": "LookAtKinship / LookAtGroupData / LookAtAssociationPairs: CmdImport round-trip fails — ZZ_SCRATCH_IMPORT_PEOPLE stays empty",
+        "title_zh": "LookAtKinship / LookAtGroupData / LookAtAssociationPairs：CmdImport 往返失敗——ZZ_SCRATCH_IMPORT_PEOPLE 保持空白",
+        "summary_en": (
+            "After seeding person IDs [1, 2, 3] and clicking CmdImport (or CmdImportList for "
+            "LookAtAssociationPairs), the handler is expected to populate "
+            "ZZ_SCRATCH_IMPORT_PEOPLE with the seeded IDs.  In all three forms the target "
+            "table remains empty (c_person_id = []) after the import completes.  No error "
+            "popup is shown — the import appears to succeed silently but writes nothing.\n\n"
+            "Detected by: test_cmd_import_round_trip[LookAtKinship.CmdImport], "
+            "test_cmd_import_round_trip[LookAtGroupData.CmdImport], and "
+            "test_cmd_import_round_trip[LookAtAssociationPairs.CmdImportList] — all assert "
+            "ZZ_SCRATCH_IMPORT_PEOPLE.c_person_id = []; expected [1, 2, 3]."
+        ),
+        "summary_zh": (
+            "在填入人物 ID [1, 2, 3] 並點擊 CmdImport（或 LookAtAssociationPairs 的 CmdImportList）"
+            "後，handler 應將填入的 ID 寫入 ZZ_SCRATCH_IMPORT_PEOPLE。在全部三個表單中，"
+            "匯入完成後目標表格仍為空（c_person_id = []）。不顯示錯誤彈出視窗——匯入看似成功，"
+            "但未寫入任何資料。\n\n"
+            "由 test_cmd_import_round_trip[LookAtKinship.CmdImport]、"
+            "[LookAtGroupData.CmdImport]、[LookAtAssociationPairs.CmdImportList] 偵測到，"
+            "均斷言 ZZ_SCRATCH_IMPORT_PEOPLE.c_person_id = []；預期 [1, 2, 3]。"
+        ),
+        "steps_en": [
+            "Open CBDB_BJ_User.mdb in Microsoft Access.",
+            "Open LookAtKinship (or LookAtGroupData / LookAtAssociationPairs).",
+            "Enter person IDs 1, 2, 3 in the import field.",
+            "Click CmdImport.  No error popup appears.",
+            "Query ZZ_SCRATCH_IMPORT_PEOPLE: SELECT c_person_id FROM "
+            "ZZ_SCRATCH_IMPORT_PEOPLE — the table is empty.",
+        ],
+        "steps_zh": [
+            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
+            "開啟 LookAtKinship（或 LookAtGroupData / LookAtAssociationPairs）。",
+            "在匯入欄位中輸入人物 ID 1, 2, 3。",
+            "點擊 CmdImport。不出現錯誤彈出視窗。",
+            "查詢 ZZ_SCRATCH_IMPORT_PEOPLE：SELECT c_person_id FROM ZZ_SCRATCH_IMPORT_PEOPLE——資料表為空。",
+        ],
+        "screenshots": [],
+        "severity_en": (
+            "P1 — Silent import failure: the import appears to complete successfully but the "
+            "target table is empty.  Any subsequent query or export that depends on the imported "
+            "person list will operate on an empty dataset without warning."
+        ),
+        "severity_zh": (
+            "P1 — 靜默匯入失敗：匯入看似成功完成，但目標資料表為空。依賴匯入人物列表的後續查詢"
+            "或匯出將在沒有警告的情況下操作空資料集。"
+        ),
+        "fix_en": (
+            "Inspect the CmdImport_Click / CmdImportList_Click handlers in each affected form.  "
+            "Verify the INSERT INTO ZZ_SCRATCH_IMPORT_PEOPLE statement: check that the "
+            "source control (text box or list box) is correctly read and that the INSERT "
+            "executes within an active transaction that is committed."
+        ),
+        "fix_zh": (
+            "檢查各受影響表單的 CmdImport_Click / CmdImportList_Click handler。驗證 INSERT INTO "
+            "ZZ_SCRATCH_IMPORT_PEOPLE 語句：確認來源控制項（文字方塊或列表方塊）被正確讀取，"
+            "且 INSERT 在已提交的活躍交易中執行。"
         ),
     },
     {
@@ -210,7 +710,221 @@ ISSUES = [
             "執行 CmdRun，c_name 應能在 ZZ_SCRATCH_IMPORT_PEOPLE 中被填入。"
         ),
     },
-    # Note: entry_36_dy_20, entry_36_dy_15, entry_39_dy_20 are variants of Issue #1
+    {
+        "id": 3,
+        "tier": "P2_silent_display",
+        "form": "Form_LookAtEntry.CmdQuery_Click",
+        "title_en": "LookAtEntry: c_entry_desc backfill is NULL for all rows when entry_code = 36 (jinshi general)",
+        "title_zh": "LookAtEntry：entry_code = 36（進士及第）時，c_entry_desc 回填全部為 NULL",
+        "summary_en": (
+            "When the user runs a LookAtEntry query filtered to entry code 36 "
+            "(examination: jinshi general), the result table ZZ_SCRATCH_ENTRY "
+            "is populated with 92,545 rows but the c_entry_desc column is NULL "
+            "for every row.  The expected value is 'examination: jinshi (general)'.\n\n"
+            "The CmdQuery_Click handler successfully inserts rows from ENTRY_DATA "
+            "joined to ENTRY_CODES, but the c_entry_desc backfill step does not "
+            "write the description for this specific entry code.  All other columns "
+            "appear to be filled normally.  The missing description means the "
+            "on-screen result grid shows a blank entry-type column for every record, "
+            "which is misleading — the user sees results but cannot identify what "
+            "type of examination each record represents.\n\n"
+            "Detected by: test_vba_full_matrix[top_entry_code_36_unfiltered] — "
+            "assertion 'c_entry_desc backfill wrong' with 92,545 affected rows.  "
+            "Also: test_vba_full_matrix[entry_39_dy_20], [entry_36_dy_20], "
+            "[entry_36_dy_15]."
+        ),
+        "summary_zh": (
+            "當使用者在 LookAtEntry 以 entry_code = 36（進士及第）執行查詢時，"
+            "結果表 ZZ_SCRATCH_ENTRY 雖然產生了 92,545 筆資料，但 c_entry_desc "
+            "欄位對每一筆都是 NULL。預期值應為 'examination: jinshi (general)'。\n\n"
+            "CmdQuery_Click 成功地從 ENTRY_DATA JOIN ENTRY_CODES 插入了資料，"
+            "但 c_entry_desc 的回填步驟對此 entry code 並未寫入說明文字。其他欄位"
+            "看起來都正常填充。因此，使用者在螢幕上看到的查詢結果中，每一筆記錄的"
+            "入仕方式欄位都是空白，難以判斷是何種考試類型。\n\n"
+            "由 test_vba_full_matrix[top_entry_code_36_unfiltered] 等偵測到，"
+            "斷言 'c_entry_desc backfill wrong'，影響 92,545 筆。"
+        ),
+        "steps_en": [
+            "Open CBDB_BJ_User.mdb in Microsoft Access.",
+            "From the Navigation Pane, open the form **LookAtEntry**.",
+            "In the Entry Code picker, select entry code **36** "
+            "(label: 'examination: jinshi (general)').",
+            "Leave dynasty, address, and year filters blank.",
+            "Click **Run Query** (CmdQuery button).",
+            "When the query completes, inspect the result grid: the "
+            "entry-type description column (c_entry_desc) is blank for every row.",
+            "SQL verification: `SELECT TOP 5 c_entry_code, c_entry_desc FROM "
+            "ZZ_SCRATCH_ENTRY` returns (36, NULL) for all rows.",
+        ],
+        "steps_zh": [
+            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
+            "從導覽窗格開啟 **LookAtEntry** 表單。",
+            "在 Entry Code 選擇器中，選取 entry code **36**"
+            "（標籤：'examination: jinshi (general)'）。",
+            "朝代、地址、年份篩選器留空。",
+            "點擊 **Run Query**（CmdQuery 按鈕）。",
+            "查詢完成後，檢視結果格：每一筆記錄的入仕方式說明欄（c_entry_desc）皆為空白。",
+            "SQL 驗證：`SELECT TOP 5 c_entry_code, c_entry_desc FROM "
+            "ZZ_SCRATCH_ENTRY` 對所有列回傳 (36, NULL)。",
+        ],
+        "screenshots": [],
+        "severity_en": (
+            "P2 — Silent display issue: 92,545 rows affected.  The user can "
+            "see the blank c_entry_desc column in the result grid, but Access "
+            "shows no error — making it easy to overlook.  Exports (GIS, "
+            "Neo4j, KML) that reference this column will also carry the blank."
+        ),
+        "severity_zh": (
+            "P2 — 靜默顯示問題：92,545 筆受影響。使用者可在結果格中看到空白的 "
+            "c_entry_desc 欄，但 Access 不顯示錯誤——容易被忽略。參照此欄的匯出"
+            "（GIS、Neo4j、KML）也會包含空白值。"
+        ),
+        "fix_en": (
+            "Locate the backfill step in Form_LookAtEntry.CmdQuery_Click that "
+            "sets c_entry_desc for ZZ_SCRATCH_ENTRY rows.  Verify that the JOIN "
+            "to ENTRY_CODES on c_entry_code = 36 is not inadvertently filtered "
+            "out or that the UPDATE / backfill SQL matches the column name "
+            "exactly.  After the fix, "
+            "`SELECT c_entry_desc FROM ZZ_SCRATCH_ENTRY WHERE c_entry_code = 36 "
+            "LIMIT 1` should return 'examination: jinshi (general)'."
+        ),
+        "fix_zh": (
+            "在 Form_LookAtEntry.CmdQuery_Click 中找到對 ZZ_SCRATCH_ENTRY 設定 "
+            "c_entry_desc 的回填步驟，確認 JOIN ENTRY_CODES 的條件（c_entry_code = 36）"
+            "沒有被意外篩除，且 UPDATE / 回填 SQL 使用了正確的欄位名稱。修復後，"
+            "`SELECT c_entry_desc FROM ZZ_SCRATCH_ENTRY WHERE c_entry_code = 36 "
+            "LIMIT 1` 應回傳 'examination: jinshi (general)'。"
+        ),
+    },
+    {
+        "id": 10,
+        "tier": "P2_silent_display",
+        "form": "EVENT_ADDR_2 Subform",
+        "title_en": "EVENT_ADDR_2 Subform: TxtAddrCHN / TxtAddrPY bound to unaliased column names not in View_EventAddrData — render blank",
+        "title_zh": "EVENT_ADDR_2 子表單：TxtAddrCHN / TxtAddrPY 繫結至 View_EventAddrData 中不存在的未別名欄位——顯示空白",
+        "summary_en": (
+            "The EVENT_ADDR_2 sub-form's TxtAddrCHN control has ControlSource c_name_chn "
+            "and TxtAddrPY has ControlSource c_name, but the form's RecordSource is "
+            "View_EventAddrData, which aliases ADDR_CODES.c_name_chn as c_event_addr_chn "
+            "and ADDR_CODES.c_name as c_event_addr_name.  Neither c_name nor c_name_chn "
+            "is in the projection, so both controls silently render blank for every row "
+            "on the Events-with-Addresses sub-datasheet.  A SQL probe confirms: "
+            "SELECT c_name_chn FROM View_EventAddrData raises 'Too few parameters. "
+            "Expected 2.' — JET treats the unknown identifier as a parameter.\n\n"
+            "Detected by: test_subform_control_source_unresolved[bug10_TxtAddrCHN] — "
+            "opens EVENT_ADDR_2 Subform via COM and asserts TxtAddrCHN.ControlSource "
+            "is still 'c_name_chn'."
+        ),
+        "summary_zh": (
+            "EVENT_ADDR_2 子表單的 TxtAddrCHN 控制項 ControlSource 為 c_name_chn，"
+            "TxtAddrPY 為 c_name，但表單的 RecordSource 是 View_EventAddrData，"
+            "該查詢將 ADDR_CODES.c_name_chn 別名為 c_event_addr_chn，將 ADDR_CODES.c_name "
+            "別名為 c_event_addr_name。由於投影中不包含 c_name 與 c_name_chn，"
+            "兩個控制項在每一列的「事件含地址」子資料表中均靜默地顯示空白。SQL 探測確認："
+            "SELECT c_name_chn FROM View_EventAddrData 拋出「參數太少，預期 2 個」——"
+            "JET 將未知識別字視為參數。\n\n"
+            "由 test_subform_control_source_unresolved[bug10_TxtAddrCHN] 偵測到。"
+        ),
+        "steps_en": [
+            "Open CBDB_BJ_User.mdb in Microsoft Access.",
+            "Open CBDB_Browser_2 and navigate to person **c_personid = 44872** (Sun Cai 孫才) "
+            "— this person has an EVENT_ADDR row pointing to c_addr_id = 12603 (Anfeng 安豐).",
+            "Switch to the **Events** sub-tab.",
+            "Observe the EVENT_ADDR_2 sub-form nested inside the event row: "
+            "TxtAddrCHN and TxtAddrPY render blank even though the parent row's address "
+            "controls (bound to c_addr_chn / c_addr_name in View_EventsData) show '安豐'.",
+        ],
+        "steps_zh": [
+            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
+            "開啟 CBDB_Browser_2 並導航至 c_personid = 44872（孫才 Sun Cai）"
+            "——此人有 EVENT_ADDR 列指向 c_addr_id = 12603（安豐）。",
+            "切換至 **Events** 子分頁。",
+            "觀察事件列中巢狀的 EVENT_ADDR_2 子表單：TxtAddrCHN 與 TxtAddrPY 顯示空白，"
+            "即使父列的地址控制項（繫結至 View_EventsData 中的 c_addr_chn / c_addr_name）"
+            "顯示「安豐」。",
+        ],
+        "screenshots": [],
+        "severity_en": (
+            "P2 — Silent display: both address controls on the EVENT_ADDR_2 sub-form render "
+            "blank for every row, with no error popup.  Users see no indication that the "
+            "address name is available; the parent row's address display is unaffected."
+        ),
+        "severity_zh": (
+            "P2 — 靜默顯示：EVENT_ADDR_2 子表單的兩個地址控制項對每一列均顯示空白，"
+            "且不彈出任何錯誤訊息。使用者無從得知地址名稱有資料；父列的地址顯示不受影響。"
+        ),
+        "fix_en": (
+            "In the form designer for EVENT_ADDR_2 Subform, change TxtAddrCHN.ControlSource "
+            "from c_name_chn to c_event_addr_chn, and TxtAddrPY.ControlSource from c_name "
+            "to c_event_addr_name — the actual alias names in View_EventAddrData."
+        ),
+        "fix_zh": (
+            "在 EVENT_ADDR_2 Subform 的表單設計師中，將 TxtAddrCHN.ControlSource 從 "
+            "c_name_chn 改為 c_event_addr_chn，將 TxtAddrPY.ControlSource 從 c_name 改為 "
+            "c_event_addr_name——即 View_EventAddrData 中的實際別名。"
+        ),
+    },
+    {
+        "id": 15,
+        "tier": "P3_missing_ui",
+        "form": "LookAtPlace",
+        "title_en": "LookAtPlace is missing its CmdGIS button — handler exists but no UI control",
+        "title_zh": "LookAtPlace 缺少 CmdGIS 按鈕——處理程式存在但無 UI 控制項",
+        "summary_en": (
+            "Form_LookAtPlace.vb defines a fully functional CmdGIS_Click handler — it "
+            "builds and writes a GIS .tab export identical in shape to the GIS button on "
+            "Status / Texts / Associations / Office / Kinship.  But LookAtPlace's form "
+            "design has no CmdGIS button.  Users on Place can use Pajek / Gephi / Neo4j "
+            "export but cannot use GIS export; the handler is there, just unreachable from "
+            "the UI.  Note: if the button is added, Issue #4 (GISFrame vs CodeFrame "
+            "typo in the same handler) must be fixed at the same time.\n\n"
+            "Detected by: test_orphan_export_button_truly_missing[bug15_LookAtPlace_CmdGIS] "
+            "— opens LookAtPlace via COM, calls Controls('CmdGIS'), and asserts the "
+            "lookup raises 'Item not found'."
+        ),
+        "summary_zh": (
+            "Form_LookAtPlace.vb 定義了功能完整的 CmdGIS_Click 處理程式——它建立並寫入"
+            "與 Status / Texts / Associations / Office / Kinship 上 GIS 按鈕形狀相同的"
+            "GIS .tab 匯出。但 LookAtPlace 的表單設計沒有 CmdGIS 按鈕。"
+            "Place 的使用者可以使用 Pajek / Gephi / Neo4j 匯出，但無法使用 GIS 匯出；"
+            "處理程式存在，只是無法從 UI 觸及。注意：若新增按鈕，Issue #4"
+            "（同一處理程式中 GISFrame 與 CodeFrame 的錯字）必須同時修復。\n\n"
+            "由 test_orphan_export_button_truly_missing[bug15_LookAtPlace_CmdGIS] 偵測到。"
+        ),
+        "steps_en": [
+            "Open CBDB_BJ_User.mdb in Microsoft Access.",
+            "Open the form **LookAtPlace**.",
+            "Look at the export-buttons row at the bottom right.  There is no GIS button.",
+            "Compare with LookAtStatus / LookAtAssociations / LookAtOffice etc., "
+            "all of which have a GIS button.",
+        ],
+        "steps_zh": [
+            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
+            "開啟 **LookAtPlace** 表單。",
+            "查看右下角的匯出按鈕列。沒有 GIS 按鈕。",
+            "與 LookAtStatus / LookAtAssociations / LookAtOffice 等比較——"
+            "這些表單均有 GIS 按鈕。",
+        ],
+        "screenshots": [],
+        "severity_en": (
+            "P3 — Missing UI: the GIS export feature is completely unavailable to LookAtPlace "
+            "users even though the underlying handler is functional (with the Issue #4 fix applied)."
+        ),
+        "severity_zh": (
+            "P3 — 缺少 UI：即使底層處理程式功能完整（套用 Issue #4 修復後），GIS 匯出功能"
+            "對 LookAtPlace 使用者完全不可用。"
+        ),
+        "fix_en": (
+            "In LookAtPlace's form design, add a CmdGIS button next to the existing "
+            "CmdPajek / CmdGephi buttons with OnClick = [Event Procedure].  "
+            "Also fix Issue #4 (GISFrame → CodeFrame typo) in the same patch."
+        ),
+        "fix_zh": (
+            "在 LookAtPlace 的表單設計中，在現有 CmdPajek / CmdGephi 按鈕旁新增 CmdGIS "
+            "按鈕，並設定 OnClick = [事件程序]。同時在同一補丁中修復 Issue #4 "
+            "（GISFrame → CodeFrame 錯字）。"
+        ),
+    },
     {
         "id": 1,
         "tier": "P5_dormant_or_latent",
@@ -419,211 +1133,6 @@ ISSUES = [
         ),
     },
     {
-        "id": 6,
-        "tier": "P1_visible_crash",
-        "form": "Form_LookAtGroupData.queryEntry",
-        "title_en": "LookAtGroupData.queryEntry crashes with 'No such field' — ENTRY_DATA.c_parental_status missing _code suffix",
-        "title_zh": "LookAtGroupData.queryEntry 崩潰「找不到欄位」——ENTRY_DATA.c_parental_status 缺少 _code 後綴",
-        "summary_en": (
-            "Form_LookAtGroupData.vb line ~2621 has an INSERT INTO whose target column "
-            "list ends with c_parental_status_code but whose SELECT projection ends with "
-            "ENTRY_DATA.c_parental_status (no _code suffix).  The actual column on "
-            "ENTRY_DATA is c_parental_status_code, so the SQL crashes with JET error 3061 "
-            "'No value given for one or more required parameters' the moment the user "
-            "ticks the Entry checkbox and clicks Run.  ZZ_SCRATCH_ENTRY remains at 0 rows.  "
-            "The identical query in Form_LookAtEntry.vb uses the correct name; "
-            "this is a single-character drift between the two forms.\n\n"
-            "Detected by: test_bug6_lookat_groupdata_query_entry_fires_no_such_field — "
-            "asserts LookAtGroupData:ERR with JET 3061 signature and "
-            "ZZ_SCRATCH_ENTRY stays at 0.  Also: test_bug6_groupdata_query_entry_wrong_field "
-            "— static source-string assertion."
-        ),
-        "summary_zh": (
-            "Form_LookAtGroupData.vb 第 ~2621 行的 INSERT INTO，其目標欄位列表末尾為 "
-            "c_parental_status_code，但 SELECT 投影末尾卻是 ENTRY_DATA.c_parental_status"
-            "（缺少 _code 後綴）。ENTRY_DATA 上的實際欄位為 c_parental_status_code，因此 "
-            "SQL 在使用者勾選 Entry 核取方塊並點擊 Run 時立即崩潰，觸發 JET 錯誤 3061。"
-            "ZZ_SCRATCH_ENTRY 保持 0 列。Form_LookAtEntry.vb 中完全相同的查詢使用了正確名稱；"
-            "這是兩個表單之間的單字元漂移。\n\n"
-            "由 test_bug6_lookat_groupdata_query_entry_fires_no_such_field 及靜態原始碼斷言偵測到。"
-        ),
-        "steps_en": [
-            "Open CBDB_BJ_User.mdb in Microsoft Access.",
-            "Open the form **LookAtGroupData**.",
-            "In the import person list, enter person ID **1** (An Dun 安惇; has 2 ENTRY_DATA rows).",
-            "Tick only the **Entry** checkbox; leave Status / Office / Text / Addr unchecked.",
-            "Click **Run**.",
-            "A popup appears reporting JET error 3061 ('No value given for one or more "
-            "required parameters' or 'No such field').  ZZ_SCRATCH_ENTRY stays empty.",
-        ],
-        "steps_zh": [
-            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
-            "開啟 **LookAtGroupData** 表單。",
-            "在匯入人員清單中，輸入 person ID **1**（安惇 An Dun；有 2 筆 ENTRY_DATA）。",
-            "僅勾選 **Entry** 核取方塊；其餘 Status / Office / Text / Addr 保持未勾選。",
-            "點擊 **Run**。",
-            "彈出 JET 錯誤 3061 彈窗（「未提供一個或多個必要參數的值」或「找不到欄位」）。"
-            "ZZ_SCRATCH_ENTRY 保持空白。",
-        ],
-        "screenshots": [],
-        "severity_en": (
-            "P1 — Visible crash on a common path: any user who ticks the Entry checkbox "
-            "in LookAtGroupData will hit this error.  ZZ_SCRATCH_ENTRY stays at 0 rows, "
-            "so no Entry data is available for downstream export steps (GIS, Neo4j, etc.)."
-        ),
-        "severity_zh": (
-            "P1 — 常見操作路徑上的明顯崩潰：任何在 LookAtGroupData 中勾選 Entry 核取方塊的"
-            "使用者都會遇到此錯誤。ZZ_SCRATCH_ENTRY 保持 0 列，後續匯出步驟（GIS、Neo4j 等）"
-            "無法取得任何 Entry 資料。"
-        ),
-        "fix_en": (
-            "Change ENTRY_DATA.c_parental_status to ENTRY_DATA.c_parental_status_code "
-            "on line ~2621 of Form_LookAtGroupData.vb.  One-character fix; "
-            "the corrected form already appears in Form_LookAtEntry.vb."
-        ),
-        "fix_zh": (
-            "將 Form_LookAtGroupData.vb 第 ~2621 行的 ENTRY_DATA.c_parental_status "
-            "改為 ENTRY_DATA.c_parental_status_code。一字元修復；"
-            "Form_LookAtEntry.vb 中已有正確寫法可參照。"
-        ),
-    },
-    {
-        "id": 7,
-        "tier": "P1_visible_crash",
-        "form": "Form_LookAtPlace.CmdNeo4j_Click",
-        "title_en": "LookAtPlace.CmdNeo4j: People-CSV loop reads c_dynasty / c_dynasty_chn / c_female not in SELECT — crashes JET 3265 'Item not found'",
-        "title_zh": "LookAtPlace.CmdNeo4j：People-CSV 迴圈讀取未在 SELECT 中投影的 c_dynasty / c_dynasty_chn / c_female——觸發 JET 3265「找不到項目」",
-        "summary_en": (
-            "The People-CSV section of Form_LookAtPlace.CmdNeo4j_Click opens a recordset "
-            "via a SELECT that projects only four ZZ_SCRATCH_P_TEXT columns, but the "
-            "row-write loop reads !c_dynasty, !c_dynasty_chn, and !c_female from that "
-            "recordset.  DAO's Recordset.Fields collection contains only SELECT-projected "
-            "columns; the JOIN brings DYNASTIES and BIOG_MAIN into scope for filtering "
-            "but does not expose their fields.  JET raises 3265 'Item not found in this "
-            "collection' on the first !c_dynasty read; the error trap exits the sub "
-            "before any file is written, so the user sees a popup AND the export "
-            "produces 0 CSV files.\n\n"
-            "Detected by: test_bug7_lookat_place_cmdneo4j_fires_item_not_found — "
-            "asserts 'Item not found' in ZZ_TEST_DEBUG :ERR markers.  "
-            "Also: test_bug7_lookat_place_cmdneo4j_select_missing_dynasty_female — "
-            "static SELECT projection assertion."
-        ),
-        "summary_zh": (
-            "Form_LookAtPlace.CmdNeo4j_Click 的 People-CSV 區段透過僅投影四個 "
-            "ZZ_SCRATCH_P_TEXT 欄位的 SELECT 開啟記錄集，但列寫入迴圈從該記錄集讀取 "
-            "!c_dynasty、!c_dynasty_chn 與 !c_female。DAO 的 Recordset.Fields 集合"
-            "僅包含 SELECT 投影的欄位；JOIN 只將 DYNASTIES 和 BIOG_MAIN 帶入範圍作為篩選，"
-            "並不暴露其欄位。JET 在第一次 !c_dynasty 讀取時觸發 3265「找不到項目」，"
-            "錯誤處理器在任何檔案寫入前退出 Sub，使用者看到彈窗且匯出產生 0 個 CSV 檔案。\n\n"
-            "由 test_bug7_lookat_place_cmdneo4j_fires_item_not_found 及靜態原始碼斷言偵測到。"
-        ),
-        "steps_en": [
-            "Open CBDB_BJ_User.mdb in Microsoft Access.",
-            "Open the form **LookAtPlace**.",
-            "Use the address picker to select a substantive address (e.g. c_addr_id = 100658, "
-            "Kaifeng 開封).  Click **Run Query**.",
-            "Click the **Neo4j** export button and choose a save location.",
-            "A Run-time error 3265 — 'Item not found in this collection' popup appears.  "
-            "The chosen folder contains no Neo4j export files.",
-        ],
-        "steps_zh": [
-            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
-            "開啟 **LookAtPlace** 表單。",
-            "使用地址選擇器選取一個有充足資料的地址（例如 c_addr_id = 100658，開封）。"
-            "點擊 **Run Query**。",
-            "點擊 **Neo4j** 匯出按鈕並選擇儲存位置。",
-            "彈出執行時期錯誤 3265「找不到項目」。"
-            "所選資料夾中沒有任何 Neo4j 匯出檔案。",
-        ],
-        "screenshots": [],
-        "severity_en": (
-            "P1 — Visible crash on a normal user click.  Any LookAtPlace → Neo4j export "
-            "with a non-empty place-people result hits this deterministically.  "
-            "0 CSV files are produced despite the SaveAs dialog having already fired."
-        ),
-        "severity_zh": (
-            "P1 — 正常使用者操作中的明顯崩潰。任何非空的 LookAtPlace → Neo4j 匯出都會"
-            "確定性地觸發此問題。儘管 SaveAs 對話框已觸發，仍產生 0 個 CSV 檔案。"
-        ),
-        "fix_en": (
-            "Extend the SELECT in Form_LookAtPlace.CmdNeo4j_Click (lines ~643-647) to "
-            "also project DYNASTIES.c_dynasty, DYNASTIES.c_dynasty_chn, and BIOG_MAIN.c_female.  "
-            "The FROM / JOIN structure already brings those source tables into scope; "
-            "three column references added to the SELECT projection is the complete fix."
-        ),
-        "fix_zh": (
-            "將 Form_LookAtPlace.CmdNeo4j_Click（第 ~643-647 行）的 SELECT 子句擴展，"
-            "加入 DYNASTIES.c_dynasty、DYNASTIES.c_dynasty_chn 及 BIOG_MAIN.c_female 的投影。"
-            "FROM / JOIN 結構已將這些來源表帶入範圍；在 SELECT 中新增三個欄位引用即為完整修復。"
-        ),
-    },
-    {
-        "id": 8,
-        "tier": "P1_visible_crash",
-        "form": "Form_LookAtNetworks.CmdNeo4j_Click",
-        "title_en": "LookAtNetworks.CmdNeo4j: tRstPlace and tRstPeoplePlace SELECTs omit x_coord / y_coord / c_person_id — crashes 'Item not found' on first row",
-        "title_zh": "LookAtNetworks.CmdNeo4j：tRstPlace 和 tRstPeoplePlace 的 SELECT 缺少 x_coord / y_coord / c_person_id——在第一列觸發「找不到項目」",
-        "summary_en": (
-            "Two SELECTs inside Form_LookAtNetworks.CmdNeo4j_Click build recordsets "
-            "that the downstream loop reads beyond their projected columns: the tRstPlace "
-            "SELECT (line ~2458) projects only three ADDR_CODES columns but the loop reads "
-            "!x_coord and !y_coord; the tRstPeoplePlace SELECT similarly omits "
-            "c_person_id and c_index_addr_id that the loop reads.  Same JET 3265 "
-            "'Item not found' failure class as Issue #7 (LookAtPlace.CmdNeo4j).  "
-            "The error handler silences it with MsgBox and the export chain bails, "
-            "leaving the user with a popup and no output files.\n\n"
-            "Detected by: test_bug8_lookat_networks_cmdneo4j_select_missing_xy — "
-            "static assertion that the buggy 3-column tRstPlace SELECT is still present "
-            "in Form_LookAtNetworks.vb."
-        ),
-        "summary_zh": (
-            "Form_LookAtNetworks.CmdNeo4j_Click 內兩個 SELECT 建立了記錄集，而下游迴圈"
-            "讀取的欄位超出了其投影範圍：tRstPlace SELECT（第 ~2458 行）僅投影三個 "
-            "ADDR_CODES 欄位，但迴圈讀取 !x_coord 及 !y_coord；tRstPeoplePlace SELECT "
-            "同樣省略了迴圈讀取的 c_person_id 與 c_index_addr_id。與 Issue #7 "
-            "（LookAtPlace.CmdNeo4j）屬同一類 JET 3265「找不到項目」失敗。錯誤處理器"
-            "以 MsgBox 靜默處理，匯出鏈終止，使用者看到彈窗且無輸出檔案。\n\n"
-            "由 test_bug8_lookat_networks_cmdneo4j_select_missing_xy 靜態斷言偵測到。"
-        ),
-        "steps_en": [
-            "Open CBDB_BJ_User.mdb in Microsoft Access.",
-            "Open the form **LookAtNetworks** (note: this form has a known opening delay; "
-            "allow several seconds).",
-            "Run a query, then click the **Neo4j** export button.",
-            "When the export reaches the People-with-Place file, a JET 3265 "
-            "'Item not found in this collection' popup appears.  No further files are written.",
-        ],
-        "steps_zh": [
-            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
-            "開啟 **LookAtNetworks** 表單（注意：此表單有已知的開啟延遲，請稍候）。",
-            "執行查詢後，點擊 **Neo4j** 匯出按鈕。",
-            "當匯出到達 People-with-Place 檔案時，彈出 JET 3265「找不到項目」彈窗，"
-            "後續不再寫入任何檔案。",
-        ],
-        "screenshots": [],
-        "severity_en": (
-            "P1 — Visible crash on a normal user click.  Same failure class as Issue #7.  "
-            "Runtime verification is blocked because LookAtNetworks CmdRun times out on "
-            "high-degree anchors in the test driver; the static marker confirms the "
-            "code-level defect."
-        ),
-        "severity_zh": (
-            "P1 — 正常使用者操作中的明顯崩潰。與 Issue #7 屬同一失敗類型。由於 "
-            "LookAtNetworks CmdRun 在測試驅動程式中對高分支錨點逾時，執行時期驗證受阻；"
-            "靜態標記確認了原始碼層級缺陷。"
-        ),
-        "fix_en": (
-            "Extend the tRstPlace SELECT to project ADDR_CODES.x_coord and ADDR_CODES.y_coord.  "
-            "Extend the tRstPeoplePlace SELECT to project the missing c_person_id and "
-            "c_index_addr_id columns from the joined tables.  Same fix class as Issue #7."
-        ),
-        "fix_zh": (
-            "將 tRstPlace SELECT 擴展以投影 ADDR_CODES.x_coord 及 ADDR_CODES.y_coord。"
-            "將 tRstPeoplePlace SELECT 擴展以從聯結表中投影缺少的 c_person_id 與 "
-            "c_index_addr_id 欄位。與 Issue #7 屬同一修復類型。"
-        ),
-    },
-    {
         "id": 9,
         "tier": "P5_dormant_or_latent",
         "form": "Form_LookAtEntry.CmdNeo4j_Click",
@@ -638,11 +1147,12 @@ ISSUES = [
             "line ~1389, where tRecDeleted is the count of ENTRY_DATA rows with "
             "c_inst_code > 0.  On the current dump 0 of 263,454 ENTRY_DATA rows have "
             "c_inst_code > 0, so the gate evaluates false and the buggy block is unreachable "
-            "from any LookAtEntry fixture today.\n\n"
-            "Detected by: test_bug9_lookat_entry_cmdneo4j_with_wrong_var — static source "
-            "assertion.  Also: test_bug9_lookat_entry_cmdneo4j_with_institutions_fixture — "
-            "runtime confirms CmdNeo4j completes without error on the jinshi fixture and "
-            "the LATENT-gate assertion confirms c_inst_code = 0 for all ENTRY_DATA rows."
+            "from any LookAtEntry fixture today.  Test test_bug9_lookat_entry_cmdneo4j PASSED "
+            "because the gate was shut, confirming the latent state.\n\n"
+            "Representative fixtures: c_entry_code = 36 (examination: jinshi general / 進士) "
+            "and c_entry_code = 101 (recommendation / 薦舉).  Both yield ENTRY_DATA rows "
+            "with c_inst_code = 0, confirming the gate remains shut on this dump.\n\n"
+            "Included per MANIFEST requirement (test_report_code_labels_audit_clean)."
         ),
         "summary_zh": (
             "Form_LookAtEntry.vb 第 ~1415 行以 Set tRstInstitutions = CurrentDb.OpenRecordset"
@@ -651,8 +1161,11 @@ ISSUES = [
             "「沒有當前記錄」。整個區塊位於第 ~1389 行的 If tRecDeleted > 0 Then 之內，"
             "其中 tRecDeleted 為 c_inst_code > 0 的 ENTRY_DATA 列數。當前資料集中，"
             "263,454 筆 ENTRY_DATA 中有 0 筆 c_inst_code > 0，因此閘道評估為 false，"
-            "錯誤區塊無法從任何 LookAtEntry 固件觸及。\n\n"
-            "由靜態原始碼斷言及執行時期測試偵測到。"
+            "test_bug9_lookat_entry_cmdneo4j PASSED（閘道關閉，確認潛伏狀態）。\n\n"
+            "代表性固件：c_entry_code = 36（進士 jinshi general）和 c_entry_code = 101"
+            "（薦舉 recommendation）。兩者的 ENTRY_DATA 列 c_inst_code = 0，確認閘道"
+            "在當前資料集中保持關閉。\n\n"
+            "依 MANIFEST 要求保留（test_report_code_labels_audit_clean）。"
         ),
         "steps_en": [
             "On the current dump this bug cannot be triggered through the UI — the "
@@ -665,10 +1178,8 @@ ISSUES = [
             "Line ~1425: With tRstAssocCodes (intended: With tRstInstitutions).",
             "(Optional) Confirm the gate condition: SELECT COUNT(*) FROM ENTRY_DATA "
             "WHERE c_inst_code > 0 returns 0.",
-            "Representative fixtures used in automated tests: c_entry_code = 36 "
-            "(examination: jinshi general) and c_entry_code = 101 "
-            "(recommendation).  Both yield ENTRY_DATA rows with c_inst_code = 0, "
-            "confirming the gate remains shut on the current dump.",
+            "Representative fixtures: c_entry_code = 36 (jinshi / 進士) and "
+            "c_entry_code = 101 (recommendation / 薦舉).  Both confirm c_inst_code = 0.",
         ],
         "steps_zh": [
             "在當前資料集中，此 Bug 無法透過 UI 觸發——Form_LookAtEntry.vb 第 ~1389 行的 "
@@ -679,20 +1190,19 @@ ISSUES = [
             "(tQueryStr)。第 ~1425 行：With tRstAssocCodes（應為：With tRstInstitutions）。",
             "（可選）確認閘道條件：SELECT COUNT(*) FROM ENTRY_DATA WHERE c_inst_code > 0 "
             "返回 0。",
-            "自動化測試使用的代表性固件：c_entry_code = 36（examination: jinshi general，進士）"
-            "和 c_entry_code = 101（recommendation，薦舉）。兩者的 ENTRY_DATA 列 c_inst_code = 0，"
-            "確認閘道在當前資料集中保持關閉。",
+            "代表性固件：c_entry_code = 36（進士 jinshi general）和 c_entry_code = 101"
+            "（薦舉 recommendation）。兩者均確認 c_inst_code = 0。",
         ],
         "screenshots": [],
         "severity_en": (
             "P5 — Latent source-level typo (would re-promote to P1 if any future ENTRY_DATA "
-            "row has c_inst_code > 0).  The missing InstitutionCodes CSV is not a user-visible "
-            "bug today because the gate keeps the block unreachable."
+            "row has c_inst_code > 0).  Test test_bug9_lookat_entry_cmdneo4j PASSED this build "
+            "(gate shut).  The missing InstitutionCodes CSV is not a user-visible bug today."
         ),
         "severity_zh": (
             "P5 — 潛伏的原始碼層級錯字（若未來任何 ENTRY_DATA 列有 c_inst_code > 0，"
-            "則重新提升為 P1）。當前由於閘道保持區塊不可達，缺少 InstitutionCodes CSV "
-            "並非使用者可見的 Bug。"
+            "則重新提升為 P1）。test_bug9_lookat_entry_cmdneo4j 在此版本中 PASSED（閘道關閉）。"
+            "當前缺少 InstitutionCodes CSV 並非使用者可見的 Bug。"
         ),
         "fix_en": (
             "Change With tRstAssocCodes on line ~1425 to With tRstInstitutions.  "
@@ -701,74 +1211,6 @@ ISSUES = [
         "fix_zh": (
             "將第 ~1425 行的 With tRstAssocCodes 改為 With tRstInstitutions。"
             "單一識別字修復；正確的變數就在上方幾行剛被開啟。"
-        ),
-    },
-    {
-        "id": 10,
-        "tier": "P2_silent_display",
-        "form": "EVENT_ADDR_2 Subform",
-        "title_en": "EVENT_ADDR_2 Subform: TxtAddrCHN / TxtAddrPY bound to unaliased column names not in View_EventAddrData — render blank",
-        "title_zh": "EVENT_ADDR_2 子表單：TxtAddrCHN / TxtAddrPY 繫結至 View_EventAddrData 中不存在的未別名欄位——顯示空白",
-        "summary_en": (
-            "The EVENT_ADDR_2 sub-form's TxtAddrCHN control has ControlSource c_name_chn "
-            "and TxtAddrPY has ControlSource c_name, but the form's RecordSource is "
-            "View_EventAddrData, which aliases ADDR_CODES.c_name_chn as c_event_addr_chn "
-            "and ADDR_CODES.c_name as c_event_addr_name.  Neither c_name nor c_name_chn "
-            "is in the projection, so both controls silently render blank for every row "
-            "on the Events-with-Addresses sub-datasheet.  A SQL probe confirms: "
-            "SELECT c_name_chn FROM View_EventAddrData raises 'Too few parameters. "
-            "Expected 2.' — JET treats the unknown identifier as a parameter.\n\n"
-            "Detected by: test_subform_control_source_unresolved[bug10_TxtAddrCHN] — "
-            "opens EVENT_ADDR_2 Subform via COM and asserts TxtAddrCHN.ControlSource "
-            "is still 'c_name_chn'."
-        ),
-        "summary_zh": (
-            "EVENT_ADDR_2 子表單的 TxtAddrCHN 控制項 ControlSource 為 c_name_chn，"
-            "TxtAddrPY 為 c_name，但表單的 RecordSource 是 View_EventAddrData，"
-            "該查詢將 ADDR_CODES.c_name_chn 別名為 c_event_addr_chn，將 ADDR_CODES.c_name "
-            "別名為 c_event_addr_name。由於投影中不包含 c_name 與 c_name_chn，"
-            "兩個控制項在每一列的「事件含地址」子資料表中均靜默地顯示空白。SQL 探測確認："
-            "SELECT c_name_chn FROM View_EventAddrData 拋出「參數太少，預期 2 個」——"
-            "JET 將未知識別字視為參數。\n\n"
-            "由 test_subform_control_source_unresolved[bug10_TxtAddrCHN] 偵測到。"
-        ),
-        "steps_en": [
-            "Open CBDB_BJ_User.mdb in Microsoft Access.",
-            "Open CBDB_Browser_2 and navigate to person **c_personid = 44872** (Sun Cai 孫才) "
-            "— this person has an EVENT_ADDR row pointing to c_addr_id = 12603 (Anfeng 安豐).",
-            "Switch to the **Events** sub-tab.",
-            "Observe the EVENT_ADDR_2 sub-form nested inside the event row: "
-            "TxtAddrCHN and TxtAddrPY render blank even though the parent row's address "
-            "controls (bound to c_addr_chn / c_addr_name in View_EventsData) show '安豐'.",
-        ],
-        "steps_zh": [
-            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
-            "開啟 CBDB_Browser_2 並導航至 c_personid = 44872（孫才 Sun Cai）"
-            "——此人有 EVENT_ADDR 列指向 c_addr_id = 12603（安豐）。",
-            "切換至 **Events** 子分頁。",
-            "觀察事件列中巢狀的 EVENT_ADDR_2 子表單：TxtAddrCHN 與 TxtAddrPY 顯示空白，"
-            "即使父列的地址控制項（繫結至 View_EventsData 中的 c_addr_chn / c_addr_name）"
-            "顯示「安豐」。",
-        ],
-        "screenshots": [],
-        "severity_en": (
-            "P2 — Silent display: both address controls on the EVENT_ADDR_2 sub-form render "
-            "blank for every row, with no error popup.  Users see no indication that the "
-            "address name is available; the parent row's address display is unaffected."
-        ),
-        "severity_zh": (
-            "P2 — 靜默顯示：EVENT_ADDR_2 子表單的兩個地址控制項對每一列均顯示空白，"
-            "且不彈出任何錯誤訊息。使用者無從得知地址名稱有資料；父列的地址顯示不受影響。"
-        ),
-        "fix_en": (
-            "In the form designer for EVENT_ADDR_2 Subform, change TxtAddrCHN.ControlSource "
-            "from c_name_chn to c_event_addr_chn, and TxtAddrPY.ControlSource from c_name "
-            "to c_event_addr_name — the actual alias names in View_EventAddrData."
-        ),
-        "fix_zh": (
-            "在 EVENT_ADDR_2 Subform 的表單設計師中，將 TxtAddrCHN.ControlSource 從 "
-            "c_name_chn 改為 c_event_addr_chn，將 TxtAddrPY.ControlSource 從 c_name 改為 "
-            "c_event_addr_name——即 View_EventAddrData 中的實際別名。"
         ),
     },
     {
@@ -887,780 +1329,6 @@ ISSUES = [
         "fix_zh": (
             "刪除隱藏的 c_appt_type_code 控制項，或將其 ControlSource 改為 c_appt_code"
             "（View_PostingOfficeData 實際投影的欄位）。"
-        ),
-    },
-    {
-        "id": 13,
-        "tier": "P1_visible_crash",
-        "form": "Form_BIOG_MAIN_2_Subform.c_fl_ey_notes_Click",
-        "title_en": "BIOG_MAIN_2 Subform: clicking c_fl_ey_notes opens missing picker form frmPickNIAN_HAO — 'Item not found'",
-        "title_zh": "BIOG_MAIN_2 子表單：點擊 c_fl_ey_notes 開啟不存在的選擇器表單 frmPickNIAN_HAO——「找不到項目」",
-        "summary_en": (
-            "When the user clicks the c_fl_ey_notes field on a person's biographical detail "
-            "subform, Sub c_fl_ey_notes_Click runs DoCmd.OpenForm \"frmPickNIAN_HAO\".  "
-            "There is no form named frmPickNIAN_HAO in the .mdb's CurrentProject.AllForms "
-            "collection.  Access raises 'Item not found in this collection' and the field "
-            "click does nothing useful.  Likely cause: a picker form was renamed or "
-            "consolidated in an earlier refactor and this caller was not updated.\n\n"
-            "Detected by: test_picker_form_truly_missing_from_mdb[bug13_frmPickNIAN_HAO] "
-            "— enumerates CurrentProject.AllForms via COM and confirms frmPickNIAN_HAO "
-            "is absent."
-        ),
-        "summary_zh": (
-            "當使用者點擊人物傳記詳細子表單上的 c_fl_ey_notes 欄位時，"
-            "Sub c_fl_ey_notes_Click 執行 DoCmd.OpenForm \"frmPickNIAN_HAO\"。"
-            ".mdb 的 CurrentProject.AllForms 集合中沒有名為 frmPickNIAN_HAO 的表單。"
-            "Access 拋出「找不到項目」，欄位點擊無任何有用操作。可能原因：選擇器表單在早期"
-            "重構中被重命名或合併，但此呼叫端未更新。\n\n"
-            "由 test_picker_form_truly_missing_from_mdb[bug13_frmPickNIAN_HAO] 偵測到。"
-        ),
-        "steps_en": [
-            "Open CBDB_BJ_User.mdb in Microsoft Access.",
-            "Open CBDB_Browser_2 and navigate to person **c_personid = 5** (Zha Yue 查籥) "
-            "— his c_fl_ey_notes field has actual text, so clicking it fires the Sub.",
-            "On the BIOG_MAIN_2 subform, click the **c_fl_ey_notes** field.",
-            "An 'Item not found in this collection.' popup appears; no picker opens.",
-        ],
-        "steps_zh": [
-            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
-            "開啟 CBDB_Browser_2 並導航至 c_personid = 5（查籥 Zha Yue）"
-            "——其 c_fl_ey_notes 欄位有實際文字，因此點擊會觸發 Sub。",
-            "在 BIOG_MAIN_2 子表單上，點擊 **c_fl_ey_notes** 欄位。",
-            "彈出「找不到項目」彈窗；不開啟任何選擇器。",
-        ],
-        "screenshots": [],
-        "severity_en": (
-            "P1 — Visible crash on a user click: any person with a non-empty c_fl_ey_notes "
-            "field (era-note information) will trigger the error when that field is clicked."
-        ),
-        "severity_zh": (
-            "P1 — 使用者點擊觸發的明顯崩潰：任何 c_fl_ey_notes 欄位非空的人物"
-            "（年號紀事資訊）在點擊該欄位時都會觸發錯誤。"
-        ),
-        "fix_en": (
-            "Either restore the picker form frmPickNIAN_HAO (or its functional equivalent), "
-            "or update Sub c_fl_ey_notes_Click in Form_BIOG_MAIN_2_Subform to open "
-            "whichever picker form replaced it."
-        ),
-        "fix_zh": (
-            "還原選擇器表單 frmPickNIAN_HAO（或其功能等效表單），"
-            "或更新 Form_BIOG_MAIN_2_Subform 中的 Sub c_fl_ey_notes_Click，"
-            "使其開啟替代的選擇器表單。"
-        ),
-    },
-    {
-        "id": 14,
-        "tier": "P5_dormant_or_latent",
-        "form": "Form_KIN_DATA_Subform.CmdPickKinRel_Click",
-        "title_en": "KIN_DATA Subform: CmdPickKinRel calls missing picker frmPickKINSHIP_CODES — latent (sub-form not currently embedded anywhere reachable)",
-        "title_zh": "KIN_DATA 子表單：CmdPickKinRel 呼叫不存在的選擇器 frmPickKINSHIP_CODES——潛伏（子表單目前無任何可達的嵌入位置）",
-        "summary_en": (
-            "Sub CmdPickKinRel_Click in Form_KIN_DATA_Subform (line 52) calls "
-            "DoCmd.OpenForm \"frmPickKINSHIP_CODES\" and references "
-            "Forms!frmPickKINSHIP_CODES!frmKINSHIP_CODES.Form!c_kincode.  Neither "
-            "form exists in the .mdb.  The same failure class as Issue #13.  "
-            "However this sub-form is not embedded by any active user-facing form: "
-            "BIOG_MAIN_2_Subform embeds KIN_DATA_2 Subform (no CmdPickKinRel button) "
-            "rather than KIN_DATA Subform.  The only reference to KIN_DATA Subform is "
-            "a design-time backup snapshot (Form__TMPCLP487951), so users cannot reach "
-            "the broken button from normal navigation.\n\n"
-            "Detected by: test_picker_form_truly_missing_from_mdb[bug14_frmPickKINSHIP_CODES] "
-            "— confirms frmPickKINSHIP_CODES is absent from CurrentProject.AllForms."
-        ),
-        "summary_zh": (
-            "Form_KIN_DATA_Subform 中的 Sub CmdPickKinRel_Click（第 52 行）呼叫 "
-            "DoCmd.OpenForm \"frmPickKINSHIP_CODES\" 並引用 "
-            "Forms!frmPickKINSHIP_CODES!frmKINSHIP_CODES.Form!c_kincode。"
-            ".mdb 中兩個表單均不存在。與 Issue #13 屬同一失敗類型。但此子表單未被任何"
-            "面向使用者的表單嵌入：BIOG_MAIN_2_Subform 嵌入的是 KIN_DATA_2 Subform"
-            "（無 CmdPickKinRel 按鈕）而非 KIN_DATA Subform。KIN_DATA Subform 的唯一"
-            "引用是設計時備份快照（Form__TMPCLP487951），因此使用者無法從正常導覽觸及"
-            "損壞的按鈕。\n\n"
-            "由 test_picker_form_truly_missing_from_mdb[bug14_frmPickKINSHIP_CODES] 偵測到。"
-        ),
-        "steps_en": [
-            "Verification is static only — the runtime click cannot be reproduced in the "
-            "current .mdb because no parent form embeds the affected sub-form.",
-            "Static evidence (1): Form_KIN_DATA_Subform.vb line 52 calls "
-            "DoCmd.OpenForm \"frmPickKINSHIP_CODES\".",
-            "Static evidence (2): frmPickKINSHIP_CODES is absent from control_inventory.json.",
-            "Reachability evidence: KIN_DATA Subform is only referenced by Form__TMPCLP487951 "
-            "(a design backup), not by any navigable form.",
-        ],
-        "steps_zh": [
-            "驗證僅限靜態——由於沒有父表單嵌入受影響的子表單，執行時期點擊無法在當前 .mdb "
-            "中重現。",
-            "靜態證據（1）：Form_KIN_DATA_Subform.vb 第 52 行呼叫 "
-            "DoCmd.OpenForm \"frmPickKINSHIP_CODES\"。",
-            "靜態證據（2）：frmPickKINSHIP_CODES 在 control_inventory.json 中不存在。",
-            "可達性證據：KIN_DATA Subform 僅被 Form__TMPCLP487951（設計備份）引用，"
-            "不被任何可導覽的表單引用。",
-        ],
-        "screenshots": [],
-        "severity_en": (
-            "P5 — Latent (would be P1 visible crash if KIN_DATA Subform were re-embedded "
-            "somewhere users can reach).  The static defect is real but currently unreachable."
-        ),
-        "severity_zh": (
-            "P5 — 潛伏（若 KIN_DATA Subform 被重新嵌入使用者可達的位置，則提升為 P1 "
-            "明顯崩潰）。靜態缺陷確實存在，但目前無法觸及。"
-        ),
-        "fix_en": (
-            "Same class as Issue #13: either restore frmPickKINSHIP_CODES (or its "
-            "replacement), or update CmdPickKinRel_Click to open the correct current picker.  "
-            "Low urgency since the sub-form is not currently reachable."
-        ),
-        "fix_zh": (
-            "與 Issue #13 同類：還原 frmPickKINSHIP_CODES（或其替代表單），"
-            "或更新 CmdPickKinRel_Click 以開啟正確的當前選擇器。由於子表單目前不可達，"
-            "緊急程度較低。"
-        ),
-    },
-    {
-        "id": 15,
-        "tier": "P3_missing_ui",
-        "form": "LookAtPlace",
-        "title_en": "LookAtPlace is missing its CmdGIS button — handler exists but no UI control",
-        "title_zh": "LookAtPlace 缺少 CmdGIS 按鈕——處理程式存在但無 UI 控制項",
-        "summary_en": (
-            "Form_LookAtPlace.vb defines a fully functional CmdGIS_Click handler — it "
-            "builds and writes a GIS .tab export identical in shape to the GIS button on "
-            "Status / Texts / Associations / Office / Kinship.  But LookAtPlace's form "
-            "design has no CmdGIS button.  Users on Place can use Pajek / Gephi / Neo4j "
-            "export but cannot use GIS export; the handler is there, just unreachable from "
-            "the UI.  Note: if the button is added, Issue #4 (GISFrame vs CodeFrame "
-            "typo in the same handler) must be fixed at the same time.\n\n"
-            "Detected by: test_orphan_export_button_truly_missing[bug15_LookAtPlace_CmdGIS] "
-            "— opens LookAtPlace via COM, calls Controls('CmdGIS'), and asserts the "
-            "lookup raises 'Item not found'."
-        ),
-        "summary_zh": (
-            "Form_LookAtPlace.vb 定義了功能完整的 CmdGIS_Click 處理程式——它建立並寫入"
-            "與 Status / Texts / Associations / Office / Kinship 上 GIS 按鈕形狀相同的"
-            "GIS .tab 匯出。但 LookAtPlace 的表單設計沒有 CmdGIS 按鈕。"
-            "Place 的使用者可以使用 Pajek / Gephi / Neo4j 匯出，但無法使用 GIS 匯出；"
-            "處理程式存在，只是無法從 UI 觸及。注意：若新增按鈕，Issue #4"
-            "（同一處理程式中 GISFrame 與 CodeFrame 的錯字）必須同時修復。\n\n"
-            "由 test_orphan_export_button_truly_missing[bug15_LookAtPlace_CmdGIS] 偵測到。"
-        ),
-        "steps_en": [
-            "Open CBDB_BJ_User.mdb in Microsoft Access.",
-            "Open the form **LookAtPlace**.",
-            "Look at the export-buttons row at the bottom right.  There is no GIS button.",
-            "Compare with LookAtStatus / LookAtAssociations / LookAtOffice etc., "
-            "all of which have a GIS button.",
-        ],
-        "steps_zh": [
-            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
-            "開啟 **LookAtPlace** 表單。",
-            "查看右下角的匯出按鈕列。沒有 GIS 按鈕。",
-            "與 LookAtStatus / LookAtAssociations / LookAtOffice 等比較——"
-            "這些表單均有 GIS 按鈕。",
-        ],
-        "screenshots": [],
-        "severity_en": (
-            "P3 — Missing UI: the GIS export feature is completely unavailable to LookAtPlace "
-            "users even though the underlying handler is functional (with the Issue #4 fix applied)."
-        ),
-        "severity_zh": (
-            "P3 — 缺少 UI：即使底層處理程式功能完整（套用 Issue #4 修復後），GIS 匯出功能"
-            "對 LookAtPlace 使用者完全不可用。"
-        ),
-        "fix_en": (
-            "In LookAtPlace's form design, add a CmdGIS button next to the existing "
-            "CmdPajek / CmdGephi buttons with OnClick = [Event Procedure].  "
-            "Also fix Issue #4 (GISFrame → CodeFrame typo) in the same patch."
-        ),
-        "fix_zh": (
-            "在 LookAtPlace 的表單設計中，在現有 CmdPajek / CmdGephi 按鈕旁新增 CmdGIS "
-            "按鈕，並設定 OnClick = [事件程序]。同時在同一補丁中修復 Issue #4 "
-            "（GISFrame → CodeFrame 錯字）。"
-        ),
-    },
-    {
-        "id": 16,
-        "tier": "P3_missing_ui",
-        "form": "LookAtStatus",
-        "title_en": "LookAtStatus is missing its CmdPajek button — handler exists but no UI control",
-        "title_zh": "LookAtStatus 缺少 CmdPajek 按鈕——處理程式存在但無 UI 控制項",
-        "summary_en": (
-            "Sub CmdPajek_Click() exists in Form_LookAtStatus.vb but no CmdPajek button "
-            "is rendered on LookAtStatus's form design.  Users on Status can see GIS and "
-            "Neo4j export but not Pajek network export.  Note: even if the button is added, "
-            "Issue #5 (ChkIDs control reference and three missing SQL columns) must be "
-            "fixed first or the button will immediately crash.\n\n"
-            "Detected by: test_bugs_15_to_19_orphan_export_handlers — static assertion "
-            "that CmdPajek_Click exists in Form_LookAtStatus.vb and CmdPajek is absent "
-            "from the form's control inventory."
-        ),
-        "summary_zh": (
-            "Form_LookAtStatus.vb 中存在 Sub CmdPajek_Click()，但 LookAtStatus 的表單"
-            "設計中沒有渲染 CmdPajek 按鈕。Status 的使用者可以看到 GIS 和 Neo4j 匯出，"
-            "但不能使用 Pajek 網路匯出。注意：即使新增按鈕，也必須先修復 Issue #5"
-            "（ChkIDs 控制項引用及三個缺少的 SQL 欄位），否則按鈕會立即崩潰。\n\n"
-            "由 test_bugs_15_to_19_orphan_export_handlers 靜態斷言偵測到。"
-        ),
-        "steps_en": [
-            "Open CBDB_BJ_User.mdb in Microsoft Access.",
-            "Open the form **LookAtStatus**.  The export-buttons row has only GIS and Neo4j; "
-            "there is no Pajek button.",
-        ],
-        "steps_zh": [
-            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
-            "開啟 **LookAtStatus** 表單。匯出按鈕列只有 GIS 和 Neo4j；沒有 Pajek 按鈕。",
-        ],
-        "screenshots": [],
-        "severity_en": "P3 — Missing UI: Pajek export unavailable to LookAtStatus users.",
-        "severity_zh": "P3 — 缺少 UI：LookAtStatus 使用者無法使用 Pajek 匯出。",
-        "fix_en": (
-            "Add a CmdPajek button to LookAtStatus's form design (after fixing Issue #5)."
-        ),
-        "fix_zh": "在 LookAtStatus 的表單設計中新增 CmdPajek 按鈕（在修復 Issue #5 之後）。",
-    },
-    {
-        "id": 17,
-        "tier": "P3_missing_ui",
-        "form": "LookAtStatus",
-        "title_en": "LookAtStatus is missing its CmdGephi button — handler exists but no UI control",
-        "title_zh": "LookAtStatus 缺少 CmdGephi 按鈕——處理程式存在但無 UI 控制項",
-        "summary_en": (
-            "Sub CmdGephi_Click() exists in Form_LookAtStatus.vb but no matching button "
-            "is on the form design.  Same shape as Issue #16.\n\n"
-            "Detected by: test_bugs_15_to_19_orphan_export_handlers."
-        ),
-        "summary_zh": (
-            "Form_LookAtStatus.vb 中存在 Sub CmdGephi_Click()，但表單設計中沒有對應的按鈕。"
-            "與 Issue #16 同類。\n\n"
-            "由 test_bugs_15_to_19_orphan_export_handlers 偵測到。"
-        ),
-        "steps_en": [
-            "Open CBDB_BJ_User.mdb in Microsoft Access.",
-            "Open the form **LookAtStatus**.  There is no Gephi export button.",
-        ],
-        "steps_zh": [
-            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
-            "開啟 **LookAtStatus** 表單。沒有 Gephi 匯出按鈕。",
-        ],
-        "screenshots": [],
-        "severity_en": "P3 — Missing UI: Gephi export unavailable to LookAtStatus users.",
-        "severity_zh": "P3 — 缺少 UI：LookAtStatus 使用者無法使用 Gephi 匯出。",
-        "fix_en": "Add a CmdGephi button to LookAtStatus's form design.",
-        "fix_zh": "在 LookAtStatus 的表單設計中新增 CmdGephi 按鈕。",
-    },
-    {
-        "id": 18,
-        "tier": "P3_missing_ui",
-        "form": "LookAtStatus",
-        "title_en": "LookAtStatus is missing its CmdUCINet button — handler exists but no UI control",
-        "title_zh": "LookAtStatus 缺少 CmdUCINet 按鈕——處理程式存在但無 UI 控制項",
-        "summary_en": (
-            "Sub CmdUCINet_Click() exists in Form_LookAtStatus.vb but no matching button "
-            "is on the form design.  Same shape as Issues #16 and #17.\n\n"
-            "Detected by: test_bugs_15_to_19_orphan_export_handlers."
-        ),
-        "summary_zh": (
-            "Form_LookAtStatus.vb 中存在 Sub CmdUCINet_Click()，但表單設計中沒有對應的按鈕。"
-            "與 Issue #16、#17 同類。\n\n"
-            "由 test_bugs_15_to_19_orphan_export_handlers 偵測到。"
-        ),
-        "steps_en": [
-            "Open CBDB_BJ_User.mdb in Microsoft Access.",
-            "Open the form **LookAtStatus**.  There is no UCINet export button.",
-        ],
-        "steps_zh": [
-            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
-            "開啟 **LookAtStatus** 表單。沒有 UCINet 匯出按鈕。",
-        ],
-        "screenshots": [],
-        "severity_en": "P3 — Missing UI: UCINet export unavailable to LookAtStatus users.",
-        "severity_zh": "P3 — 缺少 UI：LookAtStatus 使用者無法使用 UCINet 匯出。",
-        "fix_en": "Add a CmdUCINet button to LookAtStatus's form design.",
-        "fix_zh": "在 LookAtStatus 的表單設計中新增 CmdUCINet 按鈕。",
-    },
-    {
-        "id": 19,
-        "tier": "P3_missing_ui",
-        "form": "LookAtOffice",
-        "title_en": "LookAtOffice is missing its CmdGUESS button — handler exists but no UI control",
-        "title_zh": "LookAtOffice 缺少 CmdGUESS 按鈕——處理程式存在但無 UI 控制項",
-        "summary_en": (
-            "Sub CmdGUESS_Click() exists in Form_LookAtOffice.vb but no CmdGUESS button "
-            "is on the form design.  Users on Office can use GIS / GISPeople / Neo4j "
-            "export but not GUESS network export.  Same shape as Issues #15-#18.\n\n"
-            "Detected by: test_bugs_15_to_19_orphan_export_handlers."
-        ),
-        "summary_zh": (
-            "Form_LookAtOffice.vb 中存在 Sub CmdGUESS_Click()，但表單設計中沒有 CmdGUESS "
-            "按鈕。Office 使用者可以使用 GIS / GISPeople / Neo4j 匯出，但無法使用 GUESS "
-            "網路匯出。與 Issue #15-#18 同類。\n\n"
-            "由 test_bugs_15_to_19_orphan_export_handlers 偵測到。"
-        ),
-        "steps_en": [
-            "Open CBDB_BJ_User.mdb in Microsoft Access.",
-            "Open the form **LookAtOffice**.  There is no GUESS export button.",
-        ],
-        "steps_zh": [
-            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
-            "開啟 **LookAtOffice** 表單。沒有 GUESS 匯出按鈕。",
-        ],
-        "screenshots": [],
-        "severity_en": "P3 — Missing UI: GUESS export unavailable to LookAtOffice users.",
-        "severity_zh": "P3 — 缺少 UI：LookAtOffice 使用者無法使用 GUESS 匯出。",
-        "fix_en": "Add a CmdGUESS button to LookAtOffice's form design.",
-        "fix_zh": "在 LookAtOffice 的表單設計中新增 CmdGUESS 按鈕。",
-    },
-    {
-        "id": 20,
-        "tier": "P0_silent_data",
-        "form": "ADDR_CODES + Form_LookAt*.CmdGIS_Click",
-        "title_en": "BOM-prefixed address names produce embedded TAB delimiters in GIS exports — silent column misalignment",
-        "title_zh": "BOM 前綴地址名稱在 GIS 匯出中產生嵌入的 TAB 分隔符——靜默的欄位錯位",
-        "summary_en": (
-            "315 rows of ADDR_CODES carry a stray U+FEFF (BOM) prefix in both c_name "
-            "and c_name_chn, almost certainly from a UTF-8-with-BOM paste at data-import "
-            "time.  When any LookAt form copies one of these rows into its scratch staging "
-            "table via SQL UPDATE/INSERT, JET strips the BOM and re-interprets the remaining "
-            "UTF-16 LE bytes, promoting them back to Unicode with mangled values — including "
-            "a literal TAB character at position 0 (e.g. c_addr_id = 702559, Wei Shi 尉氏).  "
-            "CmdGIS writes each cell as tStr + value + tC with tC = Chr(9) and performs no "
-            "escaping, so the embedded TAB becomes a delimiter, splits AddrChn into two cells, "
-            "and silently shifts every column to its right.  A user opening the .tab file in "
-            "Excel sees numeric fields in text columns and an extra trailing column.  The same "
-            "unescaped-write pattern is present in CmdGIS of LookAtTexts / LookAtPlace / "
-            "LookAtAssociations / LookAtOffice / LookAtKinship.\n\n"
-            "Detected by: test_addr_codes_has_known_bom_dirty_rows — asserts 315 BOM-prefixed "
-            "ADDR_CODES rows in c_name and c_name_chn.  "
-            "Also: test_known_reachable_dirty_addr_present — asserts c_addr_id 702559 "
-            "(Wei Shi 尉氏) starts with U+FEFF and is reachable from status_code=40."
-        ),
-        "summary_zh": (
-            "ADDR_CODES 的 315 列在 c_name 和 c_name_chn 中都帶有雜散的 U+FEFF（BOM）前綴，"
-            "幾乎可確定是資料匯入時以帶 BOM 的 UTF-8 貼上造成的。當任何 LookAt 表單透過 SQL "
-            "UPDATE/INSERT 將這些列複製到暫存表時，JET 剝離 BOM 並重新解釋剩餘的 UTF-16 LE "
-            "位元組，將其提升回 Unicode 但值已損毀——包括位置 0 處的字面 TAB 字元（例如 "
-            "c_addr_id = 702559，尉氏）。CmdGIS 以 tStr + value + tC（tC = Chr(9)）的方式"
-            "寫入每個儲存格且不進行任何轉義，因此嵌入的 TAB 變成分隔符，將 AddrChn 分割成"
-            "兩個儲存格，並靜默地將其右側每個欄位向右移一位。使用者在 Excel 中開啟 .tab "
-            "檔案時，會看到數值欄位出現在文字欄中，並多出一個尾端欄位。相同的未轉義寫入模式"
-            "也存在於 LookAtTexts / LookAtPlace / LookAtAssociations / LookAtOffice / "
-            "LookAtKinship 的 CmdGIS 中。\n\n"
-            "由 test_addr_codes_has_known_bom_dirty_rows 及 "
-            "test_known_reachable_dirty_addr_present 偵測到。"
-        ),
-        "steps_en": [
-            "Open CBDB_BJ_User.mdb in Microsoft Access.",
-            "Open the form **LookAtStatus**.  Pick status code **40** "
-            "(civil office / [為官者：文]) without any year filter.",
-            "Click **Run Query**.  When complete (~17,000 rows), click the **GIS** button "
-            "with the encoding selector set to UTF-8.",
-            "Save the resulting .tab file and open it in Excel or a tab-aware text editor.",
-            "Around row 11476 (person Ruan Fu 阮孚, c_addr_id = 702559, Wei Shi 尉氏): "
-            "one row has 10 tab cells against the 9-column header.  AddrChn is blank, "
-            "the X column contains text, and the real X / Y values are shifted one column "
-            "to the right.",
-        ],
-        "steps_zh": [
-            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
-            "開啟 **LookAtStatus** 表單。選取狀態碼 **40** [為官者：文]（civil office / 為官者：文），不設年份篩選。",
-            "點擊 **Run Query**。完成後（約 17,000 列），將編碼選擇器設為 UTF-8 後點擊 **GIS** 按鈕。",
-            "儲存生成的 .tab 檔案並在 Excel 或支援 TAB 的文字編輯器中開啟。",
-            "在第 11476 列附近（阮孚 Ruan Fu，c_addr_id = 702559，尉氏）："
-            "一列有 10 個 TAB 儲存格，而標題只有 9 欄。AddrChn 為空，X 欄包含文字，"
-            "實際的 X / Y 值向右移了一欄。",
-        ],
-        "screenshots": [],
-        "severity_en": (
-            "P0 — Silent export column misalignment: numeric fields land in text columns "
-            "and one extra trailing column appears, with no error popup.  Currently 1 of "
-            "315 BOM-dirty ADDR_CODES rows (c_addr_id 702559) is reachable from person data; "
-            "the other 314 are orphan rows that would reproduce the same misalignment the "
-            "moment they gain their first person link."
-        ),
-        "severity_zh": (
-            "P0 — 靜默的匯出欄位錯位：數值欄位出現在文字欄中，並多出一個尾端欄位，"
-            "且不彈出任何錯誤訊息。目前 315 個帶 BOM 的 ADDR_CODES 列中有 1 個"
-            "（c_addr_id 702559）可從人物資料觸及；其餘 314 個是孤兒列，一旦獲得第一個"
-            "人物連結即會重現相同的錯位。"
-        ),
-        "fix_en": (
-            "Two complementary fixes: (1) One-shot data cleanup — strip the leading U+FEFF "
-            "from the 315 affected ADDR_CODES.c_name / c_name_chn rows "
-            "(e.g. UPDATE ADDR_CODES SET c_name = Mid(c_name, 2) WHERE Left(c_name, 1) = "
-            "ChrW(65279) and the parallel statement for c_name_chn).  "
-            "(2) Defensive sanitisation — before each tStr = tStr + value + tC append in "
-            "the CmdGIS bodies of all LookAt forms, replace any embedded Chr(9), Chr(10), "
-            "Chr(13), or U+FEFF in value with a space.  Both fixes are warranted."
-        ),
-        "fix_zh": (
-            "兩項互補修復：(1) 一次性資料清理——從 315 個受影響的 ADDR_CODES.c_name / "
-            "c_name_chn 列中剝離前導 U+FEFF（例如：UPDATE ADDR_CODES SET c_name = "
-            "Mid(c_name, 2) WHERE Left(c_name, 1) = ChrW(65279)，以及 c_name_chn 的"
-            "對應語句）。(2) 防禦性清理——在所有 LookAt 表單 CmdGIS 主體的每個 "
-            "tStr = tStr + value + tC 追加之前，將 value 中嵌入的 Chr(9)、Chr(10)、"
-            "Chr(13) 或 U+FEFF 替換為空格。兩項修復均有必要。"
-        ),
-    },
-    {
-        "id": 21,
-        "tier": "P0_silent_data",
-        "form": "Form_LookAtOffice.CmdGIS_Click",
-        "title_en": "LookAtOffice: CmdGIS output IndexYear column is nearly empty (0.2% fill rate) — likely silent column-bind regression",
-        "title_zh": "LookAtOffice：CmdGIS 輸出的 IndexYear 欄幾乎為空（填充率 0.2%）——疑似靜默欄位綁定退化",
-        "summary_en": (
-            "When CmdGIS runs for LookAtOffice with person 80944 (unfiltered), the GIS output "
-            "file is produced but the IndexYear column contains non-empty values in only 64 of "
-            "36,602 rows (0.2%), well below the 80% threshold expected for a correctly-populated "
-            "GIS export.  This pattern is consistent with the silent column-bind regressions "
-            "documented in Bugs #10, #11, and #12 — a column name in the CmdGIS SELECT is "
-            "mismatched against the actual ZZ_SCRATCH table schema.\n\n"
-            "Detected by: test_cmd_gis_produces_file[office_80944_unfiltered] — assertion "
-            "[LookAtOffice] CmdGIS column 'IndexYear' is non-empty in only 64/36602 rows (0.2%), "
-            "below 80% threshold."
-        ),
-        "summary_zh": (
-            "以人物 80944（無篩選）執行 LookAtOffice CmdGIS 時，GIS 輸出檔案雖已產生，"
-            "但 IndexYear 欄僅在 36,602 列中的 64 列有非空值（0.2%），遠低於正確 GIS "
-            "輸出預期的 80% 閾值。此模式與 Bug #10、#11、#12 記錄的靜默欄位綁定退化一致——"
-            "CmdGIS SELECT 中的欄位名稱與 ZZ_SCRATCH 表格的實際 schema 不符。\n\n"
-            "由 test_cmd_gis_produces_file[office_80944_unfiltered] 偵測到，斷言 "
-            "[LookAtOffice] CmdGIS 欄 IndexYear 僅 64/36602 列非空（0.2%），低於 80% 閾值。"
-        ),
-        "steps_en": [
-            "Open CBDB_BJ_User.mdb in Microsoft Access.",
-            "Open the LookAtOffice form.",
-            "Set person ID to 80944 and leave all other filters blank.",
-            "Click CmdGIS.  The file is produced without an error popup.",
-            "Open the GIS output file and inspect the IndexYear column: "
-            "the vast majority of rows will be empty.",
-        ],
-        "steps_zh": [
-            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
-            "開啟 LookAtOffice 表單。",
-            "將人物 ID 設為 80944，其餘篩選器留空。",
-            "點擊 CmdGIS。檔案產生時不會出現錯誤彈出視窗。",
-            "開啟 GIS 輸出檔並檢查 IndexYear 欄：絕大多數列將為空白。",
-        ],
-        "screenshots": [],
-        "severity_en": (
-            "P0 — Silent data corruption: the GIS export appears to succeed but IndexYear "
-            "data is missing for 99.8% of rows.  Downstream GIS workflows that depend on "
-            "year-based filtering will silently receive null years."
-        ),
-        "severity_zh": (
-            "P0 — 靜默資料損毀：GIS 匯出看似成功，但 99.8% 列的 IndexYear 資料遺失。"
-            "依賴年份篩選的下游 GIS 工作流程將靜默地收到空白年份。"
-        ),
-        "fix_en": (
-            "Inspect Form_LookAtOffice.CmdGIS_Click: locate the SELECT that populates "
-            "the IndexYear column in the GIS output and verify the source column name "
-            "matches the actual schema (check ZZ_SCRATCH_OFFICE or the equivalent table)."
-        ),
-        "fix_zh": (
-            "檢查 Form_LookAtOffice.CmdGIS_Click：找到填充 GIS 輸出 IndexYear 欄的 SELECT 語句，"
-            "確認來源欄位名稱與實際 schema 一致（檢查 ZZ_SCRATCH_OFFICE 或對應資料表）。"
-        ),
-    },
-    {
-        "id": 22,
-        "tier": "P1_visible_crash",
-        "form": "Form_LookAtAssociations.CmdUCINet_Click / Form_LookAtKinship.CmdUCINet_Click",
-        "title_en": "LookAtAssociations / LookAtKinship: CmdUCINet crashes with 'Invalid procedure call or argument' when c_name contains CJK Han characters",
-        "title_zh": "LookAtAssociations / LookAtKinship：當 c_name 含有 CJK 漢字時，CmdUCINet 因「Invalid procedure call or argument」崩潰",
-        "summary_en": (
-            "Form_LookAtAssociations.CmdUCINet_Click and Form_LookAtKinship.CmdUCINet_Click "
-            "both call CreateTextFile with the 2-argument signature (filename, overwrite).  "
-            "VBA's CreateTextFile raises 'Invalid procedure call or argument' (runtime error 5) "
-            "when the output path contains a CJK Han character in a c_name value — the 2-arg "
-            "form does not accept a Unicode flag, so Access silently uses the system ANSI code "
-            "page, which cannot encode Han characters.  The error fires as a popup and aborts "
-            "the export.  Fixtures using association code c_assoc_code = 437 "
-            "('Presented literary composition as gift to' / '贈詩、文') reliably trigger this "
-            "because the associated persons include Han-character names.\n\n"
-            "Detected by: test_bug22_associations_cmducinet_fires_invalid_procedure_call and "
-            "test_bug22_kinship_cmducinet_sibling_form_fires_invalid_procedure_call."
-        ),
-        "summary_zh": (
-            "Form_LookAtAssociations.CmdUCINet_Click 和 Form_LookAtKinship.CmdUCINet_Click "
-            "均以 2 參數形式呼叫 CreateTextFile（filename, overwrite），未傳入 Unicode 旗標。"
-            "當輸出路徑或 c_name 值包含 CJK 漢字時，VBA 的 CreateTextFile 觸發「Invalid "
-            "procedure call or argument」（執行期錯誤 5），因系統 ANSI 字碼頁無法編碼漢字。"
-            "錯誤以彈出視窗形式出現並中止匯出。使用關聯代碼 c_assoc_code = 437"
-            "（'Presented literary composition as gift to' / '贈詩、文'）的固件能可靠觸發此問題，"
-            "因相關人物的 c_name 包含漢字。\n\n"
-            "由 test_bug22_associations_cmducinet_fires_invalid_procedure_call 及 "
-            "test_bug22_kinship_cmducinet_sibling_form_fires_invalid_procedure_call 偵測到。"
-        ),
-        "steps_en": [
-            "Open CBDB_BJ_User.mdb in Microsoft Access.",
-            "Open the LookAtAssociations form.",
-            "Pick association code c_assoc_code = 437 "
-            "('Presented literary composition as gift to').",
-            "Click CmdUCINet.  A popup appears: "
-            "'Invalid procedure call or argument'.  The UCINet export file is not created.",
-            "The same error occurs in LookAtKinship.CmdUCINet when the kinship network "
-            "contains a person whose c_name includes CJK Han characters (e.g. '取' / 贈詩、文).",
-        ],
-        "steps_zh": [
-            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
-            "開啟 LookAtAssociations 表單。",
-            "選取關聯代碼 c_assoc_code = 437（'Presented literary composition as gift to'）。",
-            "點擊 CmdUCINet。出現彈出視窗：'Invalid procedure call or argument'。UCINet 匯出檔案未建立。",
-            "在 LookAtKinship.CmdUCINet 中，當親屬網絡包含 c_name 含 CJK 漢字的人物時，同樣會出現此錯誤。",
-        ],
-        "screenshots": [],
-        "severity_en": (
-            "P1 — Visible runtime crash: a popup aborts the export.  Any UCINet workflow on "
-            "an association network that includes persons with Han-character names will fail.  "
-            "Most CBDB persons have CJK names, making this effectively a blanket failure for "
-            "real-world LookAtAssociations / LookAtKinship → UCINet usage."
-        ),
-        "severity_zh": (
-            "P1 — 可見的執行期崩潰：彈出視窗中止匯出。任何包含漢字姓名人物的關聯網絡 UCINet "
-            "工作流程均會失敗。絕大多數 CBDB 人物具有漢字姓名，使其在實際的 LookAtAssociations / "
-            "LookAtKinship → UCINet 使用中幾乎全面失敗。"
-        ),
-        "fix_en": (
-            "Change CreateTextFile calls in Form_LookAtAssociations.CmdUCINet_Click and "
-            "Form_LookAtKinship.CmdUCINet_Click to the 3-argument form: "
-            "CreateTextFile(filename, True, True) — the third argument enables Unicode output.  "
-            "Test with a fixture that includes a person whose c_name contains CJK Han characters."
-        ),
-        "fix_zh": (
-            "將 Form_LookAtAssociations.CmdUCINet_Click 和 Form_LookAtKinship.CmdUCINet_Click "
-            "中的 CreateTextFile 呼叫改為 3 參數形式：CreateTextFile(filename, True, True)——"
-            "第三個參數啟用 Unicode 輸出。以 c_name 含 CJK 漢字的人物固件進行測試。"
-        ),
-    },
-    {
-        "id": 23,
-        "tier": "P0_silent_data",
-        "form": "Form_LookAtAssociations.CmdPajek_Click",
-        "title_en": "LookAtAssociations: CmdPajek vertex section has off-by-N count — header declares 501 vertices but exports 8,093 rows",
-        "title_zh": "LookAtAssociations：CmdPajek 頂點區段數量錯誤——標頭宣告 501 個頂點，但實際匯出 8,093 列",
-        "summary_en": (
-            "The Pajek .net file produced by Form_LookAtAssociations.CmdPajek_Click declares "
-            "'*Vertices 501' in the header but the actual vertex section contains 8,093 rows "
-            "before the next `*` section marker.  Pajek and other network analysis tools that "
-            "rely on the vertex count header will either truncate the vertex list after 501 "
-            "rows or raise a parse error, silently discarding the remaining ~7,592 vertices "
-            "from the network.\n\n"
-            "Detected by: test_export_button_produces_file[LookAtAssociations_CmdPajek] — "
-            "assertion header declared 501 vertices but found 8093 vertex rows before the next "
-            "`*` section."
-        ),
-        "summary_zh": (
-            "Form_LookAtAssociations.CmdPajek_Click 產生的 Pajek .net 檔案在標頭宣告 "
-            "'*Vertices 501'，但實際頂點區段在下一個 `*` 標記之前包含 8,093 列。Pajek "
-            "及其他依賴頂點計數標頭的網路分析工具將在 501 列後截斷頂點列表或觸發解析錯誤，"
-            "靜默地丟棄其餘約 7,592 個頂點。\n\n"
-            "由 test_export_button_produces_file[LookAtAssociations_CmdPajek] 偵測到，"
-            "斷言標頭宣告 501 個頂點但在下一個 `*` 區段前找到 8,093 列頂點。"
-        ),
-        "steps_en": [
-            "Open CBDB_BJ_User.mdb in Microsoft Access.",
-            "Open LookAtAssociations, select a query that returns a large association network.",
-            "Click CmdPajek.  The .net file is written without an error popup.",
-            "Open the .net file and count the lines in the *Vertices section: "
-            "the count exceeds the number declared in the '*Vertices N' header.",
-        ],
-        "steps_zh": [
-            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
-            "開啟 LookAtAssociations，選擇一個回傳大型關聯網絡的查詢。",
-            "點擊 CmdPajek。.net 檔案寫入時不出現錯誤視窗。",
-            "開啟 .net 檔案並計算 *Vertices 區段的列數：實際數量超過 '*Vertices N' 標頭中宣告的數字。",
-        ],
-        "screenshots": [],
-        "severity_en": (
-            "P0 — Silent data corruption: the exported Pajek file is structurally invalid. "
-            "Network analyses that ingest the file will operate on a truncated vertex set, "
-            "producing incorrect centrality / community detection results without any warning."
-        ),
-        "severity_zh": (
-            "P0 — 靜默資料損毀：匯出的 Pajek 檔案在結構上無效。讀取該檔案的網路分析將在"
-            "截斷的頂點集上運行，在沒有任何警告的情況下產生不正確的中心性/社群偵測結果。"
-        ),
-        "fix_en": (
-            "In Form_LookAtAssociations.CmdPajek_Click, locate where the '*Vertices N' header "
-            "is written and ensure N is derived from the actual count of vertex rows written, "
-            "not a pre-computed estimate or a separate query result."
-        ),
-        "fix_zh": (
-            "在 Form_LookAtAssociations.CmdPajek_Click 中，找到寫入 '*Vertices N' 標頭的位置，"
-            "確保 N 來自實際寫入的頂點列數，而非預先計算的估計值或單獨的查詢結果。"
-        ),
-    },
-    {
-        "id": 24,
-        "tier": "P0_silent_data",
-        "form": "Form_LookAtKinship.CmdGUESS_Click",
-        "title_en": "LookAtKinship: CmdGUESS Gephi output has wrong field count per node row (nodedef declares 15 columns)",
-        "title_zh": "LookAtKinship：CmdGUESS Gephi 輸出每個節點列的欄位數錯誤（nodedef 宣告 15 欄）",
-        "summary_en": (
-            "The Gephi .gdf file produced by Form_LookAtKinship.CmdGUESS_Click declares 15 "
-            "columns in the nodedef header but the actual node data rows contain a different "
-            "number of fields (column/value misalignment).  Gephi and downstream tools will "
-            "either fail to load the file or silently map node attributes to the wrong columns.\n\n"
-            "Detected by: test_cmd_guess_produces_file[kinship_person_3211] — assertion "
-            "[LookAtKinship] Gephi: node rows with bad field count (nodedef has 15 cols)."
-        ),
-        "summary_zh": (
-            "Form_LookAtKinship.CmdGUESS_Click 產生的 Gephi .gdf 檔案在 nodedef 標頭宣告 "
-            "15 個欄位，但實際節點資料列包含不同數量的欄位（欄位/值錯位）。Gephi 及下游工具"
-            "將無法載入該檔案，或靜默地將節點屬性對應到錯誤的欄位。\n\n"
-            "由 test_cmd_guess_produces_file[kinship_person_3211] 偵測到，斷言 "
-            "[LookAtKinship] Gephi: node rows with bad field count (nodedef has 15 cols)。"
-        ),
-        "steps_en": [
-            "Open CBDB_BJ_User.mdb in Microsoft Access.",
-            "Open LookAtKinship.  Set a person ID that returns a kinship network.",
-            "Click CmdGUESS.  The .gdf file is written without error.",
-            "Open the .gdf file: count the columns declared in the 'nodedef>' header "
-            "and compare with the number of comma-separated values in the first node data row.",
-        ],
-        "steps_zh": [
-            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
-            "開啟 LookAtKinship，設定一個可回傳親屬網絡的人物 ID。",
-            "點擊 CmdGUESS。.gdf 檔案寫入時不出現錯誤。",
-            "開啟 .gdf 檔案：計算 'nodedef>' 標頭宣告的欄數，與第一個節點資料列中逗號分隔值的數量進行比較。",
-        ],
-        "screenshots": [],
-        "severity_en": (
-            "P0 — Silent data corruption: the Gephi file is structurally invalid. "
-            "Node attributes are silently misaligned, making all imported node metadata unreliable."
-        ),
-        "severity_zh": (
-            "P0 — 靜默資料損毀：Gephi 檔案在結構上無效。節點屬性靜默錯位，導致所有匯入的節點元資料不可靠。"
-        ),
-        "fix_en": (
-            "In Form_LookAtKinship.CmdGUESS_Click, ensure the nodedef header column list and "
-            "the per-row value list are generated from the same ordered column definition. "
-            "A mismatch typically occurs when a column is added to one list but not the other."
-        ),
-        "fix_zh": (
-            "在 Form_LookAtKinship.CmdGUESS_Click 中，確保 nodedef 標頭欄位列表與每列值列表"
-            "來自同一個有序欄位定義。不符情況通常發生在某欄位被加入一個列表但未加入另一個時。"
-        ),
-    },
-    {
-        "id": 25,
-        "tier": "P1_visible_crash",
-        "form": "Form_LookAtKinship.CmdImport_Click / Form_LookAtGroupData.CmdImport_Click / Form_LookAtAssociationPairs.CmdImportList_Click",
-        "title_en": "LookAtKinship / LookAtGroupData / LookAtAssociationPairs: CmdImport round-trip fails — ZZ_SCRATCH_IMPORT_PEOPLE stays empty",
-        "title_zh": "LookAtKinship / LookAtGroupData / LookAtAssociationPairs：CmdImport 往返失敗——ZZ_SCRATCH_IMPORT_PEOPLE 保持空白",
-        "summary_en": (
-            "After seeding person IDs [1, 2, 3] and clicking CmdImport (or CmdImportList for "
-            "LookAtAssociationPairs), the handler is expected to populate "
-            "ZZ_SCRATCH_IMPORT_PEOPLE with the seeded IDs.  In all three forms the target "
-            "table remains empty (c_person_id = []) after the import completes.  No error "
-            "popup is shown — the import appears to succeed silently but writes nothing.\n\n"
-            "Detected by: test_cmd_import_round_trip[LookAtKinship.CmdImport], "
-            "test_cmd_import_round_trip[LookAtGroupData.CmdImport], and "
-            "test_cmd_import_round_trip[LookAtAssociationPairs.CmdImportList] — all assert "
-            "ZZ_SCRATCH_IMPORT_PEOPLE.c_person_id = []; expected [1, 2, 3]."
-        ),
-        "summary_zh": (
-            "在填入人物 ID [1, 2, 3] 並點擊 CmdImport（或 LookAtAssociationPairs 的 CmdImportList）"
-            "後，handler 應將填入的 ID 寫入 ZZ_SCRATCH_IMPORT_PEOPLE。在全部三個表單中，"
-            "匯入完成後目標表格仍為空（c_person_id = []）。不顯示錯誤彈出視窗——匯入看似成功，"
-            "但未寫入任何資料。\n\n"
-            "由 test_cmd_import_round_trip[LookAtKinship.CmdImport]、"
-            "[LookAtGroupData.CmdImport]、[LookAtAssociationPairs.CmdImportList] 偵測到，"
-            "均斷言 ZZ_SCRATCH_IMPORT_PEOPLE.c_person_id = []；預期 [1, 2, 3]。"
-        ),
-        "steps_en": [
-            "Open CBDB_BJ_User.mdb in Microsoft Access.",
-            "Open LookAtKinship (or LookAtGroupData / LookAtAssociationPairs).",
-            "Enter person IDs 1, 2, 3 in the import field.",
-            "Click CmdImport.  No error popup appears.",
-            "Query ZZ_SCRATCH_IMPORT_PEOPLE: SELECT c_person_id FROM "
-            "ZZ_SCRATCH_IMPORT_PEOPLE — the table is empty.",
-        ],
-        "steps_zh": [
-            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
-            "開啟 LookAtKinship（或 LookAtGroupData / LookAtAssociationPairs）。",
-            "在匯入欄位中輸入人物 ID 1, 2, 3。",
-            "點擊 CmdImport。不出現錯誤彈出視窗。",
-            "查詢 ZZ_SCRATCH_IMPORT_PEOPLE：SELECT c_person_id FROM ZZ_SCRATCH_IMPORT_PEOPLE——資料表為空。",
-        ],
-        "screenshots": [],
-        "severity_en": (
-            "P1 — Silent import failure: the import appears to complete successfully but the "
-            "target table is empty.  Any subsequent query or export that depends on the imported "
-            "person list will operate on an empty dataset without warning."
-        ),
-        "severity_zh": (
-            "P1 — 靜默匯入失敗：匯入看似成功完成，但目標資料表為空。依賴匯入人物列表的後續查詢"
-            "或匯出將在沒有警告的情況下操作空資料集。"
-        ),
-        "fix_en": (
-            "Inspect the CmdImport_Click / CmdImportList_Click handlers in each affected form.  "
-            "Verify the INSERT INTO ZZ_SCRATCH_IMPORT_PEOPLE statement: check that the "
-            "source control (text box or list box) is correctly read and that the INSERT "
-            "executes within an active transaction that is committed."
-        ),
-        "fix_zh": (
-            "檢查各受影響表單的 CmdImport_Click / CmdImportList_Click handler。驗證 INSERT INTO "
-            "ZZ_SCRATCH_IMPORT_PEOPLE 語句：確認來源控制項（文字方塊或列表方塊）被正確讀取，"
-            "且 INSERT 在已提交的活躍交易中執行。"
-        ),
-    },
-    {
-        "id": 26,
-        "tier": "P0_silent_data",
-        "form": "BIOG_MAIN (c_index_addr_id)",
-        "title_en": "c_index_addr_id disagreement between User MDB and cbdb-online snapshot exceeds 0.5% threshold",
-        "title_zh": "User MDB 與 cbdb-online 快照的 c_index_addr_id 不一致率超過 0.5% 閾值",
-        "summary_en": (
-            "A cross-check of BIOG_MAIN.c_index_addr_id between the User MDB and the "
-            "cbdb-online-main-server SQLite snapshot found a disagreement rate of 0.500%, "
-            "exactly at the maximum acceptable threshold.  At the default 5,000-row sample "
-            "this means approximately 25 persons have a different c_index_addr_id in the "
-            "two systems, indicating that either the User MDB has not fully applied recent "
-            "upstream address assignments or the snapshot is ahead of the current data export.\n\n"
-            "Detected by: test_index_year_addr_xcheck_sample — assertion "
-            "c_index_addr_id disagreement 0.500% exceeds 0.5% threshold."
-        ),
-        "summary_zh": (
-            "對 User MDB 與 cbdb-online-main-server SQLite 快照之間的 BIOG_MAIN.c_index_addr_id "
-            "進行交叉核查，發現不一致率為 0.500%，恰好達到最大可接受閾值。以預設 5,000 列樣本計，"
-            "約有 25 名人物在兩個系統中的 c_index_addr_id 不同，表明 User MDB 可能尚未完全套用"
-            "近期上游地址指定，或快照領先於當前資料匯出。\n\n"
-            "由 test_index_year_addr_xcheck_sample 偵測到，斷言 "
-            "c_index_addr_id 不一致率 0.500% 超過 0.5% 閾值。"
-        ),
-        "steps_en": [
-            "Run: python reports/collect_index_year_diffs.py",
-            "Inspect reports/index_drift_examples.json for rows where the bucket is "
-            "'addr_only' — these are persons where c_index_addr_id differs between "
-            "the User MDB and the online snapshot.",
-            "For each differing person, query BIOG_MAIN.c_index_addr_id and compare "
-            "against the online server to determine which value is authoritative.",
-        ],
-        "steps_zh": [
-            "執行：python reports/collect_index_year_diffs.py",
-            "檢查 reports/index_drift_examples.json 中 bucket 為 'addr_only' 的列——"
-            "這些是 User MDB 與線上快照之間 c_index_addr_id 不同的人物。",
-            "對每個不一致的人物，查詢 BIOG_MAIN.c_index_addr_id 並與線上伺服器比較，"
-            "確認哪個值為權威值。",
-        ],
-        "screenshots": [],
-        "severity_en": (
-            "P0 — Silent data drift: ~25 persons have a different primary address ID than "
-            "the online system.  Geographic analyses and GIS exports that use c_index_addr_id "
-            "will silently place these persons at the wrong location."
-        ),
-        "severity_zh": (
-            "P0 — 靜默資料漂移：約 25 名人物的主要地址 ID 與線上系統不同。使用 c_index_addr_id "
-            "的地理分析和 GIS 匯出將靜默地將這些人物置於錯誤位置。"
-        ),
-        "fix_en": (
-            "Apply the latest c_index_addr_id assignments from the cbdb-online server to "
-            "BIOG_MAIN in the User MDB.  The differing rows are enumerated in "
-            "reports/index_drift_examples.json (bucket: 'addr_only')."
-        ),
-        "fix_zh": (
-            "將 cbdb-online 伺服器最新的 c_index_addr_id 指定套用至 User MDB 中的 BIOG_MAIN。"
-            "不一致的列已列舉於 reports/index_drift_examples.json（bucket: 'addr_only'）中。"
         ),
     },
 ]

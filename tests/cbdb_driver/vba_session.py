@@ -1332,7 +1332,7 @@ class VbaSession:
     # Add new dispatch entries here; Public-global gTimerTarget chooses.
     _TIMER_DISPATCH_SUBS = (
         "CmdQuery", "CmdRun",
-        "CmdGIS", "CmdNeo4j", "CmdGephi", "CmdPajek",
+        "CmdGIS", "CmdNeo4j", "CmdGephi", "CmdPajek", "CmdUTF8Pajek",
         "CmdGUESS", "CmdGISPeople",
         "CmdStoreID", "CmdRecallID",
         # CmdImport family (roadmap 13).  Names vary across forms; only

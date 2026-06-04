@@ -10,54 +10,47 @@ _測試過程中發現的問題彙總，謹呈維護團隊斧正。_
 
 ## 覆蓋矩陣 —— 表單 × 按鈕測試結果
 
-| Form | CmdQuery | CmdGIS | CmdNeo4j | CmdPajek | CmdGephi | CmdUCINet | CmdKML | CmdGUESS | CmdRun |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| LookAtEntry | ✗ FAIL | ✓ | ✓ | — | — | — | —? | — | — |
-| LookAtStatus | ✓ | — | — | ✗ FAIL | ~ SKIP | ✓ | — | — | — |
-| LookAtTexts | ✓ | — | — | — | — | — | — | — | — |
-| LookAtPlace | ✓ | ✗ FAIL | ✗ FAIL | — | — | — | — | — | — |
-| LookAtAssociations | ✓ | ✓ | ✓ | — | — | ✗ FAIL | — | — | — |
-| LookAtOffice | ✓ | ✗ FAIL | — | — | — | — | — | ✓ | — |
-| LookAtKinship | — | ✓ | — | ✓ | — | ✗ FAIL | — | ✗ FAIL | ✓ |
-| LookAtNetworks | — | — | ~ SKIP | — | — | — | — | — | ~ SKIP |
-| LookAtGroupData | — | — | ✗ FAIL | — | — | — | — | — | ✗ FAIL |
-| LookAtAssocPairs | ~ SKIP | — | ✓ | ✓ | — | — | — | — | — |
+| Form | CmdQuery | CmdGIS | CmdNeo4j | CmdPajek | CmdGephi | CmdUCINet | CmdKML | CmdGUESS | CmdRun | CmdUTF8Pajek |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| LookAtEntry | ✗ FAIL | ✓ | ✓ | — | — | — | — | — | — | — |
+| LookAtStatus | ✓ | ✓ | ✓ | ✗ FAIL | ~ SKIP | ✓ | — | — | — | — |
+| LookAtTexts | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| LookAtPlace | ✓ | ✗ FAIL | ✗ FAIL | ✓ | ✓ | — | — | — | — | — |
+| LookAtAssociations | ✓ | ✓ | ✓ | ✗ FAIL | ✓ | ✗ FAIL | — | — | — | — |
+| LookAtOffice | ✓ | ✗ FAIL | ✓ | — | — | — | — | ✓ | — | — |
+| LookAtKinship | — | ✓ | ✓ | ✓ | — | ✗ FAIL | — | ✗ FAIL | ✓ | ✗ FAIL |
+| LookAtNetworks | — | — | ~ SKIP | — | — | — | — | — | ~ SKIP | — |
+| LookAtGroupData | — | ✓ | ✗ FAIL | — | — | — | — | — | ✗ FAIL | — |
+| LookAtAssocPairs | ~ SKIP | ✓ | ✓ | ✓ | — | ✓ | — | — | — | — |
 
-_PASS: 16 · FAIL: 10 · ERROR: 0 · SKIP: 4 · NOT RUN: 1 · N/A: 59_
+_PASS: 28 · FAIL: 12 · ERROR: 0 · SKIP: 4 · NOT RUN: 0 · N/A: 56_
 
 ## 目錄
 
 - [P0 — 靜默資料錯誤](#p0--靜默資料錯誤)
-  - [Issue #20 — BOM 字首地址名稱在 GIS 匯出中產生嵌入的 TAB 分隔符——靜默的欄位錯位](#issue-20--bom-字首地址名稱在-gis-匯出中產生嵌入的-tab-分隔符靜默的欄位錯位)
   - [Issue #21 — LookAtOffice：CmdGIS 輸出的 IndexYear 欄幾乎為空（填充率 0.2%）——疑似靜默欄位繫結退化](#issue-21--lookatofficecmdgis-輸出的-indexyear-欄幾乎為空填充率-02疑似靜默欄位繫結退化)
+  - [Issue #26 — User MDB 與 cbdb-online 快照的 c_index_addr_id 不一致率超過 0.5% 閾值](#issue-26--user-mdb-與-cbdb-online-快照的-c_index_addr_id-不一致率超過-05-閾值)
   - [Issue #23 — LookAtAssociations：CmdPajek 頂點區段數量錯誤——標頭宣告 501 個頂點，但實際匯出 8,093 列](#issue-23--lookatassociationscmdpajek-頂點區段數量錯誤標頭宣告-501-個頂點但實際匯出-8093-列)
   - [Issue #24 — LookAtKinship：CmdGUESS Gephi 輸出每個節點列的欄位數錯誤（nodedef 宣告 15 欄）](#issue-24--lookatkinshipcmdguess-gephi-輸出每個節點列的欄位數錯誤nodedef-宣告-15-欄)
-  - [Issue #26 — User MDB 與 cbdb-online 快照的 c_index_addr_id 不一致率超過 0.5% 閾值](#issue-26--user-mdb-與-cbdb-online-快照的-c_index_addr_id-不一致率超過-05-閾值)
 - [P1 — 可見的執行時報錯](#p1--可見的執行時報錯)
+  - [Issue #22 — LookAtAssociations / LookAtKinship：當 c_name 含有 CJK 漢字時，CmdUCINet 因「Invalid procedure call or argument」崩潰](#issue-22--lookatassociations--lookatkinship當-c_name-含有-cjk-漢字時cmducinet-因invalid-procedure-call-or-argument崩潰)
   - [Issue #6 — LookAtGroupData.queryEntry 崩潰「找不到欄位」——ENTRY_DATA.c_parental_status 缺少 _code 字尾](#issue-6--lookatgroupdataqueryentry-崩潰找不到欄位entry_datac_parental_status-缺少-_code-字尾)
   - [Issue #7 — LookAtPlace.CmdNeo4j：People-CSV 迴圈讀取未在 SELECT 中投影的 c_dynasty / c_dynasty_chn / c_female——觸發 JET 3265「找不到專案」](#issue-7--lookatplacecmdneo4jpeople-csv-迴圈讀取未在-select-中投影的-c_dynasty--c_dynasty_chn--c_female觸發-jet-3265找不到專案)
-  - [Issue #8 — LookAtNetworks.CmdNeo4j：tRstPlace 和 tRstPeoplePlace 的 SELECT 缺少 x_coord / y_coord / c_person_id——在第一列觸發「找不到專案」](#issue-8--lookatnetworkscmdneo4jtrstplace-和-trstpeopleplace-的-select-缺少-x_coord--y_coord--c_person_id在第一列觸發找不到專案)
-  - [Issue #13 — BIOG_MAIN_2 子表單：點選 c_fl_ey_notes 開啟不存在的選擇器表單 frmPickNIAN_HAO——「找不到專案」](#issue-13--biog_main_2-子表單點選-c_fl_ey_notes-開啟不存在的選擇器表單-frmpicknian_hao找不到專案)
-  - [Issue #22 — LookAtAssociations / LookAtKinship：當 c_name 含有 CJK 漢字時，CmdUCINet 因「Invalid procedure call or argument」崩潰](#issue-22--lookatassociations--lookatkinship當-c_name-含有-cjk-漢字時cmducinet-因invalid-procedure-call-or-argument崩潰)
   - [Issue #25 — LookAtKinship / LookAtGroupData / LookAtAssociationPairs：CmdImport 往返失敗——ZZ_SCRATCH_IMPORT_PEOPLE 保持空白](#issue-25--lookatkinship--lookatgroupdata--lookatassociationpairscmdimport-往返失敗zz_scratch_import_people-保持空白)
 - [P2 — 靜默顯示問題](#p2--靜默顯示問題)
-  - [Issue #3 — LookAtEntry：entry_code = 36（進士及第）時，c_entry_desc 回填全部為 NULL](#issue-3--lookatentryentry_code--36進士及第時c_entry_desc-回填全部為-null)
   - [Issue #2 — LookAtGroupData：CmdRun 未從 BIOG_MAIN 回填 c_name](#issue-2--lookatgroupdatacmdrun-未從-biog_main-回填-c_name)
+  - [Issue #3 — LookAtEntry：entry_code = 36（進士及第）時，c_entry_desc 回填全部為 NULL](#issue-3--lookatentryentry_code--36進士及第時c_entry_desc-回填全部為-null)
   - [Issue #10 — EVENT_ADDR_2 子表單：TxtAddrCHN / TxtAddrPY 繫結至 View_EventAddrData 中不存在的未別名欄位——顯示空白](#issue-10--event_addr_2-子表單txtaddrchn--txtaddrpy-繫結至-view_eventaddrdata-中不存在的未別名欄位顯示空白)
 - [P3 — 缺失介面](#p3--缺失介面)
   - [Issue #15 — LookAtPlace 缺少 CmdGIS 按鈕——處理程式存在但無 UI 控制項](#issue-15--lookatplace-缺少-cmdgis-按鈕處理程式存在但無-ui-控制項)
-  - [Issue #16 — LookAtStatus 缺少 CmdPajek 按鈕——處理程式存在但無 UI 控制項](#issue-16--lookatstatus-缺少-cmdpajek-按鈕處理程式存在但無-ui-控制項)
-  - [Issue #17 — LookAtStatus 缺少 CmdGephi 按鈕——處理程式存在但無 UI 控制項](#issue-17--lookatstatus-缺少-cmdgephi-按鈕處理程式存在但無-ui-控制項)
-  - [Issue #18 — LookAtStatus 缺少 CmdUCINet 按鈕——處理程式存在但無 UI 控制項](#issue-18--lookatstatus-缺少-cmducinet-按鈕處理程式存在但無-ui-控制項)
-  - [Issue #19 — LookAtOffice 缺少 CmdGUESS 按鈕——處理程式存在但無 UI 控制項](#issue-19--lookatoffice-缺少-cmdguess-按鈕處理程式存在但無-ui-控制項)
 - [P5 — 潛伏 / 不可達 / 當前無法復現](#p5--潛伏--不可達--當前無法復現)
+  - [Issue #20 — BOM 字首地址名稱在 GIS 匯出中會產生嵌入的 TAB 分隔符——當前資料集靜止（BOM 資料已在上游清理，本 dump 中受影響列數為 0）](#issue-20--bom-字首地址名稱在-gis-匯出中會產生嵌入的-tab-分隔符當前資料集靜止bom-資料已在上游清理本-dump-中受影響列數為-0)
   - [Issue #1 — View_StatusData：c_fy_range_desc / c_fy_range_chn 引用錯誤的 YEAR_RANGE_CODES 別名——當前資料集靜止](#issue-1--view_statusdatac_fy_range_desc--c_fy_range_chn-引用錯誤的-year_range_codes-別名當前資料集靜止)
   - [Issue #4 — LookAtPlace.CmdGIS_Click 引用不存在的控制項 GISFrame——潛伏，被缺少按鈕（Issue #15）遮蔽](#issue-4--lookatplacecmdgis_click-引用不存在的控制項-gisframe潛伏被缺少按鈕issue-15遮蔽)
   - [Issue #5 — LookAtStatus.CmdPajek_Click 引用缺少的控制項 ChkIDs 及三個不存在的欄位——潛伏，被缺少按鈕（Issue #16）遮蔽](#issue-5--lookatstatuscmdpajek_click-引用缺少的控制項-chkids-及三個不存在的欄位潛伏被缺少按鈕issue-16遮蔽)
   - [Issue #9 — LookAtEntry.CmdNeo4j Institutions 區塊使用錯誤的記錄集變數 tRstAssocCodes——潛伏（當前無 ENTRY_DATA 列有 c_inst_code > 0）](#issue-9--lookatentrycmdneo4j-institutions-區塊使用錯誤的記錄集變數-trstassoccodes潛伏當前無-entry_data-列有-c_inst_code--0)
   - [Issue #11 — EVENTS_DATA_2 子表單：c_event_record_id 控制項繫結至不存在的欄位——已隱藏，因此為潛伏](#issue-11--events_data_2-子表單c_event_record_id-控制項繫結至不存在的欄位已隱藏因此為潛伏)
   - [Issue #12 — POSTED_TO_OFFICE_DATA_2 子表單：c_appt_type_code 控制項繫結至未投影的欄位——已隱藏，因此為潛伏](#issue-12--posted_to_office_data_2-子表單c_appt_type_code-控制項繫結至未投影的欄位已隱藏因此為潛伏)
-  - [Issue #14 — KIN_DATA 子表單：CmdPickKinRel 呼叫不存在的選擇器 frmPickKINSHIP_CODES——潛伏（子表單目前無任何可達的嵌入位置）](#issue-14--kin_data-子表單cmdpickkinrel-呼叫不存在的選擇器-frmpickkinship_codes潛伏子表單目前無任何可達的嵌入位置)
 - [嚴重等級說明](#嚴重等級說明)
 - [附錄 A —— c_index_year / c_index_addr_id 與 cbdb-online-main-server 快照之間的偏差（差異需要逐筆分類後才能判定是否為缺陷）](#附錄-a--c_index_year--c_index_addr_id-與-cbdb-online-main-server-快照之間的偏差差異需要逐筆分類後才能判定是否為缺陷)
 - [附錄 B —— TablesFields：文件表與實際資料庫結構對比](#附錄-b--tablesfields文件表與實際資料庫結構對比)
@@ -74,30 +67,6 @@ _PASS: 16 · FAIL: 10 · ERROR: 0 · SKIP: 4 · NOT RUN: 1 · N/A: 59_
 - P5 — 潛伏 / 不可達 / 當前無法復現：保留作為歷史記錄；我們在當前 dump 上重新驗證過，無法再觸發症狀。
 
 ## P0 — 靜默資料錯誤
-
-### Issue #20 — BOM 字首地址名稱在 GIS 匯出中產生嵌入的 TAB 分隔符——靜默的欄位錯位
-
-**涉及位置:** `ADDR_CODES + Form_LookAt*.CmdGIS_Click`
-
-**嚴重等級:** P0 — 靜默的匯出欄位錯位：數值欄位出現在文字欄中，並多出一個尾端欄位，且不彈出任何錯誤訊息。目前 315 個帶 BOM 的 ADDR_CODES 列中有 1 個（c_addr_id 702559）可從人物資料觸及；其餘 314 個是孤兒列，一旦獲得第一個人物連結即會重現相同的錯位。
-
-#### 問題描述
-
-ADDR_CODES 的 315 列在 c_name 和 c_name_chn 中都帶有雜散的 U+FEFF（BOM）字首，幾乎可確定是資料匯入時以帶 BOM 的 UTF-8 貼上造成的。當任何 LookAt 表單透過 SQL UPDATE/INSERT 將這些列複製到暫存表時，JET 剝離 BOM 並重新解釋剩餘的 UTF-16 LE 位元組，將其提升回 Unicode 但值已損毀——包括位置 0 處的字面 TAB 字元（例如 c_addr_id = 702559，尉氏）。CmdGIS 以 tStr + value + tC（tC = Chr(9)）的方式寫入每個儲存格且不進行任何轉義，因此嵌入的 TAB 變成分隔符，將 AddrChn 分割成兩個儲存格，並靜默地將其右側每個欄位向右移一位。使用者在 Excel 中開啟 .tab 檔案時，會看到數值欄位出現在文字欄中，並多出一個尾端欄位。相同的未轉義寫入模式也存在於 LookAtTexts / LookAtPlace / LookAtAssociations / LookAtOffice / LookAtKinship 的 CmdGIS 中。
-
-由 test_addr_codes_has_known_bom_dirty_rows 及 test_known_reachable_dirty_addr_present 偵測到。
-
-#### 復現步驟
-
-1. 以 Microsoft Access 開啟 CBDB_BJ_User.mdb。
-2. 開啟 **LookAtStatus** 表單。選取狀態碼 **40** [為官者：文]（civil office / 為官者：文），不設年份篩選。
-3. 點選 **Run Query**。完成後（約 17,000 列），將編碼選擇器設為 UTF-8 後點選 **GIS** 按鈕。
-4. 儲存生成的 .tab 檔案並在 Excel 或支援 TAB 的文字編輯器中開啟。
-5. 在第 11476 列附近（阮孚 Ruan Fu，c_addr_id = 702559，尉氏）：一列有 10 個 TAB 儲存格，而標題只有 9 欄。AddrChn 為空，X 欄包含文字，實際的 X / Y 值向右移了一欄。
-
-#### 建議修復方案
-
-兩項互補修復：(1) 一次性資料清理——從 315 個受影響的 ADDR_CODES.c_name / c_name_chn 列中剝離前導 U+FEFF（例如：UPDATE ADDR_CODES SET c_name = Mid(c_name, 2) WHERE Left(c_name, 1) = ChrW(65279)，以及 c_name_chn 的對應語句）。(2) 防禦性清理——在所有 LookAt 表單 CmdGIS 主體的每個 tStr = tStr + value + tC 追加之前，將 value 中嵌入的 Chr(9)、Chr(10)、Chr(13) 或 U+FEFF 替換為空格。兩項修復均有必要。
 
 ### Issue #21 — LookAtOffice：CmdGIS 輸出的 IndexYear 欄幾乎為空（填充率 0.2%）——疑似靜默欄位繫結退化
 
@@ -122,6 +91,28 @@ ADDR_CODES 的 315 列在 c_name 和 c_name_chn 中都帶有雜散的 U+FEFF（B
 #### 建議修復方案
 
 檢查 Form_LookAtOffice.CmdGIS_Click：找到填充 GIS 輸出 IndexYear 欄的 SELECT 語句，確認來源欄位名稱與實際 schema 一致（檢查 ZZ_SCRATCH_OFFICE 或對應資料表）。
+
+### Issue #26 — User MDB 與 cbdb-online 快照的 c_index_addr_id 不一致率超過 0.5% 閾值
+
+**涉及位置:** `BIOG_MAIN (c_index_addr_id)`
+
+**嚴重等級:** P0 — 靜默資料漂移：約 25 名人物的主要地址 ID 與線上系統不同。使用 c_index_addr_id 的地理分析和 GIS 匯出將靜默地將這些人物置於錯誤位置。
+
+#### 問題描述
+
+對 User MDB 與 cbdb-online-main-server SQLite 快照之間的 BIOG_MAIN.c_index_addr_id 進行交叉核查，發現不一致率為 0.500%，恰好達到最大可接受閾值。以預設 5,000 列樣本計，約有 25 名人物在兩個系統中的 c_index_addr_id 不同，表明 User MDB 可能尚未完全套用近期上游地址指定，或快照領先於當前資料匯出。
+
+由 test_index_year_addr_xcheck_sample 偵測到，斷言 c_index_addr_id 不一致率 0.500% 超過 0.5% 閾值。
+
+#### 復現步驟
+
+1. 執行：python reports/collect_index_year_diffs.py
+2. 檢查 reports/index_drift_examples.json 中 bucket 為 'addr_only' 的列——這些是 User MDB 與線上快照之間 c_index_addr_id 不同的人物。
+3. 對每個不一致的人物，查詢 BIOG_MAIN.c_index_addr_id 並與線上伺服器比較，確認哪個值為權威值。
+
+#### 建議修復方案
+
+將 cbdb-online 伺服器最新的 c_index_addr_id 指定套用至 User MDB 中的 BIOG_MAIN。不一致的列已列舉於 reports/index_drift_examples.json（bucket: 'addr_only'）中。
 
 ### Issue #23 — LookAtAssociations：CmdPajek 頂點區段數量錯誤——標頭宣告 501 個頂點，但實際匯出 8,093 列
 
@@ -169,29 +160,31 @@ Form_LookAtKinship.CmdGUESS_Click 產生的 Gephi .gdf 檔案在 nodedef 標頭�
 
 在 Form_LookAtKinship.CmdGUESS_Click 中，確保 nodedef 標頭欄位列表與每列值列表來自同一個有序欄位定義。不符情況通常發生在某欄位被加入一個列表但未加入另一個時。
 
-### Issue #26 — User MDB 與 cbdb-online 快照的 c_index_addr_id 不一致率超過 0.5% 閾值
+## P1 — 可見的執行時報錯
 
-**涉及位置:** `BIOG_MAIN (c_index_addr_id)`
+### Issue #22 — LookAtAssociations / LookAtKinship：當 c_name 含有 CJK 漢字時，CmdUCINet 因「Invalid procedure call or argument」崩潰
 
-**嚴重等級:** P0 — 靜默資料漂移：約 25 名人物的主要地址 ID 與線上系統不同。使用 c_index_addr_id 的地理分析和 GIS 匯出將靜默地將這些人物置於錯誤位置。
+**涉及位置:** `Form_LookAtAssociations.CmdUCINet_Click / Form_LookAtKinship.CmdUCINet_Click`
+
+**嚴重等級:** P1 — 可見的執行期崩潰：彈出視窗中止匯出。任何包含漢字姓名人物的關聯網路 UCINet 工作流程均會失敗。絕大多數 CBDB 人物具有漢字姓名，使其在實際的 LookAtAssociations / LookAtKinship → UCINet 使用中幾乎全面失敗。
 
 #### 問題描述
 
-對 User MDB 與 cbdb-online-main-server SQLite 快照之間的 BIOG_MAIN.c_index_addr_id 進行交叉核查，發現不一致率為 0.500%，恰好達到最大可接受閾值。以預設 5,000 列樣本計，約有 25 名人物在兩個系統中的 c_index_addr_id 不同，表明 User MDB 可能尚未完全套用近期上游地址指定，或快照領先於當前資料匯出。
+Form_LookAtAssociations.CmdUCINet_Click 和 Form_LookAtKinship.CmdUCINet_Click 均以 2 引數形式呼叫 CreateTextFile（filename, overwrite），未傳入 Unicode 旗標。當輸出路徑或 c_name 值包含 CJK 漢字時，VBA 的 CreateTextFile 觸發「Invalid procedure call or argument」（執行期錯誤 5），因系統 ANSI 字碼頁無法編碼漢字。錯誤以彈出視窗形式出現並中止匯出。使用關聯程式碼 c_assoc_code = 437（'Presented literary composition as gift to' / '贈詩、文'）的韌體能可靠觸發此問題，因相關人物的 c_name 包含漢字。
 
-由 test_index_year_addr_xcheck_sample 偵測到，斷言 c_index_addr_id 不一致率 0.500% 超過 0.5% 閾值。
+由 test_bug22_associations_cmducinet_fires_invalid_procedure_call 及 test_bug22_kinship_cmducinet_sibling_form_fires_invalid_procedure_call 偵測到。
 
 #### 復現步驟
 
-1. 執行：python reports/collect_index_year_diffs.py
-2. 檢查 reports/index_drift_examples.json 中 bucket 為 'addr_only' 的列——這些是 User MDB 與線上快照之間 c_index_addr_id 不同的人物。
-3. 對每個不一致的人物，查詢 BIOG_MAIN.c_index_addr_id 並與線上伺服器比較，確認哪個值為權威值。
+1. 以 Microsoft Access 開啟 CBDB_BJ_User.mdb。
+2. 開啟 LookAtAssociations 表單。
+3. 選取關聯程式碼 c_assoc_code = 437（'Presented literary composition as gift to'）。
+4. 點選 CmdUCINet。出現彈出視窗：'Invalid procedure call or argument'。UCINet 匯出檔案未建立。
+5. 在 LookAtKinship.CmdUCINet 中，當親屬網路包含 c_name 含 CJK 漢字的人物時，同樣會出現此錯誤。
 
 #### 建議修復方案
 
-將 cbdb-online 伺服器最新的 c_index_addr_id 指定套用至 User MDB 中的 BIOG_MAIN。不一致的列已列舉於 reports/index_drift_examples.json（bucket: 'addr_only'）中。
-
-## P1 — 可見的執行時報錯
+將 Form_LookAtAssociations.CmdUCINet_Click 和 Form_LookAtKinship.CmdUCINet_Click 中的 CreateTextFile 呼叫改為 3 引數形式：CreateTextFile(filename, True, True)——第三個引數啟用 Unicode 輸出。以 c_name 含 CJK 漢字的人物韌體進行測試。
 
 ### Issue #6 — LookAtGroupData.queryEntry 崩潰「找不到欄位」——ENTRY_DATA.c_parental_status 缺少 _code 字尾
 
@@ -242,76 +235,6 @@ Form_LookAtPlace.CmdNeo4j_Click 的 People-CSV 區段透過僅投影四個 ZZ_SC
 
 將 Form_LookAtPlace.CmdNeo4j_Click（第 ~643-647 行）的 SELECT 子句擴充套件，加入 DYNASTIES.c_dynasty、DYNASTIES.c_dynasty_chn 及 BIOG_MAIN.c_female 的投影。FROM / JOIN 結構已將這些來源表帶入範圍；在 SELECT 中新增三個欄位引用即為完整修復。
 
-### Issue #8 — LookAtNetworks.CmdNeo4j：tRstPlace 和 tRstPeoplePlace 的 SELECT 缺少 x_coord / y_coord / c_person_id——在第一列觸發「找不到專案」
-
-**涉及位置:** `Form_LookAtNetworks.CmdNeo4j_Click`
-
-**嚴重等級:** P1 — 正常使用者操作中的明顯崩潰。與 Issue #7 屬同一失敗型別。由於 LookAtNetworks CmdRun 在測試驅動程式中對高分支錨點逾時，執行時期驗證受阻；靜態標記確認了原始碼層級缺陷。
-
-#### 問題描述
-
-Form_LookAtNetworks.CmdNeo4j_Click 內兩個 SELECT 建立了記錄集，而下游迴圈讀取的欄位超出了其投影範圍：tRstPlace SELECT（第 ~2458 行）僅投影三個 ADDR_CODES 欄位，但迴圈讀取 !x_coord 及 !y_coord；tRstPeoplePlace SELECT 同樣省略了迴圈讀取的 c_person_id 與 c_index_addr_id。與 Issue #7 （LookAtPlace.CmdNeo4j）屬同一類 JET 3265「找不到專案」失敗。錯誤處理器以 MsgBox 靜默處理，匯出鏈終止，使用者看到彈窗且無輸出檔案。
-
-由 test_bug8_lookat_networks_cmdneo4j_select_missing_xy 靜態斷言偵測到。
-
-#### 復現步驟
-
-1. 以 Microsoft Access 開啟 CBDB_BJ_User.mdb。
-2. 開啟 **LookAtNetworks** 表單（注意：此表單有已知的開啟延遲，請稍候）。
-3. 執行查詢後，點選 **Neo4j** 匯出按鈕。
-4. 當匯出到達 People-with-Place 檔案時，彈出 JET 3265「找不到專案」彈窗，後續不再寫入任何檔案。
-
-#### 建議修復方案
-
-將 tRstPlace SELECT 擴充套件以投影 ADDR_CODES.x_coord 及 ADDR_CODES.y_coord。將 tRstPeoplePlace SELECT 擴充套件以從聯結表中投影缺少的 c_person_id 與 c_index_addr_id 欄位。與 Issue #7 屬同一修復型別。
-
-### Issue #13 — BIOG_MAIN_2 子表單：點選 c_fl_ey_notes 開啟不存在的選擇器表單 frmPickNIAN_HAO——「找不到專案」
-
-**涉及位置:** `Form_BIOG_MAIN_2_Subform.c_fl_ey_notes_Click`
-
-**嚴重等級:** P1 — 使用者點選觸發的明顯崩潰：任何 c_fl_ey_notes 欄位非空的人物（年號紀事資訊）在點選該欄位時都會觸發錯誤。
-
-#### 問題描述
-
-當使用者點選人物傳記詳細子表單上的 c_fl_ey_notes 欄位時，Sub c_fl_ey_notes_Click 執行 DoCmd.OpenForm "frmPickNIAN_HAO"。.mdb 的 CurrentProject.AllForms 集合中沒有名為 frmPickNIAN_HAO 的表單。Access 丟擲「找不到專案」，欄位點選無任何有用操作。可能原因：選擇器表單在早期重構中被重新命名或合併，但此呼叫端未更新。
-
-由 test_picker_form_truly_missing_from_mdb[bug13_frmPickNIAN_HAO] 偵測到。
-
-#### 復現步驟
-
-1. 以 Microsoft Access 開啟 CBDB_BJ_User.mdb。
-2. 開啟 CBDB_Browser_2 並導航至 c_personid = 5（查籥 Zha Yue）——其 c_fl_ey_notes 欄位有實際文字，因此點選會觸發 Sub。
-3. 在 BIOG_MAIN_2 子表單上，點選 **c_fl_ey_notes** 欄位。
-4. 彈出「找不到專案」彈窗；不開啟任何選擇器。
-
-#### 建議修復方案
-
-還原選擇器表單 frmPickNIAN_HAO（或其功能等效表單），或更新 Form_BIOG_MAIN_2_Subform 中的 Sub c_fl_ey_notes_Click，使其開啟替代的選擇器表單。
-
-### Issue #22 — LookAtAssociations / LookAtKinship：當 c_name 含有 CJK 漢字時，CmdUCINet 因「Invalid procedure call or argument」崩潰
-
-**涉及位置:** `Form_LookAtAssociations.CmdUCINet_Click / Form_LookAtKinship.CmdUCINet_Click`
-
-**嚴重等級:** P1 — 可見的執行期崩潰：彈出視窗中止匯出。任何包含漢字姓名人物的關聯網路 UCINet 工作流程均會失敗。絕大多數 CBDB 人物具有漢字姓名，使其在實際的 LookAtAssociations / LookAtKinship → UCINet 使用中幾乎全面失敗。
-
-#### 問題描述
-
-Form_LookAtAssociations.CmdUCINet_Click 和 Form_LookAtKinship.CmdUCINet_Click 均以 2 引數形式呼叫 CreateTextFile（filename, overwrite），未傳入 Unicode 旗標。當輸出路徑或 c_name 值包含 CJK 漢字時，VBA 的 CreateTextFile 觸發「Invalid procedure call or argument」（執行期錯誤 5），因系統 ANSI 字碼頁無法編碼漢字。錯誤以彈出視窗形式出現並中止匯出。使用關聯程式碼 c_assoc_code = 437（'Presented literary composition as gift to' / '贈詩、文'）的韌體能可靠觸發此問題，因相關人物的 c_name 包含漢字。
-
-由 test_bug22_associations_cmducinet_fires_invalid_procedure_call 及 test_bug22_kinship_cmducinet_sibling_form_fires_invalid_procedure_call 偵測到。
-
-#### 復現步驟
-
-1. 以 Microsoft Access 開啟 CBDB_BJ_User.mdb。
-2. 開啟 LookAtAssociations 表單。
-3. 選取關聯程式碼 c_assoc_code = 437（'Presented literary composition as gift to'）。
-4. 點選 CmdUCINet。出現彈出視窗：'Invalid procedure call or argument'。UCINet 匯出檔案未建立。
-5. 在 LookAtKinship.CmdUCINet 中，當親屬網路包含 c_name 含 CJK 漢字的人物時，同樣會出現此錯誤。
-
-#### 建議修復方案
-
-將 Form_LookAtAssociations.CmdUCINet_Click 和 Form_LookAtKinship.CmdUCINet_Click 中的 CreateTextFile 呼叫改為 3 引數形式：CreateTextFile(filename, True, True)——第三個引數啟用 Unicode 輸出。以 c_name 含 CJK 漢字的人物韌體進行測試。
-
 ### Issue #25 — LookAtKinship / LookAtGroupData / LookAtAssociationPairs：CmdImport 往返失敗——ZZ_SCRATCH_IMPORT_PEOPLE 保持空白
 
 **涉及位置:** `Form_LookAtKinship.CmdImport_Click / Form_LookAtGroupData.CmdImport_Click / Form_LookAtAssociationPairs.CmdImportList_Click`
@@ -337,34 +260,6 @@ Form_LookAtAssociations.CmdUCINet_Click 和 Form_LookAtKinship.CmdUCINet_Click �
 檢查各受影響表單的 CmdImport_Click / CmdImportList_Click handler。驗證 INSERT INTO ZZ_SCRATCH_IMPORT_PEOPLE 語句：確認來源控制項（文字方塊或列表方塊）被正確讀取，且 INSERT 在已提交的活躍交易中執行。
 
 ## P2 — 靜默顯示問題
-
-### Issue #3 — LookAtEntry：entry_code = 36（進士及第）時，c_entry_desc 回填全部為 NULL
-
-**涉及位置:** `Form_LookAtEntry.CmdQuery_Click`
-
-**嚴重等級:** P2 — 靜默顯示問題：92,545 筆受影響。使用者可在結果格中看到空白的 c_entry_desc 欄，但 Access 不顯示錯誤——容易被忽略。參照此欄的匯出（GIS、Neo4j、KML）也會包含空白值。
-
-#### 問題描述
-
-當使用者在 LookAtEntry 以 entry_code = 36（進士及第）執行查詢時，結果表 ZZ_SCRATCH_ENTRY 雖然產生了 92,545 筆資料，但 c_entry_desc 欄位對每一筆都是 NULL。預期值應為 'examination: jinshi (general)'。
-
-CmdQuery_Click 成功地從 ENTRY_DATA JOIN ENTRY_CODES 插入了資料，但 c_entry_desc 的回填步驟對此 entry code 並未寫入說明文字。其他欄位看起來都正常填充。因此，使用者在螢幕上看到的查詢結果中，每一筆記錄的入仕方式欄位都是空白，難以判斷是何種考試型別。
-
-由 test_vba_full_matrix[top_entry_code_36_unfiltered] 偵測到，斷言 'c_entry_desc backfill wrong'，影響 92,545 筆。
-
-#### 復現步驟
-
-1. 以 Microsoft Access 開啟 CBDB_BJ_User.mdb。
-2. 從導覽窗格開啟 **LookAtEntry** 表單。
-3. 在 Entry Code 選擇器中，選取 entry code **36**（標籤：'examination: jinshi (general)'）。
-4. 朝代、地址、年份篩選器留空。
-5. 點選 **Run Query**（CmdQuery 按鈕）。
-6. 查詢完成後，檢視結果格：每一筆記錄的入仕方式說明欄（c_entry_desc）皆為空白。
-7. SQL 驗證：`SELECT TOP 5 c_entry_code, c_entry_desc FROM ZZ_SCRATCH_ENTRY` 對所有列回傳 (36, NULL)。
-
-#### 建議修復方案
-
-在 Form_LookAtEntry.CmdQuery_Click 中找到對 ZZ_SCRATCH_ENTRY 設定 c_entry_desc 的回填步驟，確認 JOIN ENTRY_CODES 的條件（c_entry_code = 36）沒有被意外篩除，且 UPDATE / 回填 SQL 使用了正確的欄位名稱。修復後，`SELECT c_entry_desc FROM ZZ_SCRATCH_ENTRY WHERE c_entry_code = 36 LIMIT 1` 應回傳 'examination: jinshi (general)'。
 
 ### Issue #2 — LookAtGroupData：CmdRun 未從 BIOG_MAIN 回填 c_name
 
@@ -392,6 +287,34 @@ CmdQuery_Click 成功地從 ENTRY_DATA JOIN ENTRY_CODES 插入了資料，但 c_
 #### 建議修復方案
 
 在 Form_LookAtGroupData.CmdRun_Click 中找到將 ZZ_SCRATCH_IMPORT_PEOPLE JOIN BIOG_MAIN 並設定 c_name 的 UPDATE 語句，確認 JOIN 條件使用了正確的主鍵欄位，且 UPDATE 目標欄位名稱拼寫正確。修復後，以任意有效 person ID 執行 CmdRun，c_name 應能在 ZZ_SCRATCH_IMPORT_PEOPLE 中被填入。
+
+### Issue #3 — LookAtEntry：entry_code = 36（進士及第）時，c_entry_desc 回填全部為 NULL
+
+**涉及位置:** `Form_LookAtEntry.CmdQuery_Click`
+
+**嚴重等級:** P2 — 靜默顯示問題：92,545 筆受影響。使用者可在結果格中看到空白的 c_entry_desc 欄，但 Access 不顯示錯誤——容易被忽略。參照此欄的匯出（GIS、Neo4j、KML）也會包含空白值。
+
+#### 問題描述
+
+當使用者在 LookAtEntry 以 entry_code = 36（進士及第）執行查詢時，結果表 ZZ_SCRATCH_ENTRY 雖然產生了 92,545 筆資料，但 c_entry_desc 欄位對每一筆都是 NULL。預期值應為 'examination: jinshi (general)'。
+
+CmdQuery_Click 成功地從 ENTRY_DATA JOIN ENTRY_CODES 插入了資料，但 c_entry_desc 的回填步驟對此 entry code 並未寫入說明文字。其他欄位看起來都正常填充。因此，使用者在螢幕上看到的查詢結果中，每一筆記錄的入仕方式欄位都是空白，難以判斷是何種考試型別。
+
+由 test_vba_full_matrix[top_entry_code_36_unfiltered] 等偵測到，斷言 'c_entry_desc backfill wrong'，影響 92,545 筆。
+
+#### 復現步驟
+
+1. 以 Microsoft Access 開啟 CBDB_BJ_User.mdb。
+2. 從導覽窗格開啟 **LookAtEntry** 表單。
+3. 在 Entry Code 選擇器中，選取 entry code **36**（標籤：'examination: jinshi (general)'）。
+4. 朝代、地址、年份篩選器留空。
+5. 點選 **Run Query**（CmdQuery 按鈕）。
+6. 查詢完成後，檢視結果格：每一筆記錄的入仕方式說明欄（c_entry_desc）皆為空白。
+7. SQL 驗證：`SELECT TOP 5 c_entry_code, c_entry_desc FROM ZZ_SCRATCH_ENTRY` 對所有列回傳 (36, NULL)。
+
+#### 建議修復方案
+
+在 Form_LookAtEntry.CmdQuery_Click 中找到對 ZZ_SCRATCH_ENTRY 設定 c_entry_desc 的回填步驟，確認 JOIN ENTRY_CODES 的條件（c_entry_code = 36）沒有被意外篩除，且 UPDATE / 回填 SQL 使用了正確的欄位名稱。修復後，`SELECT c_entry_desc FROM ZZ_SCRATCH_ENTRY WHERE c_entry_code = 36 LIMIT 1` 應回傳 'examination: jinshi (general)'。
 
 ### Issue #10 — EVENT_ADDR_2 子表單：TxtAddrCHN / TxtAddrPY 繫結至 View_EventAddrData 中不存在的未別名欄位——顯示空白
 
@@ -441,93 +364,33 @@ Form_LookAtPlace.vb 定義了功能完整的 CmdGIS_Click 處理程式——它�
 
 在 LookAtPlace 的表單設計中，在現有 CmdPajek / CmdGephi 按鈕旁新增 CmdGIS 按鈕，並設定 OnClick = [事件程式]。同時在同一補丁中修復 Issue #4 （GISFrame → CodeFrame 錯字）。
 
-### Issue #16 — LookAtStatus 缺少 CmdPajek 按鈕——處理程式存在但無 UI 控制項
-
-**涉及位置:** `LookAtStatus`
-
-**嚴重等級:** P3 — 缺少 UI：LookAtStatus 使用者無法使用 Pajek 匯出。
-
-#### 問題描述
-
-Form_LookAtStatus.vb 中存在 Sub CmdPajek_Click()，但 LookAtStatus 的表單設計中沒有渲染 CmdPajek 按鈕。Status 的使用者可以看到 GIS 和 Neo4j 匯出，但不能使用 Pajek 網路匯出。注意：即使新增按鈕，也必須先修復 Issue #5（ChkIDs 控制項引用及三個缺少的 SQL 欄位），否則按鈕會立即崩潰。
-
-由 test_bugs_15_to_19_orphan_export_handlers 靜態斷言偵測到。
-
-#### 復現步驟
-
-1. 以 Microsoft Access 開啟 CBDB_BJ_User.mdb。
-2. 開啟 **LookAtStatus** 表單。匯出按鈕列只有 GIS 和 Neo4j；沒有 Pajek 按鈕。
-
-#### 建議修復方案
-
-在 LookAtStatus 的表單設計中新增 CmdPajek 按鈕（在修復 Issue #5 之後）。
-
-### Issue #17 — LookAtStatus 缺少 CmdGephi 按鈕——處理程式存在但無 UI 控制項
-
-**涉及位置:** `LookAtStatus`
-
-**嚴重等級:** P3 — 缺少 UI：LookAtStatus 使用者無法使用 Gephi 匯出。
-
-#### 問題描述
-
-Form_LookAtStatus.vb 中存在 Sub CmdGephi_Click()，但表單設計中沒有對應的按鈕。與 Issue #16 同類。
-
-由 test_bugs_15_to_19_orphan_export_handlers 偵測到。
-
-#### 復現步驟
-
-1. 以 Microsoft Access 開啟 CBDB_BJ_User.mdb。
-2. 開啟 **LookAtStatus** 表單。沒有 Gephi 匯出按鈕。
-
-#### 建議修復方案
-
-在 LookAtStatus 的表單設計中新增 CmdGephi 按鈕。
-
-### Issue #18 — LookAtStatus 缺少 CmdUCINet 按鈕——處理程式存在但無 UI 控制項
-
-**涉及位置:** `LookAtStatus`
-
-**嚴重等級:** P3 — 缺少 UI：LookAtStatus 使用者無法使用 UCINet 匯出。
-
-#### 問題描述
-
-Form_LookAtStatus.vb 中存在 Sub CmdUCINet_Click()，但表單設計中沒有對應的按鈕。與 Issue #16、#17 同類。
-
-由 test_bugs_15_to_19_orphan_export_handlers 偵測到。
-
-#### 復現步驟
-
-1. 以 Microsoft Access 開啟 CBDB_BJ_User.mdb。
-2. 開啟 **LookAtStatus** 表單。沒有 UCINet 匯出按鈕。
-
-#### 建議修復方案
-
-在 LookAtStatus 的表單設計中新增 CmdUCINet 按鈕。
-
-### Issue #19 — LookAtOffice 缺少 CmdGUESS 按鈕——處理程式存在但無 UI 控制項
-
-**涉及位置:** `LookAtOffice`
-
-**嚴重等級:** P3 — 缺少 UI：LookAtOffice 使用者無法使用 GUESS 匯出。
-
-#### 問題描述
-
-Form_LookAtOffice.vb 中存在 Sub CmdGUESS_Click()，但表單設計中沒有 CmdGUESS 按鈕。Office 使用者可以使用 GIS / GISPeople / Neo4j 匯出，但無法使用 GUESS 網路匯出。與 Issue #15-#18 同類。
-
-由 test_bugs_15_to_19_orphan_export_handlers 偵測到。
-
-#### 復現步驟
-
-1. 以 Microsoft Access 開啟 CBDB_BJ_User.mdb。
-2. 開啟 **LookAtOffice** 表單。沒有 GUESS 匯出按鈕。
-
-#### 建議修復方案
-
-在 LookAtOffice 的表單設計中新增 CmdGUESS 按鈕。
-
 ## P5 — 潛伏 / 不可達 / 當前無法復現
 
 _本層的條目作為歷史 / 潛伏記錄保留。可分為三類：(a) DORMANT 潛伏 — 已驗證當前源資料無法觸發該症狀；(b) 當前無法復現 — 症狀不再出現，但可疑程式碼仍在（我們**沒有**確認上游有原始碼層面的修復；原因可能是 JET / Office 的行為改變、可能是我們這邊 fixture/driver 改變，也可能原本的診斷就是 false positive）；(c) LATENT 被遮蔽 — 原始碼缺陷確實存在，但因為另一個 issue（例如某個 UI 按鈕缺失）擋住了使用路徑，使用者目前碰不到。本層條目當下都不是使用者會遇到的問題，**也沒有任何一條被確認上游修復**；若要當成緊急或已關閉處理，請先諮詢。_
+
+### Issue #20 — BOM 字首地址名稱在 GIS 匯出中會產生嵌入的 TAB 分隔符——當前資料集靜止（BOM 資料已在上游清理，本 dump 中受影響列數為 0）
+
+**涉及位置:** `ADDR_CODES + Form_LookAt*.CmdGIS_Click`
+
+**嚴重等級:** P5 — 在此 dump 中為靜止（BOM 資料已在上游清理，data-20260602 中受影響列數為 0）。若未來任何 ADDR_CODES 列在 c_name 或 c_name_chn 重新引入 U+FEFF 字首，將重新啟動並提升為 P0 靜默資料損毀。未轉義的 CmdGIS 寫入程式碼是尚未解決的第二部分修復。
+
+#### 問題描述
+
+ADDR_CODES 表先前有一些 c_name 和 c_name_chn 帶有前導 U+FEFF（BOM）字首的列（幾乎可確定是資料匯入時以帶 BOM 的 UTF-8 貼上所致），經 JET 處理後會在 CmdGIS 輸出中產生嵌入的 TAB 字元。最主要的可達範例是 c_addr_id = 702559（尉氏 Wei Shi），可從 c_status_code = 40（[為官者：文] / civil office）的人物到達。
+
+在此版本（data-20260602）中，BOM 資料已在上游完成清理：test_addr_codes_has_known_bom_dirty_rows 現在找到 0 個帶 BOM 字首的列，test_known_reachable_dirty_addr_present 也回傳 0 列。CmdGIS 中未轉義的寫入模式仍存在於程式碼中（LookAtTexts / LookAtPlace / LookAtAssociations / LookAtOffice / LookAtKinship 的 CmdGIS 仍未進行 TAB 轉義），因此若未來資料引入新的 BOM 列，結構性風險將再次啟動。
+
+GOLDEN_STALE：BOM golden 測試現在預期 0 列；請更新 goldens。此 Issue 因未轉義寫入的程式碼缺陷仍然存在，故以 P5_dormant_or_latent 保留。
+
+#### 復現步驟
+
+1. 在此版本中，Bug 無法觸發——SELECT COUNT(*) FROM ADDR_CODES WHERE Left(c_name, 1) = ChrW(65279) 回傳 0。
+2. 結構性風險：開啟 Form_LookAtOffice（或任意 LookAt 表單），以狀態碼 **40**（[為官者：文] / civil office）執行 CmdGIS。若 c_addr_id = 702559（尉氏 Wei Shi）存在 BOM 列，輸出檔案在第 11476 列附近會出現多餘的 TAB 欄。
+3. （靜止驗證）確認：SELECT COUNT(*) FROM ADDR_CODES WHERE Left(c_name, 1) = ChrW(65279) 在此 dump 中回傳 0。
+
+#### 建議修復方案
+
+資料端修復已在上游套用（0 個 BOM 列殘留）。程式碼端修復仍需進行：在所有 LookAt 表單 CmdGIS 主體的每個 tStr = tStr + value + tC 追加之前，將 value 中嵌入的 Chr(9)、Chr(10)、Chr(13) 或 U+FEFF 替換為空格，以防未來匯入帶 BOM 字首列時再次發生。
 
 ### Issue #1 — View_StatusData：c_fy_range_desc / c_fy_range_chn 引用錯誤的 YEAR_RANGE_CODES 別名——當前資料集靜止
 
@@ -603,20 +466,22 @@ Form_LookAtStatus.CmdPajek_Click 包含兩個從 LookAtAssociations 複製但未
 
 **涉及位置:** `Form_LookAtEntry.CmdNeo4j_Click`
 
-**嚴重等級:** P5 — 潛伏的原始碼層級錯字（若未來任何 ENTRY_DATA 列有 c_inst_code > 0，則重新提升為 P1）。當前由於閘道保持區塊不可達，缺少 InstitutionCodes CSV 並非使用者可見的 Bug。
+**嚴重等級:** P5 — 潛伏的原始碼層級錯字（若未來任何 ENTRY_DATA 列有 c_inst_code > 0，則重新提升為 P1）。test_bug9_lookat_entry_cmdneo4j 在此版本中 PASSED（閘道關閉）。當前缺少 InstitutionCodes CSV 並非使用者可見的 Bug。
 
 #### 問題描述
 
-Form_LookAtEntry.vb 第 ~1415 行以 Set tRstInstitutions = CurrentDb.OpenRecordset(tQueryStr) 開啟機構記錄集，但第 ~1425 行卻寫 With tRstAssocCodes——引用了已在上游 AssocCodes 區塊中 Close 的記錄集。若執行，.MoveFirst 將觸發 DAO 3021「沒有當前記錄」。整個區塊位於第 ~1389 行的 If tRecDeleted > 0 Then 之內，其中 tRecDeleted 為 c_inst_code > 0 的 ENTRY_DATA 列數。當前資料集中，263,454 筆 ENTRY_DATA 中有 0 筆 c_inst_code > 0，因此閘道評估為 false，錯誤區塊無法從任何 LookAtEntry 韌體觸及。
+Form_LookAtEntry.vb 第 ~1415 行以 Set tRstInstitutions = CurrentDb.OpenRecordset(tQueryStr) 開啟機構記錄集，但第 ~1425 行卻寫 With tRstAssocCodes——引用了已在上游 AssocCodes 區塊中 Close 的記錄集。若執行，.MoveFirst 將觸發 DAO 3021「沒有當前記錄」。整個區塊位於第 ~1389 行的 If tRecDeleted > 0 Then 之內，其中 tRecDeleted 為 c_inst_code > 0 的 ENTRY_DATA 列數。當前資料集中，263,454 筆 ENTRY_DATA 中有 0 筆 c_inst_code > 0，因此閘道評估為 false，test_bug9_lookat_entry_cmdneo4j PASSED（閘道關閉，確認潛伏狀態）。
 
-由靜態原始碼斷言及執行時期測試偵測到。
+代表性韌體：c_entry_code = 36（進士 jinshi general）和 c_entry_code = 101（薦舉 recommendation）。兩者的 ENTRY_DATA 列 c_inst_code = 0，確認閘道在當前資料集中保持關閉。
+
+依 MANIFEST 要求保留（test_report_code_labels_audit_clean）。
 
 #### 復現步驟
 
 1. 在當前資料集中，此 Bug 無法透過 UI 觸發——Form_LookAtEntry.vb 第 ~1389 行的 If tRecDeleted > 0 Then 對所有可能的 LookAtEntry 韌體均評估為 false（263,454 筆 ENTRY_DATA 中有 0 筆 c_inst_code > 0）。
 2. 靜態驗證原始碼層級錯字：開啟 analysis/dump/vba/Form_LookAtEntry.vb 並檢視第 ~1415-1425 行。第 ~1415 行：Set tRstInstitutions = CurrentDb.OpenRecordset(tQueryStr)。第 ~1425 行：With tRstAssocCodes（應為：With tRstInstitutions）。
 3. （可選）確認閘道條件：SELECT COUNT(*) FROM ENTRY_DATA WHERE c_inst_code > 0 返回 0。
-4. 自動化測試使用的代表性韌體：c_entry_code = 36（examination: jinshi general，進士）和 c_entry_code = 101（recommendation，薦舉）。兩者的 ENTRY_DATA 列 c_inst_code = 0，確認閘道在當前資料集中保持關閉。
+4. 代表性韌體：c_entry_code = 36（進士 jinshi general）和 c_entry_code = 101（薦舉 recommendation）。兩者均確認 c_inst_code = 0。
 
 #### 建議修復方案
 
@@ -665,29 +530,6 @@ POSTED_TO_OFFICE_DATA_2 子表單有一個 c_appt_type_code 控制項，其 Cont
 #### 建議修復方案
 
 刪除隱藏的 c_appt_type_code 控制項，或將其 ControlSource 改為 c_appt_code（View_PostingOfficeData 實際投影的欄位）。
-
-### Issue #14 — KIN_DATA 子表單：CmdPickKinRel 呼叫不存在的選擇器 frmPickKINSHIP_CODES——潛伏（子表單目前無任何可達的嵌入位置）
-
-**涉及位置:** `Form_KIN_DATA_Subform.CmdPickKinRel_Click`
-
-**嚴重等級:** P5 — 潛伏（若 KIN_DATA Subform 被重新嵌入使用者可達的位置，則提升為 P1 明顯崩潰）。靜態缺陷確實存在，但目前無法觸及。
-
-#### 問題描述
-
-Form_KIN_DATA_Subform 中的 Sub CmdPickKinRel_Click（第 52 行）呼叫 DoCmd.OpenForm "frmPickKINSHIP_CODES" 並引用 Forms!frmPickKINSHIP_CODES!frmKINSHIP_CODES.Form!c_kincode。.mdb 中兩個表單均不存在。與 Issue #13 屬同一失敗型別。但此子表單未被任何面向使用者的表單嵌入：BIOG_MAIN_2_Subform 嵌入的是 KIN_DATA_2 Subform（無 CmdPickKinRel 按鈕）而非 KIN_DATA Subform。KIN_DATA Subform 的唯一引用是設計時備份快照（Form__TMPCLP487951），因此使用者無法從正常導覽觸及損壞的按鈕。
-
-由 test_picker_form_truly_missing_from_mdb[bug14_frmPickKINSHIP_CODES] 偵測到。
-
-#### 復現步驟
-
-1. 驗證僅限靜態——由於沒有父表單嵌入受影響的子表單，執行時期點選無法在當前 .mdb 中重現。
-2. 靜態證據（1）：Form_KIN_DATA_Subform.vb 第 52 行呼叫 DoCmd.OpenForm "frmPickKINSHIP_CODES"。
-3. 靜態證據（2）：frmPickKINSHIP_CODES 在 control_inventory.json 中不存在。
-4. 可達性證據：KIN_DATA Subform 僅被 Form__TMPCLP487951（設計備份）引用，不被任何可導覽的表單引用。
-
-#### 建議修復方案
-
-與 Issue #13 同類：還原 frmPickKINSHIP_CODES（或其替代表單），或更新 CmdPickKinRel_Click 以開啟正確的當前選擇器。由於子表單目前不可達，緊急程度較低。
 
 ## 附錄 A —— c_index_year / c_index_addr_id 與 cbdb-online-main-server 快照之間的偏差（差異需要逐筆分類後才能判定是否為缺陷）
 
