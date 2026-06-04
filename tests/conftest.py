@@ -221,11 +221,28 @@ def pytest_sessionfinish(session, exitstatus):
             return
     except ValueError:
         return  # option not registered (e.g. early-exit before addoption)
-    import subprocess
+    import subprocess, time
+    # First pass: taskkill /F — fast for well-behaved processes
     subprocess.run(
         ["taskkill", "/F", "/IM", "MSACCESS.EXE"],
-        capture_output=True,   # suppress "not found" when none are open
+        capture_output=True,
     )
+    # Second pass via psutil: catches processes that survived taskkill due
+    # to modal dialogs or pending I/O (the exact failure mode observed when
+    # 8 Access instances survived the June-2026 test runs).
+    try:
+        import psutil
+        time.sleep(0.5)  # give taskkill a moment to take effect
+        for proc in psutil.process_iter(["pid", "name"]):
+            if (proc.info["name"] or "").upper().startswith("MSACCESS"):
+                try:
+                    proc.kill()
+                    proc.wait(timeout=3)
+                except (psutil.NoSuchProcess, psutil.AccessDenied,
+                        psutil.TimeoutExpired):
+                    pass
+    except ImportError:
+        pass
 
 
 def pytest_configure(config):
