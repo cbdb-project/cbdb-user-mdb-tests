@@ -332,6 +332,11 @@ def test_bug22_associations_cmducinet_createtextfile_no_unicode_arg():
     forms = [
         ("Form_LookAtAssociations", "Associations"),
         ("Form_LookAtKinship", "Kinship"),
+        # AssociationPairs.CmdUCINet_Click also uses the same
+        # 2-arg CreateTextFile pattern (line ~2904).  Same fix
+        # applies; add it here so a single upstream patch can
+        # be verified for all three forms at once.
+        ("Form_LookAtAssociationPairs", "AssociationPairs"),
     ]
     create_call_2arg = (
         'Set tVNA = tFileSystem.CreateTextFile(tFileName, True)'

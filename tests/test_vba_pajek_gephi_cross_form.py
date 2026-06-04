@@ -64,15 +64,19 @@ class Case:
 
 
 _CASES: tuple[Case, ...] = (
-    Case("LookAtKinship",          "CmdPajek", ".net", "*vertices"),
-    Case("LookAtPlace",            "CmdPajek", ".net", "*vertices"),
-    Case("LookAtStatus",           "CmdPajek", ".net", "*vertices"),
-    Case("LookAtAssociations",     "CmdPajek", ".net", "*vertices"),
-    Case("LookAtAssociationPairs", "CmdPajek", ".net", "*vertices"),
-    Case("LookAtPlace",            "CmdGephi", ".gdf", "nodedef"),
-    Case("LookAtStatus",           "CmdGephi", ".gdf", "nodedef"),
-    Case("LookAtAssociations",     "CmdGephi", ".gdf", "nodedef"),
-    Case("LookAtAssociationPairs", "CmdGephi", ".gdf", "nodedef"),
+    Case("LookAtKinship",          "CmdPajek",     ".net", "*vertices"),
+    # CmdUTF8Pajek: same Pajek .net format as CmdPajek but UTF-8 encoded
+    # via ADO stream (Form_LookAtKinship.vb:2712).  Shares the same kinship
+    # fixture and the same _assert_pajek_depth depth check.
+    Case("LookAtKinship",          "CmdUTF8Pajek", ".net", "*vertices"),
+    Case("LookAtPlace",            "CmdPajek",     ".net", "*vertices"),
+    Case("LookAtStatus",           "CmdPajek",     ".net", "*vertices"),
+    Case("LookAtAssociations",     "CmdPajek",     ".net", "*vertices"),
+    Case("LookAtAssociationPairs", "CmdPajek",     ".net", "*vertices"),
+    Case("LookAtPlace",            "CmdGephi",     ".gdf", "nodedef"),
+    Case("LookAtStatus",           "CmdGephi",     ".gdf", "nodedef"),
+    Case("LookAtAssociations",     "CmdGephi",     ".gdf", "nodedef"),
+    Case("LookAtAssociationPairs", "CmdGephi",     ".gdf", "nodedef"),
 )
 
 
@@ -222,7 +226,7 @@ def test_export_button_produces_file(vba: VbaSession, case: Case, tmp_path):
           flush=True)
 
     # ---- Depth checks (PR R) ----------------------------------
-    if case.cmd == "CmdPajek":
+    if case.cmd in ("CmdPajek", "CmdUTF8Pajek"):
         _assert_pajek_depth(spec.name, lines)
     elif case.cmd == "CmdGephi":
         _assert_gephi_depth(spec.name, lines)

@@ -7,20 +7,21 @@
   ],
   "buttons": [
     "CmdQuery", "CmdGIS", "CmdNeo4j", "CmdPajek",
-    "CmdGephi", "CmdUCINet", "CmdKML", "CmdGUESS", "CmdRun"
+    "CmdGephi", "CmdUCINet", "CmdKML", "CmdGUESS", "CmdRun",
+    "CmdUTF8Pajek"
   ],
   "na": {
-    "_comment": "Buttons that do not exist on the form (no VBA handler).",
-    "LookAtEntry":        ["CmdPajek", "CmdGephi", "CmdUCINet", "CmdGUESS", "CmdRun"],
-    "LookAtStatus":       ["CmdGIS", "CmdNeo4j", "CmdKML", "CmdGUESS", "CmdRun"],
-    "LookAtTexts":        ["CmdGIS", "CmdNeo4j", "CmdPajek", "CmdGephi", "CmdUCINet", "CmdKML", "CmdGUESS", "CmdRun"],
-    "LookAtPlace":        ["CmdPajek", "CmdGephi", "CmdUCINet", "CmdKML", "CmdGUESS", "CmdRun"],
-    "LookAtAssociations": ["CmdPajek", "CmdGephi", "CmdKML", "CmdGUESS", "CmdRun"],
-    "LookAtOffice":       ["CmdNeo4j", "CmdPajek", "CmdGephi", "CmdUCINet", "CmdKML", "CmdRun"],
-    "LookAtKinship":      ["CmdNeo4j", "CmdGephi", "CmdKML", "CmdQuery"],
-    "LookAtNetworks":     ["CmdQuery", "CmdGIS", "CmdPajek", "CmdGephi", "CmdUCINet", "CmdKML", "CmdGUESS"],
-    "LookAtGroupData":    ["CmdQuery", "CmdGIS", "CmdPajek", "CmdGephi", "CmdUCINet", "CmdKML", "CmdGUESS"],
-    "LookAtAssocPairs":   ["CmdGIS", "CmdGephi", "CmdUCINet", "CmdKML", "CmdGUESS", "CmdRun"]
+    "_comment": "Buttons that do not exist on the form (no VBA handler). CmdKML has no handler on any form.",
+    "LookAtEntry":        ["CmdKML", "CmdPajek", "CmdGephi", "CmdUCINet", "CmdGUESS", "CmdRun", "CmdUTF8Pajek"],
+    "LookAtStatus":       ["CmdKML", "CmdGUESS", "CmdRun", "CmdUTF8Pajek"],
+    "LookAtTexts":        ["CmdPajek", "CmdGephi", "CmdUCINet", "CmdKML", "CmdGUESS", "CmdRun", "CmdUTF8Pajek"],
+    "LookAtPlace":        ["CmdUCINet", "CmdKML", "CmdGUESS", "CmdRun", "CmdUTF8Pajek"],
+    "LookAtAssociations": ["CmdKML", "CmdGUESS", "CmdRun", "CmdUTF8Pajek"],
+    "LookAtOffice":       ["CmdPajek", "CmdGephi", "CmdUCINet", "CmdKML", "CmdRun", "CmdUTF8Pajek"],
+    "LookAtKinship":      ["CmdGephi", "CmdKML", "CmdQuery"],
+    "LookAtNetworks":     ["CmdQuery", "CmdGIS", "CmdPajek", "CmdGephi", "CmdUCINet", "CmdKML", "CmdGUESS", "CmdUTF8Pajek"],
+    "LookAtGroupData":    ["CmdQuery", "CmdPajek", "CmdGephi", "CmdUCINet", "CmdKML", "CmdGUESS", "CmdUTF8Pajek"],
+    "LookAtAssocPairs":   ["CmdGephi", "CmdKML", "CmdGUESS", "CmdRun", "CmdUTF8Pajek"]
   },
   "mapping": {
     "_comment": "Patterns are substrings of pytest node_id. All matching tests are aggregated; worst outcome wins.",
@@ -41,15 +42,24 @@
           "test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtEntry]",
           "test_vba_bug_behaviors.py::test_bug9_lookat_entry_cmdneo4j"
         ]
-      },
-      "CmdKML": {
-        "patterns": []
       }
     },
     "LookAtStatus": {
       "CmdQuery": {
         "patterns": [
           "test_vba_matrix_all_forms.py::test_cross_form_matrix[status_"
+        ]
+      },
+      "CmdGIS": {
+        "_comment": "LookAtStatus has a working CmdGIS button (not orphaned). The GIS test covers it via the status_ matrix fixture.",
+        "patterns": [
+          "test_vba_cmdgis_other_forms.py::test_cmd_gis_produces_file[status_"
+        ]
+      },
+      "CmdNeo4j": {
+        "_comment": "Verified clean by PR #127 probe: 6 files, 0 ERR. CmdNeo4j bypasses subform recordset; unaffected by cleanup-rebind.",
+        "patterns": [
+          "test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtStatus]"
         ]
       },
       "CmdPajek": {
@@ -79,12 +89,34 @@
         "patterns": [
           "test_vba_matrix_all_forms.py::test_cross_form_matrix[biblcat_"
         ]
+      },
+      "CmdGIS": {
+        "_comment": "LookAtTexts has a working CmdGIS button. Archive byte_golden depth; covered by the cmdgis cross-form test via biblcat_ fixture.",
+        "patterns": [
+          "test_vba_cmdgis_other_forms.py::test_cmd_gis_produces_file[biblcat_"
+        ]
+      },
+      "CmdNeo4j": {
+        "_comment": "LookAtTexts CmdNeo4j: produces min 4 files (People, Places, PeoplePlaces, TextCodes). Archive manifest depth.",
+        "patterns": [
+          "test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtTexts]"
+        ]
       }
     },
     "LookAtPlace": {
       "CmdQuery": {
         "patterns": [
           "test_vba_matrix_all_forms.py::test_cross_form_matrix[place_"
+        ]
+      },
+      "CmdPajek": {
+        "patterns": [
+          "test_vba_pajek_gephi_cross_form.py::test_export_button_produces_file[LookAtPlace_CmdPajek]"
+        ]
+      },
+      "CmdGephi": {
+        "patterns": [
+          "test_vba_pajek_gephi_cross_form.py::test_export_button_produces_file[LookAtPlace_CmdGephi]"
         ]
       },
       "CmdGIS": {
@@ -118,6 +150,16 @@
           "test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtAssociations]"
         ]
       },
+      "CmdPajek": {
+        "patterns": [
+          "test_vba_pajek_gephi_cross_form.py::test_export_button_produces_file[LookAtAssociations_CmdPajek]"
+        ]
+      },
+      "CmdGephi": {
+        "patterns": [
+          "test_vba_pajek_gephi_cross_form.py::test_export_button_produces_file[LookAtAssociations_CmdGephi]"
+        ]
+      },
       "CmdUCINet": {
         "patterns": [
           "test_vba_bug_behaviors.py::test_bug22_associations_cmducinet"
@@ -128,6 +170,12 @@
       "CmdQuery": {
         "patterns": [
           "test_vba_matrix_all_forms.py::test_cross_form_matrix[office_"
+        ]
+      },
+      "CmdNeo4j": {
+        "_comment": "LookAtOffice CmdNeo4j: min 4 files. Archive manifest depth; in _SPECS as Spec('LookAtOffice', min_files=4).",
+        "patterns": [
+          "test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtOffice]"
         ]
       },
       "CmdGIS": {
@@ -156,9 +204,21 @@
           "test_vba_cmdgis_other_forms.py::test_cmd_gis_produces_file[kinship_"
         ]
       },
+      "CmdNeo4j": {
+        "_comment": "Archive byte_golden depth. LookAtKinship CmdNeo4j is in test_vba_cmdneo4j_cross_form._SPECS (min_files=4).",
+        "patterns": [
+          "test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtKinship]"
+        ]
+      },
       "CmdPajek": {
         "patterns": [
           "test_vba_pajek_gephi_cross_form.py::test_export_button_produces_file[LookAtKinship_CmdPajek]"
+        ]
+      },
+      "CmdUTF8Pajek": {
+        "_comment": "UTF-8 Pajek export (ADO stream, Chinese-safe). Separate button from CmdPajek; archive depth was none.",
+        "patterns": [
+          "test_vba_pajek_gephi_cross_form.py::test_export_button_produces_file[LookAtKinship_CmdUTF8Pajek]"
         ]
       },
       "CmdUCINet": {
@@ -174,7 +234,7 @@
       }
     },
     "LookAtNetworks": {
-      "_comment": "Primary entry point is CmdRun. CmdQuery and CmdGIS are N/A.",
+      "_comment": "Primary entry point is CmdRun. CmdGIS blocked by Form_Open deadlock under full injection (AGENTS landmine #3.5).",
       "CmdNeo4j": {
         "patterns": [
           "test_vba_bug_behaviors.py::test_bug8_lookat_networks"
@@ -188,6 +248,12 @@
       }
     },
     "LookAtGroupData": {
+      "CmdGIS": {
+        "_comment": "GroupData CmdGIS fires multiple per-checkbox WriteGIS_X subs. test_cmd_gis_groupdata_clean_branches covers Status/Office/Addr branches; Entry branch bug-pinned separately (Issue #6).",
+        "patterns": [
+          "test_vba_cmdgis_other_forms.py::test_cmd_gis_groupdata_clean_branches"
+        ]
+      },
       "CmdNeo4j": {
         "patterns": [
           "test_vba_bug_behaviors.py::test_bug21_lookat_groupdata_cmdneo4j",
@@ -210,6 +276,12 @@
           "test_vba_matrix_hard_forms.py::test_hard_form_query_small_fixture[assocpair_"
         ]
       },
+      "CmdGIS": {
+        "_comment": "AssocPairs has a working CmdGIS_Click (Form_LookAtAssociationPairs.vb:2011). Uses 1x3 known-edged fixture.",
+        "patterns": [
+          "test_vba_cmdgis_other_forms.py::test_cmd_gis_assocpairs"
+        ]
+      },
       "CmdNeo4j": {
         "patterns": [
           "test_vba_cmdneo4j_cross_form.py::test_cmd_neo4j_produces_files[LookAtAssociationPairs]"
@@ -219,6 +291,12 @@
         "patterns": [
           "test_vba_pajek_gephi_cross_form.py::test_export_button_produces_file[LookAtAssociationPairs_CmdPajek]",
           "test_vba_associationpairs_probe.py::test_associationpairs_cmdquery_then_cmdpajek"
+        ]
+      },
+      "CmdUCINet": {
+        "_comment": "AssocPairs has a working CmdUCINet_Click (Form_LookAtAssociationPairs.vb:2814). May crash with CJK issue (#22).",
+        "patterns": [
+          "test_vba_bug_behaviors.py::test_bug22_assocpairs_cmducinet"
         ]
       }
     }
