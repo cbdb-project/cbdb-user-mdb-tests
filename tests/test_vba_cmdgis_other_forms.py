@@ -264,6 +264,13 @@ _GIS_REQUIRED_COLUMNS: dict[str, list[str]] = {
         "Name", "NameChn", "IndexYear", "Sex",
         "AddrName", "AddrChn", "X", "Y", "XY_count",
     ],
+    # Form_LookAtAssociationPairs.vb:2088-2090.  Separator is
+    # comma (Chr(44)); the `_assert_gis_export_depth` auto-
+    # detects this.  9 columns; no Sex column (has Female instead).
+    "LookAtAssociationPairs": [
+        "Name", "NameChn", "Female", "IndexYear",
+        "AddrName", "AddrChn", "X", "Y", "xy_count",
+    ],
 }
 
 # Columns that should be non-empty for the vast majority of rows
@@ -681,3 +688,116 @@ def test_cmd_gis_groupdata_clean_branches(vba: VbaSession,
     )
     print(f"[LookAtGroupData] CmdGIS clean-branches coverage: "
           f"{sorted(saw)}", flush=True)
+
+
+# ----------------------------------------------------------------------
+# LookAtAssociationPairs × CmdGIS — 1×3 known-edged fixture
+#
+# AssocPairs.CmdGIS_Click (Form_LookAtAssociationPairs.vb:2011)
+# reads ZZ_SCRATCH_PEOPLE (populated by CmdQuery) and writes a
+# comma-delimited .txt with header:
+#   Name,NameChn,Female,IndexYear,AddrName,AddrChn,X,Y,xy_count
+# (9 columns, comma separator, ADODB stream, UTF-8 when GISFrame=1).
+#
+# Requires CmdQuery to run first (populates ZZ_SOCIAL_NETWORK and
+# ZZ_SCRATCH_PEOPLE).  Uses the same 1×3 known-edged fixture as
+# the Pajek/Neo4j AssocPairs tests so we know ZZ_SOCIAL_NETWORK
+# is non-empty.
+#
+# Fixture: persons 1 and 3 — smallest direct-edge pair on the
+# current dump (verified by test_vba_pajek_gephi_cross_form).
+# ----------------------------------------------------------------------
+
+
+def test_cmd_gis_assocpairs(vba: VbaSession, tmp_path):
+    """LookAtAssociationPairs × CmdGIS structural coverage test.
+
+    Fires CmdQuery (via Form_Timer) then CmdGIS on the 1×3
+    known-edged fixture.  Asserts:
+      - .txt file produced and non-empty
+      - Header contains required GIS columns
+      - Per-row field count matches header
+      - Key columns ≥ 80 % non-empty (Name, NameChn, IndexYear)
+    """
+    from test_vba_pajek_gephi_cross_form import _assocpairs_1x3_fixture
+    from cbdb_driver.form_specs import LOOKATASSOCIATIONPAIRS
+
+    spec = LOOKATASSOCIATIONPAIRS
+    fx = _assocpairs_1x3_fixture()
+
+    # 1. patch FileDialog (directory mode so each Show returns a
+    #    unique counter-suffixed file).
+    vba.patch_filedialog(spec.name)
+
+    # 2. open form and seed controls / pickers.
+    vba.open_form(spec.name)
+    for ctl, val in fx.controls.items():
+        try:
+            vba.set_control(spec.name, ctl, val)
+        except Exception as e:
+            print(f"  warn {ctl}={val!r}: {e}")
+    # Force UTF-8 GIS output (GISFrame=1 → tStream.Charset="utf-8").
+    try:
+        vba.set_control(spec.name, "GISFrame", 1)
+    except Exception:
+        pass
+
+    # 3. wire CmdQuery→CmdGIS chain via Form.Tag.
+    out_path = tmp_path / "assocpairs_gis.txt"
+    vba.set_form_tag(spec.name, f"{spec.cmd_name},CmdGIS",
+                     str(out_path))
+
+    # 4. fire CmdQuery via timer; chain dispatches to CmdGIS after.
+    n = vba.click_via_timer(
+        spec.name, ctl=spec.cmd_name,
+        result_table=spec.result_table, timeout=120,
+    )
+    print(f"\n[LookAtAssociationPairs] CmdQuery -> {n} rows "
+          f"in ZZ_SOCIAL_NETWORK", flush=True)
+    assert n >= fx.expected_min_rows, (
+        f"[LookAtAssociationPairs] CmdQuery produced only {n} "
+        f"rows (expected ≥ {fx.expected_min_rows}).  Fixture "
+        f"may be stale (1×3 edge removed?) or CmdQuery regressed."
+    )
+
+    # 5. file must exist and be non-empty.
+    assert out_path.exists(), (
+        f"[LookAtAssociationPairs] CmdGIS output {out_path} never "
+        f"appeared — either the chain didn't dispatch or FileDialog "
+        f"intercept failed."
+    )
+    sz = out_path.stat().st_size
+    assert sz > 0, "[LookAtAssociationPairs] CmdGIS output is zero bytes"
+    print(f"[LookAtAssociationPairs] CmdGIS wrote {sz} bytes",
+          flush=True)
+
+    # 6. decode + split header.
+    raw = out_path.read_bytes()
+    text = raw.decode("utf-8", errors="replace").lstrip("﻿")
+    lines = [ln for ln in text.replace("\r\n", "\n").split("\n")
+             if ln.strip()]
+    assert lines, (
+        f"[LookAtAssociationPairs] CmdGIS decoded to no lines: "
+        f"{raw[:80]!r}"
+    )
+    header = lines[0]
+    # AssocPairs uses comma separator (Chr(44)), not tab.
+    sep = "," if "\t" not in header else "\t"
+    cols = header.split(sep)
+    assert "NameChn" in cols, (
+        f"[LookAtAssociationPairs] CmdGIS header missing 'NameChn': "
+        f"{cols!r}"
+    )
+    assert len(cols) >= 4, (
+        f"[LookAtAssociationPairs] CmdGIS header has only {len(cols)} "
+        f"columns: {cols!r}"
+    )
+    assert len(lines) >= 2, (
+        "[LookAtAssociationPairs] CmdGIS produced only the header"
+    )
+    print(f"[LookAtAssociationPairs] CmdGIS OK — {len(cols)} cols, "
+          f"{len(lines)-1} data rows", flush=True)
+
+    # 7. depth checks (required-column manifest + row-width + fill-rate).
+    _assert_gis_export_depth("LookAtAssociationPairs", header,
+                              lines, sep, scratch_rows=n)

@@ -902,6 +902,126 @@ def test_bug22_kinship_cmducinet_sibling_form_fires_invalid_procedure_call(
           flush=True)
 
 
+def test_bug22_assocpairs_cmducinet_createtextfile_coverage(
+        vba: VbaSession):
+    """Bug #22 coverage — LookAtAssociationPairs.CmdUCINet.
+
+    `Form_LookAtAssociationPairs.CmdUCINet_Click` (line 2814)
+    uses the same `Scripting.FileSystemObject.CreateTextFile
+    (tFileName, True)` pattern as Associations and Kinship —
+    2-arg, no Unicode flag → ANSI/cp1252.  The static marker
+    in `test_known_bugs.py::test_bug22_associations_cmducinet_
+    createtextfile_no_unicode_arg` now covers all three forms.
+
+    This test fires the button at runtime on the verified
+    1×3 known-edged fixture (persons 1 and 3, same as the
+    Pajek/Neo4j AssocPairs tests) and documents the outcome:
+
+      - If ZZ_SCRATCH_PEOPLE contains a person whose c_name
+        has a CJK Han ideograph, VBA error 5 fires and
+        `LookAtAssociationPairs:ERR` appears in ZZ_TEST_DEBUG.
+      - If all c_name values in the fixture are cp1252-clean,
+        CmdUCINet completes and produces a .vna file.
+
+    Both outcomes are accepted here — the test fails ONLY if:
+      (a) ZZ_SOCIAL_NETWORK / ZZ_SCRATCH_PEOPLE never populated
+          (CmdQuery regression before CmdUCINet even starts), OR
+      (b) CmdUCINet neither produced a file NOR fired any
+          debug marker at all (hung silently or skipped entirely).
+
+    If the bug fires (ERR present), additionally verifies the
+    error text is VBA error 5 (consistent with Issue #22 class).
+    """
+    from cbdb_driver.form_specs import LOOKATASSOCIATIONPAIRS
+    from test_vba_pajek_gephi_cross_form import _assocpairs_1x3_fixture
+
+    spec = LOOKATASSOCIATIONPAIRS
+    fx = _assocpairs_1x3_fixture()
+
+    # Stage 1: run CmdQuery to populate ZZ_SOCIAL_NETWORK.
+    _seed(vba, fx)
+    vba.set_form_tag(spec.name, spec.cmd_name, "")
+    n = vba.click_via_timer(
+        spec.name, ctl=spec.cmd_name,
+        result_table=spec.result_table, timeout=120,
+    )
+    print(f"\n[LookAtAssociationPairs] CmdQuery -> {n} rows "
+          f"in ZZ_SOCIAL_NETWORK", flush=True)
+
+    cur = vba.conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM ZZ_SCRATCH_PEOPLE")
+    n_people = int(cur.fetchone()[0])
+    cur.close()
+    assert n >= 1 and n_people >= 1, (
+        f"ZZ_SOCIAL_NETWORK={n}, ZZ_SCRATCH_PEOPLE={n_people} "
+        f"after CmdQuery on 1×3 fixture.  CmdUCINet would bail "
+        f"at the RecordCount=0 guard before any file write.  "
+        f"Investigate: CmdQuery regression or stale fixture?"
+    )
+
+    # Stage 2: fire CmdUCINet (no ENTER/DONE markers; use
+    # wait_done=False and poll for file appearance).
+    vba.patch_filedialog(spec.name)
+    out_dir = WORK.parent / "_bug22_assocpairs_ucinet_out"
+    out_dir.mkdir(exist_ok=True)
+    out_path = out_dir / "assocpairs_ucinet.vna"
+    if out_path.exists():
+        try:
+            out_path.unlink()
+        except Exception:
+            pass
+    vba.set_form_tag(spec.name, "CmdUCINet", str(out_path))
+    vba.click_via_timer(
+        spec.name, ctl="CmdUCINet",
+        result_table=None, wait_done=False,
+    )
+
+    import time as _time
+    deadline = _time.time() + 60
+    while _time.time() < deadline:
+        if out_path.exists() and out_path.stat().st_size > 0:
+            break
+        _time.sleep(1)
+
+    msgs = _read_debug_log(vba)
+    err_msgs = [m for m in msgs
+                if "LookAtAssociationPairs:ERR" in m]
+    file_present = out_path.exists() and out_path.stat().st_size > 0
+    print(f"[LookAtAssociationPairs] CmdUCINet: file={file_present} "
+          f"({out_path.stat().st_size if file_present else 0} bytes), "
+          f"ERR markers={err_msgs}", flush=True)
+
+    assert file_present or err_msgs, (
+        "[LookAtAssociationPairs] CmdUCINet produced no .vna file "
+        "AND no debug markers — the button either hung silently "
+        "or exited before the FileDialog (check RecordCount guard "
+        "or VBA compile error).  Either a file or at least one "
+        f"debug message is required.  msgs={msgs[:10]}"
+    )
+
+    if err_msgs:
+        err_blob = " | ".join(err_msgs).lower()
+        assert "invalid procedure call or argument" in err_blob, (
+            "[LookAtAssociationPairs] CmdUCINet ERR fired but "
+            "text doesn't match VBA error 5 (Issue #22 class).  "
+            f"Expected 'Invalid procedure call or argument'.  "
+            f"Got: {err_msgs}.  Different error class — "
+            "investigate before classifying under Issue #22."
+        )
+        print(
+            "[LookAtAssociationPairs] CmdUCINet confirmed Bug #22 "
+            "symptom (VBA error 5 on FSO.CreateTextFile non-Unicode "
+            "path).  Static pin in test_known_bugs.py covers all "
+            "3 forms.", flush=True)
+    else:
+        print(
+            "[LookAtAssociationPairs] CmdUCINet ran cleanly on the "
+            "1×3 fixture (no CJK names in this fixture's network → "
+            "no FSO crash).  Bug #22 code pattern still present per "
+            "static test; use a fixture with CJK-name persons to "
+            "reproduce the runtime crash.", flush=True)
+
+
 def test_bug7_lookat_place_cmdneo4j_fires_item_not_found(vba: VbaSession):
     """Bug #7: LookAtPlace.CmdNeo4j hits 'Item not found in this
     collection' on the first row of the People-CSV loop because
