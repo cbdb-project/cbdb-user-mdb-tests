@@ -10,54 +10,47 @@ The issues are ordered by severity (P0 highest). Each entry includes a concise d
 
 ## Coverage Matrix — Form × Button Test Results
 
-| Form | CmdQuery | CmdGIS | CmdNeo4j | CmdPajek | CmdGephi | CmdUCINet | CmdKML | CmdGUESS | CmdRun |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| LookAtEntry | ✗ FAIL | ✓ | ✓ | — | — | — | —? | — | — |
-| LookAtStatus | ✓ | — | — | ✗ FAIL | ~ SKIP | ✓ | — | — | — |
-| LookAtTexts | ✓ | — | — | — | — | — | — | — | — |
-| LookAtPlace | ✓ | ✗ FAIL | ✗ FAIL | — | — | — | — | — | — |
-| LookAtAssociations | ✓ | ✓ | ✓ | — | — | ✗ FAIL | — | — | — |
-| LookAtOffice | ✓ | ✗ FAIL | — | — | — | — | — | ✓ | — |
-| LookAtKinship | — | ✓ | — | ✓ | — | ✗ FAIL | — | ✗ FAIL | ✓ |
-| LookAtNetworks | — | — | ~ SKIP | — | — | — | — | — | ~ SKIP |
-| LookAtGroupData | — | — | ✗ FAIL | — | — | — | — | — | ✗ FAIL |
-| LookAtAssocPairs | ~ SKIP | — | ✓ | ✓ | — | — | — | — | — |
+| Form | CmdQuery | CmdGIS | CmdNeo4j | CmdPajek | CmdGephi | CmdUCINet | CmdKML | CmdGUESS | CmdRun | CmdUTF8Pajek |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| LookAtEntry | ✗ FAIL | ✓ | ✓ | — | — | — | — | — | — | — |
+| LookAtStatus | ✓ | ✓ | ✓ | ✗ FAIL | ~ SKIP | ✓ | — | — | — | — |
+| LookAtTexts | ✓ | ✓ | ✓ | — | — | — | — | — | — | — |
+| LookAtPlace | ✓ | ✗ FAIL | ✗ FAIL | ✓ | ✓ | — | — | — | — | — |
+| LookAtAssociations | ✓ | ✓ | ✓ | ✗ FAIL | ✓ | ✗ FAIL | — | — | — | — |
+| LookAtOffice | ✓ | ✗ FAIL | ✓ | — | — | — | — | ✓ | — | — |
+| LookAtKinship | — | ✓ | ✓ | ✓ | — | ✗ FAIL | — | ✗ FAIL | ✓ | ✗ FAIL |
+| LookAtNetworks | — | — | ~ SKIP | — | — | — | — | — | ~ SKIP | — |
+| LookAtGroupData | — | ✓ | ✗ FAIL | — | — | — | — | — | ✗ FAIL | — |
+| LookAtAssocPairs | ~ SKIP | ✓ | ✓ | ✓ | — | ✓ | — | — | — | — |
 
-_PASS: 16 · FAIL: 10 · ERROR: 0 · SKIP: 4 · NOT RUN: 1 · N/A: 59_
+_PASS: 28 · FAIL: 12 · ERROR: 0 · SKIP: 4 · NOT RUN: 0 · N/A: 56_
 
 ## Table of Contents
 
 - [P0 — Silent data corruption](#p0--silent-data-corruption)
-  - [Issue #20 — BOM-prefixed address names produce embedded TAB delimiters in GIS exports — silent column misalignment](#issue-20--bom-prefixed-address-names-produce-embedded-tab-delimiters-in-gis-exports--silent-column-misalignment)
   - [Issue #21 — LookAtOffice: CmdGIS output IndexYear column is nearly empty (0.2% fill rate) — likely silent column-bind regression](#issue-21--lookatoffice-cmdgis-output-indexyear-column-is-nearly-empty-02-fill-rate--likely-silent-column-bind-regression)
+  - [Issue #26 — c_index_addr_id disagreement between User MDB and cbdb-online snapshot exceeds 0.5% threshold](#issue-26--c_index_addr_id-disagreement-between-user-mdb-and-cbdb-online-snapshot-exceeds-05-threshold)
   - [Issue #23 — LookAtAssociations: CmdPajek vertex section has off-by-N count — header declares 501 vertices but exports 8,093 rows](#issue-23--lookatassociations-cmdpajek-vertex-section-has-off-by-n-count--header-declares-501-vertices-but-exports-8093-rows)
   - [Issue #24 — LookAtKinship: CmdGUESS Gephi output has wrong field count per node row (nodedef declares 15 columns)](#issue-24--lookatkinship-cmdguess-gephi-output-has-wrong-field-count-per-node-row-nodedef-declares-15-columns)
-  - [Issue #26 — c_index_addr_id disagreement between User MDB and cbdb-online snapshot exceeds 0.5% threshold](#issue-26--c_index_addr_id-disagreement-between-user-mdb-and-cbdb-online-snapshot-exceeds-05-threshold)
 - [P1 — Visible runtime crash](#p1--visible-runtime-crash)
+  - [Issue #22 — LookAtAssociations / LookAtKinship: CmdUCINet crashes with 'Invalid procedure call or argument' when c_name contains CJK Han characters](#issue-22--lookatassociations--lookatkinship-cmducinet-crashes-with-invalid-procedure-call-or-argument-when-c_name-contains-cjk-han-characters)
   - [Issue #6 — LookAtGroupData.queryEntry crashes with 'No such field' — ENTRY_DATA.c_parental_status missing _code suffix](#issue-6--lookatgroupdataqueryentry-crashes-with-no-such-field--entry_datac_parental_status-missing-_code-suffix)
   - [Issue #7 — LookAtPlace.CmdNeo4j: People-CSV loop reads c_dynasty / c_dynasty_chn / c_female not in SELECT — crashes JET 3265 'Item not found'](#issue-7--lookatplacecmdneo4j-people-csv-loop-reads-c_dynasty--c_dynasty_chn--c_female-not-in-select--crashes-jet-3265-item-not-found)
-  - [Issue #8 — LookAtNetworks.CmdNeo4j: tRstPlace and tRstPeoplePlace SELECTs omit x_coord / y_coord / c_person_id — crashes 'Item not found' on first row](#issue-8--lookatnetworkscmdneo4j-trstplace-and-trstpeopleplace-selects-omit-x_coord--y_coord--c_person_id--crashes-item-not-found-on-first-row)
-  - [Issue #13 — BIOG_MAIN_2 Subform: clicking c_fl_ey_notes opens missing picker form frmPickNIAN_HAO — 'Item not found'](#issue-13--biog_main_2-subform-clicking-c_fl_ey_notes-opens-missing-picker-form-frmpicknian_hao--item-not-found)
-  - [Issue #22 — LookAtAssociations / LookAtKinship: CmdUCINet crashes with 'Invalid procedure call or argument' when c_name contains CJK Han characters](#issue-22--lookatassociations--lookatkinship-cmducinet-crashes-with-invalid-procedure-call-or-argument-when-c_name-contains-cjk-han-characters)
   - [Issue #25 — LookAtKinship / LookAtGroupData / LookAtAssociationPairs: CmdImport round-trip fails — ZZ_SCRATCH_IMPORT_PEOPLE stays empty](#issue-25--lookatkinship--lookatgroupdata--lookatassociationpairs-cmdimport-round-trip-fails--zz_scratch_import_people-stays-empty)
 - [P2 — Silent display](#p2--silent-display)
-  - [Issue #3 — LookAtEntry: c_entry_desc backfill is NULL for all rows when entry_code = 36 (jinshi general)](#issue-3--lookatentry-c_entry_desc-backfill-is-null-for-all-rows-when-entry_code--36-jinshi-general)
   - [Issue #2 — LookAtGroupData: CmdRun does not backfill c_name from BIOG_MAIN](#issue-2--lookatgroupdata-cmdrun-does-not-backfill-c_name-from-biog_main)
+  - [Issue #3 — LookAtEntry: c_entry_desc backfill is NULL for all rows when entry_code = 36 (jinshi general)](#issue-3--lookatentry-c_entry_desc-backfill-is-null-for-all-rows-when-entry_code--36-jinshi-general)
   - [Issue #10 — EVENT_ADDR_2 Subform: TxtAddrCHN / TxtAddrPY bound to unaliased column names not in View_EventAddrData — render blank](#issue-10--event_addr_2-subform-txtaddrchn--txtaddrpy-bound-to-unaliased-column-names-not-in-view_eventaddrdata--render-blank)
 - [P3 — Missing UI](#p3--missing-ui)
   - [Issue #15 — LookAtPlace is missing its CmdGIS button — handler exists but no UI control](#issue-15--lookatplace-is-missing-its-cmdgis-button--handler-exists-but-no-ui-control)
-  - [Issue #16 — LookAtStatus is missing its CmdPajek button — handler exists but no UI control](#issue-16--lookatstatus-is-missing-its-cmdpajek-button--handler-exists-but-no-ui-control)
-  - [Issue #17 — LookAtStatus is missing its CmdGephi button — handler exists but no UI control](#issue-17--lookatstatus-is-missing-its-cmdgephi-button--handler-exists-but-no-ui-control)
-  - [Issue #18 — LookAtStatus is missing its CmdUCINet button — handler exists but no UI control](#issue-18--lookatstatus-is-missing-its-cmducinet-button--handler-exists-but-no-ui-control)
-  - [Issue #19 — LookAtOffice is missing its CmdGUESS button — handler exists but no UI control](#issue-19--lookatoffice-is-missing-its-cmdguess-button--handler-exists-but-no-ui-control)
 - [P5 — Dormant / latent / not currently reproducible](#p5--dormant--latent--not-currently-reproducible)
+  - [Issue #20 — BOM-prefixed address names would produce embedded TAB delimiters in GIS exports — DORMANT (BOM data cleaned upstream, 0 affected rows in this dump)](#issue-20--bom-prefixed-address-names-would-produce-embedded-tab-delimiters-in-gis-exports--dormant-bom-data-cleaned-upstream-0-affected-rows-in-this-dump)
   - [Issue #1 — View_StatusData would display last-year range in the first-year column — DORMANT (no source rows trigger it on this dump)](#issue-1--view_statusdata-would-display-last-year-range-in-the-first-year-column--dormant-no-source-rows-trigger-it-on-this-dump)
   - [Issue #4 — LookAtPlace.CmdGIS_Click references non-existent control GISFrame — latent, masked by missing button (Issue #15)](#issue-4--lookatplacecmdgis_click-references-non-existent-control-gisframe--latent-masked-by-missing-button-issue-15)
   - [Issue #5 — LookAtStatus.CmdPajek_Click references missing control ChkIDs and three non-existent columns — latent, masked by missing button (Issue #16)](#issue-5--lookatstatuscmdpajek_click-references-missing-control-chkids-and-three-non-existent-columns--latent-masked-by-missing-button-issue-16)
   - [Issue #9 — LookAtEntry.CmdNeo4j Institutions block uses wrong recordset variable tRstAssocCodes — latent (no ENTRY_DATA row has c_inst_code > 0)](#issue-9--lookatentrycmdneo4j-institutions-block-uses-wrong-recordset-variable-trstassoccodes--latent-no-entry_data-row-has-c_inst_code--0)
   - [Issue #11 — EVENTS_DATA_2 Subform: c_event_record_id control bound to non-existent column — hidden, so latent](#issue-11--events_data_2-subform-c_event_record_id-control-bound-to-non-existent-column--hidden-so-latent)
   - [Issue #12 — POSTED_TO_OFFICE_DATA_2 Subform: c_appt_type_code control bound to non-projected column — hidden, so latent](#issue-12--posted_to_office_data_2-subform-c_appt_type_code-control-bound-to-non-projected-column--hidden-so-latent)
-  - [Issue #14 — KIN_DATA Subform: CmdPickKinRel calls missing picker frmPickKINSHIP_CODES — latent (sub-form not currently embedded anywhere reachable)](#issue-14--kin_data-subform-cmdpickkinrel-calls-missing-picker-frmpickkinship_codes--latent-sub-form-not-currently-embedded-anywhere-reachable)
 - [Severity legend](#severity-legend)
 - [Appendix A — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (differences need per-row classification before being filed as bugs)](#appendix-a--c_index_year--c_index_addr_id-drift-vs-the-cbdb-online-main-server-snapshot-differences-need-per-row-classification-before-being-filed-as-bugs)
 - [Appendix B — TablesFields: documentation vs. actual structure](#appendix-b--tablesfields-documentation-vs-actual-structure)
@@ -74,30 +67,6 @@ _PASS: 16 · FAIL: 10 · ERROR: 0 · SKIP: 4 · NOT RUN: 1 · N/A: 59_
 - P5 — Dormant / latent / not currently reproducible: kept as historical record; we re-checked on the current dump and could not trigger the symptom.
 
 ## P0 — Silent data corruption
-
-### Issue #20 — BOM-prefixed address names produce embedded TAB delimiters in GIS exports — silent column misalignment
-
-**Affected sub:** `ADDR_CODES + Form_LookAt*.CmdGIS_Click`
-
-**Severity:** P0 — Silent export column misalignment: numeric fields land in text columns and one extra trailing column appears, with no error popup.  Currently 1 of 315 BOM-dirty ADDR_CODES rows (c_addr_id 702559) is reachable from person data; the other 314 are orphan rows that would reproduce the same misalignment the moment they gain their first person link.
-
-#### Description
-
-315 rows of ADDR_CODES carry a stray U+FEFF (BOM) prefix in both c_name and c_name_chn, almost certainly from a UTF-8-with-BOM paste at data-import time.  When any LookAt form copies one of these rows into its scratch staging table via SQL UPDATE/INSERT, JET strips the BOM and re-interprets the remaining UTF-16 LE bytes, promoting them back to Unicode with mangled values — including a literal TAB character at position 0 (e.g. c_addr_id = 702559, Wei Shi 尉氏).  CmdGIS writes each cell as tStr + value + tC with tC = Chr(9) and performs no escaping, so the embedded TAB becomes a delimiter, splits AddrChn into two cells, and silently shifts every column to its right.  A user opening the .tab file in Excel sees numeric fields in text columns and an extra trailing column.  The same unescaped-write pattern is present in CmdGIS of LookAtTexts / LookAtPlace / LookAtAssociations / LookAtOffice / LookAtKinship.
-
-Detected by: test_addr_codes_has_known_bom_dirty_rows — asserts 315 BOM-prefixed ADDR_CODES rows in c_name and c_name_chn.  Also: test_known_reachable_dirty_addr_present — asserts c_addr_id 702559 (Wei Shi 尉氏) starts with U+FEFF and is reachable from status_code=40.
-
-#### Steps to reproduce
-
-1. Open CBDB_BJ_User.mdb in Microsoft Access.
-2. Open the form **LookAtStatus**.  Pick status code **40** (civil office / [為官者：文]) without any year filter.
-3. Click **Run Query**.  When complete (~17,000 rows), click the **GIS** button with the encoding selector set to UTF-8.
-4. Save the resulting .tab file and open it in Excel or a tab-aware text editor.
-5. Around row 11476 (person Ruan Fu 阮孚, c_addr_id = 702559, Wei Shi 尉氏): one row has 10 tab cells against the 9-column header.  AddrChn is blank, the X column contains text, and the real X / Y values are shifted one column to the right.
-
-#### Suggested fix
-
-Two complementary fixes: (1) One-shot data cleanup — strip the leading U+FEFF from the 315 affected ADDR_CODES.c_name / c_name_chn rows (e.g. UPDATE ADDR_CODES SET c_name = Mid(c_name, 2) WHERE Left(c_name, 1) = ChrW(65279) and the parallel statement for c_name_chn).  (2) Defensive sanitisation — before each tStr = tStr + value + tC append in the CmdGIS bodies of all LookAt forms, replace any embedded Chr(9), Chr(10), Chr(13), or U+FEFF in value with a space.  Both fixes are warranted.
 
 ### Issue #21 — LookAtOffice: CmdGIS output IndexYear column is nearly empty (0.2% fill rate) — likely silent column-bind regression
 
@@ -122,6 +91,28 @@ Detected by: test_cmd_gis_produces_file[office_80944_unfiltered] — assertion [
 #### Suggested fix
 
 Inspect Form_LookAtOffice.CmdGIS_Click: locate the SELECT that populates the IndexYear column in the GIS output and verify the source column name matches the actual schema (check ZZ_SCRATCH_OFFICE or the equivalent table).
+
+### Issue #26 — c_index_addr_id disagreement between User MDB and cbdb-online snapshot exceeds 0.5% threshold
+
+**Affected sub:** `BIOG_MAIN (c_index_addr_id)`
+
+**Severity:** P0 — Silent data drift: ~25 persons have a different primary address ID than the online system.  Geographic analyses and GIS exports that use c_index_addr_id will silently place these persons at the wrong location.
+
+#### Description
+
+A cross-check of BIOG_MAIN.c_index_addr_id between the User MDB and the cbdb-online-main-server SQLite snapshot found a disagreement rate of 0.500%, exactly at the maximum acceptable threshold.  At the default 5,000-row sample this means approximately 25 persons have a different c_index_addr_id in the two systems, indicating that either the User MDB has not fully applied recent upstream address assignments or the snapshot is ahead of the current data export.
+
+Detected by: test_index_year_addr_xcheck_sample — assertion c_index_addr_id disagreement 0.500% exceeds 0.5% threshold.
+
+#### Steps to reproduce
+
+1. Run: python reports/collect_index_year_diffs.py
+2. Inspect reports/index_drift_examples.json for rows where the bucket is 'addr_only' — these are persons where c_index_addr_id differs between the User MDB and the online snapshot.
+3. For each differing person, query BIOG_MAIN.c_index_addr_id and compare against the online server to determine which value is authoritative.
+
+#### Suggested fix
+
+Apply the latest c_index_addr_id assignments from the cbdb-online server to BIOG_MAIN in the User MDB.  The differing rows are enumerated in reports/index_drift_examples.json (bucket: 'addr_only').
 
 ### Issue #23 — LookAtAssociations: CmdPajek vertex section has off-by-N count — header declares 501 vertices but exports 8,093 rows
 
@@ -169,29 +160,31 @@ Detected by: test_cmd_guess_produces_file[kinship_person_3211] — assertion [Lo
 
 In Form_LookAtKinship.CmdGUESS_Click, ensure the nodedef header column list and the per-row value list are generated from the same ordered column definition. A mismatch typically occurs when a column is added to one list but not the other.
 
-### Issue #26 — c_index_addr_id disagreement between User MDB and cbdb-online snapshot exceeds 0.5% threshold
+## P1 — Visible runtime crash
 
-**Affected sub:** `BIOG_MAIN (c_index_addr_id)`
+### Issue #22 — LookAtAssociations / LookAtKinship: CmdUCINet crashes with 'Invalid procedure call or argument' when c_name contains CJK Han characters
 
-**Severity:** P0 — Silent data drift: ~25 persons have a different primary address ID than the online system.  Geographic analyses and GIS exports that use c_index_addr_id will silently place these persons at the wrong location.
+**Affected sub:** `Form_LookAtAssociations.CmdUCINet_Click / Form_LookAtKinship.CmdUCINet_Click`
+
+**Severity:** P1 — Visible runtime crash: a popup aborts the export.  Any UCINet workflow on an association network that includes persons with Han-character names will fail.  Most CBDB persons have CJK names, making this effectively a blanket failure for real-world LookAtAssociations / LookAtKinship → UCINet usage.
 
 #### Description
 
-A cross-check of BIOG_MAIN.c_index_addr_id between the User MDB and the cbdb-online-main-server SQLite snapshot found a disagreement rate of 0.500%, exactly at the maximum acceptable threshold.  At the default 5,000-row sample this means approximately 25 persons have a different c_index_addr_id in the two systems, indicating that either the User MDB has not fully applied recent upstream address assignments or the snapshot is ahead of the current data export.
+Form_LookAtAssociations.CmdUCINet_Click and Form_LookAtKinship.CmdUCINet_Click both call CreateTextFile with the 2-argument signature (filename, overwrite).  VBA's CreateTextFile raises 'Invalid procedure call or argument' (runtime error 5) when the output path contains a CJK Han character in a c_name value — the 2-arg form does not accept a Unicode flag, so Access silently uses the system ANSI code page, which cannot encode Han characters.  The error fires as a popup and aborts the export.  Fixtures using association code c_assoc_code = 437 ('Presented literary composition as gift to' / '贈詩、文') reliably trigger this because the associated persons include Han-character names.
 
-Detected by: test_index_year_addr_xcheck_sample — assertion c_index_addr_id disagreement 0.500% exceeds 0.5% threshold.
+Detected by: test_bug22_associations_cmducinet_fires_invalid_procedure_call and test_bug22_kinship_cmducinet_sibling_form_fires_invalid_procedure_call.
 
 #### Steps to reproduce
 
-1. Run: python reports/collect_index_year_diffs.py
-2. Inspect reports/index_drift_examples.json for rows where the bucket is 'addr_only' — these are persons where c_index_addr_id differs between the User MDB and the online snapshot.
-3. For each differing person, query BIOG_MAIN.c_index_addr_id and compare against the online server to determine which value is authoritative.
+1. Open CBDB_BJ_User.mdb in Microsoft Access.
+2. Open the LookAtAssociations form.
+3. Pick association code c_assoc_code = 437 ('Presented literary composition as gift to').
+4. Click CmdUCINet.  A popup appears: 'Invalid procedure call or argument'.  The UCINet export file is not created.
+5. The same error occurs in LookAtKinship.CmdUCINet when the kinship network contains a person whose c_name includes CJK Han characters (e.g. '取' / 贈詩、文).
 
 #### Suggested fix
 
-Apply the latest c_index_addr_id assignments from the cbdb-online server to BIOG_MAIN in the User MDB.  The differing rows are enumerated in reports/index_drift_examples.json (bucket: 'addr_only').
-
-## P1 — Visible runtime crash
+Change CreateTextFile calls in Form_LookAtAssociations.CmdUCINet_Click and Form_LookAtKinship.CmdUCINet_Click to the 3-argument form: CreateTextFile(filename, True, True) — the third argument enables Unicode output.  Test with a fixture that includes a person whose c_name contains CJK Han characters.
 
 ### Issue #6 — LookAtGroupData.queryEntry crashes with 'No such field' — ENTRY_DATA.c_parental_status missing _code suffix
 
@@ -242,76 +235,6 @@ Detected by: test_bug7_lookat_place_cmdneo4j_fires_item_not_found — asserts 'I
 
 Extend the SELECT in Form_LookAtPlace.CmdNeo4j_Click (lines ~643-647) to also project DYNASTIES.c_dynasty, DYNASTIES.c_dynasty_chn, and BIOG_MAIN.c_female.  The FROM / JOIN structure already brings those source tables into scope; three column references added to the SELECT projection is the complete fix.
 
-### Issue #8 — LookAtNetworks.CmdNeo4j: tRstPlace and tRstPeoplePlace SELECTs omit x_coord / y_coord / c_person_id — crashes 'Item not found' on first row
-
-**Affected sub:** `Form_LookAtNetworks.CmdNeo4j_Click`
-
-**Severity:** P1 — Visible crash on a normal user click.  Same failure class as Issue #7.  Runtime verification is blocked because LookAtNetworks CmdRun times out on high-degree anchors in the test driver; the static marker confirms the code-level defect.
-
-#### Description
-
-Two SELECTs inside Form_LookAtNetworks.CmdNeo4j_Click build recordsets that the downstream loop reads beyond their projected columns: the tRstPlace SELECT (line ~2458) projects only three ADDR_CODES columns but the loop reads !x_coord and !y_coord; the tRstPeoplePlace SELECT similarly omits c_person_id and c_index_addr_id that the loop reads.  Same JET 3265 'Item not found' failure class as Issue #7 (LookAtPlace.CmdNeo4j).  The error handler silences it with MsgBox and the export chain bails, leaving the user with a popup and no output files.
-
-Detected by: test_bug8_lookat_networks_cmdneo4j_select_missing_xy — static assertion that the buggy 3-column tRstPlace SELECT is still present in Form_LookAtNetworks.vb.
-
-#### Steps to reproduce
-
-1. Open CBDB_BJ_User.mdb in Microsoft Access.
-2. Open the form **LookAtNetworks** (note: this form has a known opening delay; allow several seconds).
-3. Run a query, then click the **Neo4j** export button.
-4. When the export reaches the People-with-Place file, a JET 3265 'Item not found in this collection' popup appears.  No further files are written.
-
-#### Suggested fix
-
-Extend the tRstPlace SELECT to project ADDR_CODES.x_coord and ADDR_CODES.y_coord.  Extend the tRstPeoplePlace SELECT to project the missing c_person_id and c_index_addr_id columns from the joined tables.  Same fix class as Issue #7.
-
-### Issue #13 — BIOG_MAIN_2 Subform: clicking c_fl_ey_notes opens missing picker form frmPickNIAN_HAO — 'Item not found'
-
-**Affected sub:** `Form_BIOG_MAIN_2_Subform.c_fl_ey_notes_Click`
-
-**Severity:** P1 — Visible crash on a user click: any person with a non-empty c_fl_ey_notes field (era-note information) will trigger the error when that field is clicked.
-
-#### Description
-
-When the user clicks the c_fl_ey_notes field on a person's biographical detail subform, Sub c_fl_ey_notes_Click runs DoCmd.OpenForm "frmPickNIAN_HAO".  There is no form named frmPickNIAN_HAO in the .mdb's CurrentProject.AllForms collection.  Access raises 'Item not found in this collection' and the field click does nothing useful.  Likely cause: a picker form was renamed or consolidated in an earlier refactor and this caller was not updated.
-
-Detected by: test_picker_form_truly_missing_from_mdb[bug13_frmPickNIAN_HAO] — enumerates CurrentProject.AllForms via COM and confirms frmPickNIAN_HAO is absent.
-
-#### Steps to reproduce
-
-1. Open CBDB_BJ_User.mdb in Microsoft Access.
-2. Open CBDB_Browser_2 and navigate to person **c_personid = 5** (Zha Yue 查籥) — his c_fl_ey_notes field has actual text, so clicking it fires the Sub.
-3. On the BIOG_MAIN_2 subform, click the **c_fl_ey_notes** field.
-4. An 'Item not found in this collection.' popup appears; no picker opens.
-
-#### Suggested fix
-
-Either restore the picker form frmPickNIAN_HAO (or its functional equivalent), or update Sub c_fl_ey_notes_Click in Form_BIOG_MAIN_2_Subform to open whichever picker form replaced it.
-
-### Issue #22 — LookAtAssociations / LookAtKinship: CmdUCINet crashes with 'Invalid procedure call or argument' when c_name contains CJK Han characters
-
-**Affected sub:** `Form_LookAtAssociations.CmdUCINet_Click / Form_LookAtKinship.CmdUCINet_Click`
-
-**Severity:** P1 — Visible runtime crash: a popup aborts the export.  Any UCINet workflow on an association network that includes persons with Han-character names will fail.  Most CBDB persons have CJK names, making this effectively a blanket failure for real-world LookAtAssociations / LookAtKinship → UCINet usage.
-
-#### Description
-
-Form_LookAtAssociations.CmdUCINet_Click and Form_LookAtKinship.CmdUCINet_Click both call CreateTextFile with the 2-argument signature (filename, overwrite).  VBA's CreateTextFile raises 'Invalid procedure call or argument' (runtime error 5) when the output path contains a CJK Han character in a c_name value — the 2-arg form does not accept a Unicode flag, so Access silently uses the system ANSI code page, which cannot encode Han characters.  The error fires as a popup and aborts the export.  Fixtures using association code c_assoc_code = 437 ('Presented literary composition as gift to' / '贈詩、文') reliably trigger this because the associated persons include Han-character names.
-
-Detected by: test_bug22_associations_cmducinet_fires_invalid_procedure_call and test_bug22_kinship_cmducinet_sibling_form_fires_invalid_procedure_call.
-
-#### Steps to reproduce
-
-1. Open CBDB_BJ_User.mdb in Microsoft Access.
-2. Open the LookAtAssociations form.
-3. Pick association code c_assoc_code = 437 ('Presented literary composition as gift to').
-4. Click CmdUCINet.  A popup appears: 'Invalid procedure call or argument'.  The UCINet export file is not created.
-5. The same error occurs in LookAtKinship.CmdUCINet when the kinship network contains a person whose c_name includes CJK Han characters (e.g. '取' / 贈詩、文).
-
-#### Suggested fix
-
-Change CreateTextFile calls in Form_LookAtAssociations.CmdUCINet_Click and Form_LookAtKinship.CmdUCINet_Click to the 3-argument form: CreateTextFile(filename, True, True) — the third argument enables Unicode output.  Test with a fixture that includes a person whose c_name contains CJK Han characters.
-
 ### Issue #25 — LookAtKinship / LookAtGroupData / LookAtAssociationPairs: CmdImport round-trip fails — ZZ_SCRATCH_IMPORT_PEOPLE stays empty
 
 **Affected sub:** `Form_LookAtKinship.CmdImport_Click / Form_LookAtGroupData.CmdImport_Click / Form_LookAtAssociationPairs.CmdImportList_Click`
@@ -337,34 +260,6 @@ Detected by: test_cmd_import_round_trip[LookAtKinship.CmdImport], test_cmd_impor
 Inspect the CmdImport_Click / CmdImportList_Click handlers in each affected form.  Verify the INSERT INTO ZZ_SCRATCH_IMPORT_PEOPLE statement: check that the source control (text box or list box) is correctly read and that the INSERT executes within an active transaction that is committed.
 
 ## P2 — Silent display
-
-### Issue #3 — LookAtEntry: c_entry_desc backfill is NULL for all rows when entry_code = 36 (jinshi general)
-
-**Affected sub:** `Form_LookAtEntry.CmdQuery_Click`
-
-**Severity:** P2 — Silent display issue: 92,545 rows affected.  The user can see the blank c_entry_desc column in the result grid, but Access shows no error — making it easy to overlook.  Exports (GIS, Neo4j, KML) that reference this column will also carry the blank.
-
-#### Description
-
-When the user runs a LookAtEntry query filtered to entry code 36 (examination: jinshi general), the result table ZZ_SCRATCH_ENTRY is populated with 92,545 rows but the c_entry_desc column is NULL for every row.  The expected value is 'examination: jinshi (general)'.
-
-The CmdQuery_Click handler successfully inserts rows from ENTRY_DATA joined to ENTRY_CODES, but the c_entry_desc backfill step does not write the description for this specific entry code.  All other columns appear to be filled normally.  The missing description means the on-screen result grid shows a blank entry-type column for every record, which is misleading — the user sees results but cannot identify what type of examination each record represents.
-
-Detected by: test_vba_full_matrix[top_entry_code_36_unfiltered] — assertion 'c_entry_desc backfill wrong' with 92,545 affected rows.
-
-#### Steps to reproduce
-
-1. Open CBDB_BJ_User.mdb in Microsoft Access.
-2. From the Navigation Pane, open the form **LookAtEntry**.
-3. In the Entry Code picker, select entry code **36** (label: 'examination: jinshi (general)').
-4. Leave dynasty, address, and year filters blank.
-5. Click **Run Query** (CmdQuery button).
-6. When the query completes, inspect the result grid: the entry-type description column (c_entry_desc) is blank for every row.
-7. SQL verification: `SELECT TOP 5 c_entry_code, c_entry_desc FROM ZZ_SCRATCH_ENTRY` returns (36, NULL) for all rows.
-
-#### Suggested fix
-
-Locate the backfill step in Form_LookAtEntry.CmdQuery_Click that sets c_entry_desc for ZZ_SCRATCH_ENTRY rows.  Verify that the JOIN to ENTRY_CODES on c_entry_code = 36 is not inadvertently filtered out or that the UPDATE / backfill SQL matches the column name exactly.  After the fix, `SELECT c_entry_desc FROM ZZ_SCRATCH_ENTRY WHERE c_entry_code = 36 LIMIT 1` should return 'examination: jinshi (general)'.
 
 ### Issue #2 — LookAtGroupData: CmdRun does not backfill c_name from BIOG_MAIN
 
@@ -392,6 +287,34 @@ Detected by: test_hard_form_query_small_fixture[groupdata_person_1_small] — as
 #### Suggested fix
 
 Locate the UPDATE statement in Form_LookAtGroupData.CmdRun_Click that joins ZZ_SCRATCH_IMPORT_PEOPLE to BIOG_MAIN and sets c_name. Check that the JOIN condition matches the correct key column and that the UPDATE target column name is spelled correctly.  After the fix, running CmdRun with any valid person ID should populate c_name in ZZ_SCRATCH_IMPORT_PEOPLE.
+
+### Issue #3 — LookAtEntry: c_entry_desc backfill is NULL for all rows when entry_code = 36 (jinshi general)
+
+**Affected sub:** `Form_LookAtEntry.CmdQuery_Click`
+
+**Severity:** P2 — Silent display issue: 92,545 rows affected.  The user can see the blank c_entry_desc column in the result grid, but Access shows no error — making it easy to overlook.  Exports (GIS, Neo4j, KML) that reference this column will also carry the blank.
+
+#### Description
+
+When the user runs a LookAtEntry query filtered to entry code 36 (examination: jinshi general), the result table ZZ_SCRATCH_ENTRY is populated with 92,545 rows but the c_entry_desc column is NULL for every row.  The expected value is 'examination: jinshi (general)'.
+
+The CmdQuery_Click handler successfully inserts rows from ENTRY_DATA joined to ENTRY_CODES, but the c_entry_desc backfill step does not write the description for this specific entry code.  All other columns appear to be filled normally.  The missing description means the on-screen result grid shows a blank entry-type column for every record, which is misleading — the user sees results but cannot identify what type of examination each record represents.
+
+Detected by: test_vba_full_matrix[top_entry_code_36_unfiltered] — assertion 'c_entry_desc backfill wrong' with 92,545 affected rows.  Also: test_vba_full_matrix[entry_39_dy_20], [entry_36_dy_20], [entry_36_dy_15].
+
+#### Steps to reproduce
+
+1. Open CBDB_BJ_User.mdb in Microsoft Access.
+2. From the Navigation Pane, open the form **LookAtEntry**.
+3. In the Entry Code picker, select entry code **36** (label: 'examination: jinshi (general)').
+4. Leave dynasty, address, and year filters blank.
+5. Click **Run Query** (CmdQuery button).
+6. When the query completes, inspect the result grid: the entry-type description column (c_entry_desc) is blank for every row.
+7. SQL verification: `SELECT TOP 5 c_entry_code, c_entry_desc FROM ZZ_SCRATCH_ENTRY` returns (36, NULL) for all rows.
+
+#### Suggested fix
+
+Locate the backfill step in Form_LookAtEntry.CmdQuery_Click that sets c_entry_desc for ZZ_SCRATCH_ENTRY rows.  Verify that the JOIN to ENTRY_CODES on c_entry_code = 36 is not inadvertently filtered out or that the UPDATE / backfill SQL matches the column name exactly.  After the fix, `SELECT c_entry_desc FROM ZZ_SCRATCH_ENTRY WHERE c_entry_code = 36 LIMIT 1` should return 'examination: jinshi (general)'.
 
 ### Issue #10 — EVENT_ADDR_2 Subform: TxtAddrCHN / TxtAddrPY bound to unaliased column names not in View_EventAddrData — render blank
 
@@ -441,93 +364,33 @@ Detected by: test_orphan_export_button_truly_missing[bug15_LookAtPlace_CmdGIS] �
 
 In LookAtPlace's form design, add a CmdGIS button next to the existing CmdPajek / CmdGephi buttons with OnClick = [Event Procedure].  Also fix Issue #4 (GISFrame → CodeFrame typo) in the same patch.
 
-### Issue #16 — LookAtStatus is missing its CmdPajek button — handler exists but no UI control
-
-**Affected sub:** `LookAtStatus`
-
-**Severity:** P3 — Missing UI: Pajek export unavailable to LookAtStatus users.
-
-#### Description
-
-Sub CmdPajek_Click() exists in Form_LookAtStatus.vb but no CmdPajek button is rendered on LookAtStatus's form design.  Users on Status can see GIS and Neo4j export but not Pajek network export.  Note: even if the button is added, Issue #5 (ChkIDs control reference and three missing SQL columns) must be fixed first or the button will immediately crash.
-
-Detected by: test_bugs_15_to_19_orphan_export_handlers — static assertion that CmdPajek_Click exists in Form_LookAtStatus.vb and CmdPajek is absent from the form's control inventory.
-
-#### Steps to reproduce
-
-1. Open CBDB_BJ_User.mdb in Microsoft Access.
-2. Open the form **LookAtStatus**.  The export-buttons row has only GIS and Neo4j; there is no Pajek button.
-
-#### Suggested fix
-
-Add a CmdPajek button to LookAtStatus's form design (after fixing Issue #5).
-
-### Issue #17 — LookAtStatus is missing its CmdGephi button — handler exists but no UI control
-
-**Affected sub:** `LookAtStatus`
-
-**Severity:** P3 — Missing UI: Gephi export unavailable to LookAtStatus users.
-
-#### Description
-
-Sub CmdGephi_Click() exists in Form_LookAtStatus.vb but no matching button is on the form design.  Same shape as Issue #16.
-
-Detected by: test_bugs_15_to_19_orphan_export_handlers.
-
-#### Steps to reproduce
-
-1. Open CBDB_BJ_User.mdb in Microsoft Access.
-2. Open the form **LookAtStatus**.  There is no Gephi export button.
-
-#### Suggested fix
-
-Add a CmdGephi button to LookAtStatus's form design.
-
-### Issue #18 — LookAtStatus is missing its CmdUCINet button — handler exists but no UI control
-
-**Affected sub:** `LookAtStatus`
-
-**Severity:** P3 — Missing UI: UCINet export unavailable to LookAtStatus users.
-
-#### Description
-
-Sub CmdUCINet_Click() exists in Form_LookAtStatus.vb but no matching button is on the form design.  Same shape as Issues #16 and #17.
-
-Detected by: test_bugs_15_to_19_orphan_export_handlers.
-
-#### Steps to reproduce
-
-1. Open CBDB_BJ_User.mdb in Microsoft Access.
-2. Open the form **LookAtStatus**.  There is no UCINet export button.
-
-#### Suggested fix
-
-Add a CmdUCINet button to LookAtStatus's form design.
-
-### Issue #19 — LookAtOffice is missing its CmdGUESS button — handler exists but no UI control
-
-**Affected sub:** `LookAtOffice`
-
-**Severity:** P3 — Missing UI: GUESS export unavailable to LookAtOffice users.
-
-#### Description
-
-Sub CmdGUESS_Click() exists in Form_LookAtOffice.vb but no CmdGUESS button is on the form design.  Users on Office can use GIS / GISPeople / Neo4j export but not GUESS network export.  Same shape as Issues #15-#18.
-
-Detected by: test_bugs_15_to_19_orphan_export_handlers.
-
-#### Steps to reproduce
-
-1. Open CBDB_BJ_User.mdb in Microsoft Access.
-2. Open the form **LookAtOffice**.  There is no GUESS export button.
-
-#### Suggested fix
-
-Add a CmdGUESS button to LookAtOffice's form design.
-
 ## P5 — Dormant / latent / not currently reproducible
 
 _Items in this tier are kept as historical / latent record.  They fall into three categories: (a) DORMANT — verified that current source data doesn't trigger the symptom; (b) NOT CURRENTLY REPRODUCIBLE — the symptom no longer surfaces even though the suspect code is still present (we have NOT confirmed an upstream source-level fix; could be a JET / Office behaviour change, a fixture / driver change on our side, or the original diagnosis was a false positive); (c) LATENT — the source-code defect is real, but the user can't reach it because another issue (e.g. a missing UI button) blocks the path.  None of these are user-facing today; **none have been verified as fixed upstream** — please consult before treating any of them as either urgent or closed._
+
+### Issue #20 — BOM-prefixed address names would produce embedded TAB delimiters in GIS exports — DORMANT (BOM data cleaned upstream, 0 affected rows in this dump)
+
+**Affected sub:** `ADDR_CODES + Form_LookAt*.CmdGIS_Click`
+
+**Severity:** P5 — Dormant on this dump (BOM data cleaned upstream, 0 affected rows in data-20260602).  Would re-activate as P0 silent data corruption if any future ADDR_CODES row re-introduces a U+FEFF prefix in c_name or c_name_chn.  The unescaped CmdGIS write code is the second half of the fix still outstanding.
+
+#### Description
+
+The ADDR_CODES table previously contained rows where c_name and c_name_chn carried a leading U+FEFF (BOM) prefix (almost certainly from a UTF-8-with-BOM paste at data-import time), which when passed through JET produced embedded TAB characters in the CmdGIS output.  The key reachable example was c_addr_id = 702559 (Wei Shi 尉氏), reachable from persons with c_status_code = 40 (civil office / [為官者：文]).
+
+In this build (data-20260602) the BOM data has been cleaned upstream: test_addr_codes_has_known_bom_dirty_rows now finds 0 BOM-prefixed rows, and test_known_reachable_dirty_addr_present also returns 0 rows.  The GIS unescaped-write pattern remains in the code (CmdGIS of LookAtTexts / LookAtPlace / LookAtAssociations / LookAtOffice / LookAtKinship still does no TAB escaping), so the structural risk re-activates if future data introduces another BOM row.
+
+GOLDEN_STALE: BOM golden tests now expect 0 rows; update goldens.  This issue is retained as P5_dormant_or_latent because the unescaped-write code defect is still present.
+
+#### Steps to reproduce
+
+1. In this build the bug cannot be triggered — SELECT COUNT(*) FROM ADDR_CODES WHERE Left(c_name, 1) = ChrW(65279) returns 0.
+2. The structural risk: open Form_LookAtOffice (or any LookAt form), run CmdGIS with status code **40** (civil office / [為官者：文]).  If a BOM row were present for c_addr_id = 702559 (Wei Shi 尉氏) the output file would have an extra TAB column around row 11476.
+3. (Dormant verification) Confirm: SELECT COUNT(*) FROM ADDR_CODES WHERE Left(c_name, 1) = ChrW(65279) returns 0 on this dump.
+
+#### Suggested fix
+
+The data-side fix has been applied upstream (0 BOM rows remain).  The code-side fix is still needed: before each tStr = tStr + value + tC append in the CmdGIS bodies of all LookAt forms, replace any embedded Chr(9), Chr(10), Chr(13), or U+FEFF in value with a space.  This prevents re-occurrence if future imports bring BOM-prefixed rows.
 
 ### Issue #1 — View_StatusData would display last-year range in the first-year column — DORMANT (no source rows trigger it on this dump)
 
@@ -603,20 +466,22 @@ Two fixes required: (a) replace ChkIDs.Value with False (or add a real ChkIDs co
 
 **Affected sub:** `Form_LookAtEntry.CmdNeo4j_Click`
 
-**Severity:** P5 — Latent source-level typo (would re-promote to P1 if any future ENTRY_DATA row has c_inst_code > 0).  The missing InstitutionCodes CSV is not a user-visible bug today because the gate keeps the block unreachable.
+**Severity:** P5 — Latent source-level typo (would re-promote to P1 if any future ENTRY_DATA row has c_inst_code > 0).  Test test_bug9_lookat_entry_cmdneo4j PASSED this build (gate shut).  The missing InstitutionCodes CSV is not a user-visible bug today.
 
 #### Description
 
-Form_LookAtEntry.vb line ~1415 opens an institutions recordset as Set tRstInstitutions = CurrentDb.OpenRecordset(tQueryStr), but line ~1425 says With tRstAssocCodes — referencing a recordset that was already Close'd in the AssocCodes block upstream.  If executed, .MoveFirst would raise DAO 3021 'No current record'.  The entire block sits inside If tRecDeleted > 0 Then at line ~1389, where tRecDeleted is the count of ENTRY_DATA rows with c_inst_code > 0.  On the current dump 0 of 263,454 ENTRY_DATA rows have c_inst_code > 0, so the gate evaluates false and the buggy block is unreachable from any LookAtEntry fixture today.
+Form_LookAtEntry.vb line ~1415 opens an institutions recordset as Set tRstInstitutions = CurrentDb.OpenRecordset(tQueryStr), but line ~1425 says With tRstAssocCodes — referencing a recordset that was already Close'd in the AssocCodes block upstream.  If executed, .MoveFirst would raise DAO 3021 'No current record'.  The entire block sits inside If tRecDeleted > 0 Then at line ~1389, where tRecDeleted is the count of ENTRY_DATA rows with c_inst_code > 0.  On the current dump 0 of 263,454 ENTRY_DATA rows have c_inst_code > 0, so the gate evaluates false and the buggy block is unreachable from any LookAtEntry fixture today.  Test test_bug9_lookat_entry_cmdneo4j PASSED because the gate was shut, confirming the latent state.
 
-Detected by: test_bug9_lookat_entry_cmdneo4j_with_wrong_var — static source assertion.  Also: test_bug9_lookat_entry_cmdneo4j_with_institutions_fixture — runtime confirms CmdNeo4j completes without error on the jinshi fixture and the LATENT-gate assertion confirms c_inst_code = 0 for all ENTRY_DATA rows.
+Representative fixtures: c_entry_code = 36 (examination: jinshi general / 進士) and c_entry_code = 101 (recommendation / 薦舉).  Both yield ENTRY_DATA rows with c_inst_code = 0, confirming the gate remains shut on this dump.
+
+Included per MANIFEST requirement (test_report_code_labels_audit_clean).
 
 #### Steps to reproduce
 
 1. On the current dump this bug cannot be triggered through the UI — the If tRecDeleted > 0 Then gate at Form_LookAtEntry.vb:~1389 is false for every possible LookAtEntry fixture (0 of 263,454 ENTRY_DATA rows have c_inst_code > 0).
 2. Verify the source-level typo statically: open analysis/dump/vba/Form_LookAtEntry.vb and inspect lines ~1415-1425.  Line ~1415: Set tRstInstitutions = CurrentDb.OpenRecordset(tQueryStr).  Line ~1425: With tRstAssocCodes (intended: With tRstInstitutions).
 3. (Optional) Confirm the gate condition: SELECT COUNT(*) FROM ENTRY_DATA WHERE c_inst_code > 0 returns 0.
-4. Representative fixtures used in automated tests: c_entry_code = 36 (examination: jinshi general) and c_entry_code = 101 (recommendation).  Both yield ENTRY_DATA rows with c_inst_code = 0, confirming the gate remains shut on the current dump.
+4. Representative fixtures: c_entry_code = 36 (jinshi / 進士) and c_entry_code = 101 (recommendation / 薦舉).  Both confirm c_inst_code = 0.
 
 #### Suggested fix
 
@@ -665,29 +530,6 @@ Detected by: test_subform_control_source_unresolved[bug12_c_appt_type_code] — 
 #### Suggested fix
 
 Either delete the hidden c_appt_type_code control, or change its ControlSource to c_appt_code (the actual column projected by View_PostingOfficeData).
-
-### Issue #14 — KIN_DATA Subform: CmdPickKinRel calls missing picker frmPickKINSHIP_CODES — latent (sub-form not currently embedded anywhere reachable)
-
-**Affected sub:** `Form_KIN_DATA_Subform.CmdPickKinRel_Click`
-
-**Severity:** P5 — Latent (would be P1 visible crash if KIN_DATA Subform were re-embedded somewhere users can reach).  The static defect is real but currently unreachable.
-
-#### Description
-
-Sub CmdPickKinRel_Click in Form_KIN_DATA_Subform (line 52) calls DoCmd.OpenForm "frmPickKINSHIP_CODES" and references Forms!frmPickKINSHIP_CODES!frmKINSHIP_CODES.Form!c_kincode.  Neither form exists in the .mdb.  The same failure class as Issue #13.  However this sub-form is not embedded by any active user-facing form: BIOG_MAIN_2_Subform embeds KIN_DATA_2 Subform (no CmdPickKinRel button) rather than KIN_DATA Subform.  The only reference to KIN_DATA Subform is a design-time backup snapshot (Form__TMPCLP487951), so users cannot reach the broken button from normal navigation.
-
-Detected by: test_picker_form_truly_missing_from_mdb[bug14_frmPickKINSHIP_CODES] — confirms frmPickKINSHIP_CODES is absent from CurrentProject.AllForms.
-
-#### Steps to reproduce
-
-1. Verification is static only — the runtime click cannot be reproduced in the current .mdb because no parent form embeds the affected sub-form.
-2. Static evidence (1): Form_KIN_DATA_Subform.vb line 52 calls DoCmd.OpenForm "frmPickKINSHIP_CODES".
-3. Static evidence (2): frmPickKINSHIP_CODES is absent from control_inventory.json.
-4. Reachability evidence: KIN_DATA Subform is only referenced by Form__TMPCLP487951 (a design backup), not by any navigable form.
-
-#### Suggested fix
-
-Same class as Issue #13: either restore frmPickKINSHIP_CODES (or its replacement), or update CmdPickKinRel_Click to open the correct current picker.  Low urgency since the sub-form is not currently reachable.
 
 ## Appendix A — c_index_year / c_index_addr_id drift vs the cbdb-online-main-server snapshot (differences need per-row classification before being filed as bugs)
 

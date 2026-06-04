@@ -1,5 +1,5 @@
 {
-  "report": "reports\\pytest_report_build20260603.json",
+  "report": "reports\\pytest_report_build20260604.json",
   "mapping": "C:\\Users\\how612\\Documents\\GitHub\\cbdb-user-mdb-tests\\docs\\test-matrix-mapping.json",
   "forms": [
     "LookAtEntry",
@@ -22,7 +22,8 @@
     "CmdUCINet",
     "CmdKML",
     "CmdGUESS",
-    "CmdRun"
+    "CmdRun",
+    "CmdUTF8Pajek"
   ],
   "matrix": {
     "LookAtEntry": {
@@ -32,75 +33,82 @@
       "CmdPajek": "N/A",
       "CmdGephi": "N/A",
       "CmdUCINet": "N/A",
-      "CmdKML": "NOT_RUN",
+      "CmdKML": "N/A",
       "CmdGUESS": "N/A",
-      "CmdRun": "N/A"
+      "CmdRun": "N/A",
+      "CmdUTF8Pajek": "N/A"
     },
     "LookAtStatus": {
       "CmdQuery": "PASS",
-      "CmdGIS": "N/A",
-      "CmdNeo4j": "N/A",
+      "CmdGIS": "PASS",
+      "CmdNeo4j": "PASS",
       "CmdPajek": "FAIL",
       "CmdGephi": "SKIP",
       "CmdUCINet": "PASS",
       "CmdKML": "N/A",
       "CmdGUESS": "N/A",
-      "CmdRun": "N/A"
+      "CmdRun": "N/A",
+      "CmdUTF8Pajek": "N/A"
     },
     "LookAtTexts": {
-      "CmdQuery": "PASS",
-      "CmdGIS": "N/A",
-      "CmdNeo4j": "N/A",
-      "CmdPajek": "N/A",
-      "CmdGephi": "N/A",
-      "CmdUCINet": "N/A",
-      "CmdKML": "N/A",
-      "CmdGUESS": "N/A",
-      "CmdRun": "N/A"
-    },
-    "LookAtPlace": {
-      "CmdQuery": "PASS",
-      "CmdGIS": "FAIL",
-      "CmdNeo4j": "FAIL",
-      "CmdPajek": "N/A",
-      "CmdGephi": "N/A",
-      "CmdUCINet": "N/A",
-      "CmdKML": "N/A",
-      "CmdGUESS": "N/A",
-      "CmdRun": "N/A"
-    },
-    "LookAtAssociations": {
       "CmdQuery": "PASS",
       "CmdGIS": "PASS",
       "CmdNeo4j": "PASS",
       "CmdPajek": "N/A",
       "CmdGephi": "N/A",
+      "CmdUCINet": "N/A",
+      "CmdKML": "N/A",
+      "CmdGUESS": "N/A",
+      "CmdRun": "N/A",
+      "CmdUTF8Pajek": "N/A"
+    },
+    "LookAtPlace": {
+      "CmdQuery": "PASS",
+      "CmdGIS": "FAIL",
+      "CmdNeo4j": "FAIL",
+      "CmdPajek": "PASS",
+      "CmdGephi": "PASS",
+      "CmdUCINet": "N/A",
+      "CmdKML": "N/A",
+      "CmdGUESS": "N/A",
+      "CmdRun": "N/A",
+      "CmdUTF8Pajek": "N/A"
+    },
+    "LookAtAssociations": {
+      "CmdQuery": "PASS",
+      "CmdGIS": "PASS",
+      "CmdNeo4j": "PASS",
+      "CmdPajek": "FAIL",
+      "CmdGephi": "PASS",
       "CmdUCINet": "FAIL",
       "CmdKML": "N/A",
       "CmdGUESS": "N/A",
-      "CmdRun": "N/A"
+      "CmdRun": "N/A",
+      "CmdUTF8Pajek": "N/A"
     },
     "LookAtOffice": {
       "CmdQuery": "PASS",
       "CmdGIS": "FAIL",
-      "CmdNeo4j": "N/A",
+      "CmdNeo4j": "PASS",
       "CmdPajek": "N/A",
       "CmdGephi": "N/A",
       "CmdUCINet": "N/A",
       "CmdKML": "N/A",
       "CmdGUESS": "PASS",
-      "CmdRun": "N/A"
+      "CmdRun": "N/A",
+      "CmdUTF8Pajek": "N/A"
     },
     "LookAtKinship": {
       "CmdQuery": "N/A",
       "CmdGIS": "PASS",
-      "CmdNeo4j": "N/A",
+      "CmdNeo4j": "PASS",
       "CmdPajek": "PASS",
       "CmdGephi": "N/A",
       "CmdUCINet": "FAIL",
       "CmdKML": "N/A",
       "CmdGUESS": "FAIL",
-      "CmdRun": "PASS"
+      "CmdRun": "PASS",
+      "CmdUTF8Pajek": "FAIL"
     },
     "LookAtNetworks": {
       "CmdQuery": "N/A",
@@ -111,37 +119,40 @@
       "CmdUCINet": "N/A",
       "CmdKML": "N/A",
       "CmdGUESS": "N/A",
-      "CmdRun": "SKIP"
+      "CmdRun": "SKIP",
+      "CmdUTF8Pajek": "N/A"
     },
     "LookAtGroupData": {
       "CmdQuery": "N/A",
-      "CmdGIS": "N/A",
+      "CmdGIS": "PASS",
       "CmdNeo4j": "FAIL",
       "CmdPajek": "N/A",
       "CmdGephi": "N/A",
       "CmdUCINet": "N/A",
       "CmdKML": "N/A",
       "CmdGUESS": "N/A",
-      "CmdRun": "FAIL"
+      "CmdRun": "FAIL",
+      "CmdUTF8Pajek": "N/A"
     },
     "LookAtAssocPairs": {
       "CmdQuery": "SKIP",
-      "CmdGIS": "N/A",
+      "CmdGIS": "PASS",
       "CmdNeo4j": "PASS",
       "CmdPajek": "PASS",
       "CmdGephi": "N/A",
-      "CmdUCINet": "N/A",
+      "CmdUCINet": "PASS",
       "CmdKML": "N/A",
       "CmdGUESS": "N/A",
-      "CmdRun": "N/A"
+      "CmdRun": "N/A",
+      "CmdUTF8Pajek": "N/A"
     }
   },
   "summary": {
-    "NOT_RUN": 1,
-    "PASS": 16,
+    "NOT_RUN": 0,
+    "PASS": 28,
     "SKIP": 4,
     "ERROR": 0,
-    "FAIL": 10,
-    "N/A": 59
+    "FAIL": 12,
+    "N/A": 56
   }
 }
