@@ -109,6 +109,24 @@ looking at.
      goldens, do NOT add to ISSUES.
    - Infrastructure failures (dialog cascade, orphan Access process) →
      fix infra, do NOT add to ISSUES.
+   - **⚠️ MANDATORY before writing any issue: look up every numeric ID
+     in the MDB code tables.**  Fixture names like `office_80944_unfiltered`
+     contain a *code-table ID*, not a person ID.  The prefix tells you
+     the table:
+     ```
+     office_NNNNN        → OFFICE_CODES.c_office_id
+     entry_NNN / entry_code_NNN → ENTRY_CODES.c_entry_code
+     status_NNN          → STATUS_CODES.c_status_code
+     assoc_NNN           → ASSOC_CODES.c_assoc_code
+     place_addr_NNNNN    → ADDR_CODES.c_addr_id
+     kinship_person_NNNNN / groupdata_person_N → BIOG_MAIN.c_personid  (actual person)
+     ```
+     Query the MDB to get the human-readable label before writing the
+     issue description.  Never write "person NNNNN" for a code-table ID.
+     The audit `python analysis/audit_report_code_labels.py` enforces
+     this after report generation — its MANIFEST is the permanent record
+     of required / forbidden labels per issue (lives in `analysis/`, not
+     cleared between builds).
 8. **Regenerate** report: `python reports/generate_report.py`
    The report now always contains: Coverage Matrix | Issues |
    Appendix A (index drift) | Appendix B (TablesFields diff) |
