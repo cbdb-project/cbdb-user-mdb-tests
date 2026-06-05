@@ -56,3 +56,8 @@ Thumbs.db
 
 # --- Claude / agents ------------------------------------------------------
 .claude/
+.external/
+
+# pytest temp artefacts dropped into working directory
+pytest_failures.txt
+*pytest_failures.txt
