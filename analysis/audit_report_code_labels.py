@@ -185,6 +185,26 @@ MANIFEST: list[dict] = [
             "zh": ["c_personid = 437", "人物 picker"],
         },
     },
+    {
+        # Issue #21: LookAtOffice CmdGIS IndexYear regression.
+        # Fixture is c_office_id=80944 (典史 / Clerk/District Jailor),
+        # NOT a person ID.  Pin the correct office label and forbid
+        # the "person 80944" / "人物 80944" wording that was written
+        # by mistake in build-20260604 before correction.
+        "issue_id": 21,
+        "table": "OFFICE_CODES",
+        "code_col": "c_office_id",
+        "code_value": 80944,
+        "desc_cols": ["c_office_chn", "c_office_trans"],
+        "expected_labels": {
+            "en": ["c_office_id", "80944", "Clerk"],
+            "zh": ["80944", "典史"],
+        },
+        "forbidden_labels": {
+            "en": ["person 80944", "person ID to 80944"],
+            "zh": ["人物 80944", "人物 ID 設為 80944"],
+        },
+    },
 ]
 
 

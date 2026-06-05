@@ -1,8 +1,8 @@
 {
   "summary": {
-    "n_manifest_entries": 7,
-    "n_per_lang_checks_total": 14,
-    "n_per_lang_checks_passed": 14,
+    "n_manifest_entries": 8,
+    "n_per_lang_checks_total": 16,
+    "n_per_lang_checks_passed": 16,
     "n_mismatches": 0,
     "manifest_coverage": [
       {
@@ -46,6 +46,12 @@
         "table": "ASSOC_CODES",
         "code_col": "c_assoc_code",
         "code_value": 437
+      },
+      {
+        "issue_id": 21,
+        "table": "OFFICE_CODES",
+        "code_col": "c_office_id",
+        "code_value": 80944
       }
     ]
   },
@@ -255,6 +261,36 @@
       "mdb_desc": {
         "c_assoc_desc": "Presented literary composition as gift to",
         "c_assoc_desc_chn": "贈詩、文"
+      },
+      "missing_expected_labels": [],
+      "found_forbidden_labels": [],
+      "mdb_desc_present_in_block": true
+    },
+    {
+      "issue_id": 21,
+      "table": "OFFICE_CODES",
+      "code_col": "c_office_id",
+      "code_value": 80944,
+      "lang": "en",
+      "block_found": true,
+      "mdb_desc": {
+        "c_office_chn": "典史",
+        "c_office_trans": "Clerk/Disctrict Jailor"
+      },
+      "missing_expected_labels": [],
+      "found_forbidden_labels": [],
+      "mdb_desc_present_in_block": true
+    },
+    {
+      "issue_id": 21,
+      "table": "OFFICE_CODES",
+      "code_col": "c_office_id",
+      "code_value": 80944,
+      "lang": "zh",
+      "block_found": true,
+      "mdb_desc": {
+        "c_office_chn": "典史",
+        "c_office_trans": "Clerk/Disctrict Jailor"
       },
       "missing_expected_labels": [],
       "found_forbidden_labels": [],

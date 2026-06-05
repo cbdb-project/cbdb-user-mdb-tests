@@ -58,7 +58,8 @@ ISSUES = [
         "title_en": "LookAtOffice: CmdGIS output IndexYear column is nearly empty (0.2% fill rate) — likely silent column-bind regression",
         "title_zh": "LookAtOffice：CmdGIS 輸出的 IndexYear 欄幾乎為空（填充率 0.2%）——疑似靜默欄位綁定退化",
         "summary_en": (
-            "When CmdGIS runs for LookAtOffice with person 80944 (unfiltered), the GIS output "
+            "When CmdGIS runs for LookAtOffice with c_office_id = 80944 "
+            "(典史 / Clerk/District Jailor, unfiltered), the GIS output "
             "file is produced but the IndexYear column contains non-empty values in only 64 of "
             "36,602 rows (0.2%), well below the 80% threshold expected for a correctly-populated "
             "GIS export.  This pattern is consistent with the silent column-bind regressions "
@@ -69,7 +70,7 @@ ISSUES = [
             "below 80% threshold."
         ),
         "summary_zh": (
-            "以人物 80944（無篩選）執行 LookAtOffice CmdGIS 時，GIS 輸出檔案雖已產生，"
+            "以官職代碼 80944（典史 / Clerk/District Jailor，無篩選）執行 LookAtOffice CmdGIS 時，GIS 輸出檔案雖已產生，"
             "但 IndexYear 欄僅在 36,602 列中的 64 列有非空值（0.2%），遠低於正確 GIS "
             "輸出預期的 80% 閾值。此模式與 Bug #10、#11、#12 記錄的靜默欄位綁定退化一致——"
             "CmdGIS SELECT 中的欄位名稱與 ZZ_SCRATCH 表格的實際 schema 不符。\n\n"
@@ -79,7 +80,8 @@ ISSUES = [
         "steps_en": [
             "Open CBDB_BJ_User.mdb in Microsoft Access.",
             "Open the LookAtOffice form.",
-            "Set person ID to 80944 and leave all other filters blank.",
+            "In the Office Code picker, select c_office_id = 80944 "
+            "(典史 / Clerk/District Jailor) and leave all other filters blank.",
             "Click CmdGIS.  The file is produced without an error popup.",
             "Open the GIS output file and inspect the IndexYear column: "
             "the vast majority of rows will be empty.",
@@ -87,7 +89,7 @@ ISSUES = [
         "steps_zh": [
             "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
             "開啟 LookAtOffice 表單。",
-            "將人物 ID 設為 80944，其餘篩選器留空。",
+            "在官職代碼選擇器中選取官職代碼 80944（典史 / Clerk/District Jailor），其餘篩選器留空。",
             "點擊 CmdGIS。檔案產生時不會出現錯誤彈出視窗。",
             "開啟 GIS 輸出檔並檢查 IndexYear 欄：絕大多數列將為空白。",
         ],
