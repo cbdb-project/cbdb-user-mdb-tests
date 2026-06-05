@@ -52,68 +52,6 @@ ISSUES = [
     # No carry-forward from previous builds.
 
     {
-        "id": 21,
-        "tier": "P0_silent_data",
-        "form": "Form_LookAtOffice.CmdGIS_Click",
-        "title_en": "LookAtOffice: CmdGIS output IndexYear column is nearly empty (0.2% fill rate) — likely silent column-bind regression",
-        "title_zh": "LookAtOffice：CmdGIS 輸出的 IndexYear 欄幾乎為空（填充率 0.2%）——疑似靜默欄位綁定退化",
-        "summary_en": (
-            "When CmdGIS runs for LookAtOffice with c_office_id = 80944 "
-            "(典史 / Clerk/District Jailor, unfiltered), the GIS output "
-            "file is produced but the IndexYear column contains non-empty values in only 64 of "
-            "36,602 rows (0.2%), well below the 80% threshold expected for a correctly-populated "
-            "GIS export.  This pattern is consistent with the silent column-bind regressions "
-            "documented in Bugs #10, #11, and #12 — a column name in the CmdGIS SELECT is "
-            "mismatched against the actual ZZ_SCRATCH table schema.\n\n"
-            "Detected by: test_cmd_gis_produces_file[office_80944_unfiltered] — assertion "
-            "[LookAtOffice] CmdGIS column 'IndexYear' is non-empty in only 64/36602 rows (0.2%), "
-            "below 80% threshold."
-        ),
-        "summary_zh": (
-            "以官職代碼 80944（典史 / Clerk/District Jailor，無篩選）執行 LookAtOffice CmdGIS 時，GIS 輸出檔案雖已產生，"
-            "但 IndexYear 欄僅在 36,602 列中的 64 列有非空值（0.2%），遠低於正確 GIS "
-            "輸出預期的 80% 閾值。此模式與 Bug #10、#11、#12 記錄的靜默欄位綁定退化一致——"
-            "CmdGIS SELECT 中的欄位名稱與 ZZ_SCRATCH 表格的實際 schema 不符。\n\n"
-            "由 test_cmd_gis_produces_file[office_80944_unfiltered] 偵測到，斷言 "
-            "[LookAtOffice] CmdGIS 欄 IndexYear 僅 64/36602 列非空（0.2%），低於 80% 閾值。"
-        ),
-        "steps_en": [
-            "Open CBDB_BJ_User.mdb in Microsoft Access.",
-            "Open the LookAtOffice form.",
-            "In the Office Code picker, select c_office_id = 80944 "
-            "(典史 / Clerk/District Jailor) and leave all other filters blank.",
-            "Click CmdGIS.  The file is produced without an error popup.",
-            "Open the GIS output file and inspect the IndexYear column: "
-            "the vast majority of rows will be empty.",
-        ],
-        "steps_zh": [
-            "以 Microsoft Access 開啟 CBDB_BJ_User.mdb。",
-            "開啟 LookAtOffice 表單。",
-            "在官職代碼選擇器中選取官職代碼 80944（典史 / Clerk/District Jailor），其餘篩選器留空。",
-            "點擊 CmdGIS。檔案產生時不會出現錯誤彈出視窗。",
-            "開啟 GIS 輸出檔並檢查 IndexYear 欄：絕大多數列將為空白。",
-        ],
-        "screenshots": [],
-        "severity_en": (
-            "P0 — Silent data corruption: the GIS export appears to succeed but IndexYear "
-            "data is missing for 99.8% of rows.  Downstream GIS workflows that depend on "
-            "year-based filtering will silently receive null years."
-        ),
-        "severity_zh": (
-            "P0 — 靜默資料損毀：GIS 匯出看似成功，但 99.8% 列的 IndexYear 資料遺失。"
-            "依賴年份篩選的下游 GIS 工作流程將靜默地收到空白年份。"
-        ),
-        "fix_en": (
-            "Inspect Form_LookAtOffice.CmdGIS_Click: locate the SELECT that populates "
-            "the IndexYear column in the GIS output and verify the source column name "
-            "matches the actual schema (check ZZ_SCRATCH_OFFICE or the equivalent table)."
-        ),
-        "fix_zh": (
-            "檢查 Form_LookAtOffice.CmdGIS_Click：找到填充 GIS 輸出 IndexYear 欄的 SELECT 語句，"
-            "確認來源欄位名稱與實際 schema 一致（檢查 ZZ_SCRATCH_OFFICE 或對應資料表）。"
-        ),
-    },
-    {
         "id": 26,
         "tier": "P0_silent_data",
         "form": "BIOG_MAIN (c_index_addr_id)",

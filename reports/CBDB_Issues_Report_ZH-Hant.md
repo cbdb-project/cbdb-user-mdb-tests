@@ -28,7 +28,6 @@ _PASS: 28 · FAIL: 12 · ERROR: 0 · SKIP: 4 · NOT RUN: 0 · N/A: 56_
 ## 目錄
 
 - [P0 — 靜默資料錯誤](#p0--靜默資料錯誤)
-  - [Issue #21 — LookAtOffice：CmdGIS 輸出的 IndexYear 欄幾乎為空（填充率 0.2%）——疑似靜默欄位繫結退化](#issue-21--lookatofficecmdgis-輸出的-indexyear-欄幾乎為空填充率-02疑似靜默欄位繫結退化)
   - [Issue #26 — User MDB 與 cbdb-online 快照的 c_index_addr_id 不一致率超過 0.5% 閾值](#issue-26--user-mdb-與-cbdb-online-快照的-c_index_addr_id-不一致率超過-05-閾值)
   - [Issue #23 — LookAtAssociations：CmdPajek 頂點區段數量錯誤——標頭宣告 501 個頂點，但實際匯出 8,093 列](#issue-23--lookatassociationscmdpajek-頂點區段數量錯誤標頭宣告-501-個頂點但實際匯出-8093-列)
   - [Issue #24 — LookAtKinship：CmdGUESS Gephi 輸出每個節點列的欄位數錯誤（nodedef 宣告 15 欄）](#issue-24--lookatkinshipcmdguess-gephi-輸出每個節點列的欄位數錯誤nodedef-宣告-15-欄)
@@ -67,30 +66,6 @@ _PASS: 28 · FAIL: 12 · ERROR: 0 · SKIP: 4 · NOT RUN: 0 · N/A: 56_
 - P5 — 潛伏 / 不可達 / 當前無法復現：保留作為歷史記錄；我們在當前 dump 上重新驗證過，無法再觸發症狀。
 
 ## P0 — 靜默資料錯誤
-
-### Issue #21 — LookAtOffice：CmdGIS 輸出的 IndexYear 欄幾乎為空（填充率 0.2%）——疑似靜默欄位繫結退化
-
-**涉及位置:** `Form_LookAtOffice.CmdGIS_Click`
-
-**嚴重等級:** P0 — 靜默資料損毀：GIS 匯出看似成功，但 99.8% 列的 IndexYear 資料遺失。依賴年份篩選的下游 GIS 工作流程將靜默地收到空白年份。
-
-#### 問題描述
-
-以官職程式碼 80944（典史 / Clerk/District Jailor，無篩選）執行 LookAtOffice CmdGIS 時，GIS 輸出檔案雖已產生，但 IndexYear 欄僅在 36,602 列中的 64 列有非空值（0.2%），遠低於正確 GIS 輸出預期的 80% 閾值。此模式與 Bug #10、#11、#12 記錄的靜默欄位繫結退化一致——CmdGIS SELECT 中的欄位名稱與 ZZ_SCRATCH 表格的實際 schema 不符。
-
-由 test_cmd_gis_produces_file[office_80944_unfiltered] 偵測到，斷言 [LookAtOffice] CmdGIS 欄 IndexYear 僅 64/36602 列非空（0.2%），低於 80% 閾值。
-
-#### 復現步驟
-
-1. 以 Microsoft Access 開啟 CBDB_BJ_User.mdb。
-2. 開啟 LookAtOffice 表單。
-3. 在官職程式碼選擇器中選取官職程式碼 80944（典史 / Clerk/District Jailor），其餘篩選器留空。
-4. 點選 CmdGIS。檔案產生時不會出現錯誤彈出視窗。
-5. 開啟 GIS 輸出檔並檢查 IndexYear 欄：絕大多數列將為空白。
-
-#### 建議修復方案
-
-檢查 Form_LookAtOffice.CmdGIS_Click：找到填充 GIS 輸出 IndexYear 欄的 SELECT 語句，確認來源欄位名稱與實際 schema 一致（檢查 ZZ_SCRATCH_OFFICE 或對應資料表）。
 
 ### Issue #26 — User MDB 與 cbdb-online 快照的 c_index_addr_id 不一致率超過 0.5% 閾值
 

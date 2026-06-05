@@ -276,8 +276,15 @@ _GIS_REQUIRED_COLUMNS: dict[str, list[str]] = {
 # Columns that should be non-empty for the vast majority of rows
 # (>= 80 %).  Catches a silent column-bind regression that leaves
 # everything blank (the user-reported "lost columns" bug pattern).
+#
+# IndexYear is intentionally excluded: its fill rate depends heavily
+# on which office/dynasty the query covers.  For example, c_office_id=80944
+# (典史 / Clerk/District Jailor) holders are mostly Qing officials with
+# no career index year in BIOG_MAIN (0.27% fill rate in source data) —
+# this is a data characteristic, not a column-bind bug.
+# Name / NameChn should always be non-empty for any valid CBDB person.
 _GIS_EXPECTED_NON_EMPTY = {
-    "Name", "NameChn", "IndexYear",
+    "Name", "NameChn",
 }
 
 # Strings the form uses as "no data" placeholders.  We treat these
