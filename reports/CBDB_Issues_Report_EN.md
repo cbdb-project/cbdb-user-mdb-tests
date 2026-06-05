@@ -28,7 +28,6 @@ _PASS: 28 · FAIL: 12 · ERROR: 0 · SKIP: 4 · NOT RUN: 0 · N/A: 56_
 ## Table of Contents
 
 - [P0 — Silent data corruption](#p0--silent-data-corruption)
-  - [Issue #21 — LookAtOffice: CmdGIS output IndexYear column is nearly empty (0.2% fill rate) — likely silent column-bind regression](#issue-21--lookatoffice-cmdgis-output-indexyear-column-is-nearly-empty-02-fill-rate--likely-silent-column-bind-regression)
   - [Issue #26 — c_index_addr_id disagreement between User MDB and cbdb-online snapshot exceeds 0.5% threshold](#issue-26--c_index_addr_id-disagreement-between-user-mdb-and-cbdb-online-snapshot-exceeds-05-threshold)
   - [Issue #23 — LookAtAssociations: CmdPajek vertex section has off-by-N count — header declares 501 vertices but exports 8,093 rows](#issue-23--lookatassociations-cmdpajek-vertex-section-has-off-by-n-count--header-declares-501-vertices-but-exports-8093-rows)
   - [Issue #24 — LookAtKinship: CmdGUESS Gephi output has wrong field count per node row (nodedef declares 15 columns)](#issue-24--lookatkinship-cmdguess-gephi-output-has-wrong-field-count-per-node-row-nodedef-declares-15-columns)
@@ -67,30 +66,6 @@ _PASS: 28 · FAIL: 12 · ERROR: 0 · SKIP: 4 · NOT RUN: 0 · N/A: 56_
 - P5 — Dormant / latent / not currently reproducible: kept as historical record; we re-checked on the current dump and could not trigger the symptom.
 
 ## P0 — Silent data corruption
-
-### Issue #21 — LookAtOffice: CmdGIS output IndexYear column is nearly empty (0.2% fill rate) — likely silent column-bind regression
-
-**Affected sub:** `Form_LookAtOffice.CmdGIS_Click`
-
-**Severity:** P0 — Silent data corruption: the GIS export appears to succeed but IndexYear data is missing for 99.8% of rows.  Downstream GIS workflows that depend on year-based filtering will silently receive null years.
-
-#### Description
-
-When CmdGIS runs for LookAtOffice with c_office_id = 80944 (典史 / Clerk/District Jailor, unfiltered), the GIS output file is produced but the IndexYear column contains non-empty values in only 64 of 36,602 rows (0.2%), well below the 80% threshold expected for a correctly-populated GIS export.  This pattern is consistent with the silent column-bind regressions documented in Bugs #10, #11, and #12 — a column name in the CmdGIS SELECT is mismatched against the actual ZZ_SCRATCH table schema.
-
-Detected by: test_cmd_gis_produces_file[office_80944_unfiltered] — assertion [LookAtOffice] CmdGIS column 'IndexYear' is non-empty in only 64/36602 rows (0.2%), below 80% threshold.
-
-#### Steps to reproduce
-
-1. Open CBDB_BJ_User.mdb in Microsoft Access.
-2. Open the LookAtOffice form.
-3. In the Office Code picker, select c_office_id = 80944 (典史 / Clerk/District Jailor) and leave all other filters blank.
-4. Click CmdGIS.  The file is produced without an error popup.
-5. Open the GIS output file and inspect the IndexYear column: the vast majority of rows will be empty.
-
-#### Suggested fix
-
-Inspect Form_LookAtOffice.CmdGIS_Click: locate the SELECT that populates the IndexYear column in the GIS output and verify the source column name matches the actual schema (check ZZ_SCRATCH_OFFICE or the equivalent table).
 
 ### Issue #26 — c_index_addr_id disagreement between User MDB and cbdb-online snapshot exceeds 0.5% threshold
 
