@@ -76,7 +76,7 @@ _PASS: 28 · FAIL: 12 · ERROR: 0 · SKIP: 4 · NOT RUN: 0 · N/A: 56_
 
 #### 問題描述
 
-以人物 80944（無篩選）執行 LookAtOffice CmdGIS 時，GIS 輸出檔案雖已產生，但 IndexYear 欄僅在 36,602 列中的 64 列有非空值（0.2%），遠低於正確 GIS 輸出預期的 80% 閾值。此模式與 Bug #10、#11、#12 記錄的靜默欄位繫結退化一致——CmdGIS SELECT 中的欄位名稱與 ZZ_SCRATCH 表格的實際 schema 不符。
+以官職程式碼 80944（典史 / Clerk/District Jailor，無篩選）執行 LookAtOffice CmdGIS 時，GIS 輸出檔案雖已產生，但 IndexYear 欄僅在 36,602 列中的 64 列有非空值（0.2%），遠低於正確 GIS 輸出預期的 80% 閾值。此模式與 Bug #10、#11、#12 記錄的靜默欄位繫結退化一致——CmdGIS SELECT 中的欄位名稱與 ZZ_SCRATCH 表格的實際 schema 不符。
 
 由 test_cmd_gis_produces_file[office_80944_unfiltered] 偵測到，斷言 [LookAtOffice] CmdGIS 欄 IndexYear 僅 64/36602 列非空（0.2%），低於 80% 閾值。
 
@@ -84,7 +84,7 @@ _PASS: 28 · FAIL: 12 · ERROR: 0 · SKIP: 4 · NOT RUN: 0 · N/A: 56_
 
 1. 以 Microsoft Access 開啟 CBDB_BJ_User.mdb。
 2. 開啟 LookAtOffice 表單。
-3. 將人物 ID 設為 80944，其餘篩選器留空。
+3. 在官職程式碼選擇器中選取官職程式碼 80944（典史 / Clerk/District Jailor），其餘篩選器留空。
 4. 點選 CmdGIS。檔案產生時不會出現錯誤彈出視窗。
 5. 開啟 GIS 輸出檔並檢查 IndexYear 欄：絕大多數列將為空白。
 

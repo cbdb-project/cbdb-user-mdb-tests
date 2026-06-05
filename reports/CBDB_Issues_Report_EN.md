@@ -76,7 +76,7 @@ _PASS: 28 · FAIL: 12 · ERROR: 0 · SKIP: 4 · NOT RUN: 0 · N/A: 56_
 
 #### Description
 
-When CmdGIS runs for LookAtOffice with person 80944 (unfiltered), the GIS output file is produced but the IndexYear column contains non-empty values in only 64 of 36,602 rows (0.2%), well below the 80% threshold expected for a correctly-populated GIS export.  This pattern is consistent with the silent column-bind regressions documented in Bugs #10, #11, and #12 — a column name in the CmdGIS SELECT is mismatched against the actual ZZ_SCRATCH table schema.
+When CmdGIS runs for LookAtOffice with c_office_id = 80944 (典史 / Clerk/District Jailor, unfiltered), the GIS output file is produced but the IndexYear column contains non-empty values in only 64 of 36,602 rows (0.2%), well below the 80% threshold expected for a correctly-populated GIS export.  This pattern is consistent with the silent column-bind regressions documented in Bugs #10, #11, and #12 — a column name in the CmdGIS SELECT is mismatched against the actual ZZ_SCRATCH table schema.
 
 Detected by: test_cmd_gis_produces_file[office_80944_unfiltered] — assertion [LookAtOffice] CmdGIS column 'IndexYear' is non-empty in only 64/36602 rows (0.2%), below 80% threshold.
 
@@ -84,7 +84,7 @@ Detected by: test_cmd_gis_produces_file[office_80944_unfiltered] — assertion [
 
 1. Open CBDB_BJ_User.mdb in Microsoft Access.
 2. Open the LookAtOffice form.
-3. Set person ID to 80944 and leave all other filters blank.
+3. In the Office Code picker, select c_office_id = 80944 (典史 / Clerk/District Jailor) and leave all other filters blank.
 4. Click CmdGIS.  The file is produced without an error popup.
 5. Open the GIS output file and inspect the IndexYear column: the vast majority of rows will be empty.
 
