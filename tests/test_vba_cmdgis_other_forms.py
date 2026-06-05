@@ -70,15 +70,18 @@ def _skip_marks(fx: CrossFixture):
 
 
 def _gis_fixtures() -> list[CrossFixture]:
-    """One fixture per form from the matrix's high-density inputs.
-    Pick the first matrix fixture per form so we don't blow the
-    runtime up by parametrising over every fixture × every form."""
-    by_form: dict[str, CrossFixture] = {}
+    """Volume fixture per form (first in list) plus all quality fixtures
+    (expected_gis_iy_min_pct > 0).  Dynastic-combo fixtures are excluded
+    to avoid blowing up runtime."""
+    volume: dict[str, CrossFixture] = {}
+    quality: list[CrossFixture] = []
     for fx in _all_fixtures():
         if fx.spec.name not in _FORMS_WITH_CMDGIS_TESTABLE_HERE:
             continue
-        by_form.setdefault(fx.spec.name, fx)
-    return list(by_form.values())
+        volume.setdefault(fx.spec.name, fx)
+        if fx.expected_gis_iy_min_pct > 0:
+            quality.append(fx)
+    return list(volume.values()) + quality
 
 
 def _seed_query_inputs(vba: VbaSession, fx: CrossFixture) -> None:
@@ -204,7 +207,8 @@ def test_cmd_gis_produces_file(vba: VbaSession, fx: CrossFixture, tmp_path):
     # large-scale data emptiness that the surface checks (file
     # exists, NameChn in header) miss.
     _assert_gis_export_depth(spec.name, header, lines, sep,
-                              scratch_rows=n)
+                              scratch_rows=n,
+                              min_iy_pct=fx.expected_gis_iy_min_pct)
 
 
 # ----------------------------------------------------------------------
@@ -297,13 +301,15 @@ def _assert_gis_export_depth(form_name: str,
                               header: str,
                               lines: list[str],
                               sep: str,
-                              scratch_rows: int) -> None:
+                              scratch_rows: int,
+                              min_iy_pct: float = 0.0) -> None:
     """Run the depth assertions on a parsed GIS export.
 
     `lines` includes the header at index 0; data rows are
     `lines[1:]`.  `scratch_rows` is the row count that came out of
     CmdQuery (or CmdRun) so we can sanity-check that the export
-    didn't silently drop most of them.
+    didn't silently drop most of them.  `min_iy_pct` > 0 enables the
+    IndexYear fill-rate check (quality fixtures only).
     """
     cols = header.split(sep)
     n_cols = len(cols)
@@ -365,6 +371,32 @@ def _assert_gis_export_depth(form_name: str,
             f"silent column-bind regression of the kind that gave "
             f"us Bugs #10/#11/#12."
         )
+
+    # 8c-extra. IndexYear fill rate — quality fixtures only.
+    # Catches silent column-bind regressions (the class of bug that
+    # gave us Issues #10/#11/#12).  Skipped for volume fixtures where
+    # the source population legitimately has sparse IndexYear (e.g.
+    # 典史 office holders: 0.3% IY in BIOG_MAIN).
+    if min_iy_pct > 0 and "IndexYear" in col_index:
+        idx = col_index["IndexYear"]
+        iy_non_empty = 0
+        for line in data_rows:
+            cells = line.split(sep)
+            if idx >= len(cells):
+                continue
+            v = cells[idx].strip()
+            if v not in _GIS_EMPTY_PLACEHOLDERS:
+                iy_non_empty += 1
+        if data_rows:
+            iy_rate = iy_non_empty / len(data_rows)
+            assert iy_rate >= min_iy_pct, (
+                f"[{form_name}] CmdGIS IndexYear is non-empty in only "
+                f"{iy_non_empty}/{len(data_rows)} rows "
+                f"({100*iy_rate:.1f}%). "
+                f"Expected >= {100*min_iy_pct:.0f}% (quality fixture). "
+                f"This suggests a column-bind regression — compare the "
+                f"scratch table c_index_year with the GIS output."
+            )
 
     # 8d. Row-count sanity: GIS export should produce roughly one
     # row per scratch_table row.  CmdGIS sometimes deduplicates or

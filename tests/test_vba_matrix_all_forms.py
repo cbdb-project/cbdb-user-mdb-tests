@@ -50,6 +50,9 @@ class CrossFixture:
     controls: dict = field(default_factory=dict)
     expected_min_rows: int = 1
     source_sql: str | None = None
+    # 0.0 = no IY threshold (volume fixture; population legitimately sparse).
+    # >0  = quality fixture: CmdGIS IndexYear must be ≥ this fraction non-empty.
+    expected_gis_iy_min_pct: float = 0.0
 
 
 def _load_inputs() -> dict | None:
@@ -69,6 +72,7 @@ def _make_status_fixtures(inputs: dict) -> list[CrossFixture]:
             picker_ids=[c],
             controls={"FrameFilterYears": 1},   # 1 = no year filter
             expected_min_rows=1000,
+            expected_gis_iy_min_pct=0.0,  # volume: code 40 is 83.4% IY — fragile
             source_sql=(f"SELECT DISTINCT c_personid FROM STATUS_DATA "
                         f"WHERE c_status_code = {c}"),
         ))
@@ -81,6 +85,7 @@ def _make_status_fixtures(inputs: dict) -> list[CrossFixture]:
             picker_ids=[c],
             controls={"FrameFilterYears": 3},   # 3 = dynasty mode
             expected_min_rows=max(1, int(combo["n_persons"]) // 50),
+            expected_gis_iy_min_pct=0.0,
             source_sql=(
                 f"SELECT DISTINCT BIOG_MAIN.c_personid "
                 f"FROM BIOG_MAIN INNER JOIN STATUS_DATA "
@@ -88,6 +93,18 @@ def _make_status_fixtures(inputs: dict) -> list[CrossFixture]:
                 f"WHERE STATUS_DATA.c_status_code = {c} "
                 f"  AND BIOG_MAIN.c_dy = {dy}"
             ),
+        ))
+    for row in data.get("high_iy_status_codes", [])[:1]:
+        c = int(row["c_status_code"])
+        out.append(CrossFixture(
+            name=f"status_{c}_iy_check",
+            spec=LOOKATSTATUS,
+            picker_ids=[c],
+            controls={"FrameFilterYears": 1},
+            expected_min_rows=100,
+            expected_gis_iy_min_pct=0.80,
+            source_sql=(f"SELECT DISTINCT c_personid FROM STATUS_DATA "
+                        f"WHERE c_status_code = {c}"),
         ))
     return out
 
@@ -107,6 +124,7 @@ def _make_texts_fixtures(inputs: dict) -> list[CrossFixture]:
                 picker_ids=[c],
                 controls={"FrameFilterYears": 1},
                 expected_min_rows=10,
+                expected_gis_iy_min_pct=0.0,  # volume: fill rate not yet measured
                 source_sql=(
                     f"SELECT DISTINCT BIOG_TEXT_DATA.c_personid "
                     f"FROM BIOG_TEXT_DATA INNER JOIN TEXT_CODES "
@@ -129,6 +147,7 @@ def _make_assoc_fixtures(inputs: dict) -> list[CrossFixture]:
             picker_ids=[c],
             controls={"FrameFilterYears": 1},
             expected_min_rows=500,
+            expected_gis_iy_min_pct=0.0,  # volume: code 437 is 76.8% IY — below 80%
             source_sql=(f"SELECT DISTINCT c_personid FROM ASSOC_DATA "
                         f"WHERE c_assoc_code = {c}"),
         ))
@@ -141,6 +160,7 @@ def _make_assoc_fixtures(inputs: dict) -> list[CrossFixture]:
             picker_ids=[c],
             controls={"FrameFilterYears": 3},
             expected_min_rows=max(1, int(combo["n_rows"]) // 100),
+            expected_gis_iy_min_pct=0.0,
             source_sql=(
                 f"SELECT DISTINCT BIOG_MAIN.c_personid "
                 f"FROM BIOG_MAIN INNER JOIN ASSOC_DATA "
@@ -148,6 +168,18 @@ def _make_assoc_fixtures(inputs: dict) -> list[CrossFixture]:
                 f"WHERE ASSOC_DATA.c_assoc_code = {c} "
                 f"  AND BIOG_MAIN.c_dy = {dy}"
             ),
+        ))
+    for row in data.get("high_iy_assoc_codes", [])[:1]:
+        c = int(row["c_assoc_code"])
+        out.append(CrossFixture(
+            name=f"assoc_{c}_iy_check",
+            spec=LOOKATASSOCIATIONS,
+            picker_ids=[c],
+            controls={"FrameFilterYears": 1},
+            expected_min_rows=100,
+            expected_gis_iy_min_pct=0.80,
+            source_sql=(f"SELECT DISTINCT c_personid FROM ASSOC_DATA "
+                        f"WHERE c_assoc_code = {c}"),
         ))
     return out
 
@@ -165,6 +197,19 @@ def _make_office_fixtures(inputs: dict) -> list[CrossFixture]:
             # ZZ_OFFICE_CODE picker branch (see Form_LookAtOffice line 2080-2117).
             controls={"FrameFilterYears": 1, "TxtTypeDesc": "[All]"},
             expected_min_rows=10,
+            expected_gis_iy_min_pct=0.0,  # volume: e.g. 典史 80944 has 0.3% IY
+            source_sql=(f"SELECT DISTINCT c_personid FROM POSTED_TO_OFFICE_DATA "
+                        f"WHERE c_office_id = {c}"),
+        ))
+    for row in data.get("high_iy_office_codes", [])[:1]:
+        c = int(row["c_office_id"])
+        out.append(CrossFixture(
+            name=f"office_{c}_iy_check",
+            spec=LOOKATOFFICE,
+            picker_ids=[c],
+            controls={"FrameFilterYears": 1, "TxtTypeDesc": "[All]"},
+            expected_min_rows=50,
+            expected_gis_iy_min_pct=0.80,
             source_sql=(f"SELECT DISTINCT c_personid FROM POSTED_TO_OFFICE_DATA "
                         f"WHERE c_office_id = {c}"),
         ))
@@ -186,6 +231,7 @@ def _make_place_fixtures(inputs: dict) -> list[CrossFixture]:
                       "ChkAssoc": False, "ChkPosting": False,
                       "ChkEntry": False},
             expected_min_rows=50,
+            expected_gis_iy_min_pct=0.0,  # volume: mixed population, IY not measured
             source_sql=(f"SELECT DISTINCT c_personid FROM BIOG_ADDR_DATA "
                         f"WHERE c_addr_id = {a}"),
         ))
@@ -205,6 +251,7 @@ def _make_kinship_fixtures(inputs: dict) -> list[CrossFixture]:
             picker_ids=[p],
             controls={},   # use form defaults for distance constraints
             expected_min_rows=1,
+            expected_gis_iy_min_pct=0.0,
             source_sql=None,
         ))
     return out
@@ -222,6 +269,7 @@ def _make_networks_fixtures(inputs: dict) -> list[CrossFixture]:
             picker_ids=[p],
             controls={},
             expected_min_rows=1,
+            expected_gis_iy_min_pct=0.0,
             source_sql=None,
         ))
     return out
@@ -241,6 +289,7 @@ def _make_groupdata_fixtures(inputs: dict) -> list[CrossFixture]:
             picker_ids=[p],
             controls={},
             expected_min_rows=1,
+            expected_gis_iy_min_pct=0.0,
             source_sql=None,
         ))
     return out
@@ -267,6 +316,7 @@ def _make_assoc_pairs_fixtures(inputs: dict) -> list[CrossFixture]:
                       "FrameFilterYears": 1,
                       "Chk2Nodes": 0, "ChkKinship": 0},
             expected_min_rows=1,
+            expected_gis_iy_min_pct=0.0,
             source_sql=None,
         ))
     return out
@@ -302,6 +352,7 @@ def _make_entry_fixtures(inputs: dict) -> list[CrossFixture]:
         # Same recipe used by the investigation script.
         controls={"FrameYears": 1},
         expected_min_rows=10,
+        expected_gis_iy_min_pct=0.0,  # small fixture (code 101, 878 rows), IY not measured
         source_sql=(
             f"SELECT DISTINCT c_personid FROM ENTRY_DATA "
             f"WHERE c_entry_code = {code}"

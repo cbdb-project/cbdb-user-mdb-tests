@@ -728,9 +728,25 @@ python analysis/discover_test_inputs.py   # ~5 sec
 - top persons by kin / association count (good network seeds)
 - top assoc / kin / office codes
 - well-connected (person, person) pairs for AssociationPairs
+- **high-IY codes** (`high_iy_office_codes`, `high_iy_assoc_codes`, `high_iy_status_codes`):
+  top codes where IndexYear fill rate ≥ 90% in BIOG_MAIN AND ≥ 200 rows — these
+  drive quality fixtures whose CmdGIS IndexYear column is asserted ≥ 80% non-empty.
 
-`tests/test_vba_matrix.py` consumes the JSON to build VBA-driven
+`tests/test_vba_matrix_all_forms.py` consumes the JSON to build VBA-driven
 parametrized fixtures automatically.
+
+### Fixture class: volume vs. quality
+
+Each form has two classes of GIS fixtures (see `docs/design-fixture-quality-split.md`):
+
+| Class | `expected_gis_iy_min_pct` | Purpose |
+|-------|--------------------------|---------|
+| **Volume** (`_unfiltered`, dynastic) | `0.0` | Stress-test CmdQuery→CmdGIS pipeline at scale; skip IY check |
+| **Quality** (`_iy_check`) | `0.80` | Column-bind regression detection; source data has ≥ 90% IY coverage |
+
+**Rule**: when adding a new GIS-testable form or code, set `expected_gis_iy_min_pct=0.0`
+unless you have measured ≥ 90% IndexYear coverage in the source for that code.
+Never raise the threshold on a volume fixture — use a separate quality fixture instead.
 
 ### CRITICAL: re-run discovery on EVERY data update
 
