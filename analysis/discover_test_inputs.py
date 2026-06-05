@@ -175,6 +175,23 @@ def discover_lookatstatus(conn) -> dict:
             GROUP BY c_status_code, c_dy
             ORDER BY COUNT(*) DESC
         """),
+        "high_iy_status_codes": fetch(conn, """
+            SELECT TOP 5 SD.c_status_code,
+                   SC.c_status_desc,
+                   SC.c_status_desc_chn,
+                   COUNT(*) AS n_rows
+            FROM (STATUS_DATA AS SD
+                INNER JOIN BIOG_MAIN AS BM ON SD.c_personid = BM.c_personid)
+                INNER JOIN STATUS_CODES AS SC
+                  ON SD.c_status_code = SC.c_status_code
+            GROUP BY SD.c_status_code,
+                     SC.c_status_desc,
+                     SC.c_status_desc_chn
+            HAVING COUNT(*) >= 200
+              AND (SUM(IIF(BM.c_index_year IS NULL OR BM.c_index_year=0,0,1))
+                   / COUNT(*)) >= 0.90
+            ORDER BY COUNT(*) DESC
+        """),
     }
 
 
@@ -249,6 +266,23 @@ def discover_lookatassociations(conn) -> dict:
             GROUP BY ASSOC_DATA.c_assoc_code, BIOG_MAIN.c_dy
             ORDER BY COUNT(*) DESC
         """),
+        "high_iy_assoc_codes": fetch(conn, """
+            SELECT TOP 5 AD.c_assoc_code,
+                   AC.c_assoc_desc,
+                   AC.c_assoc_desc_chn,
+                   COUNT(*) AS n_rows
+            FROM (ASSOC_DATA AS AD
+                INNER JOIN BIOG_MAIN AS BM ON AD.c_personid = BM.c_personid)
+                INNER JOIN ASSOC_CODES AS AC
+                  ON AD.c_assoc_code = AC.c_assoc_code
+            GROUP BY AD.c_assoc_code,
+                     AC.c_assoc_desc,
+                     AC.c_assoc_desc_chn
+            HAVING COUNT(*) >= 200
+              AND (SUM(IIF(BM.c_index_year IS NULL OR BM.c_index_year=0,0,1))
+                   / COUNT(*)) >= 0.90
+            ORDER BY COUNT(*) DESC
+        """),
     }
 
 
@@ -264,6 +298,23 @@ def discover_lookatoffice(conn) -> dict:
             GROUP BY POSTED_TO_OFFICE_DATA.c_office_id,
                      OFFICE_CODES.c_office_chn,
                      OFFICE_CODES.c_office_pinyin
+            ORDER BY COUNT(*) DESC
+        """),
+        "high_iy_office_codes": fetch(conn, """
+            SELECT TOP 5 POD.c_office_id,
+                   OC.c_office_chn,
+                   OC.c_office_pinyin,
+                   COUNT(*) AS n_postings
+            FROM (POSTED_TO_OFFICE_DATA AS POD
+                INNER JOIN BIOG_MAIN AS BM ON POD.c_personid = BM.c_personid)
+                INNER JOIN OFFICE_CODES AS OC
+                  ON POD.c_office_id = OC.c_office_id
+            GROUP BY POD.c_office_id,
+                     OC.c_office_chn,
+                     OC.c_office_pinyin
+            HAVING COUNT(*) >= 200
+              AND (SUM(IIF(BM.c_index_year IS NULL OR BM.c_index_year=0,0,1))
+                   / COUNT(*)) >= 0.90
             ORDER BY COUNT(*) DESC
         """),
     }
