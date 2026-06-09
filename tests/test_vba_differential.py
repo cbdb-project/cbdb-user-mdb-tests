@@ -111,7 +111,6 @@ def test_lookatentry_vba_vs_python(vba: VbaSession,
         "Run Query", form="LookAtEntry",
         result_table="ZZ_SCRATCH_ENTRY",
         force_enable_ctl="CmdQuery",
-        timeout=30,
     )
     assert n_vba > 0, f"[{case_id}] VBA produced 0 rows"
     df_vba = vba.read("ZZ_SCRATCH_ENTRY")
@@ -161,7 +160,6 @@ def test_lookatentry_post_query_button_states(vba: VbaSession):
         "Run Query", form="LookAtEntry",
         result_table="ZZ_SCRATCH_ENTRY",
         force_enable_ctl="CmdQuery",
-        timeout=30,
     )
     assert n > 0
 

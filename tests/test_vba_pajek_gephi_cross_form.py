@@ -194,7 +194,7 @@ def test_export_button_produces_file(vba: VbaSession, case: Case, tmp_path):
 
     n = vba.click_via_timer(
         spec.name, ctl=spec.cmd_name,
-        result_table=spec.result_table, timeout=120,
+        result_table=spec.result_table,
     )
     print(f"\n[{spec.name}] {spec.cmd_name} -> {n} scratch rows", flush=True)
     assert n >= fx.expected_min_rows, (

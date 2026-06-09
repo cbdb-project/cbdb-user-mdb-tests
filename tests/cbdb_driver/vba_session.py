@@ -39,6 +39,10 @@ import win32process
 from pywinauto import Application as PWA
 
 from .access_app import kill_access_pid, register_spawned_pid
+from ._timeouts import vba_timeout
+
+# Generous, env-tunable (CBDB_VBA_TIMEOUT_S) ceiling for VBA/COM waits (B5).
+DEFAULT_VBA_TIMEOUT = vba_timeout(300.0)
 
 
 ACEDAO_CANDIDATES = [
@@ -1560,7 +1564,8 @@ class VbaSession:
         )
         cm.AddFromString(sub)
 
-    def _wait_for_done(self, short_form: str, timeout: float) -> bool:
+    def _wait_for_done(self, short_form: str,
+                       timeout: float = DEFAULT_VBA_TIMEOUT) -> bool:
         """Poll ZZ_TEST_DEBUG for the '<short>:DONE' marker that the
         injected autodetect appends right before Exit_CmdQuery_Click."""
         marker = f"{short_form}:DONE"
@@ -1637,7 +1642,7 @@ class VbaSession:
     def click_via_timer(self, form: str, *,
                         ctl: str = "CmdQuery",
                         result_table: str | None = None,
-                        timeout: float = 90.0,
+                        timeout: float = DEFAULT_VBA_TIMEOUT,
                         stable_for: float = 8.0,
                         wait_done: bool = True) -> int:
         """Trigger CmdQuery_Click via Form_Timer.  Use this when
@@ -1699,7 +1704,7 @@ class VbaSession:
                                     form: str,
                                     result_table: str,
                                     force_enable_ctl: str | None = None,
-                                    timeout: float = 30.0) -> int:
+                                    timeout: float = DEFAULT_VBA_TIMEOUT) -> int:
         """Click and poll result_table until it changes from initial
         row count. Returns final row count."""
         try:

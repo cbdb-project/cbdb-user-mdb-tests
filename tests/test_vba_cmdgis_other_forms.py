@@ -148,7 +148,7 @@ def test_cmd_gis_produces_file(vba: VbaSession, fx: CrossFixture, tmp_path):
     # chain block at end of the body dispatches to CmdGIS
     n = vba.click_via_timer(
         spec.name, ctl=spec.cmd_name,
-        result_table=spec.result_table, timeout=120,
+        result_table=spec.result_table,
     )
     print(f"\n[{spec.name}] {spec.cmd_name} produced {n} scratch rows",
           flush=True)
@@ -612,7 +612,7 @@ def test_cmd_gis_groupdata_clean_branches(vba: VbaSession,
         # Watch ZZ_SCRATCH_STATUS — it's the first per-checkbox
         # sub-query CmdRun calls and tells us whether the chain
         # is dispatching at all.
-        result_table="ZZ_SCRATCH_STATUS", timeout=180,
+        result_table="ZZ_SCRATCH_STATUS",
     )
     print(f"\n[LookAtGroupData] CmdRun -> "
           f"ZZ_SCRATCH_STATUS rows = {n}", flush=True)
@@ -789,7 +789,7 @@ def test_cmd_gis_assocpairs(vba: VbaSession, tmp_path):
     # 4. fire CmdQuery via timer; chain dispatches to CmdGIS after.
     n = vba.click_via_timer(
         spec.name, ctl=spec.cmd_name,
-        result_table=spec.result_table, timeout=120,
+        result_table=spec.result_table,
     )
     print(f"\n[LookAtAssociationPairs] CmdQuery -> {n} rows "
           f"in ZZ_SOCIAL_NETWORK", flush=True)

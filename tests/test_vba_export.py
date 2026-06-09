@@ -25,7 +25,7 @@ from pathlib import Path
 
 import pytest
 
-from cbdb_driver.vba_session import VbaSession, make_fixture
+from cbdb_driver.vba_session import VbaSession, make_fixture, DEFAULT_VBA_TIMEOUT
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -41,7 +41,7 @@ def vba():
     yield from make_fixture(SRC, WORK)
 
 
-def _wait_for_stable_file(path: Path, timeout: float = 60,
+def _wait_for_stable_file(path: Path, timeout: float = DEFAULT_VBA_TIMEOUT,
                           stable_for: float = 3) -> int:
     """Block until path exists and its size is stable for `stable_for`
     seconds (signals the writer finished). Return final size."""
@@ -92,7 +92,7 @@ def test_lookatentry_cmd_gis(vba: VbaSession):
 
     n = vba.click_via_timer(
         "LookAtEntry", ctl="CmdQuery",
-        result_table="ZZ_SCRATCH_ENTRY", timeout=120,
+        result_table="ZZ_SCRATCH_ENTRY",
     )
     assert n > 0, f"CmdQuery_Click produced no rows (n={n})"
     print(f"  CmdQuery+CmdGIS chain: {n} rows queried")

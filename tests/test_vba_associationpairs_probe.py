@@ -112,7 +112,7 @@ def test_associationpairs_cmdquery_setfocus_patch_unblocks_inserts(
     # the body actually runs.
     n = vba.click_via_timer(
         spec.name, ctl=spec.cmd_name,
-        result_table=spec.result_table, timeout=180,
+        result_table=spec.result_table,
     )
     print(f"\n[LookAtAssociationPairs] CmdQuery click_via_timer -> "
           f"{n} rows in {spec.result_table}", flush=True)
@@ -259,7 +259,7 @@ def test_associationpairs_cmdquery_then_cmdpajek_export_chain(
     # SetFocus patch being applied).
     n = vba.click_via_timer(
         spec.name, ctl=spec.cmd_name,
-        result_table=spec.result_table, timeout=180,
+        result_table=spec.result_table,
     )
     print(f"\n[LookAtAssociationPairs] CmdQuery+CmdPajek chain "
           f"-> {n} rows in {spec.result_table}", flush=True)

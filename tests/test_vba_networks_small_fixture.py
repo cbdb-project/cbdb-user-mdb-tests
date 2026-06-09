@@ -124,7 +124,6 @@ def test_cmdrun_smoke_cao_zhi(vba_minimal_inject):
     n_via_timer = vba.click_via_timer(
         "LookAtNetworks", ctl="CmdRun",
         result_table="ZZ_SOCIAL_NETWORK",
-        timeout=120,
     )
 
     # CmdRun fired and returned with the result table populated.

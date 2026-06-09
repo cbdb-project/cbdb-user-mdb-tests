@@ -86,7 +86,7 @@ from pathlib import Path
 
 import pytest
 
-from cbdb_driver.vba_session import VbaSession, make_fixture
+from cbdb_driver.vba_session import VbaSession, make_fixture, DEFAULT_VBA_TIMEOUT
 from cbdb_driver.form_specs import LOOKATKINSHIP
 
 from test_vba_matrix_all_forms import _all_fixtures, SRC
@@ -149,7 +149,7 @@ def test_cmducinet_kinship_writes_vna_with_three_sections(
     vba.set_form_tag(spec.name, spec.cmd_name, "")
     n_scratch = vba.click_via_timer(
         spec.name, ctl=spec.cmd_name,
-        result_table=spec.result_table, timeout=180,
+        result_table=spec.result_table,
     )
     print(f"\n[LookAtKinship] {spec.cmd_name} -> {n_scratch} "
           f"rows in {spec.result_table}", flush=True)
@@ -198,7 +198,7 @@ def test_cmducinet_kinship_writes_vna_with_three_sections(
     # via Scripting.FileSystemObject.CreateTextFile —
     # synchronous on the VBA thread, so the file should
     # appear well within the 60s poll cap on this fixture.
-    file_deadline = time.time() + 60
+    file_deadline = time.time() + DEFAULT_VBA_TIMEOUT
     while time.time() < file_deadline:
         if out_path.exists() and out_path.stat().st_size > 0:
             break

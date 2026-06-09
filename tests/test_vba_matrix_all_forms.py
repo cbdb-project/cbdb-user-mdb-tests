@@ -461,14 +461,13 @@ def test_cross_form_matrix(vba: VbaSession, fx: CrossFixture):
     if spec.name in _TIMER_TRIGGER_FORMS:
         n = vba.click_via_timer(
             spec.name, ctl=spec.cmd_name,
-            result_table=spec.result_table, timeout=120,
+            result_table=spec.result_table,
         )
     else:
         n = vba.click_button_and_wait_table(
             spec.cmd_caption, form=spec.name,
             result_table=spec.result_table,
             force_enable_ctl=spec.cmd_name,
-            timeout=60,
         )
     print(f"\n[{fx.name}] VBA produced {n} rows", flush=True)
     assert n >= fx.expected_min_rows, (

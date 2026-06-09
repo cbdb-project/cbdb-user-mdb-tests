@@ -240,7 +240,7 @@ def test_cmd_neo4j_produces_files(vba: VbaSession, spec: Spec, tmp_path):
 
     n = vba.click_via_timer(
         fspec.name, ctl=fspec.cmd_name,
-        result_table=fspec.result_table, timeout=180,
+        result_table=fspec.result_table,
     )
     print(f"\n[{fspec.name}] {fspec.cmd_name} -> {n} scratch rows",
           flush=True)

@@ -24,6 +24,7 @@ from cbdb_driver.access_app import (
     _pid_for_access_app, register_spawned_pid, kill_access_pid,
     _kill_file_holder,
 )
+from cbdb_driver.vba_session import DEFAULT_VBA_TIMEOUT
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -165,7 +166,7 @@ def test_vba_lookatentry_run_query_yin_general_kaifeng(inline_session):
 
     # poll for ZZ_SCRATCH_ENTRY to fill
     rows = 0
-    deadline = time.time() + 30
+    deadline = time.time() + DEFAULT_VBA_TIMEOUT
     while time.time() < deadline:
         time.sleep(0.5)
         cur = conn.cursor()

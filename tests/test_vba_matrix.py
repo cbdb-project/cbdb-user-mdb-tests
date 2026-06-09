@@ -262,7 +262,6 @@ def test_vba_full_matrix(vba: VbaSession, fx: Fixture):
         fx.cmd_caption, form=fx.form,
         result_table=fx.result_table,
         force_enable_ctl=fx.cmd_name,
-        timeout=60,
     )
     print(f"\n[{fx.name}] VBA produced {n} rows")
     assert n >= fx.expected_min_rows, (

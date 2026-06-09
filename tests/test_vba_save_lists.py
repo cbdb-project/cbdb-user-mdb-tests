@@ -30,7 +30,7 @@ from pathlib import Path
 
 import pytest
 
-from cbdb_driver.vba_session import VbaSession, make_fixture
+from cbdb_driver.vba_session import VbaSession, make_fixture, DEFAULT_VBA_TIMEOUT
 from cbdb_driver.form_specs import ALL_SAVES, SaveSpec
 
 
@@ -79,7 +79,7 @@ def _expected_descs(vba: VbaSession, codes_table: str, id_col: str,
     return out
 
 
-def _wait_for_file(path: Path, timeout: float = 30.0) -> bool:
+def _wait_for_file(path: Path, timeout: float = DEFAULT_VBA_TIMEOUT) -> bool:
     deadline = time.time() + timeout
     while time.time() < deadline:
         if path.exists() and path.stat().st_size > 0:
@@ -138,7 +138,7 @@ def test_cmd_save_round_trip(vba: VbaSession, spec: SaveSpec, tmp_path):
     )
 
     # 5. wait for the file
-    assert _wait_for_file(out_path, timeout=30.0), (
+    assert _wait_for_file(out_path), (  # inherit DEFAULT_VBA_TIMEOUT (B5)
         f"[{spec.form}.{spec.button}] expected file at {out_path} "
         f"never appeared"
     )
