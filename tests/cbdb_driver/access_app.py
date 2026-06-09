@@ -44,6 +44,23 @@ def _pid_for_access_app(app) -> int | None:
     return int(pid) if pid else None
 
 
+# Session-wide registry of MSACCESS PIDs THIS test session spawned.  The
+# pytest_sessionfinish safety-net kills ONLY these (never the developer's
+# unrelated Access windows).  Populated by AccessApp.open / VbaSession.open
+# right after they capture their PID.
+_SPAWNED_PIDS: set[int] = set()
+
+
+def register_spawned_pid(pid) -> None:
+    """Record a PID this session spawned, for the scoped sessionfinish kill."""
+    if pid:
+        _SPAWNED_PIDS.add(int(pid))
+
+
+def spawned_pids() -> set[int]:
+    return set(_SPAWNED_PIDS)
+
+
 def kill_access_pid(pid: int, wait_s: float = 3.0) -> bool:
     """Force-kill exactly one MSACCESS.EXE PID and wait for it to exit.
 
@@ -219,6 +236,7 @@ class AccessApp:
         # Quit/CloseCurrentDatabase the hWnd may already be gone, and
         # we need the PID for a scoped taskkill in close().
         self._pid = _pid_for_access_app(self._app)
+        register_spawned_pid(self._pid)  # for the scoped sessionfinish kill
         self._fix_vba_references()
         # ODBC for direct table I/O (much faster than DAO recordsets to df)
         cs = (

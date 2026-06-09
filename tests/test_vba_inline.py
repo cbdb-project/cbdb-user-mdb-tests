@@ -13,13 +13,17 @@ from __future__ import annotations
 
 import os
 import shutil
-import subprocess
 import time
 from pathlib import Path
 
 import pyodbc
 import pytest
 import win32com.client
+
+from cbdb_driver.access_app import (
+    _pid_for_access_app, register_spawned_pid, kill_access_pid,
+    _kill_file_holder,
+)
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -35,12 +39,14 @@ def inline_session():
     Yields a dict of handles {app, conn}. Tears down by closing
     everything.
     """
-    subprocess.run(["taskkill", "/F", "/IM", "MSACCESS.EXE"],
-                   capture_output=True)
+    # B10: do NOT global-kill MSACCESS (that nukes the developer's unrelated
+    # Access windows).  Only free WORK if a stale process is holding it —
+    # _kill_file_holder scopes to the single process that has WORK open.
     if WORK.exists():
         try:
             WORK.unlink()
         except PermissionError:
+            _kill_file_holder(WORK)
             time.sleep(1)
             WORK.unlink()
     shutil.copy2(SRC, WORK)
@@ -63,6 +69,10 @@ def inline_session():
         pass
     app.Visible = True
     app.OpenCurrentDatabase(str(WORK))
+    # Capture + register the PID now (HWND alive) so teardown can scope-kill
+    # only THIS process and the sessionfinish safety-net knows about it.
+    _pid = _pid_for_access_app(app)
+    register_spawned_pid(_pid)
 
     # fix DAO ref
     proj = app.VBE.VBProjects(1)
@@ -94,8 +104,9 @@ def inline_session():
     except Exception: pass
     try: app.Quit()
     except Exception: pass
-    subprocess.run(["taskkill", "/F", "/IM", "MSACCESS.EXE"],
-                   capture_output=True)
+    # B10: scoped kill of ONLY this test's Access process (was global /IM).
+    if _pid is not None:
+        kill_access_pid(_pid)
 
 
 def test_vba_lookatentry_run_query_yin_general_kaifeng(inline_session):

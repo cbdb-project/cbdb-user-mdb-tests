@@ -38,7 +38,7 @@ import win32com.client
 import win32process
 from pywinauto import Application as PWA
 
-from .access_app import kill_access_pid
+from .access_app import kill_access_pid, register_spawned_pid
 
 
 ACEDAO_CANDIDATES = [
@@ -444,6 +444,7 @@ class VbaSession:
         # Capture PID early — close() needs it for a scoped taskkill
         # and the HWND may already be gone by then.
         self._pid = _pid_for_access_app(self.app)
+        register_spawned_pid(self._pid)  # for the scoped sessionfinish kill
 
         # Fix DAO ref if broken
         proj = self.app.VBE.VBProjects(1)
