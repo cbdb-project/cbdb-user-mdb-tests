@@ -530,5 +530,16 @@ The standardized method is complete when ALL hold:
   build has 0 BOM rows (upstream cleaned them — Issue #20 dormant on this build)**,
   so the old 315 assert would have failed. `test_schema_data_mdb.py` xfail reasons
   de-dated (point at schema_diff.json). Reviewed by review agent + codex; none found.
-- _next_: (recommended order) **B3 (--include-vba default)** → B1 (single
-  entrypoint, archive not delete) → B2/B4/B5/B6/B9/B10/B11 → C2/C3/C4 → D0/D1/D2.
+- 2026-06-09 — **B3 done** (no silent shrinkage): conftest `_should_include_vba`
+  — on a COM-capable Windows box (pywin32 present) the Access-COM suite is now
+  AUTO-INCLUDED by default; `--fast` opts out, `--include-vba` forces ON anywhere;
+  a notice prints on auto-on.  Default `pytest tests/` collects 375 (incl. 172
+  vba+infra, previously silently dropped); `--fast`→0; headless stays OFF (fast
+  suite still collects clean).  **Regression caught in review + fixed**: the
+  MSACCESS taskkill in `pytest_sessionfinish` was re-gated from "collection
+  eligibility" to `_ACCESS_TESTS_EXECUTED` (set in a new `pytest_runtest_setup`
+  hook only when an access/vba test actually runs) so `--collect-only` / pure-unit
+  / `--fast` runs never kill the developer's unrelated Access windows. Reviewed by
+  review agent + codex; finding closed.
+- _next_: (recommended order) **B1 (single entrypoint, archive not delete)** →
+  B2/B4/B5/B6/B9/B10/B11 → C2/C3/C4 → D0/D1/D2.
