@@ -1,24 +1,44 @@
 ﻿"""Fast-suite tests verifying that TablesFields and ForeignKeys
-documentation tables inside CBDB_20260430_DATA.mdb accurately reflect
-the actual database structure.
+documentation tables inside the DATA mdb accurately reflect the actual
+database structure.
 
 No VBA or COM required.  Runs with the standard fast suite:
     python -m pytest tests/test_schema_data_mdb.py -v
 
-Requires data/CBDB_20260430_DATA.mdb to be present (gitignored).
-If the file is absent every test is skipped automatically.
+The DATA mdb is resolved dynamically (newest CBDB_*_DATA.mdb in data/,
+gitignored) — never a hardcoded build date.  On headless/non-Windows
+(no pyodbc) the whole module is skipped; on a box that CAN run it but has
+no DATA mdb, the tests FAIL (not skip) so the schema/FK coverage cannot
+silently vanish.
 """
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 import pytest
-import pyodbc
+
+# pyodbc is Windows/Access-only; skip the whole module on headless/Linux
+# so the fast suite still collects cleanly there (mirrors conftest's rule).
+pyodbc = pytest.importorskip("pyodbc")
 
 REPO = Path(__file__).resolve().parent.parent
-DATA_MDB = REPO / "data" / "CBDB_20260430_DATA.mdb"
 SCHEMA_DIFF_JSON = REPO / "reports" / "schema_diff.json"
+
+# Resolve the DATA mdb dynamically (newest CBDB_*_DATA.mdb in data/) via the
+# shared finder — NEVER hardcode a build date.  A pinned CBDB_20260430_DATA.mdb
+# previously made every test pytest.skip() on any other build, silently dropping
+# the whole schema/FK module (coverage-floor regression).  None => no DATA mdb
+# found; the fixture turns that into a FAIL, not a skip.
+sys.path.insert(0, str(REPO / "analysis"))
+# Let an ImportError propagate (a corrupt checkout should fail loudly, not
+# masquerade as "no DATA mdb").  Only "no file found" maps to None.
+from _data_mdb_finder import find_data_mdb  # noqa: E402
+try:
+    DATA_MDB = find_data_mdb(REPO)
+except FileNotFoundError:
+    DATA_MDB = None
 
 
 # ---------------------------------------------------------------------------
@@ -27,8 +47,14 @@ SCHEMA_DIFF_JSON = REPO / "reports" / "schema_diff.json"
 
 @pytest.fixture(scope="module")
 def data_mdb_conn():
-    if not DATA_MDB.exists():
-        pytest.skip("DATA mdb not present (gitignored)")
+    if DATA_MDB is None:
+        pytest.fail(
+            "No CBDB_*_DATA.mdb found in data/ — the TablesFields/ForeignKeys "
+            "schema validation cannot run.  Place the DATA mdb in data/ (it is "
+            "gitignored).  This is a FAILURE, not a skip: silently skipping "
+            "would drop the whole schema/FK module from the standardized run "
+            "(the coverage-floor regression this guards against)."
+        )
     conn = pyodbc.connect(
         f"DRIVER={{Microsoft Access Driver (*.mdb, *.accdb)}};DBQ={DATA_MDB};"
     )
