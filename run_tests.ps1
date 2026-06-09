@@ -110,6 +110,13 @@ if (Test-Path "$ROOT\reports\screenshots") {
 }
 Write-Host "  prior reports archived to reports/archive/build_$priorBuild/"
 
+# ---- Step 4b: discover high-density test inputs (EXPLICIT; B11) -----------
+# Discovery is an explicit pipeline step (not a silent mid-pytest regeneration),
+# so the test SET is fixed before tests run.  pytest's freshness gate then
+# sees a fresh test_inputs.json and just proceeds.
+Write-Host "`n=== Step 4b: Discover test inputs ===" -ForegroundColor Yellow
+Run "python `"$ROOT\analysis\discover_test_inputs.py`""
+
 # ---- Step 5: tests (failures are EXPECTED; they become issues) ------------
 Write-Host "`n=== Step 5: Running tests ===" -ForegroundColor Yellow
 $vbaFlag = if ($Fast) { "--fast" } else { "--include-vba" }

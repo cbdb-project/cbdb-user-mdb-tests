@@ -806,11 +806,15 @@ CBDB grows over time.  The "top entry code" today may not be top in
 six months.  Plus new addresses / dynasties / status codes can
 appear.  Stale `test_inputs.json` defeats the whole point.
 
-`tests/conftest.py` auto-runs discovery if `test_inputs.json` is
-older than `data/CBDB_BJ_User.mdb` (or, when uniquely resolvable,
-`data/CBDB_*_DATA.mdb`).  Disable with `--no-discover-inputs`.
-The decision logic lives in `_refresh_decision` and is unit-tested
-in `tests/test_infra_refresh_decision.py`.
+Discovery is an EXPLICIT step (B11): the standardized run (`run_tests.ps1`
+Step 4b) regenerates `test_inputs.json` before tests, so the test SET is
+fixed up front.  `tests/conftest.py` does NOT silently regenerate mid-run —
+if `test_inputs.json` is stale vs `data/CBDB_BJ_User.mdb` (or, when uniquely
+resolvable, `data/CBDB_*_DATA.mdb`) it **fails the session** with a remedy:
+run `python analysis/discover_test_inputs.py`, or pass `--refresh-inputs`
+to regenerate now, or `--no-discover-inputs` to skip the gate.  The
+freshness logic lives in `_refresh_decision` and is unit-tested in
+`tests/test_infra_refresh_decision.py`.
 
 ## Standard workflow after a `.mdb` update
 
@@ -854,11 +858,13 @@ python reports/generate_report.py
    (Status / Texts / Associations / Office / Place / Kinship +
    LookAtEntry separately in `test_vba_matrix.py`)
 2. ✅ DONE — `test_vba_export.py` real CmdGIS export, byte-level diff
-3. ✅ DONE — `tests/conftest.py::pytest_configure` auto-runs
-   `discover_test_inputs.py` when `analysis/dump/test_inputs.json`
-   is missing or older than `data/CBDB_BJ_User.mdb` (and the
-   uniquely-resolvable `data/CBDB_*_DATA.mdb` when present).
-   Decision logic in `_refresh_decision`; unit-tested in
+3. ✅ DONE — discovery is an EXPLICIT step (B11): `run_tests.ps1` Step 4b
+   regenerates `analysis/dump/test_inputs.json`.  `tests/conftest.py::
+   pytest_configure` no longer auto-regenerates mid-run — if the fixture
+   file is stale/missing vs `data/CBDB_BJ_User.mdb` (and the
+   uniquely-resolvable `data/CBDB_*_DATA.mdb`) it FAILS the session;
+   `--refresh-inputs` regenerates now, `--no-discover-inputs` skips the gate.
+   Freshness logic in `_refresh_decision`; unit-tested in
    `tests/test_infra_refresh_decision.py`.
 4. Three forms still skipped in matrix (need smaller fixtures + lower
    distance constraints to avoid recursive expansion timeout):

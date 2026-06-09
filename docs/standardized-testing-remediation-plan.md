@@ -587,5 +587,13 @@ The standardized method is complete when ALL hold:
   path-scoped `_kill_file_holder` instead of a blanket kill.  Only remaining `/IM`
   is the env-gated `kill_orphan_access` (manual recovery).  Reviewed by review
   agent + codex; none found.
-- _next_: (recommended order) **B11 (explicit discovery)** → B5 (wall-clock →
-  DONE-marker) → C2/C3/C4 → D0/D1/D2.
+- 2026-06-09 — **B11 done** (explicit discovery): `conftest.pytest_configure`
+  no longer silently regenerates `test_inputs.json` mid-session (which let the
+  test SET drift between back-to-back runs).  Stale/missing now FAILS the session
+  with a remedy; new `--refresh-inputs` regenerates on demand; `--no-discover-inputs`
+  still skips.  `run_tests.ps1` Step 4b runs discovery explicitly before pytest
+  (deterministic per B4), so the standardized run has a fixed test set up front.
+  Docs synced (AGENTS.md ×2, README EN+ZH, conftest docstring).  Reviewed by
+  review agent + codex; none found.
+- _next_: (recommended order) **B5 (wall-clock → DONE-marker gating)** →
+  C2/C3/C4 → D0/D1/D2.
