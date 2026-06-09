@@ -44,7 +44,14 @@ def pytest_addoption(parser):
     )
     parser.addoption(
         "--no-discover-inputs", action="store_true", default=False,
-        help="Skip auto-running discover_test_inputs.py at session start.",
+        help="Skip the relink + test_inputs.json freshness gate at session start.",
+    )
+    parser.addoption(
+        "--refresh-inputs", action="store_true", default=False,
+        help="Explicitly (re)generate analysis/dump/test_inputs.json if it is "
+             "stale.  Without this, a STALE fixture file FAILS the session "
+             "(discovery is an explicit pipeline step, not a silent mid-run "
+             "regeneration that could change the test set between runs).",
     )
     parser.addoption(
         "--include-vba", action="store_true", default=False,
@@ -306,7 +313,9 @@ def pytest_configure(config):
     before any test can open the User mdb.  Stale links silently corrupt
     every pyodbc-based test (SQL replay, saved-view checks, etc.).
 
-    Step 2 — test_inputs.json refresh (existing logic).
+    Step 2 — test_inputs.json freshness GATE (B11): if the fixture file is
+    stale it FAILS the session (discovery is an explicit step, not a silent
+    mid-run regen); pass --refresh-inputs to regenerate now.
 
     Disable both steps with: pytest --no-discover-inputs
     """
@@ -375,16 +384,29 @@ def pytest_configure(config):
             )
         print(f"[conftest] relink complete.")
 
-    # --- Step 2: refresh test_inputs.json if stale ---
+    # --- Step 2: test_inputs.json freshness gate (B11) ---
+    # Discovery is an EXPLICIT pipeline step (run_tests.ps1 / the standardized
+    # run), NOT a silent mid-session regeneration — auto-regenerating here made
+    # the test SET change between back-to-back runs whenever a data mtime moved.
+    # Stale now FAILS with a clear remedy, unless --refresh-inputs is passed.
     inputs_json = ROOT / "analysis" / "dump" / "test_inputs.json"
     action, reason = _refresh_decision(inputs_json, mdb, data_mdb)
     if action == "skip":
         if reason == "fresh":
-            print(f"\n[conftest] {inputs_json.name} fresh; "
-                  f"skipping discovery")
+            print(f"\n[conftest] {inputs_json.name} fresh; skipping discovery")
         return
-    # action == "refresh"
-    print(f"\n[conftest] refreshing {inputs_json.name} "
+
+    # action == "refresh" (stale / missing)
+    if not config.getoption("--refresh-inputs"):
+        pytest.exit(
+            f"[conftest] {inputs_json.name} is STALE ({reason}) vs the current "
+            f"data files.  Discovery is an explicit step so the test set can't "
+            f"silently change mid-run.  Run:\n"
+            f"    python analysis/discover_test_inputs.py\n"
+            f"then commit the result, OR pass --refresh-inputs to regenerate "
+            f"now, OR --no-discover-inputs to skip the gate."
+        )
+    print(f"\n[conftest] --refresh-inputs: regenerating {inputs_json.name} "
           f"(reason: {reason}) ...")
     rc = subprocess.run(
         [sys.executable, str(ROOT / "analysis" / "discover_test_inputs.py")],
@@ -393,10 +415,7 @@ def pytest_configure(config):
     if rc.returncode != 0:
         pytest.exit(
             f"[conftest] discover_test_inputs.py FAILED (rc="
-            f"{rc.returncode}).  Tests would otherwise run against "
-            f"a stale fixture file ({inputs_json.name}).  Fix the "
-            f"discovery error or pass `--no-discover-inputs` to "
-            f"skip refresh.\n\n  stderr tail:\n{rc.stderr[-1000:]}"
+            f"{rc.returncode}).\n\n  stderr tail:\n{rc.stderr[-1000:]}"
         )
     print(f"[conftest] discovery refreshed.")
 
