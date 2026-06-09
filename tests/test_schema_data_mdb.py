@@ -31,7 +31,9 @@ SCHEMA_DIFF_JSON = REPO / "reports" / "schema_diff.json"
 # previously made every test pytest.skip() on any other build, silently dropping
 # the whole schema/FK module (coverage-floor regression).  None => no DATA mdb
 # found; the fixture turns that into a FAIL, not a skip.
-sys.path.insert(0, str(REPO / "analysis"))
+_ANALYSIS_DIR = str(REPO / "analysis")
+if _ANALYSIS_DIR not in sys.path:
+    sys.path.insert(0, _ANALYSIS_DIR)
 # Let an ImportError propagate (a corrupt checkout should fail loudly, not
 # masquerade as "no DATA mdb").  Only "no file found" maps to None.
 from _data_mdb_finder import find_data_mdb  # noqa: E402
@@ -176,9 +178,10 @@ def _columns_for_table(table_name: str) -> set[str]:
 
 @pytest.mark.xfail(
     reason=(
-        "TablesFields documents 'PersonIDSource' which does not exist in the "
-        "2026-04-30 dump. This xfail documents the stale documentation; "
-        "promote to strict once the doc table is updated."
+        "TablesFields is known to document table(s) that don't exist in the "
+        "DATA mdb (build-dependent; see reports/schema_diff.json "
+        "tables_fields.only_in_current for the authoritative per-build list). "
+        "xfail documents the doc drift; promote to strict once docs are updated."
     ),
     strict=False,
 )
@@ -205,15 +208,10 @@ def test_tables_fields_all_tables_exist(data_mdb_conn):
 
 @pytest.mark.xfail(
     reason=(
-        "TablesFields documents columns that do not exist in the 2026-04-30 dump "
-        "(ADMIN_CAT_CODE_TYPE_REL.c_admin_type_code, ADMIN_CAT_TYPES.c_admin_type_code, "
-        "ADMIN_CAT_TYPES.c_admin_type_hz, ADMIN_CAT_TYPES.c_admin_type_trans, "
-        "ENTRY_DATA.c_addr_id, ENTRY_DATA.c_posting_id, "
-        "MERGED_PERSON_DATA.c_merged_to_personid, PersonIDSource.LineNum, "
-        "PersonIDSource.SourceTable, TMP_ADDR_C.Max_c_belongs_first_year -- "
-        "10 stale documentation entries in total). "
-        "See schema_diff.json only_in_current for the authoritative list. "
-        "Promote to strict once docs are updated."
+        "TablesFields is known to document columns that don't exist in the "
+        "DATA mdb (build-dependent count + list; see reports/schema_diff.json "
+        "tables_fields.only_in_current for the authoritative per-build list). "
+        "xfail documents the doc drift; promote to strict once docs are updated."
     ),
     strict=False,
 )
@@ -342,12 +340,10 @@ def test_foreign_keys_referenced_columns_exist(data_mdb_conn):
 @pytest.mark.xfail(
     reason=(
         "TablesFields is known to be out of sync with the actual DB schema "
-        "in the 2026-04-30 dump (10 stale rows, 131 undocumented columns, "
-        "648 DataFormat/NULL_allowed mismatches -- see schema_diff.json; "
-        "mismatch count is elevated because 8 tables required the SELECT "
-        "TOP 1 fallback, leaving DataFormat/NULL_allowed as None). "
-        "This xfail documents the finding; promote to a strict assertion "
-        "once the docs are updated."
+        "(build-dependent counts: stale rows / undocumented columns / "
+        "DataFormat-NULL mismatches — see reports/schema_diff.json for the "
+        "authoritative per-build numbers).  This xfail documents the finding; "
+        "promote to a strict assertion once the docs are updated."
     ),
     strict=False,
 )

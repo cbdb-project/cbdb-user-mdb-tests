@@ -2125,6 +2125,19 @@ def _build_md(lang: str, out_path: Path) -> None:
     lines.append("")
     lines.append(f"_{Z(subtitle)}_")
     lines.append("")
+    # Build stamp (B7 part 2): record which DATA build this report describes.
+    try:
+        import sys as _sys
+        _ana = str(REPO / "analysis")
+        if _ana not in _sys.path:
+            _sys.path.insert(0, _ana)
+        from build_stamp import current_build as _cur_build
+        _build = _cur_build(REPO)
+    except Exception:
+        _build = None
+    _build_label = ("Data build: " if is_en else "数据构建：") + (_build or "unknown")
+    lines.append(f"_{Z(_build_label)}_")
+    lines.append("")
 
     intro = (
         "Dear maintainer,\n\n"

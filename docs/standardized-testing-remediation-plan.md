@@ -519,6 +519,16 @@ The standardized method is complete when ALL hold:
   + stamp the build into the pytest JSON + report header.  Also noted: this
   module's test 1/2/5 carry `xfail` reasons still citing "the 2026-04-30 dump"
   — re-anchor under B7 part 2 / B8.
-- _next_: (recommended order) **B7 part 2 + B8 (build pinning/stamp + re-anchor
-  magic counts)** → B3 (--include-vba default) → B1 (single entrypoint, archive
-  not delete) → B2/B4/B5/B6/B9/B10/B11 → C2/C3/C4 → D0/D1/D2.
+- 2026-06-09 — **B7 part 2 + B8 done**: `analysis/build_stamp.py` (current/expected
+  build, pin precedence env > data/EXPECTED_BUILD > none) + `tests/test_build_stamp.py`
+  (12 tests). conftest: `pytest_configure` fails loudly on a pin mismatch (no-op
+  when unpinned); `@pytest.hookimpl(optionalhook=True) pytest_json_modifyreport`
+  stamps the build into the pytest JSON. `generate_report.py` header now prints
+  "Data build: <YYYYMMDD>". B8: `test_addr_codes_embedded_delim.py` no longer
+  hardcodes 315 — `_BOM_ROWS_BY_BUILD` anchors per build (20260430→315,
+  20260602→0) and xfails on an uncalibrated build; **found the live 20260602
+  build has 0 BOM rows (upstream cleaned them — Issue #20 dormant on this build)**,
+  so the old 315 assert would have failed. `test_schema_data_mdb.py` xfail reasons
+  de-dated (point at schema_diff.json). Reviewed by review agent + codex; none found.
+- _next_: (recommended order) **B3 (--include-vba default)** → B1 (single
+  entrypoint, archive not delete) → B2/B4/B5/B6/B9/B10/B11 → C2/C3/C4 → D0/D1/D2.

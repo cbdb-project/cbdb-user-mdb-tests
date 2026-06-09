@@ -263,6 +263,21 @@ def pytest_configure(config):
         "access: requires a running Access COM session "
         "(Windows + Office + a working data/CBDB_BJ_User.mdb).",
     )
+
+    # --- Build pin (B7 part 2): fail loudly if a pinned expected build
+    # doesn't match the DATA mdb actually in data/.  No pin set => no-op
+    # (record-only).  Runs even with --no-discover-inputs.
+    _ana = str(ROOT / "analysis")
+    if _ana not in sys.path:
+        sys.path.insert(0, _ana)
+    try:
+        from build_stamp import build_pin_error  # type: ignore[import]
+        _pin_err = build_pin_error(ROOT)
+    except ImportError:
+        _pin_err = None
+    if _pin_err:
+        pytest.exit(f"[conftest] build pin: {_pin_err}")
+
     if config.getoption("--no-discover-inputs"):
         return
 
@@ -324,6 +339,25 @@ def pytest_configure(config):
             f"skip refresh.\n\n  stderr tail:\n{rc.stderr[-1000:]}"
         )
     print(f"[conftest] discovery refreshed.")
+
+
+@pytest.hookimpl(optionalhook=True)
+def pytest_json_modifyreport(json_report):
+    """Stamp the DATA build into the pytest JSON report (B7 part 2).
+
+    Fires only when pytest-json-report is active (--json-report).  Marked
+    optionalhook so pluggy doesn't error when that plugin isn't installed.
+    Lets the generated report + any consumer know which build this run tested.
+    """
+    try:
+        _ana = str(ROOT / "analysis")
+        if _ana not in sys.path:
+            sys.path.insert(0, _ana)
+        from build_stamp import build_stamp as _stamp  # type: ignore[import]
+        json_report.setdefault("environment", {}).update(_stamp(ROOT))
+    except Exception:
+        # Stamping is best-effort metadata; never fail the report over it.
+        pass
 
 
 @pytest.fixture(scope="session")
