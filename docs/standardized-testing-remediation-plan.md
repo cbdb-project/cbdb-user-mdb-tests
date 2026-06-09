@@ -616,5 +616,15 @@ The standardized method is complete when ALL hold:
   Screenshot capture is already back in the pipeline (run_tests.ps1 Step 6) and
   the caption-consistency audit runs at Step 5f.  6 new tests in
   test_report_triage_gate.py (42 total).  Reviewed by review agent + codex; none found.
+- 2026-06-09 — **C3 done** (Appendix A data-driven): removed the stale hardcoded
+  intro counts ("~575 / 657 246 diffs", "13 rows across 3 buckets", "we have not
+  classified") from all 4 builder copies (docx EN/ZH + markdown EN/ZH) — they now
+  defer to the **Classification summary** section, which already renders bucket
+  counts/percentages from `reports/index_drift_classification.json` (produced by
+  the classifiers run in run_tests.ps1 Step 5c).  Added an `else:` placeholder to
+  both builders so the summary heading + a "Not generated — run classify_index_drift.py"
+  note always appear (the intro's promise is now honoured; no silently-missing
+  section).  Reviewed by review agent + codex; finding (missing else-placeholder)
+  closed.
 - _next_: (recommended order) **C2 (fold static audits into the report)** →
   C3 (drift classification into Appendix A) → C4 (screenshots gate) → D0/D1/D2.
