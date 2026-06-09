@@ -638,6 +638,16 @@ The standardized method is complete when ALL hold:
   "all historical ids must appear" rule.  Reviewed by review agent (raised the
   --ci-insufficiency MAJOR → fixed via the -Verify audits) + codex; none found.
   **Phase B + C complete.**
-- _next_: (recommended order) **D0 (oracle classification A/B/C)** → D2 (replay
-  deprecation tracking) → D1 (differential oracle off the replay — scaffold +
-  document; full independent-oracle construction needs domain input + live COM).
+- 2026-06-09 — **D0 done** (oracle classification): `analysis/build_oracle_registry.py`
+  → `docs/oracle-classification.json` classifies every `tests/test_*.py` by oracle
+  (A real-VBA×independent / B real-VBA×replay / C replay×golden / NA infra) from
+  import signatures + COM-fixture (com_app/fresh_form) usage.  Current: A=22, B=2
+  (`test_vba_differential`, `test_vba_matrix`), C=3 (`test_lookatentry`,
+  `test_other_lookat_forms`, `test_exports`), NA=14.  Only A counts as VBA
+  verification.  `tests/test_oracle_classification.py` (6 tests) pins the logic +
+  fails if a new test is unclassified (no silent C-class creep).  AGENTS.md §
+  "Oracle classification" documents it.  Reviewed by review agent (fixed
+  test_infra_smoke NA→A) + codex; none found.
+- _next_: **D2 (replay deprecation tracking) + D1 (differential oracle off the
+  replay — document the requirement; the independent-oracle construction itself
+  needs domain input + a live COM run, so it's scaffolded/tracked, not built blind).**
