@@ -59,6 +59,7 @@ def test_bug_view_statusdata_fy_value_equals_ly_value(ro_conn):
         SELECT TOP 50 c_personid, c_fy_range_desc, c_ly_range_desc
         FROM View_StatusData
         WHERE c_fy_range_desc IS NOT NULL OR c_ly_range_desc IS NOT NULL
+        ORDER BY c_personid
     """)
     rows = cur.fetchall()
     cur.close()

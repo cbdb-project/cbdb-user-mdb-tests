@@ -554,6 +554,17 @@ The standardized method is complete when ALL hold:
   `-DryRun` prints the full sequence, `-Verify` on clean slate → INCOMPLETE +
   exit 1.  AGENTS.md updated to describe the new entrypoint.  Reviewed by review
   agent + codex.
-- _next_: (recommended order) **B4 (discover tie-break) + B6 (TOP ORDER BY)** →
-  B9 (golden strict) → B10 (scoped kill) → B11 (explicit discovery) → B5
-  (wall-clock → DONE-marker) → C2/C3/C4 → D0/D1/D2.
+- 2026-06-09 — **B4 + B6 done** (deterministic selection + sampling): all 20
+  `discover_test_inputs.py` `TOP N ... ORDER BY COUNT(*) DESC` queries got a
+  secondary sort (`, 1` for the 15 single-code queries, `, 1, 2` for the 5
+  two-key combos) — running discover twice now yields a byte-identical
+  `test_inputs.json` (was tie-nondeterministic).  B6: added `ORDER BY` to the
+  three TOP-without-ORDER-BY samplers (`test_known_bugs.py` View_StatusData,
+  `test_saved_views.py`, `test_vba_import_lists.py`).  Reviewed by review agent +
+  codex; none found.  NOTE (step-7 triage, NOT a regression from this change):
+  the 2 View_StatusData `test_known_bugs` markers fail on build 20260602 because
+  Issue #1 (alias-swap) appears FIXED upstream — the alias-swap test reads
+  queries.json (no DB/ordering) yet fails, and the OLD no-ORDER-BY sample also
+  had a mismatch; determinism just surfaces it reliably.
+- _next_: (recommended order) **B9 (golden strict)** → B10 (scoped kill) → B11
+  (explicit discovery) → B5 (wall-clock → DONE-marker) → C2/C3/C4 → D0/D1/D2.

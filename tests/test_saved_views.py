@@ -75,7 +75,8 @@ def test_view_personid_present_and_valid(ro_conn, view_name):
     # take a small sample of DISTINCT pids to keep tests fast
     cur.execute(
         f"SELECT TOP 50 c_personid FROM [{view_name}] "
-        f"WHERE c_personid IS NOT NULL GROUP BY c_personid"
+        f"WHERE c_personid IS NOT NULL GROUP BY c_personid "
+        f"ORDER BY c_personid"
     )
     sample = sorted({int(r[0]) for r in cur.fetchall()})
     cur.close()

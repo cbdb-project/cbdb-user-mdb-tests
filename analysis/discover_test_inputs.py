@@ -85,7 +85,7 @@ def discover_lookatentry(conn) -> dict:
         GROUP BY ENTRY_DATA.c_entry_code,
                  ENTRY_CODES.c_entry_desc,
                  ENTRY_CODES.c_entry_desc_chn
-        ORDER BY COUNT(*) DESC
+        ORDER BY COUNT(*) DESC, 1
     """)
 
     out["top_addresses"] = fetch(conn, """
@@ -99,7 +99,7 @@ def discover_lookatentry(conn) -> dict:
         GROUP BY BIOG_MAIN.c_index_addr_id,
                  ADDR_CODES.c_name,
                  ADDR_CODES.c_name_chn
-        ORDER BY COUNT(*) DESC
+        ORDER BY COUNT(*) DESC, 1
     """)
 
     out["top_dynasties"] = fetch(conn, """
@@ -112,7 +112,7 @@ def discover_lookatentry(conn) -> dict:
         GROUP BY BIOG_MAIN.c_dy, DYNASTIES.c_dynasty,
                  DYNASTIES.c_dynasty_chn,
                  DYNASTIES.c_start, DYNASTIES.c_end
-        ORDER BY COUNT(*) DESC
+        ORDER BY COUNT(*) DESC, 1
     """)
 
     # populous (entry_code × dynasty) combos — Access SQL doesn't have
@@ -128,7 +128,7 @@ def discover_lookatentry(conn) -> dict:
             WHERE BIOG_MAIN.c_dy IS NOT NULL
         ) AS sub
         GROUP BY c_entry_code, c_dy
-        ORDER BY COUNT(*) DESC
+        ORDER BY COUNT(*) DESC, 1, 2
     """)
 
     # populous (entry_code × address) combos — what HelpFile-style fixtures look like
@@ -143,7 +143,7 @@ def discover_lookatentry(conn) -> dict:
             WHERE BIOG_MAIN.c_index_addr_id IS NOT NULL
         ) AS sub
         GROUP BY c_entry_code, c_index_addr_id
-        ORDER BY COUNT(*) DESC
+        ORDER BY COUNT(*) DESC, 1, 2
     """)
 
     return out
@@ -161,7 +161,7 @@ def discover_lookatstatus(conn) -> dict:
             GROUP BY STATUS_DATA.c_status_code,
                      STATUS_CODES.c_status_desc,
                      STATUS_CODES.c_status_desc_chn
-            ORDER BY COUNT(*) DESC
+            ORDER BY COUNT(*) DESC, 1
         """),
         "status_x_dynasty_combos": fetch(conn, """
             SELECT TOP 15 c_status_code, c_dy, COUNT(*) AS n_persons
@@ -173,7 +173,7 @@ def discover_lookatstatus(conn) -> dict:
                   ON STATUS_DATA.c_personid = BIOG_MAIN.c_personid
             ) AS sub
             GROUP BY c_status_code, c_dy
-            ORDER BY COUNT(*) DESC
+            ORDER BY COUNT(*) DESC, 1, 2
         """),
         "high_iy_status_codes": fetch(conn, """
             SELECT TOP 5 SD.c_status_code,
@@ -190,7 +190,7 @@ def discover_lookatstatus(conn) -> dict:
             HAVING COUNT(*) >= 200
               AND (SUM(IIF(BM.c_index_year IS NULL OR BM.c_index_year=0,0,1))
                    / COUNT(*)) >= 0.90
-            ORDER BY COUNT(*) DESC
+            ORDER BY COUNT(*) DESC, 1
         """),
     }
 
@@ -208,7 +208,7 @@ def discover_lookattexts(conn) -> dict:
             GROUP BY TEXT_CODES.c_bibl_cat_code,
                      TEXT_BIBLCAT_CODES.c_text_cat_desc,
                      TEXT_BIBLCAT_CODES.c_text_cat_desc_chn
-            ORDER BY COUNT(*) DESC
+            ORDER BY COUNT(*) DESC, 1
         """),
         "biblcat_x_writers": fetch(conn, """
             SELECT TOP 15 c_bibl_cat_code, COUNT(*) AS n_writers
@@ -220,7 +220,7 @@ def discover_lookattexts(conn) -> dict:
                 WHERE TEXT_CODES.c_bibl_cat_code IS NOT NULL
             ) AS sub
             GROUP BY c_bibl_cat_code
-            ORDER BY COUNT(*) DESC
+            ORDER BY COUNT(*) DESC, 1
         """),
     }
 
@@ -238,7 +238,7 @@ def discover_lookatplace(conn) -> dict:
             WHERE BIOG_MAIN.c_index_addr_id IS NOT NULL
             GROUP BY BIOG_MAIN.c_index_addr_id,
                      ADDR_CODES.c_name, ADDR_CODES.c_name_chn
-            ORDER BY COUNT(*) DESC
+            ORDER BY COUNT(*) DESC, 1
         """),
     }
 
@@ -255,7 +255,7 @@ def discover_lookatassociations(conn) -> dict:
             GROUP BY ASSOC_DATA.c_assoc_code,
                      ASSOC_CODES.c_assoc_desc,
                      ASSOC_CODES.c_assoc_desc_chn
-            ORDER BY COUNT(*) DESC
+            ORDER BY COUNT(*) DESC, 1
         """),
         "assoc_x_dynasty_combos": fetch(conn, """
             SELECT TOP 15 ASSOC_DATA.c_assoc_code,
@@ -264,7 +264,7 @@ def discover_lookatassociations(conn) -> dict:
             FROM ASSOC_DATA INNER JOIN BIOG_MAIN
               ON ASSOC_DATA.c_personid = BIOG_MAIN.c_personid
             GROUP BY ASSOC_DATA.c_assoc_code, BIOG_MAIN.c_dy
-            ORDER BY COUNT(*) DESC
+            ORDER BY COUNT(*) DESC, 1, 2
         """),
         "high_iy_assoc_codes": fetch(conn, """
             SELECT TOP 5 AD.c_assoc_code,
@@ -281,7 +281,7 @@ def discover_lookatassociations(conn) -> dict:
             HAVING COUNT(*) >= 200
               AND (SUM(IIF(BM.c_index_year IS NULL OR BM.c_index_year=0,0,1))
                    / COUNT(*)) >= 0.90
-            ORDER BY COUNT(*) DESC
+            ORDER BY COUNT(*) DESC, 1
         """),
     }
 
@@ -298,7 +298,7 @@ def discover_lookatoffice(conn) -> dict:
             GROUP BY POSTED_TO_OFFICE_DATA.c_office_id,
                      OFFICE_CODES.c_office_chn,
                      OFFICE_CODES.c_office_pinyin
-            ORDER BY COUNT(*) DESC
+            ORDER BY COUNT(*) DESC, 1
         """),
         "high_iy_office_codes": fetch(conn, """
             SELECT TOP 5 POD.c_office_id,
@@ -315,7 +315,7 @@ def discover_lookatoffice(conn) -> dict:
             HAVING COUNT(*) >= 200
               AND (SUM(IIF(BM.c_index_year IS NULL OR BM.c_index_year=0,0,1))
                    / COUNT(*)) >= 0.90
-            ORDER BY COUNT(*) DESC
+            ORDER BY COUNT(*) DESC, 1
         """),
     }
 
@@ -333,7 +333,7 @@ def discover_lookatkinship(conn) -> dict:
             GROUP BY KIN_DATA.c_personid,
                      BIOG_MAIN.c_name,
                      BIOG_MAIN.c_name_chn
-            ORDER BY COUNT(*) DESC
+            ORDER BY COUNT(*) DESC, 1
         """),
         # most-used kinship codes
         "top_kin_codes": fetch(conn, """
@@ -346,7 +346,7 @@ def discover_lookatkinship(conn) -> dict:
             GROUP BY KIN_DATA.c_kin_code,
                      KINSHIP_CODES.c_kinrel,
                      KINSHIP_CODES.c_kinrel_chn
-            ORDER BY COUNT(*) DESC
+            ORDER BY COUNT(*) DESC, 1
         """),
     }
 
@@ -364,7 +364,7 @@ def discover_lookatnetworks(conn) -> dict:
             GROUP BY ASSOC_DATA.c_personid,
                      BIOG_MAIN.c_name,
                      BIOG_MAIN.c_name_chn
-            ORDER BY COUNT(*) DESC
+            ORDER BY COUNT(*) DESC, 1
         """),
     }
 
@@ -379,7 +379,7 @@ def discover_lookatassociationpairs(conn) -> dict:
             FROM ASSOC_DATA
             WHERE c_assoc_id IS NOT NULL
             GROUP BY c_personid, c_assoc_id
-            ORDER BY COUNT(*) DESC
+            ORDER BY COUNT(*) DESC, 1, 2
         """),
     }
 

@@ -59,7 +59,8 @@ def _pick_valid_ids(vba: VbaSession, source_table: str, source_col: str,
     cur = vba.conn.cursor()
     cur.execute(
         f"SELECT DISTINCT TOP {n} [{source_col}] FROM [{source_table}] "
-        f"WHERE [{source_col}] IS NOT NULL AND [{source_col}] > 0"
+        f"WHERE [{source_col}] IS NOT NULL AND [{source_col}] > 0 "
+        f"ORDER BY [{source_col}]"
     )
     ids = [int(r[0]) for r in cur.fetchall()]
     cur.close()
