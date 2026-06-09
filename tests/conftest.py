@@ -48,14 +48,65 @@ def pytest_addoption(parser):
     )
     parser.addoption(
         "--include-vba", action="store_true", default=False,
-        help="Include the Access-COM ('access' marker) test files.  "
-             "Defaults to OFF — the fast suite skips them so headless / "
-             "non-Windows runs don't error-out.",
+        help="Force-include the Access-COM ('access' marker) test files.  "
+             "On a capable Windows box (pywin32 present) the COM suite is "
+             "ON by default already; use --fast to opt OUT.",
+    )
+    parser.addoption(
+        "--fast", action="store_true", default=False,
+        help="Explicitly run the FAST subset (skip the Access-COM test "
+             "files).  Use this to opt out of the auto-on COM suite on "
+             "Windows — so 'running the tests' is always an explicit choice, "
+             "never a silent smaller set.",
     )
 
 
 def _is_access_com_test_file(name: str) -> bool:
     return name.startswith("test_vba_") or name == "test_infra_smoke.py"
+
+
+def _com_capable() -> bool:
+    """True if this box can actually drive Access COM (Windows + pywin32)."""
+    if sys.platform != "win32":
+        return False
+    try:
+        import win32com  # noqa: F401
+        return True
+    except ImportError:
+        return False
+
+
+def _should_include_vba(config) -> bool:
+    """Whether to collect the Access-COM test files this run.
+
+    B3 (no silent shrinkage): on a COM-capable Windows box the full suite
+    is ON BY DEFAULT — "running the tests" must not silently drop the whole
+    COM behavioural suite.  Opt out explicitly with --fast.  --include-vba
+    forces ON anywhere.  Non-Windows / no-pywin32 stays OFF so the fast
+    suite still collects cleanly there.
+    """
+    if config.getoption("--fast"):
+        return False
+    if config.getoption("--include-vba"):
+        return True
+    return _com_capable()
+
+
+# Set True only once an Access-COM test actually ENTERS setup this session.
+# pytest_sessionfinish's MSACCESS taskkill keys off THIS, not off collection
+# eligibility — otherwise --collect-only or a pure-unit targeted run on a
+# COM-capable Windows box would kill the developer's unrelated Access windows.
+_ACCESS_TESTS_EXECUTED = False
+
+
+def pytest_runtest_setup(item):
+    global _ACCESS_TESTS_EXECUTED
+    try:
+        name = Path(str(item.fspath)).name
+    except Exception:
+        return
+    if _is_access_com_test_file(name):
+        _ACCESS_TESTS_EXECUTED = True
 
 
 def pytest_ignore_collect(collection_path, config):
@@ -68,10 +119,11 @@ def pytest_ignore_collect(collection_path, config):
     fails on Linux / headless / fresh machines that lack pywin32.
 
     Skipping the file at collect-time is the only way to keep
-    `pytest tests/ -W ignore` green on a non-Windows box.  Pass
-    `--include-vba` to opt back in.
+    `pytest tests/ -W ignore` green on a non-Windows box.  On a
+    COM-capable Windows box the COM suite is auto-included (B3); use
+    `--fast` to skip it, or `--include-vba` to force it anywhere.
     """
-    if config.getoption("--include-vba"):
+    if _should_include_vba(config):
         return False
     return _is_access_com_test_file(collection_path.name)
 
@@ -198,10 +250,13 @@ def _data_mdb_relink_needed(user_mdb: Path, data_mdb: Path | None) -> bool:
 
 
 def pytest_sessionfinish(session, exitstatus):
-    """Kill all MSACCESS.EXE processes after a --include-vba session.
+    """Kill all MSACCESS.EXE processes after a session that actually RAN
+    Access-COM tests.
 
-    Only runs when --include-vba was used.  Skipped otherwise (fast
-    suite never opens Access, so there is nothing to clean up).
+    Gated on _ACCESS_TESTS_EXECUTED (set when an access/vba test enters
+    setup), NOT on collection eligibility — so --collect-only, --fast, or a
+    pure-unit targeted run never triggers the kill and can't take down the
+    developer's unrelated Access windows.
 
     WARNING: this kills every MSACCESS.EXE on the machine, not only
     the ones this test session opened.  Close any unrelated Access
@@ -216,11 +271,11 @@ def pytest_sessionfinish(session, exitstatus):
     """
     if sys.platform != "win32":
         return
-    try:
-        if not session.config.getoption("--include-vba", default=False):
-            return
-    except ValueError:
-        return  # option not registered (e.g. early-exit before addoption)
+    # Only clean up if an Access-COM test actually RAN this session — never
+    # on --collect-only or a pure-unit/--fast run (which never opened Access),
+    # so we don't kill the developer's unrelated Access windows.
+    if not _ACCESS_TESTS_EXECUTED:
+        return
     import subprocess, time
     # First pass: taskkill /F — fast for well-behaved processes
     subprocess.run(
@@ -277,6 +332,14 @@ def pytest_configure(config):
         _pin_err = None
     if _pin_err:
         pytest.exit(f"[conftest] build pin: {_pin_err}")
+
+    # B3: tell the operator when the heavy COM suite is auto-included, so a
+    # plain `pytest tests/` on Windows is never a silent surprise (or a silent
+    # smaller set).  --fast opts out; --include-vba is the explicit force.
+    if _should_include_vba(config) and not config.getoption("--include-vba"):
+        print("\n[conftest] Access-COM/VBA suite AUTO-INCLUDED (capable Windows "
+              "box).  This is the full standardized suite (slow).  Pass --fast "
+              "to run only the fast subset.")
 
     if config.getoption("--no-discover-inputs"):
         return
