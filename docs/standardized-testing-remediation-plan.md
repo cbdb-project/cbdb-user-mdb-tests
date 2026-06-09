@@ -492,6 +492,12 @@ The standardized method is complete when ALL hold:
 
 - 2026-06-09 — Phase 0 done (branch `feat/report-triage-gate`): triage gate +
   tests + docs (commit `3a10912`), clean-slate cleanup (commit `e8ed3bf`),
-  `.external/` deleted. This plan written.
-- _next_: (recommended order) E1+E2 (rubric + review protocol) → C0 (coverage floor)
-  → B7/B3/B1 (stop silent shrinkage + entrypoint) → remaining B → C2/C3/C4 → D.
+  `.external/` deleted. This plan written (commit `ea86c0d`).
+- 2026-06-09 — **E1+E2 done**: "Report self-review rubric + review protocol" added
+  to `docs/skills/issue-report-maintainer.md` (R1 per-issue, R2 whole-report, R3
+  evidence-vs-claim, R4 independent-review record, + worked exemplar pointer);
+  protocol generate-draft → self-review → independent fresh-context review (review
+  agent + codex) → finalize; `AGENTS.md` step 7 now requires it. Reviewed by review
+  agent + codex; sequencing/coverage findings closed.
+- _next_: (recommended order) **C0 (coverage floor)** → B7/B3/B1 (stop silent
+  shrinkage + entrypoint) → remaining B → C2/C3/C4 → D0/D1/D2.
