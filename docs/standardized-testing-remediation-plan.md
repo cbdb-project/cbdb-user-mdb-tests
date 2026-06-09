@@ -541,5 +541,19 @@ The standardized method is complete when ALL hold:
   hook only when an access/vba test actually runs) so `--collect-only` / pure-unit
   / `--fast` runs never kill the developer's unrelated Access windows. Reviewed by
   review agent + codex; finding closed.
-- _next_: (recommended order) **B1 (single entrypoint, archive not delete)** →
-  B2/B4/B5/B6/B9/B10/B11 → C2/C3/C4 → D0/D1/D2.
+- 2026-06-09 — **B1 + B2 done** (single entrypoint, archive not delete):
+  `run_tests.ps1` rewritten as the single canonical entrypoint — Step 1 now
+  ARCHIVES the prior build (Move-Item to `reports/archive/build_<priorBuild>`,
+  derived from the prior report's "Data build:" stamp) instead of deleting (B2);
+  it runs steps 5/5b/5c(+classifiers)/5d/5e(export matrix)/5f(audits)/6(screenshots)
+  + the coverage-floor check; pytest failures are non-fatal (they become issues).
+  New `-Fast` (skip COM suite) and `-Verify` (post-step-7/8 completeness gate that
+  FAILS if `reports/` lacks the MD report/coverage matrix or is below the
+  build_20260430 floor).  Step 7 (rebuild ISSUES) is the only manual gate.
+  File is pure-ASCII (PS 5.1 mis-decodes UTF-8 em-dashes).  Verified: parses,
+  `-DryRun` prints the full sequence, `-Verify` on clean slate → INCOMPLETE +
+  exit 1.  AGENTS.md updated to describe the new entrypoint.  Reviewed by review
+  agent + codex.
+- _next_: (recommended order) **B4 (discover tie-break) + B6 (TOP ORDER BY)** →
+  B9 (golden strict) → B10 (scoped kill) → B11 (explicit discovery) → B5
+  (wall-clock → DONE-marker) → C2/C3/C4 → D0/D1/D2.
