@@ -423,14 +423,16 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
         "multiple candidate years apply; (4) null / default "
         "handling differences (e.g. how a missing birthyear "
         "collapses).\n\n"
-        "**We have not classified the steady ~575 / 657 246 "
-        "diffs we currently observe.**  The examples below are a "
-        "small sample (currently 13 rows across 3 buckets, "
-        "from `reports/index_drift_examples.json`) — illustrative "
-        "of the *shapes* of disagreement, not statistically "
-        "representative.  Please don't treat them as a verdict "
-        "either way; they're a starting point for whoever does "
-        "the per-row triage.\n\n"
+        "The per-row classification of these diffs is in the "
+        "**Classification summary** below, generated from "
+        "`reports/index_drift_classification.json` when the "
+        "classifier has run (a placeholder appears if it hasn't); "
+        "the actual counts and buckets are data-driven, not "
+        "hardcoded here.  The worked example rows further down "
+        "(from `reports/index_drift_examples.json`) illustrate the "
+        "*shapes* of disagreement — illustrative, not statistically "
+        "representative, and a starting point for per-row triage, "
+        "not a verdict either way.\n\n"
         "Why we still keep this appendix: if the *shape* of "
         "disagreement changes between releases (e.g. addresses "
         "start diverging where only years used to, or per-rule "
@@ -463,11 +465,13 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
         "適用時，兩邊的優先序 / 平手規則不同；(4) null / 預設值"
         "處理不同（例如缺失的生年是當作 0、NULL，還是「卒年減 60」）。"
         "\n\n"
-        "**我們並沒有對目前看到的 ~575 / 657 246 筆差異做完整分類。**"
-        "下方列舉的樣本（目前共 13 筆、3 種分桶，"
-        "來自 `reports/index_drift_examples.json`）只是**示範**這些"
-        "差異**長什麼樣**，並非統計上有代表性。請不要把這些樣例"
-        "當成任何方向的結論，它們只是後續逐筆分類的起點。\n\n"
+        "這些差異的逐筆分類見下方的 **分類匯總**，由 "
+        "`reports/index_drift_classification.json` 自動生成（分類器"
+        "尚未執行時顯示佔位文字）；實際的計數與分桶都是 data-driven，"
+        "不在此處寫死。再往下列舉的樣例（來自 "
+        "`reports/index_drift_examples.json`）只是**示範**差異**長什麼"
+        "樣**，並非統計上有代表性，是後續逐筆分類的起點，並非任何"
+        "方向的結論。\n\n"
         "我們仍然把這份附錄放在這裡，是因為：若差異的「形狀」在"
         "不同次發行之間發生變化（例如原本只年份對不齊，現在地點"
         "也開始對不齊；或 per-rule type-code 的分佈突然偏離），"
@@ -571,6 +575,15 @@ def _add_index_drift_appendix(doc, is_en: bool, Z) -> None:
                 f"完整輸出見 `reports/index_drift_classification.json`，"
                 f"算法來源指標見 `analysis/index_drift_algorithm_notes.md`。"
             ))
+    else:
+        _h(doc, 2, Z("Classification summary" if is_en else "分類匯總"))
+        doc.add_paragraph(Z(
+            "_Not generated — run `python analysis/classify_index_drift.py` "
+            "(reports/index_drift_classification.json absent)._"
+            if is_en else
+            "_尚未生成 —— 請執行 `python analysis/classify_index_drift.py`"
+            "（缺 reports/index_drift_classification.json）。_"
+        ))
 
     # ---- Year-drift rule classification (PR K1) ----
     if RULE_CLASSIFICATION_JSON.exists():
@@ -2586,13 +2599,16 @@ def _build_md(lang: str, out_path: Path) -> None:
             "between PHP and VBA; (3) priority / tie-break "
             "differences; (4) null / default handling differences."
             "\n\n"
-            "**We have not classified the steady ~575 / 657 246 "
-            "diffs we currently observe.**  The examples below are a "
-            "small sample (currently 13 rows across 3 buckets, "
-            "from `reports/index_drift_examples.json`) — illustrative "
-            "of the shapes of disagreement, not statistically "
-            "representative.  They are a starting point for per-row "
-            "triage, not a verdict."
+            "The per-row classification of these diffs is in the "
+            "**Classification summary** below, generated from "
+            "`reports/index_drift_classification.json` when the "
+            "classifier has run (placeholder otherwise) — counts and "
+            "buckets are data-driven, not hardcoded.  The worked "
+            "example rows further down "
+            "(`reports/index_drift_examples.json`) illustrate the "
+            "*shapes* of disagreement; illustrative, not statistically "
+            "representative, a starting point for per-row triage, not "
+            "a verdict."
             if is_en else
             "我們把本 .mdb 的 BIOG_MAIN 與 cbdb-online-main-server 每週"
             "釋出的 SQLite 快照在 `c_index_year`、`c_index_addr_id` "
@@ -2615,11 +2631,12 @@ def _build_md(lang: str, out_path: Path) -> None:
             "至少四個原因，光看差異本身分不出來：(1) 源資料快照漂移；"
             "(2) PHP 與 VBA 之間的演算法 / 移植差異；(3) 優先序 / "
             "平手規則不同；(4) null / 預設值處理不同。\n\n"
-            "**我們並沒有對目前看到的 ~575 / 657 246 筆差異做完整"
-            "分類。**下方列舉的樣本（目前共 13 筆、3 種分桶，來自 "
-            "`reports/index_drift_examples.json`）只是**示範**這些"
-            "差異**長什麼樣**，並非統計上有代表性，是後續逐筆分類"
-            "的起點，不是結論。"
+            "這些差異的逐筆分類見下方 **分類匯總**，由 "
+            "`reports/index_drift_classification.json` 自動生成（分類器"
+            "尚未執行時顯示佔位）；計數與分桶都是 data-driven，不寫死。"
+            "再往下列舉的樣例（`reports/index_drift_examples.json`）只是"
+            "**示範**差異**長什麼樣**，並非統計上有代表性，是後續逐筆"
+            "分類的起點，不是結論。"
         )
         lines.append(Z(intro_drift))
         lines.append("")
@@ -2723,6 +2740,16 @@ def _build_md(lang: str, out_path: Path) -> None:
                     f"`analysis/index_drift_algorithm_notes.md`。"
                 ))
                 lines.append("")
+        else:
+            lines.append(f"### {Z('Classification summary' if is_en else '分類匯總')}")
+            lines.append(Z(
+                "_Not generated — run `python analysis/classify_index_drift.py` "
+                "(reports/index_drift_classification.json absent)._"
+                if is_en else
+                "_尚未生成 —— 請執行 `python analysis/classify_index_drift.py`"
+                "（缺 reports/index_drift_classification.json）。_"
+            ))
+            lines.append("")
 
         # ---- Year-drift rule classification (PR K1) — markdown ----
         if RULE_CLASSIFICATION_JSON.exists():
