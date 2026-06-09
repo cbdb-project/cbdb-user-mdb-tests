@@ -54,7 +54,12 @@ def _base(**over) -> dict:
 
 
 def _v(it: dict) -> list[str]:
-    return gr._issue_violations(it)
+    # shot_files=[] so the C4 screenshot gate never fires for the contract tests
+    return gr._issue_violations(it, shot_files=[])
+
+
+def _v_shots(it: dict, shot_files: list[str]) -> list[str]:
+    return gr._issue_violations(it, shot_files=shot_files)
 
 
 # --------------------------------------------------------------------- #
@@ -262,6 +267,34 @@ def test_issue_violations_collects_multiple_in_one_pass():
     assert len(msgs) >= 2
     assert any("fixture" in m for m in msgs)
     assert any("user_symptom" in m for m in msgs)
+
+
+# --------------------------------------------------------------------- #
+# C4: screenshot-presence gate
+# --------------------------------------------------------------------- #
+
+def test_screenshot_gap_flags_unwired_files():
+    msg = gr._screenshot_gap(7, [], ["bug7_step1.png", "bug7_popup.png", "bug9_x.png"])
+    assert msg and "issue 7" in msg
+
+
+def test_screenshot_gap_none_when_declared():
+    assert gr._screenshot_gap(7, ["bug7_step1.png"], ["bug7_step1.png"]) is None
+
+
+def test_screenshot_gap_none_when_no_matching_files():
+    assert gr._screenshot_gap(7, [], ["bug9_x.png", "bug10_y.png"]) is None
+
+
+def test_issue_violations_flags_screenshot_gap_for_visible_tier():
+    it = _base(id=7, tier="P1_visible_crash")  # screenshots=[] by _base
+    assert any("screenshots/" in m for m in _v_shots(it, ["bug7_step1.png"]))
+
+
+def test_issue_violations_no_screenshot_gap_for_p5():
+    it = _base(id=7, tier="P5_dormant_or_latent",
+               evidence={"finding_class": "latent_code"})
+    assert not any("screenshots/" in m for m in _v_shots(it, ["bug7_x.png"]))
 
 
 def test_validate_issues_reports_every_bad_issue(monkeypatch):
