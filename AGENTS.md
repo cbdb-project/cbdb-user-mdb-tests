@@ -60,6 +60,14 @@ This means:
   THIS build.
 - Bugs that passed in a previous build and still pass now → they do
   not exist in this build's report.  Do not write "fixed in build X".
+  **This build-independence rule applies to the whole report/audit
+  pipeline, not just `ISSUES`.**  Assessment must REFUSE to reference
+  prior tests or prior builds: no "fixed upstream in build YYYYMMDD"
+  reasoning in the `analysis/audit_*.py` MANIFESTs, no cross-build
+  diffing to decide whether an issue is real.  Each build is judged
+  solely on its own test run + source.  (A finding may only be DROPPED
+  on its own evidence this build — never because a previous build
+  called it fixed.)
 - Bugs that were in a previous build and still fail now → write a
   fresh entry as if you are seeing them for the first time.  Cross-
   referencing old IDs is optional, not required.
@@ -109,6 +117,23 @@ looking at.
      goldens, do NOT add to ISSUES.
    - Infrastructure failures (dialog cascade, orphan Access process) →
      fix infra, do NOT add to ISSUES.
+   - **⚠️ A failing test is a LEAD, not a confirmed user bug.**  Severity
+     reflects what a USER perceives, not which test went red.  Before
+     writing an entry, classify it (`evidence.finding_class`) and ground
+     it: P0/P1/P2 are reserved for symptoms a human can reproduce in the
+     Access UI (a popup / blank-or-wrong on-screen data / a file the user
+     asked for that is missing or corrupt), and each MUST carry
+     `evidence.vba_ref` + `fixture` + `user_symptom`.  Index-drift
+     cross-checks go to Appendix A (classify first — do NOT file as P0);
+     structural-metric / injected-marker leads (`:ERR` in `ZZ_TEST_DEBUG`,
+     export-file column/row counts) stay P5 until confirmed in the real
+     UI (`evidence.ui_verified=True`).  This is **enforced** by
+     `_validate_issues()` in `reports/generate_report.py` (it raises and
+     writes nothing on a contract violation) and pinned by
+     `tests/test_report_triage_gate.py`.  Full contract + the
+     `finding_class` vocabulary live in
+     [`docs/skills/issue-report-maintainer.md`](docs/skills/issue-report-maintainer.md)
+     § "Report-triage contract".
    - **⚠️ MANDATORY before writing any issue: look up every numeric ID
      in the MDB code tables.**  Fixture names like `office_80944_unfiltered`
      contain a *code-table ID*, not a person ID.  The prefix tells you
@@ -397,6 +422,19 @@ Triage convention used by the report:
 When triaging future findings, weight P0/P1 heavier than P2-P5.
 Static scans tend to surface a lot of low-priority noise — flag it,
 but don't let it crowd out the P0/P1 stuff.
+
+**P0/P1/P2 are reserved for what a USER perceives**, not for whichever
+test went red.  A cross-check threshold tripping vs an external
+snapshot, a structural metric parsed from an export file, or an
+injected `:ERR` marker the real error handler swallows are **leads, not
+confirmed user bugs** — they may only reach a user-perceptible tier
+after the symptom is confirmed in the real Access UI.  This is enforced
+by the report-triage gate (`_validate_issues()` in
+`reports/generate_report.py`, pinned by
+`tests/test_report_triage_gate.py`); the full contract +
+`evidence.finding_class` vocabulary live in
+[`docs/skills/issue-report-maintainer.md`](docs/skills/issue-report-maintainer.md)
+§ "Report-triage contract".
 
 **Static audits** are a release-workflow must-run.  Every audit
 under `analysis/audit_*.py` runs via

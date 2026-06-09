@@ -14,6 +14,7 @@ off, not a pull request.
 """
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 from docx import Document
@@ -1134,20 +1135,197 @@ _VALID_TIERS = frozenset([
 # not in tier_order), which is a silent-corruption trap.
 
 
-def _validate_issues() -> None:
-    """Fail loudly if any ISSUES entry has an unknown tier.
+# ---------------------------------------------------------------------
+# Report-triage contract (the "user-perceptible validation gate").
+# Full prose: docs/skills/issue-report-maintainer.md § "Report-triage
+# contract"; summary: AGENTS.md § Confirmed bugs.
+#
+# WHY THIS EXISTS.  Severity must reflect what a USER perceives, not
+# which test went red.  A regression run surfaces three kinds of red
+# that are NOT user-perceptible on their own and were historically
+# mis-filed as P0/P1:
+#   - a cross-check threshold tripping vs an external snapshot
+#     (c_index_year / c_index_addr_id drift) — a maintenance-cadence or
+#     classification question, not a UI bug;
+#   - a structural metric parsed out of an export file (vertex-count
+#     header vs row count, nodedef column count) — may be a real bug or
+#     a test-measurement artifact;
+#   - an injected harness marker firing (a ZZ_TEST_DEBUG ":ERR" written
+#     under MsgBox suppression) that the real error handler swallows so
+#     the user never sees it.
+# These are LEADS, not confirmed user bugs.  P0/P1/P2 are reserved for
+# findings a human can reproduce through the Access UI and observe a
+# concrete symptom (a popup, blank-or-wrong on-screen data, or a file
+# the user asked for that is missing or corrupt).  A lead may only be
+# rated P0/P1/P2 after the symptom is confirmed in the real UI
+# (evidence.ui_verified == True); otherwise it is P5 pending
+# verification, or (for drift) belongs in Appendix A.
+# ---------------------------------------------------------------------
 
-    A typo in 'tier' silently drops the issue from all rendered outputs
-    (it won't appear in tier_order).  Run this once before building so
-    the error surfaces immediately instead of producing a quietly
-    incomplete report.
+_FINDING_CLASSES = frozenset([
+    "user_facing_bug",    # a human reproduces it via the UI and sees a symptom
+    "cross_check_drift",  # divergence vs an external snapshot (index year/addr)
+    "structural_metric",  # derived by parsing an export file's structure
+    "internal_marker",    # detected only via an injected harness marker/state
+    "latent_code",        # real source defect with no current user-facing trigger
+])
+
+# Tiers that assert the symptom is user-perceptible on the current dump.
+_USER_PERCEPTIBLE_TIERS = frozenset([
+    "P0_silent_data", "P1_visible_crash", "P2_silent_display",
+])
+
+
+def _issue_violations(it: dict) -> list[str]:
+    """Return a list of triage-contract violations for one ISSUES entry.
+
+    Empty list == the entry satisfies the contract.  Collecting all
+    violations (rather than raising on the first) lets _validate_issues
+    report every problem in one pass.
     """
-    for it in ISSUES:
-        if it.get("tier") not in _VALID_TIERS:
-            raise ValueError(
-                f"ISSUES id={it.get('id')}: unknown tier {it.get('tier')!r}. "
-                f"Valid tiers: {sorted(_VALID_TIERS)}"
+    out: list[str] = []
+    tier = it.get("tier")
+    if tier not in _VALID_TIERS:
+        # A typo in 'tier' silently drops the issue from all rendered
+        # outputs (it won't appear in tier_order) — a silent-corruption
+        # trap.  Report and stop; later checks can't reason about tier.
+        out.append(
+            f"unknown tier {tier!r} (valid: {sorted(_VALID_TIERS)})"
+        )
+        return out
+
+    ev = it.get("evidence")
+    if not isinstance(ev, dict):
+        out.append(
+            "missing 'evidence' block.  Every issue needs "
+            "evidence={'finding_class': ..., ...}; P0/P1/P2 additionally "
+            "need vba_ref, fixture, user_symptom."
+        )
+        return out
+
+    fclass = ev.get("finding_class")
+    if fclass not in _FINDING_CLASSES:
+        out.append(
+            f"evidence.finding_class {fclass!r} invalid "
+            f"(valid: {sorted(_FINDING_CLASSES)})"
+        )
+        return out
+
+    # NOTE — the gate trusts the author-supplied `finding_class`; it
+    # enforces structure + class->tier routing, but it cannot divine
+    # whether a finding labelled `user_facing_bug` really is one.  That
+    # judgement is the reviewer's (the issue-report skill, the AI
+    # reviewer, codex).  A deliberate mis-label (drift filed as
+    # user_facing_bug to dodge routing) is caught in review, not here.
+    # Keep this boundary explicit rather than bolting on brittle
+    # keyword heuristics that would false-positive and create a false
+    # sense of completeness.
+
+    # `ui_verified` is a human attestation that the symptom was seen in
+    # the real Access UI.  Require literal True — a truthy string like
+    # "pending" must NOT unlock a user-perceptible tier.
+    ui_verified = ev.get("ui_verified") is True
+
+    # --- finding_class -> tier routing ---
+    if fclass == "user_facing_bug":
+        # Reproducible-now by a user → P0–P4.  A defect that is real but
+        # NOT user-triggerable on this dump is latent_code (→ P5), so a
+        # user_facing_bug parked at P5 is a contradiction.
+        if tier == "P5_dormant_or_latent":
+            out.append(
+                "user_facing_bug must be P0–P4.  A defect that is real but "
+                "not user-triggerable on this dump is latent_code (→ P5), "
+                "not user_facing_bug."
             )
+    elif fclass == "cross_check_drift":
+        # Drift belongs in Appendix A, not a standalone P-tier issue.
+        # Only admissible at all as P5 AND only when a per-row
+        # classifier has judged it a real algorithm bug (not a
+        # maintenance-cadence / source-snapshot diff).
+        if tier != "P5_dormant_or_latent" or not str(
+            ev.get("classification_ref") or ""
+        ).strip():
+            out.append(
+                "cross_check_drift findings belong in Appendix A, not a "
+                "P-tier issue.  Admissible only as P5_dormant_or_latent "
+                "WITH evidence.classification_ref pointing to a "
+                "classify_*_drift output that judged it a real algorithm "
+                "bug (not maintenance-cadence / source-snapshot drift)."
+            )
+    elif fclass == "latent_code":
+        if tier != "P5_dormant_or_latent":
+            out.append(
+                f"latent_code (real defect, no user-facing trigger today) "
+                f"must be tier P5_dormant_or_latent, not {tier}."
+            )
+    elif fclass in ("structural_metric", "internal_marker"):
+        # Not user-perceptible on its own.  Until a human confirms the
+        # symptom in the real UI (ui_verified), it may ONLY be P5 —
+        # parking it at P3/P4 must not dodge that requirement either.
+        if not ui_verified and tier != "P5_dormant_or_latent":
+            out.append(
+                f"{fclass} rated {tier} but evidence.ui_verified is not "
+                f"True.  A metric parsed from an export file / an injected "
+                f"harness marker is not user-perceptible on its own — open "
+                f"the artifact in the real Access UI, confirm the symptom, "
+                f"and set evidence.ui_verified=True, or file it as "
+                f"P5_dormant_or_latent pending verification."
+            )
+
+    # --- required evidence for user-perceptible tiers ---
+    if tier in _USER_PERCEPTIBLE_TIERS:
+        for field in ("vba_ref", "fixture", "user_symptom"):
+            if not str(ev.get(field) or "").strip():
+                out.append(
+                    f"tier {tier} requires a non-empty evidence.{field} "
+                    f"(source location / concrete reproducer / the symptom "
+                    f"a user observes)."
+                )
+        symptom = str(ev.get("user_symptom") or "").strip().lower()
+        # Lint (a BACKSTOP, not a proof) for the common anti-pattern of
+        # pasting test/assertion output in place of a user-observable
+        # symptom.  Patterns are high-precision — comparison operators,
+        # pytest-style "expected N … got M" count assertions, this repo's
+        # test-id prefixes and harness markers — chosen so they don't
+        # flag legitimate symptom prose ("the user got an empty folder").
+        # It cannot prove a symptom is genuinely user-facing; that is the
+        # reviewer's call (see the finding_class note above).
+        _restate_prefixes = ("detected by", "assertion", "assert ")
+        _restate_substrings = (
+            "zz_test_debug", "detected by test", "test_cmd", "test_export",
+            "test_bug", "test_index", "test_vba", ":err marker",
+            "!=", "==", "assertion failed", "assertion error",
+        )
+        if (symptom.startswith(_restate_prefixes)
+                or any(s in symptom for s in _restate_substrings)
+                or re.search(r"expected\b.{0,40}\bgot\b.*\d", symptom)):
+            out.append(
+                "evidence.user_symptom must describe what the USER observes "
+                "(a popup, blank-or-wrong on-screen data, a missing/corrupt "
+                "file), not restate the test assertion ('Detected by …' / "
+                "'expected N … got M')."
+            )
+
+    return out
+
+
+def _validate_issues() -> None:
+    """Enforce the report-triage contract before any file is written.
+
+    Fails loudly (raises ValueError listing every violation) so a
+    mis-tiered or under-evidenced issue surfaces immediately instead of
+    shipping in the report.  See _issue_violations / the module banner
+    above for the rules.  An empty ISSUES list passes (clean slate).
+    """
+    problems: list[str] = []
+    for it in ISSUES:
+        for msg in _issue_violations(it):
+            problems.append(f"ISSUES id={it.get('id')!r}: {msg}")
+    if problems:
+        raise ValueError(
+            f"Report-triage contract violations ({len(problems)}):\n  - "
+            + "\n  - ".join(problems)
+        )
 
 
 def _add_schema_diff_appendix_docx(doc, is_en: bool, Z) -> None:
