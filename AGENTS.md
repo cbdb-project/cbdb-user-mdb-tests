@@ -425,7 +425,10 @@ replay × golden (`test_lookatentry.py`, `test_other_lookat_forms.py`,
 Do NOT count a B/C "pass" as evidence the VBA is correct.  Differential
 tests currently use the replay as their oracle (class B) — migrating
 them to an independent oracle (HelpFile values / hand-SQL / the online
-snapshot) is task D1 in the remediation plan.
+snapshot) is task D1.  The plan to lift every B/C test to A and delete
+`cbdb_replay/` is tracked in
+[`docs/oracle-deprecation-tracking.md`](docs/oracle-deprecation-tracking.md);
+**do not extend `cbdb_replay`** (no new replay modules).
 
 ## Confirmed bugs in the live .mdb
 
