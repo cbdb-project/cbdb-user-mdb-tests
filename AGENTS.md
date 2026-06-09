@@ -134,6 +134,15 @@ looking at.
      `finding_class` vocabulary live in
      [`docs/skills/issue-report-maintainer.md`](docs/skills/issue-report-maintainer.md)
      § "Report-triage contract".
+   - **The gate is only the machine half.**  After rebuilding `ISSUES`
+     you MUST run the report self-review rubric and the
+     generate-draft-report (run `generate_report.py`) → self-review →
+     independent-review (review agent + codex) → finalize protocol in
+     [`docs/skills/issue-report-maintainer.md`](docs/skills/issue-report-maintainer.md)
+     § "Report self-review rubric + review protocol".  The report is not
+     done until the filled rubric exists and the independent review
+     reports no serious findings.  This is how the LLM-judgment in this
+     step is held to one standard across operators.
    - **⚠️ MANDATORY before writing any issue: look up every numeric ID
      in the MDB code tables.**  Fixture names like `office_80944_unfiltered`
      contain a *code-table ID*, not a person ID.  The prefix tells you

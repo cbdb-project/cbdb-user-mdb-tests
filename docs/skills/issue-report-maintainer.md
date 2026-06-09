@@ -129,6 +129,126 @@ labelled `user_facing_bug` really is one.  That judgement — and the
 reviewer, codex).  A deliberate mis-label is caught in review, not by
 the gate.
 
+## Report self-review rubric + review protocol (the LLM-judgment half)
+
+The triage gate above is the **machine-checkable** half: deterministic,
+same input → same pass/fail.  Authoring the report (rebuilding `ISSUES`
+each build) is **LLM judgment** — the calls the gate cannot verify
+("is this symptom really user-perceptible?", "is `finding_class`
+honest?", "is `vba_ref` the real defect line?").  To make two operators
+(or the same model on two days) converge, that judgment is bound by an
+explicit rubric **and** a mandatory independent review.
+
+### Protocol (do NOT skip a step)
+
+1. **Generate the draft** — rebuild `ISSUES` from scratch for this build
+   (clean slate; no carry-forward — see AGENTS.md § Build-test cycle),
+   then run `python reports/generate_report.py` to produce the draft
+   `reports/CBDB_Issues_Report_*.md` (this also runs the gate; it must
+   exit 0).  Steps 2–3 review THIS draft, not just the edited `ISSUES`.
+2. **Self-review** — fill in the rubric below for EVERY issue and for
+   the report as a whole.  A `[ ]` you cannot honestly tick is a defect
+   to fix, not to wave through.
+3. **Independent review (fresh context)** — this is the part that
+   catches self-rationalization.  After self-review, run BOTH:
+   - **≥1 review agent** (Agent tool, fresh context) that reads the
+     drafted `ISSUES` + the generated draft report and checks them
+     against this rubric + the triage gate; iterate until no blocker/major.
+   - **codex** (terminal, not an Agent):
+     `Write-Output "<rubric-based review prompt>" | codex exec --dangerously-bypass-approvals-and-sandbox`
+     ; iterate until no serious issue.
+4. **Fix → regenerate → re-run the gate** — apply the findings, re-run
+   `python reports/generate_report.py` (must exit 0), and repeat 2–3 if
+   the fixes were substantive.  Only THEN is the report final.
+
+The report is **not done** until the filled rubric exists AND step 3
+reports no serious findings.  Paste the filled rubric into the
+report-back / PR summary (same convention as
+`programmer-self-review-template.md`).
+
+### R1 — Per-issue (tick for EVERY entry; cite evidence inline)
+
+- [ ] **finding_class is honest** — it is NOT a `cross_check_drift` /
+  `structural_metric` / `internal_marker` mislabeled `user_facing_bug`
+  to dodge routing.  (If the lead came from an index-drift xcheck, a
+  parsed export-file metric, or a `ZZ_TEST_DEBUG` `:ERR` marker, the
+  class reflects that.)
+- [ ] **user_symptom is a real UI-observable effect** — a popup, blank
+  /wrong on-screen data, or a file the user asked for that is missing
+  /corrupt.  It is NOT a restatement of the test assertion.
+- [ ] **P0/P1/P2 were re-verified in the live Access UI** — `ui_verified`
+  is True ONLY because a human/agent actually reproduced the symptom by
+  driving the form (open → click → observe), not because a test marker
+  fired.  If not re-verified, the entry is P5 pending verification.
+- [ ] **`vba_ref` was opened and confirmed** to be the real defect
+  location (file + line), not guessed from the test name.
+- [ ] **`fixture` is grounded** — every numeric ID was looked up in the
+  MDB code tables to its human label per AGENTS.md (e.g.
+  `office_NNNNN → OFFICE_CODES.c_office_id`), Chinese name included; no
+  "person NNNNN" for a code-table ID.
+- [ ] **severity matches what the user perceives**, not which test went
+  red.  An entry was NOT escalated to P0/P1 merely because a threshold
+  cross-check or a structural metric tripped.
+- [ ] **steps_en/steps_zh reproduce the symptom as a human would** (the
+  exact picker codes / fixture / the row or file where it shows), not
+  "run python script X".
+- [ ] **screenshot present** for a visible (non-latent) issue, or its
+  absence is explained (e.g. form open hangs COM — reconstructed popup
+  with a hedge caption per the screenshot-consistency rules below).
+
+### R2 — Whole-report consistency
+
+- [ ] **Coverage floor met** — every form×button cell, every
+  `analysis/audit_*.py`, and every appendix kind that
+  `reports/archive/build_20260430/` exercised is represented in THIS
+  build (as an issue, or an explicit "audit clean" / "cell passed").
+  No silent shrinkage — compare against `reports/archive/build_20260430/`
+  by hand until the machine coverage-floor check (remediation-plan task
+  C0) lands.
+- [ ] **Static-audit hits folded in** — `analysis/run_all_audits.py`
+  output was read; each hit is either a classified issue or recorded
+  clean.  (Audit-sourced bugs must not vanish just because pytest was
+  green.)
+- [ ] **Appendix A is generated from the drift classifiers** (not
+  hand-written); no stale hardcoded counts (the "~575 diffs / N rows"
+  text must be data-driven).  Drift stays in Appendix A unless promoted
+  to P5 with `classification_ref`.
+- [ ] **Build is stamped** — the report header + pytest JSON record
+  which `CBDB_*_DATA.mdb` build this run tested.
+- [ ] **Bilingual + README agree** — EN and ZH summaries report the same
+  counts/classifications; README tier-count table + ZH "已確認 N 個
+  issue" line match `ISSUES`.
+- [ ] **No cross-build carry-forward** — no "fixed in build X" reasoning
+  anywhere (report or audit MANIFESTs); each entry is fresh for THIS
+  build (principle: build independence).
+- [ ] **Gate passes** — `python reports/generate_report.py` exits 0.
+
+### R3 — Evidence vs claim (same spirit as programmer-self-review-template.md)
+
+- [ ] Every claim traces to a test/probe this build ran or to clearly
+  labeled static inference; inferences are hedged (*likely* /
+  *static evidence suggests*), not stated as proven facts.
+- [ ] No extrapolation from one test/cell to a broader claim it does
+  not cover.
+
+### R4 — Independent review record
+
+- [ ] A fresh-context **review agent** checked the report against R1–R3
+  + the gate; all blocker/major findings closed.
+- [ ] **codex** reviewed against R1–R3 + the gate; no serious issue
+  remains.
+- [ ] Residual risk named: what was NOT verified this build, and what
+  would verify it later.
+
+### Worked exemplar (copy the SHAPE, not the content)
+
+For the gold standard of a fully-formed entry, study build_20260430's
+Issue #7 and Issue #20 in `reports/archive/build_20260430/CBDB_Issues_Report_EN.md`:
+VBA `file:line`, a grounded fixture with its Chinese label, byte/behavior
+evidence, an honest screenshot caption, and an independent-oracle
+citation.  Reuse that shape; never reuse that build's issue *content*
+(it was one run's findings, not a standard).
+
 ## When you can change `severity` / `count`
 
 You can change severity ONLY when the SAME PR also:
