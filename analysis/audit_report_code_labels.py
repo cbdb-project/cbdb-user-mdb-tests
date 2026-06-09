@@ -35,8 +35,10 @@ This audit:
    `reports/report_code_label_audit.json`.
 
 If the audit finds a mismatch, the JSON's `mismatches` array
-will be non-empty and the regression test in
-`tests/test_markdown_report.py` will fail.
+will be non-empty.  Run this directly
+(`python analysis/audit_report_code_labels.py`) after regenerating
+the report; the pytest wrapper that used to assert it is re-added
+when the canonical report is rebuilt.
 
 Pure pyodbc; no Access COM.
 """

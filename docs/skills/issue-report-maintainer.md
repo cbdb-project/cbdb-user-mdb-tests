@@ -56,6 +56,79 @@ P5 covers three flavours:
 - **NOT CURRENTLY REPRODUCIBLE** — kept as historical record after
   re-verification couldn't trigger the symptom.
 
+## Report-triage contract (the user-perceptible validation gate)
+
+**Severity must reflect what a USER perceives, not which test went
+red.**  A regression run surfaces three kinds of red that are *not*
+user-perceptible on their own and were historically mis-filed as
+P0/P1:
+
+- a **cross-check threshold** tripping vs an external snapshot
+  (`c_index_year` / `c_index_addr_id` drift) — a maintenance-cadence
+  or classification question, not a UI bug;
+- a **structural metric** parsed out of an export file (a Pajek
+  vertex-count header vs row count, a Gephi nodedef column count) —
+  may be a real bug *or* a test-measurement artifact;
+- an **injected harness marker** firing (a `ZZ_TEST_DEBUG` `:ERR`
+  written under MsgBox suppression) that the real error handler
+  swallows so the user never sees it.
+
+These are **leads, not confirmed user bugs.**  P0/P1/P2 are reserved
+for findings a human can reproduce through the Access UI and observe a
+concrete symptom (a popup, blank-or-wrong on-screen data, or a file the
+user asked for that is missing or corrupt).  A lead may only be rated
+P0/P1/P2 after the symptom is confirmed in the real UI; otherwise it is
+P5 pending verification, or (for drift) belongs in Appendix A.
+
+This is **enforced in code** by `_validate_issues()` /
+`_issue_violations()` in `reports/generate_report.py` (runs before any
+file is written — a violation raises and no report is produced) and
+**pinned by** `tests/test_report_triage_gate.py`.  The contract:
+
+**Every `ISSUES` entry carries a structured `evidence` block:**
+
+```python
+"evidence": {
+    "finding_class": "user_facing_bug",   # required; controlled vocab below
+    "vba_ref": "Form_LookAtPlace.vb:322",  # required for P0/P1/P2
+    "fixture": "c_addr_id=100658 (Kaifeng 開封)",  # required for P0/P1/P2
+    "user_symptom": "DAO 3265 popup; chosen export folder is empty",  # required P0/P1/P2
+    "detection": "audit_recordset_sql_projection",  # optional: how it was found
+    "ui_verified": True,    # human confirmed the symptom in the real Access UI
+    "classification_ref": "reports/index_addr_drift_classification.json",  # drift only
+},
+```
+
+**`finding_class` controlled vocabulary:**
+
+| class | meaning | admissible tiers |
+|---|---|---|
+| `user_facing_bug` | a human reproduces it via the UI and sees a symptom | P0–P4 (a *dormant* user-facing defect is `latent_code` → P5, not this) |
+| `cross_check_drift` | divergence vs an external snapshot (index year/addr) | **P5 only**, AND only with `classification_ref` to a `classify_*_drift` output that judged it a real algorithm bug (not maintenance-cadence / source-snapshot drift) |
+| `structural_metric` | derived by parsing an export file's structure | **P5** unless `ui_verified == True` |
+| `internal_marker` | detected only via an injected harness marker / harness-only state | **P5** unless `ui_verified == True` |
+| `latent_code` | real source defect with no current user-facing trigger | **P5 only** |
+
+**The gate enforces:**
+
+1. `tier` valid; `evidence` present; `finding_class` in the vocab.
+2. P0/P1/P2 require non-empty `vba_ref` + `fixture` + `user_symptom`,
+   and `user_symptom` must describe what the user observes — not
+   restate a test assertion (`Detected by …`, `expected N … got M`,
+   `!=`, `ZZ_TEST_DEBUG`, a `test_*` id …).
+3. `cross_check_drift` is forbidden outside P5-with-`classification_ref`.
+4. `structural_metric` / `internal_marker` must be P5 unless
+   `ui_verified is True` (literal `True` — a truthy `"pending"` does
+   not unlock a tier).
+5. `latent_code` must be P5.  Empty `ISSUES` passes (clean slate).
+
+**The gate validates STRUCTURE, not truth.**  It trusts the
+author-supplied `finding_class`; it cannot divine whether a finding
+labelled `user_facing_bug` really is one.  That judgement — and the
+`ui_verified` attestation — is the reviewer's (this skill, the AI
+reviewer, codex).  A deliberate mis-label is caught in review, not by
+the gate.
+
 ## When you can change `severity` / `count`
 
 You can change severity ONLY when the SAME PR also:
@@ -142,7 +215,7 @@ python reports/generate_report.py
 python analysis/audit_report_code_labels.py
 python analysis/audit_report_screenshot_consistency.py
 python analysis/reverify_all_issues.py
-pytest tests/test_known_bugs.py tests/test_markdown_report.py \
+pytest tests/test_known_bugs.py tests/test_report_triage_gate.py \
        -W ignore --no-discover-inputs
 pytest tests/ -W ignore
 ```
@@ -161,7 +234,7 @@ python reports/generate_report.py
 python analysis/audit_report_code_labels.py
 python analysis/audit_report_screenshot_consistency.py
 python analysis/reverify_all_issues.py
-pytest tests/test_known_bugs.py tests/test_markdown_report.py \
+pytest tests/test_known_bugs.py tests/test_report_triage_gate.py \
        -W ignore --no-discover-inputs
 pytest tests/ -W ignore
 ```
@@ -307,7 +380,7 @@ was written AND about the current canonical state.
 [ ] synced README tier-count table + ZH summary line if severity / count changed
 [ ] ran `python analysis/reverify_all_issues.py` and updated its
     bucket logic for this issue if classification shifted
-[ ] ran `pytest tests/test_known_bugs.py tests/test_markdown_report.py
+[ ] ran `pytest tests/test_known_bugs.py tests/test_report_triage_gate.py
     -W ignore --no-discover-inputs`
 [ ] updated screenshots / captions if the tier changed
     (P5 latent must NOT carry active-tense "users see ... popup"
