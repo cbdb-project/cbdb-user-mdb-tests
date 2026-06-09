@@ -385,9 +385,11 @@ silently vanish or differ), then the rest.
     the replay (verify each individually when tagging).
 
 ### D1 — Move the differential oracle off the replay  [MAJOR]
-- **Problem:** `tests/test_vba_differential.py` compares real VBA to `cbdb_replay`,
-  which was written by reading the same VBA → circular; contradicts principle 1 and
+- **Problem:** `tests/test_vba_differential.py` AND `tests/test_vba_matrix.py`
+  (both class B in the registry) compare real VBA to `cbdb_replay`, which was
+  written by reading the same VBA → circular; contradicts principle 1 and
   `AGENTS.md` ("compare with INDEPENDENT source SQL, not the Python replay").
+  Live tracking checklist: `docs/oracle-deprecation-tracking.md`.
 - **Fix:** replace the oracle with an independent source per fixture: HelpFile-
   documented expected values, hand-derived SQL that does NOT reuse `cbdb_replay`, or
   the cbdb-online-main-server snapshot. Until migrated, keep the test but label it
@@ -648,6 +650,31 @@ The standardized method is complete when ALL hold:
   fails if a new test is unclassified (no silent C-class creep).  AGENTS.md §
   "Oracle classification" documents it.  Reviewed by review agent (fixed
   test_infra_smoke NA→A) + codex; none found.
-- _next_: **D2 (replay deprecation tracking) + D1 (differential oracle off the
-  replay — document the requirement; the independent-oracle construction itself
-  needs domain input + a live COM run, so it's scaffolded/tracked, not built blind).**
+- 2026-06-09 — **D1 + D2 done** (documented/tracked): `docs/oracle-deprecation-tracking.md`
+  is the living checklist — D1 migrates the two class-B differential tests
+  (`test_vba_differential`, `test_vba_matrix`) off the `cbdb_replay` oracle to an
+  independent source; D2 replaces the three class-C replay×golden tests with
+  class-A real-VBA tests then deletes the orphaned `cbdb_replay` modules.  The
+  actual independent-oracle construction is NOT done blind (needs domain input +
+  a live Access-COM run); the D0 registry meanwhile ensures B/C passes aren't
+  counted as VBA verification, so the gap is tracked, not silent.  AGENTS.md +
+  plan §6 D1 point at the tracker.  Reviewed by review agent + codex; findings
+  (stale HelpFile claim, plan/doc D1 scope, guard-mechanic wording) closed.
+
+---
+
+## ALL PHASES COMPLETE (2026-06-09)
+
+Phase 0 (clean slate + triage gate) · E1+E2 (self-review rubric + review
+protocol) · C0 (coverage floor) · **B1–B11** (single entrypoint/archive,
+`--include-vba` default, build pinning, deterministic discovery+sampling,
+strict goldens, scoped MSACCESS kill, explicit discovery, centralized timeouts)
+· **C2/C3/C4** (audits folded in, Appendix A data-driven, screenshot gate) ·
+**D0** (oracle classification) · **D1/D2** (replay-deprecation tracking).
+
+Every increment passed a fresh-context review agent + codex.  Remaining *non-code*
+work is deliberately deferred and tracked: the D1 independent-oracle construction
+(needs domain input + live COM) and the D2 replay→real-VBA migrations
+(`docs/oracle-deprecation-tracking.md`).  The standardized method (run_tests.ps1
+single entrypoint + the gates) is in place; the next real-data build run exercises
+it end-to-end.
