@@ -202,9 +202,10 @@ report-back / PR summary (same convention as
   `analysis/audit_*.py`, and every appendix kind that
   `reports/archive/build_20260430/` exercised is represented in THIS
   build (as an issue, or an explicit "audit clean" / "cell passed").
-  No silent shrinkage — compare against `reports/archive/build_20260430/`
-  by hand until the machine coverage-floor check (remediation-plan task
-  C0) lands.
+  No silent shrinkage — run `python analysis/check_coverage_floor.py`
+  (it compares the current build against the build_20260430 floor in
+  `docs/coverage-floor.json`; regenerate the current export matrix +
+  drift classifiers first, then it must exit 0).
 - [ ] **Static-audit hits folded in** — `analysis/run_all_audits.py`
   output was read; each hit is either a classified issue or recorded
   clean.  (Audit-sourced bugs must not vanish just because pytest was

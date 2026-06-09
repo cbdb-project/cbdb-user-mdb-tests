@@ -499,5 +499,14 @@ The standardized method is complete when ALL hold:
   protocol generate-draft → self-review → independent fresh-context review (review
   agent + codex) → finalize; `AGENTS.md` step 7 now requires it. Reviewed by review
   agent + codex; sequencing/coverage findings closed.
-- _next_: (recommended order) **C0 (coverage floor)** → B7/B3/B1 (stop silent
-  shrinkage + entrypoint) → remaining B → C2/C3/C4 → D0/D1/D2.
+- 2026-06-09 — **C0 done**: `analysis/build_coverage_floor.py` generates
+  `docs/coverage-floor.json` (54 export cells w/ min-depth, 24 required audits,
+  index-drift-classification appendix) from the build_20260430 archive;
+  `analysis/check_coverage_floor.py` (pure `export_gaps`/`audit_gaps`/
+  `appendix_gaps`/`all_gaps` + CLI) fails with named gaps on any regression below
+  the floor; `tests/test_coverage_floor.py` (12 cases) pins it. Verified end-to-end
+  against the archive matrix (export 0 gaps, appendix gap fires). Still TODO: wire
+  the checker into the single entrypoint (B1) so a real build runs it after
+  regenerating the current export matrix + drift classifiers.
+- _next_: (recommended order) **B7/B3/B1 (stop silent shrinkage + entrypoint)** →
+  remaining B → C2/C3/C4 → D0/D1/D2.
