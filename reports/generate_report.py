@@ -1175,13 +1175,50 @@ _USER_PERCEPTIBLE_TIERS = frozenset([
     "P0_silent_data", "P1_visible_crash", "P2_silent_display",
 ])
 
+# Tiers that should carry screenshots when captured (visible in the UI).
+# P4 setup / P5 latent are exempt (latent shots are optional + hedged).
+_SCREENSHOT_TIERS = frozenset([
+    "P0_silent_data", "P1_visible_crash", "P2_silent_display", "P3_missing_ui",
+])
 
-def _issue_violations(it: dict) -> list[str]:
+
+def _screenshot_gap(issue_id, declared, available) -> str | None:
+    """C4: flag the build-20260605 regression where screenshot files existed
+    on disk but the entry shipped with screenshots=[] (imageless docx).
+
+    `declared` = the entry's screenshots list; `available` = filenames present
+    in reports/screenshots/.  Returns a message if files named bug<id>_* exist
+    but none are declared, else None.
+
+    Scope/limitation: this keys on capture_screenshots.py's `bug<id>_*` naming
+    convention.  It catches the exact build-20260605 regression (files on disk
+    but screenshots=[]); it does NOT guarantee every visible issue HAS a
+    screenshot, nor catch shots saved under a non-bug<id>_ name.  The
+    declared-vs-present caption audit (analysis/audit_report_screenshot_
+    consistency.py) is the complementary check.
+    """
+    if not issue_id or declared:
+        return None
+    prefix = f"bug{issue_id}_"
+    hits = [f for f in available if f.startswith(prefix)]
+    if hits:
+        return (
+            f"{len(hits)} screenshot file(s) for issue {issue_id} exist in "
+            f"reports/screenshots/ ({prefix}*) but the entry's screenshots=[] "
+            f"— wire them into the entry, or the report ships imageless (the "
+            f"build-20260605 regression)."
+        )
+    return None
+
+
+def _issue_violations(it: dict, shot_files: list | None = None) -> list[str]:
     """Return a list of triage-contract violations for one ISSUES entry.
 
     Empty list == the entry satisfies the contract.  Collecting all
     violations (rather than raising on the first) lets _validate_issues
-    report every problem in one pass.
+    report every problem in one pass.  ``shot_files`` is the list of
+    filenames in reports/screenshots/ (computed once by _validate_issues);
+    None means "read SHOT_DIR now" (used by ad-hoc callers/tests).
     """
     out: list[str] = []
     tier = it.get("tier")
@@ -1306,6 +1343,16 @@ def _issue_violations(it: dict) -> list[str]:
                 "'expected N … got M')."
             )
 
+    # --- screenshot-presence gate (C4) ---
+    if tier in _SCREENSHOT_TIERS:
+        if shot_files is None:
+            shot_files = ([p.name for p in SHOT_DIR.glob("*")]
+                          if SHOT_DIR.exists() else [])
+        gap = _screenshot_gap(it.get("id"), it.get("screenshots") or [],
+                              shot_files)
+        if gap:
+            out.append(gap)
+
     return out
 
 
@@ -1317,9 +1364,11 @@ def _validate_issues() -> None:
     shipping in the report.  See _issue_violations / the module banner
     above for the rules.  An empty ISSUES list passes (clean slate).
     """
+    shot_files = ([p.name for p in SHOT_DIR.glob("*")]
+                  if SHOT_DIR.exists() else [])
     problems: list[str] = []
     for it in ISSUES:
-        for msg in _issue_violations(it):
+        for msg in _issue_violations(it, shot_files=shot_files):
             problems.append(f"ISSUES id={it.get('id')!r}: {msg}")
     if problems:
         raise ValueError(

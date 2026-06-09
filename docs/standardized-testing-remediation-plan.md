@@ -609,5 +609,12 @@ The standardized method is complete when ALL hold:
   incl. annotated defaults / 180s); none found.  NOTE: the bare `time.sleep(N)`
   *settle* delays (short, not completion gates) and pywinauto window-ready
   `timeout=10` are intentionally left.
+- 2026-06-09 — **C4 done** (screenshot-presence gate): `generate_report._screenshot_gap`
+  + `_SCREENSHOT_TIERS` (P0/P1/P2/P3) flag the build-20260605 regression — when
+  `reports/screenshots/bug<id>_*` files exist on disk but the entry's
+  `screenshots=[]` (the imageless-docx hole), generation FAILS.  P4/P5 exempt.
+  Screenshot capture is already back in the pipeline (run_tests.ps1 Step 6) and
+  the caption-consistency audit runs at Step 5f.  6 new tests in
+  test_report_triage_gate.py (42 total).  Reviewed by review agent + codex; none found.
 - _next_: (recommended order) **C2 (fold static audits into the report)** →
   C3 (drift classification into Appendix A) → C4 (screenshots gate) → D0/D1/D2.
