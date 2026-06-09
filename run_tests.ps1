@@ -63,6 +63,16 @@ function Verify-Complete {
     }
     Write-Host "`n>>> coverage-floor gate (must not cover less than build_20260430)" -ForegroundColor Cyan
     Run "python `"$ROOT\analysis\check_coverage_floor.py`""
+    # C2: report-consistency audits over the GENERATED report.  The code-label
+    # audit FAILS if a MANIFEST-attributed issue's block is missing from the
+    # report (a dropped audit-sourced bug — the build-20260605 mode) or its code
+    # labels drift; the screenshot audit fails on caption/tier inconsistency.
+    # Build-independent: the MANIFEST is maintained per build (a genuinely-fixed
+    # issue is removed from it WITH evidence, per the marker-failure policy).
+    Write-Host "`n>>> report code-label audit (dropped/mislabeled manifested issue)" -ForegroundColor Cyan
+    Run "python `"$ROOT\analysis\audit_report_code_labels.py`""
+    Write-Host "`n>>> report screenshot-consistency audit" -ForegroundColor Cyan
+    Run "python `"$ROOT\analysis\audit_report_screenshot_consistency.py`""
     Write-Host "`n=== build verified complete ===" -ForegroundColor Green
 }
 
@@ -142,9 +152,14 @@ Run "python `"$ROOT\reports\collect_schema_diffs.py`""
 Write-Host "`n=== Step 5e: Export coverage matrix ===" -ForegroundColor Yellow
 Run "python `"$ROOT\analysis\export_coverage_matrix.py`""
 
-# ---- Step 5f: static audits (informational; folded into ISSUES at step 7) -
-Write-Host "`n=== Step 5f: Static audits ===" -ForegroundColor Yellow
-RunSoft "python `"$ROOT\analysis\run_all_audits.py`""
+# ---- Step 5f: static audits (C2) -----------------------------------------
+# --ci surfaces ONLY findings ABOVE analysis/audit_baseline.json (a NEW audit
+# hit = a candidate bug the step-7 author MUST fold into ISSUES or record clean;
+# the default exit code is always nonzero because known bugs flag, so it would
+# be uninformative here).  RunSoft: a new finding warns loudly but doesn't abort
+# the run — triage happens at step 7 (see the report-triage contract).
+Write-Host "`n=== Step 5f: Static audits (--ci: new findings vs baseline) ===" -ForegroundColor Yellow
+RunSoft "python `"$ROOT\analysis\run_all_audits.py`" --ci"
 
 # ---- Step 6: screenshots -------------------------------------------------
 Write-Host "`n=== Step 6: Screenshots ===" -ForegroundColor Yellow

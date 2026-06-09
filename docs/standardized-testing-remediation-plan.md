@@ -626,5 +626,18 @@ The standardized method is complete when ALL hold:
   note always appear (the intro's promise is now honoured; no silently-missing
   section).  Reviewed by review agent + codex; finding (missing else-placeholder)
   closed.
-- _next_: (recommended order) **C2 (fold static audits into the report)** →
-  C3 (drift classification into Appendix A) → C4 (screenshots gate) → D0/D1/D2.
+- 2026-06-09 — **C2 done** (fold static audits into the report): run_tests.ps1
+  Step 5f now runs `run_all_audits.py --ci` (RunSoft) — surfaces audit findings
+  ABOVE `analysis/audit_baseline.json` as triage input without aborting.  The
+  `-Verify` gate now also fatally runs `audit_report_code_labels.py` +
+  `audit_report_screenshot_consistency.py` AFTER the report exists: the code-label
+  audit FAILS if a MANIFEST-attributed issue's block is missing from the rebuilt
+  report (the exact build-20260605 dropped-issue mode) or its labels drift — and
+  it's build-independent because the MANIFEST is maintained per build (a fixed
+  issue is removed WITH evidence per the marker-failure policy), NOT a naive
+  "all historical ids must appear" rule.  Reviewed by review agent (raised the
+  --ci-insufficiency MAJOR → fixed via the -Verify audits) + codex; none found.
+  **Phase B + C complete.**
+- _next_: (recommended order) **D0 (oracle classification A/B/C)** → D2 (replay
+  deprecation tracking) → D1 (differential oracle off the replay — scaffold +
+  document; full independent-oracle construction needs domain input + live COM).
