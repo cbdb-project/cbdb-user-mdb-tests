@@ -22,6 +22,7 @@ that the depth check legitimately catches downstream.
 """
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 import pyodbc
@@ -30,18 +31,41 @@ import pytest
 ROOT = Path(__file__).resolve().parent.parent
 USER_MDB = ROOT / "data" / "CBDB_BJ_User.mdb"
 
-# Known counts as of CBDB_20260430_DATA.mdb.  When upstream fixes
-# the data these will drop to 0; treat any change as a signal to
-# re-evaluate the GIS depth check failure documented in
-# analysis/gis_status_embedded_delim_root_cause.md.
-_EXPECTED_BOM_ROWS_C_NAME = 315
-_EXPECTED_BOM_ROWS_C_NAME_CHN = 315
+# BOM dirty-row count is a PER-BUILD data characteristic, not a constant.
+# Upstream cleaned the stray U+FEFF prefixes between builds:
+#   20260430 -> 315 dirty rows (Issue #20 reproduces)
+#   20260602 -> 0   dirty rows (cleaned; Issue #20 dormant on this build)
+# Anchor the expectation to the build so the test asserts the RIGHT thing
+# per build instead of silently passing/failing on drift (plan B8).  A
+# build not in this map => xfail "not calibrated for build X" — measure
+# the count on that build and add it here.
+_BOM_ROWS_BY_BUILD = {
+    "20260430": 315,
+    "20260602": 0,
+}
 
-# The one row reachable from STATUS_DATA.c_status_code=40 (PR T's
-# LookAtStatus fixture).  This is the row that flips row 11476 of
-# the GIS export from a clean 9-cell line into a 10-cell line.
+# The one row that was reachable-and-dirty from STATUS_DATA.c_status_code=40
+# (PR T's LookAtStatus fixture) on the dirty builds — flips GIS row 11476
+# from a clean 9-cell line into a 10-cell line.
 _KNOWN_REACHABLE_DIRTY_ADDR_ID = 702559    # Wei Shi 尉氏
 _KNOWN_REACHABLE_PERSON_ID = 29619         # Ruan Fu 阮孚
+
+
+def _expected_bom_rows() -> int:
+    """Expected BOM-dirty row count for the build in data/, or xfail if the
+    build isn't calibrated yet."""
+    _ana = str(ROOT / "analysis")
+    if _ana not in sys.path:
+        sys.path.insert(0, _ana)
+    from build_stamp import current_build  # noqa: E402
+    build = current_build(ROOT)
+    if build not in _BOM_ROWS_BY_BUILD:
+        pytest.xfail(
+            f"ADDR_CODES BOM-row count not calibrated for build {build!r}.  "
+            f"Measure it (count rows where c_name contains U+FEFF) and add "
+            f"'{build}': <count> to _BOM_ROWS_BY_BUILD."
+        )
+    return _BOM_ROWS_BY_BUILD[build]
 
 
 def _open() -> pyodbc.Connection:
@@ -59,11 +83,12 @@ def conn() -> pyodbc.Connection:
     c.close()
 
 
-def test_addr_codes_has_known_bom_dirty_rows(conn) -> None:
-    """315 rows of ADDR_CODES carry a stray BOM prefix in c_name
-    and c_name_chn.  See analysis/gis_status_embedded_delim_root_
-    cause.md for the full chain to silent column-misalignment in
-    GIS exports."""
+def test_addr_codes_bom_dirty_rows_match_build(conn) -> None:
+    """ADDR_CODES BOM-prefixed row count matches the calibrated value for
+    THIS build.  Dirty builds (e.g. 20260430: 315) reproduce Issue #20;
+    clean builds (e.g. 20260602: 0) have it dormant.  See
+    analysis/gis_status_embedded_delim_root_cause.md."""
+    expected = _expected_bom_rows()
     cur = conn.cursor()
     cur.execute("SELECT c_name, c_name_chn FROM ADDR_CODES")
     n_bom_name = 0
@@ -75,28 +100,34 @@ def test_addr_codes_has_known_bom_dirty_rows(conn) -> None:
         if nz is not None and "﻿" in nz:
             n_bom_name_chn += 1
 
-    # Don't be exact — allow ±10% drift in case a few rows get
-    # cleaned up incrementally.  But require *some* dirty rows so
-    # the LookAtStatus row 11476 test stays meaningful.
-    assert n_bom_name >= _EXPECTED_BOM_ROWS_C_NAME * 0.9, (
-        f"ADDR_CODES.c_name BOM-prefixed row count dropped from "
-        f"{_EXPECTED_BOM_ROWS_C_NAME} to {n_bom_name}.  Upstream "
-        f"may have cleaned the data — re-run the LookAtStatus "
-        f"GIS test (row 11476) and decide if this regression test "
-        f"can be removed.  See "
-        f"analysis/gis_status_embedded_delim_root_cause.md."
-    )
-    assert n_bom_name_chn >= _EXPECTED_BOM_ROWS_C_NAME_CHN * 0.9, (
-        f"ADDR_CODES.c_name_chn BOM-prefixed row count dropped "
-        f"from {_EXPECTED_BOM_ROWS_C_NAME_CHN} to {n_bom_name_chn}."
-    )
+    if expected == 0:
+        # Clean build: the dirty-data condition (and Issue #20) is dormant.
+        assert n_bom_name == 0 and n_bom_name_chn == 0, (
+            f"build calibrated to 0 BOM rows but found "
+            f"c_name={n_bom_name}, c_name_chn={n_bom_name_chn}.  Recalibrate "
+            f"_BOM_ROWS_BY_BUILD or investigate new dirty data."
+        )
+    else:
+        # Dirty build: require ~expected rows (±10% for incremental cleanup)
+        # so the downstream LookAtStatus GIS row-11476 check stays meaningful.
+        assert n_bom_name >= expected * 0.9, (
+            f"ADDR_CODES.c_name BOM-prefixed row count {n_bom_name} is below "
+            f"90% of the calibrated {expected} for this build.  If upstream "
+            f"cleaned the data, recalibrate _BOM_ROWS_BY_BUILD and re-check "
+            f"the LookAtStatus GIS test (row 11476)."
+        )
+        assert n_bom_name_chn >= expected * 0.9, (
+            f"ADDR_CODES.c_name_chn BOM-prefixed row count {n_bom_name_chn} "
+            f"is below 90% of the calibrated {expected}."
+        )
 
 
 def test_known_reachable_dirty_addr_present(conn) -> None:
-    """addr_id 702559 (Wei Shi / 尉氏) is the one BOM-dirty row
-    reachable from status_code=40 in the PR T LookAtStatus
-    fixture.  This is the row that produces the 10-cell line at
-    GIS row 11476."""
+    """addr_id 702559 (Wei Shi / 尉氏) is the row reachable from
+    status_code=40 in the PR T LookAtStatus fixture — on dirty builds it
+    is BOM-prefixed (producing the 10-cell GIS line at row 11476); on
+    clean builds it must exist but carry NO BOM."""
+    expected = _expected_bom_rows()
     cur = conn.cursor()
     cur.execute(
         "SELECT c_addr_id, c_name, c_name_chn FROM ADDR_CODES "
@@ -108,11 +139,22 @@ def test_known_reachable_dirty_addr_present(conn) -> None:
         f"{_KNOWN_REACHABLE_DIRTY_ADDR_ID}, got {len(rows)}."
     )
     aid, n, nz = rows[0]
+
+    if expected == 0:
+        # Clean build: the row exists but the BOM was stripped upstream.
+        assert (n is None or not n.startswith("﻿")) and \
+               (nz is None or not nz.startswith("﻿")), (
+            f"build calibrated clean (0 BOM rows) but c_addr_id="
+            f"{_KNOWN_REACHABLE_DIRTY_ADDR_ID} still BOM-prefixed: "
+            f"c_name={n!r}, c_name_chn={nz!r}.  Recalibrate _BOM_ROWS_BY_BUILD."
+        )
+        return
+
     assert n is not None and n.startswith("﻿"), (
         f"ADDR_CODES.c_name for {_KNOWN_REACHABLE_DIRTY_ADDR_ID} "
         f"no longer starts with U+FEFF: {n!r}.  If this row was "
-        f"cleaned up, re-check the LookAtStatus GIS row 11476 "
-        f"failure — it may now pass."
+        f"cleaned up, recalibrate _BOM_ROWS_BY_BUILD to 0 for this "
+        f"build and re-check the LookAtStatus GIS row 11476 failure."
     )
     assert nz is not None and nz.startswith("﻿"), (
         f"ADDR_CODES.c_name_chn for "
