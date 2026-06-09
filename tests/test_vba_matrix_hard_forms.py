@@ -135,7 +135,7 @@ def test_hard_form_query_small_fixture(vba: VbaSession, fx: CrossFixture):
     if spec.name == "LookAtGroupData":
         vba.click_via_timer(
             spec.name, ctl=spec.cmd_name,
-            result_table=None, timeout=180,
+            result_table=None,
         )
         _check_groupdata(vba, fx.picker_ids[0])
         return
@@ -143,7 +143,7 @@ def test_hard_form_query_small_fixture(vba: VbaSession, fx: CrossFixture):
     if spec.name == "LookAtAssociationPairs":
         vba.click_via_timer(
             spec.name, ctl=spec.cmd_name,
-            result_table=spec.result_table, timeout=180,
+            result_table=spec.result_table,
         )
         _check_assoc_pairs(vba)
         return
@@ -152,7 +152,7 @@ def test_hard_form_query_small_fixture(vba: VbaSession, fx: CrossFixture):
     # future fixtures).
     n = vba.click_via_timer(
         spec.name, ctl=spec.cmd_name,
-        result_table=spec.result_table, timeout=180,
+        result_table=spec.result_table,
     )
     print(f"\n[{spec.name}] {spec.cmd_name} -> {n} rows in {spec.result_table}",
           flush=True)

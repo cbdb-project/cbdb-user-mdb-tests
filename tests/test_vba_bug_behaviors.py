@@ -33,7 +33,7 @@ from pathlib import Path
 
 import pytest
 
-from cbdb_driver.vba_session import VbaSession, make_fixture
+from cbdb_driver.vba_session import VbaSession, make_fixture, DEFAULT_VBA_TIMEOUT
 from cbdb_driver.form_specs import LOOKATPLACE, LOOKATENTRY, LOOKATKINSHIP
 from test_vba_matrix_all_forms import _all_fixtures, CrossFixture, SRC
 
@@ -83,7 +83,7 @@ def _read_debug_log(vba: VbaSession) -> list[str]:
 
 def _chain_via_tag(vba: VbaSession, form: str, *,
                     chain: str, target_table: str = "",
-                    timeout: int = 90) -> list[str]:
+                    timeout: float = DEFAULT_VBA_TIMEOUT) -> list[str]:
     """Fire CmdQuery → chain target via Form.Tag, return ZZ_TEST_DEBUG."""
     out_dir = WORK.parent / "_bug_behavior_out"
     out_dir.mkdir(exist_ok=True)
@@ -174,7 +174,7 @@ def test_bug5_lookat_status_cmdpajek_sql_fires_field_error(vba: VbaSession):
 
     # Direct timer-fire CmdPajek (NO CmdQuery chain).
     vba.click_via_timer(spec.name, ctl="CmdPajek",
-                         result_table=None, timeout=60)
+                         result_table=None)
     msgs = _read_debug_log(vba)
     print(f"\nDEBUG log: {msgs}", flush=True)
     err_msgs = [m for m in msgs if ":ERR " in m]
@@ -535,7 +535,7 @@ def test_bug22_associations_cmducinet_fires_invalid_procedure_call(
     vba.set_form_tag("LookAtAssociations", spec.cmd_name, "")
     n = vba.click_via_timer(
         "LookAtAssociations", ctl=spec.cmd_name,
-        result_table=spec.result_table, timeout=180,
+        result_table=spec.result_table,
     )
     print(f"\n[LookAtAssociations] CmdQuery -> {n} scratch "
           f"rows", flush=True)
@@ -580,7 +580,7 @@ def test_bug22_associations_cmducinet_fires_invalid_procedure_call(
     # *node properties*; partial file appears within a few
     # seconds).
     import time as _time
-    file_deadline = _time.time() + 60
+    file_deadline = _time.time() + DEFAULT_VBA_TIMEOUT
     while _time.time() < file_deadline:
         if out_path.exists() and out_path.stat().st_size > 0:
             break
@@ -707,7 +707,7 @@ def test_bug22_kinship_cmducinet_sibling_form_fires_invalid_procedure_call(
     vba.set_form_tag(spec.name, spec.cmd_name, "")
     n = vba.click_via_timer(
         spec.name, ctl=spec.cmd_name,
-        result_table=spec.result_table, timeout=180,
+        result_table=spec.result_table,
     )
     print(f"\n[LookAtKinship] CmdRun -> {n} ZZ_SCRATCH_KIN "
           f"rows", flush=True)
@@ -767,7 +767,7 @@ def test_bug22_kinship_cmducinet_sibling_form_fires_invalid_procedure_call(
     # *node properties* row; partial file appears within a
     # few seconds).
     import time as _time
-    file_deadline = _time.time() + 60
+    file_deadline = _time.time() + DEFAULT_VBA_TIMEOUT
     while _time.time() < file_deadline:
         if out_path.exists() and out_path.stat().st_size > 0:
             break
@@ -943,7 +943,7 @@ def test_bug22_assocpairs_cmducinet_createtextfile_coverage(
     vba.set_form_tag(spec.name, spec.cmd_name, "")
     n = vba.click_via_timer(
         spec.name, ctl=spec.cmd_name,
-        result_table=spec.result_table, timeout=120,
+        result_table=spec.result_table,
     )
     print(f"\n[LookAtAssociationPairs] CmdQuery -> {n} rows "
           f"in ZZ_SOCIAL_NETWORK", flush=True)
@@ -977,7 +977,7 @@ def test_bug22_assocpairs_cmducinet_createtextfile_coverage(
     )
 
     import time as _time
-    deadline = _time.time() + 60
+    deadline = _time.time() + DEFAULT_VBA_TIMEOUT
     while _time.time() < deadline:
         if out_path.exists() and out_path.stat().st_size > 0:
             break

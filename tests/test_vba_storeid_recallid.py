@@ -171,7 +171,7 @@ def test_storeid_matches_scratch(vba: VbaSession, fx: CrossFixture):
     # CmdQuery_Click writes a "<short>:DONE" marker after the chain
     # block fires.  Wait for it to make sure CmdStoreID has run.
     short = spec.name
-    ok = vba._wait_for_done(short, timeout=120)
+    ok = vba._wait_for_done(short)  # inherit DEFAULT_VBA_TIMEOUT (B5)
     assert ok, f"[{spec.name}] DONE marker for {short} not seen"
 
     # 3. compare the two sets
@@ -301,7 +301,7 @@ def test_storeid_recallid_roundtrip_entry_to_kinship(vba: VbaSession):
     vba.click_chain_via_timer(
         entry.name, [entry.cmd_name, "CmdStoreID"], sleep_after=2.0,
     )
-    ok = vba._wait_for_done(entry.name, timeout=120)
+    ok = vba._wait_for_done(entry.name)  # inherit DEFAULT_VBA_TIMEOUT (B5)
     assert ok, "Entry DONE marker not seen — chain didn't complete"
 
     # Capture what was stored.

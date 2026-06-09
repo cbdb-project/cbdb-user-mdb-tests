@@ -31,7 +31,10 @@ acFormView = 0
 acHidden = 1
 acSaveNo = 2
 
-DEFAULT_QUERY_TIMEOUT = 30.0
+from ._timeouts import vba_timeout
+# Generous, env-tunable (CBDB_VBA_TIMEOUT_S) ceiling — was a hardcoded 30.0,
+# which timed out spuriously on slow machines (B5).
+DEFAULT_QUERY_TIMEOUT = vba_timeout(300.0)
 
 
 class FormDriver:

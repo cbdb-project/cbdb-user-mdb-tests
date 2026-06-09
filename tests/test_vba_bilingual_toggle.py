@@ -81,6 +81,6 @@ def test_bilingual_toggle_fires_cleanly(vba: VbaSession,
     """Fire the bilingual toggle via the timer-trigger path and assert
     the Click completes without an ERR debug-log entry."""
     vba.open_form(form)
-    n = vba.click_via_timer(form, ctl=button, timeout=30)
+    n = vba.click_via_timer(form, ctl=button)  # inherit generous DEFAULT_VBA_TIMEOUT (B5)
     print(f"\n[{form}] {button} fired (matrix returned n={n})", flush=True)
     _check_no_err(vba, form)

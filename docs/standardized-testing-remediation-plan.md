@@ -595,5 +595,19 @@ The standardized method is complete when ALL hold:
   (deterministic per B4), so the standardized run has a fixed test set up front.
   Docs synced (AGENTS.md ×2, README EN+ZH, conftest docstring).  Reviewed by
   review agent + codex; none found.
-- _next_: (recommended order) **B5 (wall-clock → DONE-marker gating)** →
-  C2/C3/C4 → D0/D1/D2.
+- 2026-06-09 — **B5 done** (de-flake wall-clock waits): every COM completion-wait
+  ceiling is now centralized into one generous, env-tunable value
+  (`tests/cbdb_driver/_timeouts.vba_timeout` → `DEFAULT_VBA_TIMEOUT`, default 300s,
+  override `CBDB_VBA_TIMEOUT_S`).  Was a scatter of hardcoded 30/60/90/120/180s
+  ceilings — a real query finishing just past the ceiling on a slow machine timed
+  out → 0 rows → FAIL where a fast machine PASSED (machine-speed-dependent).  Now:
+  driver defaults (`click_via_timer` / `click_button_and_wait_table` / `_wait_for_done`,
+  `form_driver.DEFAULT_QUERY_TIMEOUT`) + every test call site + the file-wait deadline
+  loops + local `_wait_for_*` helpers all route through it; success paths break out
+  early so the large ceiling is free on success.  `tests/test_vba_timeout.py`
+  (5 pure tests).  Reviewed by review agent + codex (3 sweeps to catch every literal
+  incl. annotated defaults / 180s); none found.  NOTE: the bare `time.sleep(N)`
+  *settle* delays (short, not completion gates) and pywinauto window-ready
+  `timeout=10` are intentionally left.
+- _next_: (recommended order) **C2 (fold static audits into the report)** →
+  C3 (drift classification into Appendix A) → C4 (screenshots gate) → D0/D1/D2.

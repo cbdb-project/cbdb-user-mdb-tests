@@ -34,7 +34,7 @@ from pathlib import Path
 
 import pytest
 
-from cbdb_driver.vba_session import VbaSession, make_fixture
+from cbdb_driver.vba_session import VbaSession, make_fixture, DEFAULT_VBA_TIMEOUT
 from cbdb_driver.form_specs import ALL_IMPORTS, ImportSpec
 
 
@@ -103,7 +103,7 @@ def _distinct_set(vba: VbaSession, table: str, col: str) -> set[int]:
 
 
 def _wait_for_count(vba: VbaSession, table: str, col: str, target: int,
-                    timeout: float = 60.0) -> int:
+                    timeout: float = DEFAULT_VBA_TIMEOUT) -> int:
     """Poll until row count >= target or timeout.  CmdImport doesn't
     write a DONE marker (the autodetect-injected one only goes into
     CmdQuery / CmdRun), so a row-count ramp is the cheapest completion
@@ -200,7 +200,7 @@ def test_cmd_import_round_trip(vba: VbaSession, spec: ImportSpec, tmp_path):
     # 5. wait for the target table to fill.  CmdImport doesn't have a
     # DONE marker — poll until DISTINCT count reaches our 3 valid IDs.
     n = _wait_for_count(vba, spec.target_table, spec.target_col,
-                        target=len(expected_good), timeout=60.0)
+                        target=len(expected_good))
     print(f"[{spec.form}.{spec.button}] target table reached {n} "
           f"distinct rows", flush=True)
 

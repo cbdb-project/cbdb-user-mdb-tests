@@ -79,7 +79,7 @@ def _setup_kaifeng_yin_general(vba: VbaSession) -> int:
     n = vba.click_button_and_wait_table(
         "Run Query", form="LookAtEntry",
         result_table="ZZ_SCRATCH_ENTRY",
-        force_enable_ctl="CmdQuery", timeout=30,
+        force_enable_ctl="CmdQuery",
     )
     assert n > 0, "VBA produced 0 rows; cannot integrity-check"
     return n
