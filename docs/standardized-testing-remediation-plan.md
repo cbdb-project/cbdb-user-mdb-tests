@@ -504,9 +504,21 @@ The standardized method is complete when ALL hold:
   index-drift-classification appendix) from the build_20260430 archive;
   `analysis/check_coverage_floor.py` (pure `export_gaps`/`audit_gaps`/
   `appendix_gaps`/`all_gaps` + CLI) fails with named gaps on any regression below
-  the floor; `tests/test_coverage_floor.py` (12 cases) pins it. Verified end-to-end
+  the floor; `tests/test_coverage_floor.py` (15 cases) pins it. Verified end-to-end
   against the archive matrix (export 0 gaps, appendix gap fires). Still TODO: wire
   the checker into the single entrypoint (B1) so a real build runs it after
   regenerating the current export matrix + drift classifiers.
-- _next_: (recommended order) **B7/B3/B1 (stop silent shrinkage + entrypoint)** →
-  remaining B → C2/C3/C4 → D0/D1/D2.
+- 2026-06-09 — **B7 part 1 done** (silent-skip fix / C1): `tests/test_schema_data_mdb.py`
+  no longer hardcodes `CBDB_20260430_DATA.mdb` — it resolves the DATA mdb via
+  `_data_mdb_finder.find_data_mdb` (newest CBDB_*_DATA.mdb), uses
+  `pytest.importorskip("pyodbc")` (headless skips the module), and the
+  `data_mdb_conn` fixture now `pytest.fail()`s (not skip) when no DATA mdb is
+  present. Verified it now RUNS against the live `CBDB_20260602_DATA.mdb`
+  (was silently skipping). Reviewed by review agent + codex; none found.
+  **B7 part 2 still TODO**: assert `LinkListInit.c_dataset == expected build`
+  + stamp the build into the pytest JSON + report header.  Also noted: this
+  module's test 1/2/5 carry `xfail` reasons still citing "the 2026-04-30 dump"
+  — re-anchor under B7 part 2 / B8.
+- _next_: (recommended order) **B7 part 2 + B8 (build pinning/stamp + re-anchor
+  magic counts)** → B3 (--include-vba default) → B1 (single entrypoint, archive
+  not delete) → B2/B4/B5/B6/B9/B10/B11 → C2/C3/C4 → D0/D1/D2.
