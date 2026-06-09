@@ -169,14 +169,19 @@ looking at.
 ### ⛔ MANDATORY: report pipeline is NOT optional — even for verification runs
 
 **Any time the user asks to "run tests" (or equivalent), execute the
-full workflow via `run_tests.ps1`.  Steps 1 + 5 + 5b + 5c + 5d are
-automated by the script; step 7 (rewrite ISSUES) and step 8
-(generate_report.py) must follow immediately after.**
+full workflow via `run_tests.ps1` — the single canonical entrypoint.  It
+automates steps 1 (ARCHIVE prior, never delete) / 5 / 5b / 5c (incl. drift
+classification) / 5d / 5e (export matrix) / 5f (static audits) / 6
+(screenshots) and runs the coverage-floor check.  Step 7 (rebuild ISSUES —
+LLM judgment, the ONLY manual gate) and step 8 (generate_report.py) follow,
+then `-Verify` enforces completeness + the coverage floor.**
 
 ```powershell
-# From repo root — runs steps 1 / 5 / 5b / 5c / 5d automatically:
-.\run_tests.ps1
-# Then do step 7 (rewrite ISSUES dict) + step 8 manually.
+# From repo root — archives prior build, runs steps 5/5b-5f/6 + floor check:
+.\run_tests.ps1            # add -Fast to skip the slow COM suite
+# Then do step 7 (rebuild ISSUES, per the report-triage contract + self-review
+# rubric) + step 8 (python reports/generate_report.py), then:
+.\run_tests.ps1 -Verify    # FAILS if reports/ is partial or below the floor
 ```
 
 Rationale: a test run without a generated report leaves `reports/` in an
