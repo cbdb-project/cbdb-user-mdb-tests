@@ -566,5 +566,14 @@ The standardized method is complete when ALL hold:
   Issue #1 (alias-swap) appears FIXED upstream — the alias-swap test reads
   queries.json (no DB/ordering) yet fails, and the OLD no-ORDER-BY sample also
   had a mismatch; determinism just surfaces it reliably.
-- _next_: (recommended order) **B9 (golden strict)** → B10 (scoped kill) → B11
-  (explicit discovery) → B5 (wall-clock → DONE-marker) → C2/C3/C4 → D0/D1/D2.
+- 2026-06-09 — **B9 done** (strict goldens): `golden_helpers.assert_matches_golden`
+  — a MISSING golden now FAILS (writes it for inspection, then raises) instead of
+  self-blessing; the `allow_count_drift>0` path now tolerates the COUNT difference
+  but STILL value-checks rows present in both frames (key-matched, unique-guarded),
+  raising on any shared-row per-cell regression (was: silent skip), and warns when
+  a non-unique key forces count-only.  Default `allow_count_drift=0.0` (strict);
+  existing callers unaffected (committed goldens → exact-match path unchanged).
+  `tests/test_golden_helpers.py` (8 pure-pandas tests).  Reviewed by review agent
+  + codex; none found.
+- _next_: (recommended order) **B10 (scoped MSACCESS kill)** → B11 (explicit
+  discovery) → B5 (wall-clock → DONE-marker) → C2/C3/C4 → D0/D1/D2.

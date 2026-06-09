@@ -13,6 +13,7 @@ and pass.  The user must visually inspect git diff to bless changes.
 from __future__ import annotations
 
 import io
+import warnings
 from pathlib import Path
 
 import pandas as pd
@@ -53,12 +54,19 @@ def assert_matches_golden(df: pd.DataFrame,
     """
     df_norm = normalize(df, sort_by=sort_by)
 
-    if regenerate or not golden_path.exists():
+    if regenerate:
         write_csv(df_norm, golden_path)
-        if not golden_path.exists():
-            raise AssertionError(f"wrote new golden: {golden_path}")
-        # On regenerate, succeed silently.
-        return
+        return  # explicit bless
+
+    if not golden_path.exists():
+        # A missing golden must FAIL in a standardized run, NOT self-bless.
+        # Write it so the author can inspect/commit it, but fail loudly so a
+        # fresh checkout can't silently "pass" a never-compared case.
+        write_csv(df_norm, golden_path)
+        raise AssertionError(
+            f"golden was missing -- wrote {golden_path}; inspect it, commit "
+            f"it, and re-run.  (Use --regenerate-goldens to bless intentionally.)"
+        )
 
     expected = read_csv(golden_path)
     # bring df_norm to the same string-typed shape so we can compare:
@@ -93,14 +101,36 @@ def assert_matches_golden(df: pd.DataFrame,
             f"  actual:   {sorted(actual.columns)}"
         )
 
-    # if drift was allowed, set-compare on primary-identity columns
+    # If a count drift was allowed, tolerate the COUNT difference but STILL
+    # value-check the rows present in BOTH frames (matched on sort_by) -- a
+    # per-cell regression on a shared row must never be silently skipped
+    # (the old behaviour returned here without any value comparison).
     if drift > 0:
-        ids_a = set(map(tuple, actual[sort_by].itertuples(index=False, name=None)))
-        ids_e = set(map(tuple, expected[sort_by].itertuples(index=False, name=None)))
-        added = ids_a - ids_e
-        removed = ids_e - ids_a
-        # For drift-tolerant mode, just report; don't fail on individual rows
-        # provided the count drift was within bounds.
+        key_cols = [c for c in sort_by if c in actual.columns]
+        a_idx = actual.set_index(key_cols) if key_cols else None
+        e_idx = expected.set_index(key_cols) if key_cols else None
+        if a_idx is not None and a_idx.index.is_unique and e_idx.index.is_unique:
+            common = a_idx.index.intersection(e_idx.index)
+            val_cols = [c for c in expected.columns if c not in key_cols]
+            a_common = a_idx.loc[common, val_cols].sort_index()
+            e_common = e_idx.loc[common, val_cols].sort_index()
+            cmp = a_common.compare(e_common, keep_shape=False, keep_equal=False)
+            if not cmp.empty:
+                raise AssertionError(
+                    f"value diffs on {len(cmp)} shared row(s) vs golden "
+                    f"{golden_path.name} (count drift within tolerance, but "
+                    f"matched rows differ):\n{cmp.head(20).to_string()}"
+                )
+        else:
+            # Degenerate key (empty or non-unique sort_by): we can't safely
+            # value-match shared rows, so only the count check ran.  Warn so a
+            # maintainer notices the comparison was weaker than per-row strict.
+            warnings.warn(
+                f"{golden_path.name}: allow_count_drift>0 with a non-unique / "
+                f"empty sort_by key {sort_by} -- shared-row values were NOT "
+                f"compared (count-only).  Use a unique sort_by for strict drift.",
+                stacklevel=2,
+            )
         return
 
     # strict per-row comparison on the columns the golden has, in golden order
