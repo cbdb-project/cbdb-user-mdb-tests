@@ -250,52 +250,49 @@ def _data_mdb_relink_needed(user_mdb: Path, data_mdb: Path | None) -> bool:
 
 
 def pytest_sessionfinish(session, exitstatus):
-    """Kill all MSACCESS.EXE processes after a session that actually RAN
-    Access-COM tests.
+    """Kill ONLY the MSACCESS.EXE processes THIS session spawned (B10).
 
-    Gated on _ACCESS_TESTS_EXECUTED (set when an access/vba test enters
-    setup), NOT on collection eligibility — so --collect-only, --fast, or a
-    pure-unit targeted run never triggers the kill and can't take down the
-    developer's unrelated Access windows.
-
-    WARNING: this kills every MSACCESS.EXE on the machine, not only
-    the ones this test session opened.  Close any unrelated Access
-    databases before running --include-vba to avoid losing unsaved work.
-    This is a known limitation: per-PID kill requires tracking PIDs
-    across fixture teardowns, which is complex; a global kill is the
-    pragmatic alternative to leaving stale windows on screen.
-
-    The com_app and VbaSession fixtures call close() in their teardowns,
-    but if a dialog blocks or the session is interrupted the teardown
-    may not run.  This hook is the safety net.
+    Scoped per-PID: the AccessApp/VbaSession fixtures register every PID
+    they open in the cbdb_driver spawned-PID registry, and this hook kills
+    only those — NEVER the developer's unrelated Access windows.  Gated on
+    _ACCESS_TESTS_EXECUTED so --collect-only / --fast / pure-unit runs do
+    nothing.  Fixture close()s normally kill their own PID already; this is
+    the safety net for when a dialog block or interrupt skipped teardown.
     """
     if sys.platform != "win32":
         return
-    # Only clean up if an Access-COM test actually RAN this session — never
-    # on --collect-only or a pure-unit/--fast run (which never opened Access),
-    # so we don't kill the developer's unrelated Access windows.
     if not _ACCESS_TESTS_EXECUTED:
         return
-    import subprocess, time
-    # First pass: taskkill /F — fast for well-behaved processes
-    subprocess.run(
-        ["taskkill", "/F", "/IM", "MSACCESS.EXE"],
-        capture_output=True,
-    )
-    # Second pass via psutil: catches processes that survived taskkill due
-    # to modal dialogs or pending I/O (the exact failure mode observed when
-    # 8 Access instances survived the June-2026 test runs).
+    try:
+        from cbdb_driver.access_app import spawned_pids, kill_access_pid
+    except Exception:
+        return  # COM driver never imported => nothing we spawned to clean up
+    pids = spawned_pids()
+    if not pids:
+        return
+    for pid in pids:
+        try:
+            kill_access_pid(pid)  # taskkill /F /PID + wait; harmless if gone
+        except Exception:
+            pass
+    # Belt-and-suspenders for any of OUR pids that survived taskkill (modal
+    # dialog / pending I/O).  Re-check the name so a RECYCLED pid that is no
+    # longer Access is never killed.
     try:
         import psutil
-        time.sleep(0.5)  # give taskkill a moment to take effect
-        for proc in psutil.process_iter(["pid", "name"]):
-            if (proc.info["name"] or "").upper().startswith("MSACCESS"):
-                try:
+        import time
+        time.sleep(0.3)
+        for pid in pids:
+            if not psutil.pid_exists(pid):
+                continue
+            try:
+                proc = psutil.Process(pid)
+                if (proc.name() or "").upper().startswith("MSACCESS"):
                     proc.kill()
                     proc.wait(timeout=3)
-                except (psutil.NoSuchProcess, psutil.AccessDenied,
-                        psutil.TimeoutExpired):
-                    pass
+            except (psutil.NoSuchProcess, psutil.AccessDenied,
+                    psutil.TimeoutExpired):
+                pass
     except ImportError:
         pass
 

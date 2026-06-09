@@ -575,5 +575,17 @@ The standardized method is complete when ALL hold:
   existing callers unaffected (committed goldens → exact-match path unchanged).
   `tests/test_golden_helpers.py` (8 pure-pandas tests).  Reviewed by review agent
   + codex; none found.
-- _next_: (recommended order) **B10 (scoped MSACCESS kill)** → B11 (explicit
-  discovery) → B5 (wall-clock → DONE-marker) → C2/C3/C4 → D0/D1/D2.
+- 2026-06-09 — **B10 done** (scoped MSACCESS kill): `cbdb_driver/access_app.py`
+  gained a session `_SPAWNED_PIDS` registry (`register_spawned_pid`/`spawned_pids`);
+  AccessApp.open + VbaSession.open register their PID.  `conftest.pytest_sessionfinish`
+  now kills ONLY registered PIDs (via `kill_access_pid` + a psutil fallback that
+  re-checks the proc name to skip recycled PIDs) — no more global `taskkill /F /IM`,
+  so it can never take down the developer's unrelated Access windows.  **Review
+  blocker fixed**: `test_vba_inline.py` had its OWN global `/IM` kill at fixture
+  setup+teardown and spawned Access without registering — now it registers its PID,
+  scope-kills only that PID at teardown, and frees a held WORK copy via the
+  path-scoped `_kill_file_holder` instead of a blanket kill.  Only remaining `/IM`
+  is the env-gated `kill_orphan_access` (manual recovery).  Reviewed by review
+  agent + codex; none found.
+- _next_: (recommended order) **B11 (explicit discovery)** → B5 (wall-clock →
+  DONE-marker) → C2/C3/C4 → D0/D1/D2.
