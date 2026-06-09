@@ -1,0 +1,61 @@
+{
+  "_meta": {
+    "purpose": "Oracle classification of each test file (D0).  Only class A (real VBA x independent oracle) counts as VBA verification; B/C passes are NOT evidence the .mdb's VBA is correct.  See docs/standardized-testing-remediation-plan.md.",
+    "generated_by": "analysis/build_oracle_registry.py",
+    "classes": {
+      "A": "real VBA x independent oracle (counts as VBA verification)",
+      "B": "real VBA x cbdb_replay oracle (divergence-only; weak)",
+      "C": "replay x golden (tests Python, not the VBA)",
+      "NA": "infra / pure-unit (no Access, no replay)"
+    },
+    "counts": {
+      "NA": 14,
+      "C": 3,
+      "A": 22,
+      "B": 2
+    }
+  },
+  "tests": {
+    "test_addr_codes_embedded_delim.py": "NA",
+    "test_build_stamp.py": "NA",
+    "test_coverage_floor.py": "NA",
+    "test_exports.py": "C",
+    "test_golden_helpers.py": "NA",
+    "test_index_year_xcheck.py": "NA",
+    "test_infra_refresh_decision.py": "NA",
+    "test_infra_smoke.py": "A",
+    "test_known_bugs.py": "NA",
+    "test_lookatentry.py": "C",
+    "test_oracle_classification.py": "NA",
+    "test_other_forms_skeletons.py": "NA",
+    "test_other_lookat_forms.py": "C",
+    "test_report_triage_gate.py": "NA",
+    "test_saved_views.py": "NA",
+    "test_schema.py": "NA",
+    "test_schema_data_mdb.py": "NA",
+    "test_vba_associationpairs_probe.py": "A",
+    "test_vba_bilingual_toggle.py": "A",
+    "test_vba_bilingual_ui.py": "A",
+    "test_vba_bug_behaviors.py": "A",
+    "test_vba_bug_design_time.py": "A",
+    "test_vba_cmdgis_other_forms.py": "A",
+    "test_vba_cmdgispeople_office.py": "A",
+    "test_vba_cmdguess_cross_form.py": "A",
+    "test_vba_cmdneo4j_cross_form.py": "A",
+    "test_vba_cmducinet_kinship.py": "A",
+    "test_vba_differential.py": "B",
+    "test_vba_export.py": "A",
+    "test_vba_import_lists.py": "A",
+    "test_vba_inline.py": "A",
+    "test_vba_integrity.py": "A",
+    "test_vba_matrix.py": "B",
+    "test_vba_matrix_all_forms.py": "A",
+    "test_vba_matrix_hard_forms.py": "A",
+    "test_vba_networks_small_fixture.py": "A",
+    "test_vba_pajek_gephi_cross_form.py": "A",
+    "test_vba_pickers_smoke.py": "A",
+    "test_vba_save_lists.py": "A",
+    "test_vba_storeid_recallid.py": "A",
+    "test_vba_timeout.py": "NA"
+  }
+}
