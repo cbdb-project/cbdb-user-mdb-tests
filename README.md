@@ -313,8 +313,10 @@ is rebuilt from scratch each build, so these mirror the current `ISSUES` list.
 >   now has a CmdGIS button). No P0/P1/P2 filed — the run was non-interactive
 >   so no UI symptom could be confirmed; user-facing defects whose symptom
 >   was not UI-verified are P5 pending verification. `reverify_all_issues.py`
->   is STALE on #1/#11/#12 (hardcoded prose) — follow-up: re-derive its
->   verdicts from the fresh dump.
+>   was STALE on #1/#10/#11/#12 (hardcoded verdicts) — now re-derived from
+>   the fresh dump (greps the View_StatusData SQL for the swap; checks
+>   whether the offending control bindings still exist), so it reports those
+>   four as REVIEW "defect not present this dump", consistent with the report.
 >
 > The classifier lives in [`analysis/reverify_all_issues.py`](./analysis/reverify_all_issues.py)
 > and is cross-checked against `generate_report.py` so the report
