@@ -1704,9 +1704,42 @@ class VbaSession:
                                     form: str,
                                     result_table: str,
                                     force_enable_ctl: str | None = None,
+                                    ctl: str | None = None,
                                     timeout: float = DEFAULT_VBA_TIMEOUT) -> int:
-        """Click and poll result_table until it changes from initial
-        row count. Returns final row count."""
+        """Fire the form's query button and return the result-table row count.
+
+        Prefers the COM Form_Timer trigger (`click_via_timer`): it invokes
+        the real `<ctl>_Click` handler directly through Access COM and needs
+        NO interactive desktop, so it works in locked / RDP-detached /
+        headless sessions where pywinauto UIA cannot reach the button
+        (`_find_button` raises ``button 'Run Query' not found``).  This is
+        the project's documented "Form_Timer trigger universally" direction
+        (AGENTS.md landmines #1/#5); the LookAtEntry-driving callers
+        (`test_vba_integrity` / `test_vba_matrix` / `test_vba_differential`)
+        were the last ones still on the pywinauto path.  (`test_vba_inline`
+        keeps its own inline pywinauto click on purpose — it is the
+        enabled-button contract test and does NOT call this method.)
+
+        The trigger control is `ctl` if given, else `force_enable_ctl` — every
+        query caller already passes its CmdQuery control there.  The COM path
+        fires the identical VBA handler, so result-table contents (and thus
+        all downstream assertions) are unchanged; only the *trigger* differs.
+
+        Falls back to the legacy pywinauto click ONLY when no control name is
+        available (caption-only callers), preserving old behaviour for them.
+        """
+        trigger_ctl = ctl or force_enable_ctl
+        if trigger_ctl:
+            # COM path — robust, no UIA dependency.  click_via_timer waits on
+            # the '<form>:DONE' marker (covers the backfill UPDATE chain) then
+            # returns the result-table row count.
+            return self.click_via_timer(
+                form, ctl=trigger_ctl,
+                result_table=result_table, timeout=timeout,
+            )
+        # Legacy pywinauto fallback (caption-only callers; interactive desktop
+        # required).  Polls result_table until it changes from the initial
+        # row count, then returns the final count.
         try:
             initial = self.row_count(result_table)
         except Exception:
