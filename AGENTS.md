@@ -189,8 +189,12 @@ incomplete state.  The reviewer cannot assess results; the coverage matrix
 and appendices are absent; and the next agent that opens the repo will
 find a JSON report with no matching MD.
 
-Quick pipeline for steps 5b–8 (substitute `<build>` for the date):
+Quick pipeline for steps 5b–8 (substitute `<build>` for the date).  Set
+`PYTHONIOENCODING=utf-8` first — several of these scripts `print()` non-ASCII
+(CJK names, `↔`/em-dashes) and will raise `UnicodeEncodeError` on a legacy
+charmap console (`run_tests.ps1` already pins this for the automated run):
 ```
+set PYTHONIOENCODING=utf-8        # PowerShell: $env:PYTHONIOENCODING = "utf-8"
 python analysis/build_coverage_matrix.py --report reports/pytest_report_<build>.json
 python reports/collect_index_year_diffs.py
 python reports/collect_schema_diffs.py
