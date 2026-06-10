@@ -1075,12 +1075,6 @@
         "c_assoc_desc": "Biography written by",
         "c_assoc_desc_chn": "傳記作者為Y",
         "n_rows": 2602
-      },
-      {
-        "c_assoc_code": 133,
-        "c_assoc_desc": "Biographer of",
-        "c_assoc_desc_chn": "為Y作傳",
-        "n_rows": 2602
       }
     ],
     "assoc_x_dynasty_combos": [
@@ -1388,15 +1382,15 @@
         "n_kin": 72
       },
       {
-        "c_personid": 67284,
-        "c_name": "Zhu Gang",
-        "c_name_chn": "朱棡",
-        "n_kin": 70
-      },
-      {
         "c_personid": 9002,
         "c_name": "Zhao Jiong",
         "c_name_chn": "趙炅",
+        "n_kin": 70
+      },
+      {
+        "c_personid": 67284,
+        "c_name": "Zhu Gang",
+        "c_name_chn": "朱棡",
         "n_kin": 70
       },
       {
@@ -1454,15 +1448,9 @@
         "n_kin": 51
       },
       {
-        "c_personid": 129186,
-        "c_name": "Mao Pan",
-        "c_name_chn": "茅鎜",
-        "n_kin": 49
-      },
-      {
-        "c_personid": 67679,
-        "c_name": "Zhu Youbin",
-        "c_name_chn": "朱祐檳",
+        "c_personid": 13059,
+        "c_name": "Li Yuan (Emperor Gaozu of Tang)",
+        "c_name_chn": "李淵(唐高祖)",
         "n_kin": 49
       },
       {
@@ -1472,9 +1460,9 @@
         "n_kin": 49
       },
       {
-        "c_personid": 13059,
-        "c_name": "Li Yuan (Emperor Gaozu of Tang)",
-        "c_name_chn": "李淵(唐高祖)",
+        "c_personid": 67679,
+        "c_name": "Zhu Youbin",
+        "c_name_chn": "朱祐檳",
         "n_kin": 49
       }
     ],
@@ -1698,23 +1686,23 @@
   "lookatassociationpairs": {
     "top_pairs_by_edge_count": [
       {
-        "person_id_1": 7111,
-        "person_id_2": 3767,
-        "n_edges": 47
-      },
-      {
         "person_id_1": 3767,
         "person_id_2": 7111,
         "n_edges": 47
       },
       {
-        "person_id_1": 7164,
-        "person_id_2": 3257,
-        "n_edges": 40
+        "person_id_1": 7111,
+        "person_id_2": 3767,
+        "n_edges": 47
       },
       {
         "person_id_1": 3257,
         "person_id_2": 7164,
+        "n_edges": 40
+      },
+      {
+        "person_id_1": 7164,
+        "person_id_2": 3257,
         "n_edges": 40
       },
       {
@@ -1753,8 +1741,8 @@
         "n_edges": 31
       },
       {
-        "person_id_1": 7197,
-        "person_id_2": 7111,
+        "person_id_1": 3767,
+        "person_id_2": 7197,
         "n_edges": 30
       },
       {
@@ -1763,24 +1751,9 @@
         "n_edges": 30
       },
       {
-        "person_id_1": 3767,
-        "person_id_2": 7197,
-        "n_edges": 30
-      },
-      {
-        "person_id_1": 7055,
-        "person_id_2": 3257,
-        "n_edges": 28
-      },
-      {
         "person_id_1": 7197,
-        "person_id_2": 1384,
-        "n_edges": 28
-      },
-      {
-        "person_id_1": 3257,
-        "person_id_2": 7055,
-        "n_edges": 28
+        "person_id_2": 7111,
+        "n_edges": 30
       },
       {
         "person_id_1": 1384,

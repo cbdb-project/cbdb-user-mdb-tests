@@ -260,14 +260,26 @@ content elsewhere.  The same script can emit `.docx` siblings on
 demand (gitignored; run `python reports/generate_report.py` to
 produce fresh ones).
 
+Counts below are for the **current build (data build 20260602)** — the report
+is rebuilt from scratch each build, so these mirror the current `ISSUES` list.
+
 | Tier | Count | Meaning |
 |------|------:|---------|
-| P0 — Silent data corruption | 3 | wrong data shown, no user warning |
-| P1 — Visible runtime crash  | 4 | error popup on a normal user click |
-| P2 — Silent display         | 1 | user-visible bound control renders blank where data exists |
-| P3 — Missing UI             | 5 | event handler exists in code but no button on the form |
-| P4 — Setup                  | 1 | one-time install fix (dao360.dll on Office 2016+) |
-| P5 — Dormant / latent / not currently reproducible | 7 | defect real but doesn't fire on the current dump or has no UI trigger today; **none have been verified as upstream-fixed** (#1 dormant; #4, #5, #9, #11, #12, #14 latent) |
+| P0 — Silent data corruption | 0 | wrong data shown, no user warning |
+| P1 — Visible runtime crash  | 0 | error popup on a normal user click |
+| P2 — Silent display         | 0 | user-visible bound control renders blank where data exists |
+| P3 — Missing UI             | 5 | event handler exists in code but no button on the form (#13, #16, #17, #18, #19) |
+| P4 — Setup                  | 1 | one-time install fix (dao360.dll on Office 2016+) (#2) |
+| P5 — Dormant / latent / not currently reproducible | 10 | defect real but doesn't fire on the current dump or has no UI trigger today; **none have been verified as upstream-fixed** (#5, #6, #7, #8, #9, #14, #22 latent; #20 dormant; #23, #24 structural-metric) |
+
+> **No P0/P1/P2 this build.** The build-20260602 run was executed in a
+> non-interactive session (pywinauto UIA unavailable), so no runtime UI
+> symptom could be re-verified. Per the report-triage contract, a
+> user-perceptible tier (P0/P1/P2) requires the symptom confirmed in the
+> live Access UI; defects whose source is present but whose symptom was not
+> UI-verified this build are filed P5 pending verification. The deepest
+> LookAtEntry checks (data-integrity / matrix / differential) DID run via the
+> COM Form_Timer path and passed — see the Closing note in the report.
 
 > **Re-verifications.** Issues that earlier snapshots graded 🔴/🟡
 > were re-checked end-to-end in three passes:
@@ -289,6 +301,20 @@ produce fresh ones).
 >   unreachable for any LookAtEntry fixture and produces no popup
 >   — verified end-to-end via SQL pre-image + real Access COM in
 >   [`analysis/issue9_neo4j_institutioncodes_reverification.md`](./analysis/issue9_neo4j_institutioncodes_reverification.md))
+> - 2026-06-09 (data build 20260602) — **fresh full-suite run.** Three
+>   prior issues no longer reproduce and were DROPPED on this build's own
+>   evidence (fresh metadata dump): **#1** View_StatusData now reads the
+>   correct `YEAR_RANGE_CODES` alias for the first-year range (swap fixed);
+>   **#10** the EVENT_ADDR_2 Subform controls now bind to the projected
+>   aliases (`c_event_addr_chn` / `c_event_addr_name`) — no blank-column
+>   symptom; **#11 / #12** the offending hidden subform controls
+>   (`c_event_record_id` / `c_appt_type_code` bindings) are gone from the
+>   forms. **#4 / #15** premises no longer hold (GISFrame exists; LookAtPlace
+>   now has a CmdGIS button). No P0/P1/P2 filed — the run was non-interactive
+>   so no UI symptom could be confirmed; user-facing defects whose symptom
+>   was not UI-verified are P5 pending verification. `reverify_all_issues.py`
+>   is STALE on #1/#11/#12 (hardcoded prose) — follow-up: re-derive its
+>   verdicts from the fresh dump.
 >
 > The classifier lives in [`analysis/reverify_all_issues.py`](./analysis/reverify_all_issues.py)
 > and is cross-checked against `generate_report.py` so the report
@@ -398,7 +424,7 @@ CBDB 用戶端是給歷史學家用的 Windows-only Access 介面，每次資料
 - GIS / Neo4j / KML 匯出檔位元組級相等
 - 跨 lookup 表的外鍵完整性
 
-已找到的 bug 在 [`reports/CBDB_Issues_Report_ZH-Hant.md`](./reports/CBDB_Issues_Report_ZH-Hant.md)（共 21 個 issue，由 `reports/generate_report.py` 自動生成 4 份輸出）。
+已找到的 bug 在 [`reports/CBDB_Issues_Report_ZH-Hant.md`](./reports/CBDB_Issues_Report_ZH-Hant.md)（data build 20260602 共 16 個 issue，由 `reports/generate_report.py` 自動生成 4 份輸出；每個 build 從零重建）。
 
 ## 安裝
 
@@ -442,7 +468,7 @@ python -m pytest tests/test_vba_export.py -v -W ignore --include-vba
 - ✅ 7/10 LookAt 表單已納入真 VBA matrix（12 fixtures，110 秒跑完）
 - ✅ 1 個真實匯出位元組對比（`LookAtEntry.CmdGIS`）
 - ✅ 12 維度資料完整性檢查
-- ✅ 已確認 21 個 issue（最高編號為 #22；ID #3 已於 2026-05-03 退役為早期 false positive；詳見 [`reports/CBDB_Issues_Report_ZH-Hant.md`](./reports/CBDB_Issues_Report_ZH-Hant.md)；P0 ×3 / P1 ×4 / P2 ×1 / P3 ×5 / P4 ×1 / P5 dormant·latent ×7。原 Bug #3 於 2026-05-03 從報告中移除——重新驗證 0 NULL backfill 且無上游源碼修復證據，視為早期 false positive。Issue #9 於 2026-05-04 從 P0 降為 P5 latent——`Form_LookAtEntry.vb:1425` 的 source-level typo 雖然真實存在，但被第 1389 行的 `If tRecDeleted > 0 Then` gate 擋下；當前 dump 263,454 筆 ENTRY_DATA 中 `c_inst_code > 0` 為 0,所以任何 LookAtEntry fixture 都進不到那個分支、不會 popup（端到端 SQL + Access COM 證據見 `analysis/issue9_neo4j_institutioncodes_reverification.md`）。新增 Issue #20（GIS 匯出嵌入 tab／BOM 造成欄位錯位），證據 + probe 腳本見 `analysis/gis_status_embedded_delim_root_cause.md` / `analysis/probe_status_gis_embedded_delim.py` / `analysis/probe_status_gis_export_bytes.py` / `tests/test_addr_codes_embedded_delim.py`）
+- ✅ 已確認 16 個 issue（data build 20260602，每個 build 從零重建；詳見 [`reports/CBDB_Issues_Report_ZH-Hant.md`](./reports/CBDB_Issues_Report_ZH-Hant.md)）：P0 ×0 / P1 ×0 / P2 ×0 / P3 ×5（#13, #16, #17, #18, #19，missing-UI）/ P4 ×1（#2，dao360 setup）/ P5 ×10（#5, #6, #7, #8, #9, #14, #22 latent；#20 dormant；#23, #24 structural-metric）。本 build 為非互動 session（pywinauto UIA 不可用），無法在真實 UI 重現任何 runtime 症狀，故 P0/P1/P2 為 0——凡源碼缺陷存在但症狀未經 UI 確認者皆列 P5 pending verification。#1（alias swap 已修正）、#10（EVENT_ADDR_2 子表單控制項已綁定到投影別名）、#11/#12（隱藏 subform 控制項已移除）本 build 不再重現，已 drop。LookAtEntry 最深層的 integrity / matrix / differential 測試已透過 COM Form_Timer 路徑實際執行並通過。
 - 🟡 剩 1 個表單（LookAtNetworks）因 Form_Open hang 暫跳過；其餘 2 個（LookAtAssociationPairs / LookAtGroupData）已用 tiny fixture 覆蓋（`test_vba_matrix_hard_forms.py`）— roadmap 第 7 項
 - 🟡 其他匯出按鈕大多已部分涵蓋：CmdGIS（6 個 form, `test_vba_cmdgis_other_forms.py`）、CmdGUESS（Kinship+Office, `test_vba_cmdguess_cross_form.py`）、CmdPajek/Gephi（`test_vba_pajek_gephi_cross_form.py`，7 過 — 原 5 過 + AssociationPairs 的 CmdPajek/CmdGephi 透過 1×3 known-edged pair 解開（依賴 SetFocus driver patch）/ 2 Status skip）、CmdGISPeople（Office）、CmdNeo4j（8 過 / 0 skip — Entry/Texts/Office/Kinship/AssociationPairs/Associations/Place/Status 全部通過。Status 於 2026-05-08 從 skip 提升為 covered，使用 matrix `status_<top_code>_unfiltered` fixture；先前的 skip 為 false-positive copy-paste（從 Pajek/Gephi cross-form Status skip 抄過來），PR #127 driver/meta probe 直接反駁了「same root family」的判斷 — CmdNeo4j 在 Status 上跑得乾淨（6 files、0 :ERR、0 watchdog dialogs），而 CmdPajek + CmdGephi 仍因 cleanup-rebind 在 `Form_LookAtStatus.vb:1457+1460` 觸發 VBA 424 'Object required'。**Status × CmdNeo4j 不需要 driver patch**（與 Place / Associations 不同）；per-shape pin 鎖死 6 個檔（People / PeopleStatus / Places / PeoplePlaces / PersonPlaceCodes / StatusCodes）；classifier 新增 1 個單列 shape（StatusCode → StatusCodes code-table）+ 1 個 2-col disambiguator（(NameID, StatusCode) → PeopleStatus）。Status × CmdPajek + CmdGephi 仍在 cross-form Pajek/Gephi test 上 skipped，受同一 cleanup-rebind 'Object required' issue 阻擋 —— 那是獨立的 driver/meta workaround verification line。Place 於 2026-05-08 從 skip 提升為 covered，使用 matrix `place_addr_<top_addr_id>` fixture，仰賴 PR #123（`_rewrite_place_cmdneo4j_trstpeople_projection` 把 `Form_LookAtPlace.CmdNeo4j_Click` 中 `tRstPeople` 的 SELECT projection 擴成含 `DYNASTIES.c_dynasty / c_dynasty_chn / BIOG_MAIN.c_female`，下游 `!c_dynasty` / `!c_female` 欄位讀取不再觸發 JET 3265 — canonical Issue #24）；per-shape pin 鎖死 6 個檔（People / PeoplePlaces / Places / PersonPlaceRelations / PersonPlaceRelCodes / IndexAddrTypeCodes）；classifier 新增 3 個 shape（PersonID / PersonPlaceRelCode / IndexAddrTypeCode）。Issue #24 仍維持 P1 canonical —— workaround 讓此 cell *可測試*，並非 *已修復*。與 Associations（#116 → #117 → #118）不同，Place 只需這一個 SELECT-projection rewrite —— `Form_LookAtPlace.CmdNeo4j_Click` 沒有 concat-form debug MsgBox 層。Entry 於 2026-05-04 從 skip 提升為 covered，固定 Issue #9 LATENT-gate；AssociationPairs 於 2026-05-07 從 skip 提升為 covered，使用 1×3 known-edged pair（與 Pajek/Gephi 同一 fixture），仰賴 PR #109 的 CmdNeo4j_Click debug-MsgBox suppress driver patch；classifier 新增 3 個 shape：Person1_ID / AssociationCode / KinshipCode。Associations 也於 2026-05-07 從 skip 提升為 covered，使用 matrix `assoc_<top_code>_unfiltered` fixture，仰賴 PR #116（c_addr_type rewrite 解掉 canonical Issue #23 的 target-column typo）+ PR #117（5-prefix debug-MsgBox suppress）；per-shape pin 鎖死 8 個檔（People / Places / PeoplePlaces / PeopleAssociations / AssociationCodes / KinshipCodes / OccasionCodes / TopicCodes）；classifier 新增 2 個 shape（OccasionCode / TopicCode）+ 1 個 2-col disambiguator。Issue #23 仍維持 P1 canonical —— workarounds 讓此 cell *可測試*，並非 *已修復*。順手挖出 Bug #7/#8/#9）。CmdKML 仍未測；CmdUCINet 的 family first coverage cell 已落地於 LookAtKinship（`tests/test_vba_cmducinet_kinship.py`，.vna 三段結構由 probe `investigate/cmducinet-family-shape` 確立）**但已知 fixture-fragile，依 Issue #22 的 runtime-confirmed Kinship sibling form** —— 通過僅是因為 matrix 提供的 person 3211 親屬網絡剛好沒有 Han 字符 c_name；換成能觸達 Han 名字的 fixture 就會在同一處重現 Issue #22 的 VBA error 5（sibling probe `investigate/kinship-cmducinet-sibling-risk` 已直接示範）；Associations CmdUCINet 已直接 canonicalize 為 Issue #22 P1（匯出途中 VBA error 5 已重現 + static + runtime marker 雙向釘死），Place CmdUCINet 仍 gap（使用 ADO Stream，需要單獨 per-form 處理）— roadmap 第 8 項
 - ✅ discovery 為顯式步驟（`run_tests.ps1` Step 4b 先重生成 `test_inputs.json`）；pytest 啟動時對其做新鮮度閘門：過時則 FAIL 並提示（`--refresh-inputs` 立即重生成 / `--no-discover-inputs` 跳過），不再靜默 mid-run 重生成 — roadmap 第 9 項

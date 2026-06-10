@@ -1,0 +1,876 @@
+﻿RowNum,DumpTblNm,DumpFldNm,AccessTblNm,AccessFldNm,IndexOnField,DataFormat,NULL_allowed,ForeignKey,ForeignKeyBaseField
+,,,ADDR_BELONGS_DATA,c_addr_id,Primary Key,Long,False,ADDR_CODES,c_addr_id
+,,,ADDR_BELONGS_DATA,c_belongs_to,Primary Key,Long,False,ADDR_CODES,c_addr_id
+,,,ADDR_BELONGS_DATA,c_created_by,,Text,True,,
+,,,ADDR_BELONGS_DATA,c_created_date,,Date/Time,True,,
+,,,ADDR_BELONGS_DATA,c_firstyear,Primary Key,Integer,False,,
+,,,ADDR_BELONGS_DATA,c_lastyear,Primary Key,Integer,False,,
+,,,ADDR_BELONGS_DATA,c_modified_by,,Text,True,,
+,,,ADDR_BELONGS_DATA,c_modified_date,,Date/Time,True,,
+,,,ADDR_BELONGS_DATA,c_notes,,Memo,True,,
+,,,ADDR_BELONGS_DATA,c_pages,,Text,True,,
+,,,ADDR_BELONGS_DATA,c_secondary_source_author,,Text,True,,
+,,,ADDR_BELONGS_DATA,c_source,,Long,True,TEXT_CODES,c_textid
+,,,ADDR_CODES,c_addr_id,Primary Key,Long,False,,
+,,,ADDR_CODES,c_admin_cat_code,,Integer,False,ADMIN_CAT_CODES,c_admin_cat_code
+,,,ADDR_CODES,c_admin_type,,Text,False,,
+,,,ADDR_CODES,c_alt_names,,Text,True,,
+,,,ADDR_CODES,c_firstyear,,Integer,True,,
+,,,ADDR_CODES,c_lastyear,,Integer,True,,
+,,,ADDR_CODES,c_name,,Text,False,,
+,,,ADDR_CODES,c_name_chn,,Text,False,,
+,,,ADDR_CODES,c_notes,,Memo,True,,
+,,,ADDR_CODES,CHGIS_PT_ID,,Long,True,,
+,,,ADDR_CODES,x_coord,,Double,False,,
+,,,ADDR_CODES,y_coord,,Double,False,,
+,,,ADMIN_CAT_CODE_TYPE_REL,c_admin_cat_code,Primary Key,Integer,False,ADMIN_CAT_CODES,c_admin_cat_code
+,,,ADMIN_CAT_CODE_TYPE_REL,c_admin_type_code,Primary Key,Text,False,ADMIN_CAT_TYPES,c_admin_type_code
+,,,ADMIN_CAT_CODES,c_admin_cat_code,Primary Key,Integer,False,,
+,,,ADMIN_CAT_CODES,c_admin_cat_hz,,Text,False,,
+,,,ADMIN_CAT_CODES,c_admin_cat_py,,Text,False,,
+,,,ADMIN_CAT_CODES,c_admin_cat_trans,,Text,True,,
+,,,ADMIN_CAT_CODES,c_notes,,Memo,True,,
+,,,ADMIN_CAT_TYPES,c_admin_type_code,Primary Key,Text,False,,
+,,,ADMIN_CAT_TYPES,c_admin_type_hz,,Text,False,,
+,,,ADMIN_CAT_TYPES,c_admin_type_trans,,Text,False,,
+,,,ADMIN_CAT_TYPES,c_notes,,Memo,False,,
+336,name_types,code,ALTNAME_CODES,c_name_type_code,Primary Key,Integer,False,,
+337,name_types,desc,ALTNAME_CODES,c_name_type_desc,,Text,False,,
+338,name_types,descchn,ALTNAME_CODES,c_name_type_desc_chn,,Text,False,,
+269,fix_altnames,別名拼音(c_alt_name),ALTNAME_DATA,c_alt_name,,Text,False,,
+270,fix_altnames,別名漢字(c_alt_name_chn),ALTNAME_DATA,c_alt_name_chn,Primary Key,Text,False,,
+271,fix_altnames,別名類別代碼(c_alt_name_type_code),ALTNAME_DATA,c_alt_name_type_code,Primary Key,Integer,False,ALTNAME_CODES,c_name_type_code
+,,,ALTNAME_DATA,c_created_by,,Text,True,,
+,,,ALTNAME_DATA,c_created_date,,Date/Time,True,,
+,,,ALTNAME_DATA,c_modified_by,,Text,True,,
+,,,ALTNAME_DATA,c_modified_date,,Date/Time,True,,
+276,fix_altnames,注(c_notes),ALTNAME_DATA,c_notes,,Text,True,,
+275,fix_altnames,頁碼/條目(c_pages),ALTNAME_DATA,c_pages,,Text,True,,
+268,fix_altnames,c_personid,ALTNAME_DATA,c_personid,Primary Key,Long,False,BIOG_MAIN,c_personid
+,,,ALTNAME_DATA,c_sequence,,Integer,True,,
+274,fix_altnames,出處(c_source),ALTNAME_DATA,c_source,,Long,True,TEXT_CODES,c_textid
+,,,APPOINTMENT_CODE_TYPE_REL,c_appt_code,Primary Key,Integer,False,APPOINTMENT_CODES,c_appt_code
+,,,APPOINTMENT_CODE_TYPE_REL,c_appt_type_code,Primary Key,Text,False,APPOINTMENT_TYPES,c_appt_type_code
+12,appointment_type_codes,code,APPOINTMENT_CODES,c_appt_code,Primary,Integer,False,,
+14,appointment_type_codes,typedesc,APPOINTMENT_CODES,c_appt_desc,,Text,False,,
+,,,APPOINTMENT_CODES,c_appt_desc_alt,,Text,True,,
+13,appointment_type_codes,deschn,APPOINTMENT_CODES,c_appt_desc_chn,,Text,False,,
+,,,APPOINTMENT_CODES,c_appt_desc_chn_alt,,Text,True,,
+,,,APPOINTMENT_CODES,c_notes,,Text,True,,
+,,,APPOINTMENT_TYPES,c_appt_type_code,Primary Key,Text,False,,
+,,,APPOINTMENT_TYPES,c_appt_type_desc,,Text,False,,
+,,,APPOINTMENT_TYPES,c_appt_type_desc_chn,,Text,False,,
+,,,APPOINTMENT_TYPES,c_notes,,Text,True,,
+,,,ASSOC_CODE_TYPE_REL,c_assoc_code,Primary Key,Integer,False,ASSOC_CODES,c_assoc_code
+,,,ASSOC_CODE_TYPE_REL,c_assoc_type_code,Primary Key,Text,False,ASSOC_TYPES,c_assoc_type_code
+16,assoc_codes,code,ASSOC_CODES,c_assoc_code,Primary,Integer,False,,
+18,assoc_codes,desc,ASSOC_CODES,c_assoc_desc,,Text,True,,
+19,assoc_codes,descchn,ASSOC_CODES,c_assoc_desc_chn,,Text,False,,
+17,assoc_codes,pair,ASSOC_CODES,c_assoc_pair,,Long,True,,
+,,,ASSOC_CODES,c_assoc_pair2,,Integer,True,ASSOC_CODES,c_assoc_code
+,,,ASSOC_CODES,c_assoc_role_type,,Text,False,,
+30,assoc_codes,example,ASSOC_CODES,c_example,,Text,True,,
+29,assoc_codes,sortorder,ASSOC_CODES,c_sortorder,,Integer,False,,
+51,assoc_data,addr_id,ASSOC_DATA,c_addr_id,,Long,True,ADDR_CODES,c_addr_id
+58,assoc_data,社會關係指證人(assoc_claimer_id),ASSOC_DATA,c_assoc_claimer_id,,Long,True,BIOG_MAIN,c_personid
+32,assoc_data,社會關係類別(assoc_code),ASSOC_DATA,c_assoc_code,Primary Key,Integer,False,ASSOC_CODES,c_assoc_code
+,,,ASSOC_DATA,c_assoc_count,,Integer,True,,
+40,assoc_data,社會關係年份(assoc_year),ASSOC_DATA,c_assoc_first_year,,Integer,True,,
+62,assoc_data,日c_assoc_day,ASSOC_DATA,c_assoc_fy_day,,Integer,True,,
+63,assoc_data,日干支c_assoc_day_gz,ASSOC_DATA,c_assoc_fy_day_gz,,Integer,True,GANZHI_CODES,c_ganzhi_code
+60,assoc_data,閏c_assoc_intercalary,ASSOC_DATA,c_assoc_fy_intercalary,,Binary,True,,
+61,assoc_data,月c_assoc_month,ASSOC_DATA,c_assoc_fy_month,,Integer,True,,
+43,assoc_data,社會關係(年號)(assoc_nh_code),ASSOC_DATA,c_assoc_fy_nh_code,,Integer,True,nian_hao,c_nianhao_id
+44,assoc_data,社會關係(年)(assoc_nh_year),ASSOC_DATA,c_assoc_fy_nh_year,,Integer,True,,
+45,assoc_data,社會關係(時限)(assoc_range),ASSOC_DATA,c_assoc_fy_range,,Integer,True,year_range_codes,c_range_code
+36,assoc_data,社會關係人(assoc_id),ASSOC_DATA,c_assoc_id,Primary Key,Long,False,BIOG_MAIN,c_personid
+37,assoc_data,社會關係人親屬關係類別(assoc_kin_code),ASSOC_DATA,c_assoc_kin_code,Primary Key,Integer,False,,
+38,assoc_data,社會關係人親戚姓名(assoc_kin_id),ASSOC_DATA,c_assoc_kin_id,Primary Key,Long,False,BIOG_MAIN,c_personid
+,,,ASSOC_DATA,c_assoc_last_year,,Integer,True,,
+,,,ASSOC_DATA,c_assoc_ly_day,,Integer,True,,
+,,,ASSOC_DATA,c_assoc_ly_day_gz,,Integer,True,GANZHI_CODES,c_ganzhi_code
+,,,ASSOC_DATA,c_assoc_ly_intercalary,,Binary,True,,
+,,,ASSOC_DATA,c_assoc_ly_month,,Integer,True,,
+,,,ASSOC_DATA,c_assoc_ly_nh_code,,Integer,True,NIAN_HAO,c_nianhao_code
+,,,ASSOC_DATA,c_assoc_ly_nh_year,,Integer,True,,
+,,,ASSOC_DATA,c_assoc_ly_range,,Integer,True,YEAR_RANGE_CODES,c_range_code
+,,,ASSOC_DATA,c_created_by,,Text,True,,
+,,,ASSOC_DATA,c_created_date,,Date/Time,True,,
+55,assoc_data,就讀學校(school_code),ASSOC_DATA,c_inst_code,,Integer,True,SOCIAL_INSTITUTION_CODES,c_inst_code
+,,,ASSOC_DATA,c_inst_name_code,,Integer,True,SOCIAL_INSTITUTION_NAME_CODES,c_inst_name_code
+34,assoc_data,親屬關係類別(kin_code),ASSOC_DATA,c_kin_code,Primary Key,Integer,False,KINSHIP_CODES,c_kincode
+35,assoc_data,親戚姓名(kin_id),ASSOC_DATA,c_kin_id,Primary Key,Long,False,BIOG_MAIN,c_personid
+52,assoc_data,作品文學樣式(litgenre_code),ASSOC_DATA,c_litgenre_code,,Integer,True,literarygenre_codes,c_lit_genre_code
+,,,ASSOC_DATA,c_modified_by,,Text,True,,
+,,,ASSOC_DATA,c_modified_date,,Date/Time,True,,
+46,assoc_data,注(notes),ASSOC_DATA,c_notes,,Memo,True,,
+53,assoc_data,場合(occasion_code),ASSOC_DATA,c_occasion_code,,Integer,True,OCCASION_CODES,c_occasion_code
+42,assoc_data,pages,ASSOC_DATA,c_pages,,Text,True,,
+33,assoc_data,personid,ASSOC_DATA,c_personid,Primary Key,Long,False,BIOG_MAIN,c_personid
+39,assoc_data,次序(sequence),ASSOC_DATA,c_sequence,,Integer,True,,
+41,assoc_data,出處(source),ASSOC_DATA,c_source,,Long,True,TEXT_CODES,c_textid
+,,,ASSOC_DATA,c_tertiary_personid,,Long,True,BIOG_MAIN,c_personid
+56,assoc_data,作品標題(text_title),ASSOC_DATA,c_text_title,Primary Key,Text,False,,
+54,assoc_data,學術主題(topic_code),ASSOC_DATA,c_topic_code,,Integer,True,SCHOLARLYTOPIC_CODES,c_topic_code
+,,,ASSOC_TYPES,c_assoc_type_code,Primary Key,Text,False,,
+,,,ASSOC_TYPES,c_assoc_type_desc,,Text,False,,
+,,,ASSOC_TYPES,c_assoc_type_desc_chn,,Text,False,,
+,,,ASSOC_TYPES,c_assoc_type_level,,Integer,False,,
+,,,ASSOC_TYPES,c_assoc_type_parent_id,,Text,False,,
+,,,ASSOC_TYPES,c_assoc_type_short_desc,,Text,True,,
+,,,ASSOC_TYPES,c_assoc_type_sortorder,,Integer,False,,
+65,assume_office_codes,assume_code,ASSUME_OFFICE_CODES,c_assume_office_code,Primary,Integer,False,,
+67,assume_office_codes,assume_desc,ASSUME_OFFICE_CODES,c_assume_office_desc,,Text,False,,
+66,assume_office_codes,assume_chn,ASSUME_OFFICE_CODES,c_assume_office_desc_chn,,Text,False,,
+73,biog_addr_codes,desc,BIOG_ADDR_CODES,c_addr_desc,,Text,False,,
+74,biog_addr_codes,descchn,BIOG_ADDR_CODES,c_addr_desc_chn,,Text,False,,
+75,biog_addr_codes,note,BIOG_ADDR_CODES,c_addr_note,,Text,True,,
+72,biog_addr_codes,type,BIOG_ADDR_CODES,c_addr_type,Primary,Integer,False,,
+,,,BIOG_ADDR_CODES,c_index_addr_default_rank,,Integer,False,,
+,,,BIOG_ADDR_CODES,c_index_addr_rank,,Integer,False,,
+78,biog_addr_data,c_addr_id,BIOG_ADDR_DATA,c_addr_id,Primary,Long,False,ADDR_CODES,c_addr_id
+79,biog_addr_data,地址類別(c_addr_type),BIOG_ADDR_DATA,c_addr_type,Primary,Integer,False,BIOG_ADDR_CODES,c_addr_type
+,,,BIOG_ADDR_DATA,c_created_by,,Text,True,,
+,,,BIOG_ADDR_DATA,c_created_date,,Date/Time,True,,
+81,biog_addr_data,始年(c_firstyear),BIOG_ADDR_DATA,c_firstyear,,Integer,True,,
+97,biog_addr_data,始年(日)c_fy_day,BIOG_ADDR_DATA,c_fy_day,,Integer,True,,
+99,biog_addr_data,始年(日干支)c_fy_day_gz,BIOG_ADDR_DATA,c_fy_day_gz,,Integer,True,GANZHI_CODES,c_ganzhi_code
+93,biog_addr_data,始年(閏)c_fy_intercalary,BIOG_ADDR_DATA,c_fy_intercalary,,Binary,True,,
+95,biog_addr_data,始年(月)c_fy_month,BIOG_ADDR_DATA,c_fy_month,,Integer,True,,
+86,biog_addr_data,始年年代碼(c_fy_nh_code),BIOG_ADDR_DATA,c_fy_nh_code,,Integer,True,nian_hao,c_nianhao_id
+88,biog_addr_data,始年年(c_fy_nh_year),BIOG_ADDR_DATA,c_fy_nh_year,,Integer,True,,
+90,biog_addr_data,始年時限(c_fy_range),BIOG_ADDR_DATA,c_fy_range,,Integer,True,year_range_codes,c_range_code
+82,biog_addr_data,終年(c_lastyear),BIOG_ADDR_DATA,c_lastyear,,Integer,True,,
+98,biog_addr_data,終年(日)c_ly_day,BIOG_ADDR_DATA,c_ly_day,,Integer,True,,
+100,biog_addr_data,終年(日干支)c_ly_day_gz,BIOG_ADDR_DATA,c_ly_day_gz,,Integer,True,GANZHI_CODES,c_ganzhi_code
+94,biog_addr_data,終年(閏)c_ly_intercalary,BIOG_ADDR_DATA,c_ly_intercalary,,Binary,True,,
+96,biog_addr_data,終年(月)c_ly_month,BIOG_ADDR_DATA,c_ly_month,,Integer,True,,
+87,biog_addr_data,終年年代碼(c_ly_nh_code),BIOG_ADDR_DATA,c_ly_nh_code,,Integer,True,nian_hao,c_nianhao_id
+89,biog_addr_data,終年年(c_ly_nh_year),BIOG_ADDR_DATA,c_ly_nh_year,,Integer,True,,
+91,biog_addr_data,終年時限(c_ly_range),BIOG_ADDR_DATA,c_ly_range,,Integer,True,year_range_codes,c_range_code
+,,,BIOG_ADDR_DATA,c_modified_by,,Text,True,,
+,,,BIOG_ADDR_DATA,c_modified_date,,Date/Time,True,,
+92,biog_addr_data,娘家地址(c_natal),BIOG_ADDR_DATA,c_natal,,Binary,True,,
+85,biog_addr_data,注(c_notes),BIOG_ADDR_DATA,c_notes,,Memo,True,,
+84,biog_addr_data,頁數/條目(c_pages),BIOG_ADDR_DATA,c_pages,,Text,True,,
+77,biog_addr_data,c_personid,BIOG_ADDR_DATA,c_personid,Primary,Long,False,BIOG_MAIN,c_personid
+80,biog_addr_data,遷徙次序(c_sequence),BIOG_ADDR_DATA,c_sequence,Primary,Integer,False,,
+83,biog_addr_data,出處(c_source),BIOG_ADDR_DATA,c_source,,Long,False,TEXT_CODES,c_textid
+,,,BIOG_INST_CODES,c_bi_role_chn,,Text,False,,
+,,,BIOG_INST_CODES,c_bi_role_code,Primary Key,Integer,False,,
+,,,BIOG_INST_CODES,c_bi_role_desc,,Text,False,,
+,,,BIOG_INST_CODES,c_notes,,Text,True,,
+,,,BIOG_INST_DATA,c_bi_begin_year,,Integer,True,,
+,,,BIOG_INST_DATA,c_bi_by_nh_code,,Integer,True,NIAN_HAO,c_nianhao_id
+,,,BIOG_INST_DATA,c_bi_by_nh_year,,Integer,True,,
+,,,BIOG_INST_DATA,c_bi_by_range,,Integer,True,YEAR_RANGE_CODES,c_range_code
+,,,BIOG_INST_DATA,c_bi_end_year,,Integer,True,,
+,,,BIOG_INST_DATA,c_bi_ey_nh_code,,Integer,True,NIAN_HAO,c_nianhao_id
+,,,BIOG_INST_DATA,c_bi_ey_nh_year,,Integer,True,,
+,,,BIOG_INST_DATA,c_bi_ey_range,,Integer,True,YEAR_RANGE_CODES,c_range_code
+,,,BIOG_INST_DATA,c_bi_role_code,Primary Key,Integer,False,BIOG_INST_CODES,c_bi_role_code
+,,,BIOG_INST_DATA,c_created_by,,Text,True,,
+,,,BIOG_INST_DATA,c_created_date,,Date/Time,True,,
+,,,BIOG_INST_DATA,c_inst_code,Primary Key,Integer,False,SOCIAL_INSTITUTION_CODES,c_inst_code
+,,,BIOG_INST_DATA,c_inst_name_code,Primary Key,Integer,False,SOCIAL_INSTITUTION_CODES,c_inst_name_code
+,,,BIOG_INST_DATA,c_modified_by,,Text,True,,
+,,,BIOG_INST_DATA,c_modified_date,,Date/Time,True,,
+,,,BIOG_INST_DATA,c_notes,,Memo,True,,
+,,,BIOG_INST_DATA,c_pages,,Text,True,,
+,,,BIOG_INST_DATA,c_personid,Primary Key,Long,False,BIOG_MAIN,c_personid
+,,,BIOG_INST_DATA,c_source,,Long,True,TEXT_CODES,c_textid
+111,biog_main,生年,BIOG_MAIN,c_birthyear,,Integer,True,,
+143,biog_main,生年(日)(c_by_day),BIOG_MAIN,c_by_day,,Integer,True,,
+145,biog_main,生年(日干支)(c_by_day_gz),BIOG_MAIN,c_by_day_gz,,Integer,True,GANZHI_CODES,c_ganzhi_code
+139,biog_main,生年(閏)(c_by_intercalary),BIOG_MAIN,c_by_intercalary,,Binary,True,,
+141,biog_main,生年(月)(c_by_month),BIOG_MAIN,c_by_month,,Integer,True,,
+112,biog_main,生年(年號)(by_nh_code),BIOG_MAIN,c_by_nh_code,,Integer,True,nian_hao,c_nianhao_id
+113,biog_main,生年(年)(by_nh_year),BIOG_MAIN,c_by_nh_year,,Integer,True,,
+114,biog_main,生年時限(by_range),BIOG_MAIN,c_by_range,,Integer,True,year_range_codes,c_range_code
+135,biog_main,郡望(choronym_code),BIOG_MAIN,c_choronym_code,,Integer,True,choronym_codes,c_choronym_code
+,,,BIOG_MAIN,c_created_by,,Text,True,,
+,,,BIOG_MAIN,c_created_date,,Date/Time,True,,
+119,biog_main,享年(death_age),BIOG_MAIN,c_death_age,,Integer,True,,
+120,biog_main,享年範圍(death_age_appro),BIOG_MAIN,c_death_age_range,,Integer,True,year_range_codes,c_range_code
+115,biog_main,卒年(death year),BIOG_MAIN,c_deathyear,,Integer,True,,
+134,biog_main,朝代(dy),BIOG_MAIN,c_dy,,Integer,True,dynasties,c_dy
+144,biog_main,卒年(日)(c_dy_day),BIOG_MAIN,c_dy_day,,Integer,True,,
+146,biog_main,卒年(日干支)(c_dy_day_gz),BIOG_MAIN,c_dy_day_gz,,Integer,True,GANZHI_CODES,c_ganzhi_code
+140,biog_main,卒年(閏)(c_dy_intercalary),BIOG_MAIN,c_dy_intercalary,,Binary,True,,
+142,biog_main,卒年(月)(c_dy_month),BIOG_MAIN,c_dy_month,,Integer,True,,
+116,biog_main,卒年(年號)(dy_nh_code),BIOG_MAIN,c_dy_nh_code,,Integer,True,nian_hao,c_nianhao_id
+117,biog_main,卒年(年)(dy_nh_year),BIOG_MAIN,c_dy_nh_year,,Integer,True,,
+118,biog_main,卒年時限(dy_range),BIOG_MAIN,c_dy_range,,Integer,True,year_range_codes,c_range_code
+109,biog_main,種族(ethnicity_code),BIOG_MAIN,c_ethnicity_code,,Integer,True,ETHNICITY_CODES,c_ethnicity_code
+108,biog_main,性別(原female),BIOG_MAIN,c_female,,Binary,True,,
+121,biog_main,在世始年(fl_earliest_year),BIOG_MAIN,c_fl_earliest_year,,Integer,True,,
+122,biog_main,在世始年(年號)(fl_ey_nh_code),BIOG_MAIN,c_fl_ey_nh_code,,Integer,True,nian_hao,c_nianhao_id
+123,biog_main,在世始年(年)(fl_ey_nh_year),BIOG_MAIN,c_fl_ey_nh_year,,Integer,True,,
+124,biog_main,在世始年(注)(fl_ey_notes),BIOG_MAIN,c_fl_ey_notes,,Text,True,,
+125,biog_main,在世終年(fl_latest_year),BIOG_MAIN,c_fl_latest_year,,Integer,True,,
+126,biog_main,在世終年(年號)(fl_ly_nh_code),BIOG_MAIN,c_fl_ly_nh_code,,Integer,True,nian_hao,c_nianhao_id
+127,biog_main,在世終年(年)(fl_ly_nh_year),BIOG_MAIN,c_fl_ly_nh_year,,Integer,True,,
+128,biog_main,在世終年(注)(fl_ly_notes),BIOG_MAIN,c_fl_ly_notes,,Text,True,,
+,,,BIOG_MAIN,c_household_status_code,,Integer,True,HOUSEHOLD_STATUS_CODES,c_household_status_code
+,,,BIOG_MAIN,c_index_addr_id,,Long,True,ADDR_CODES,c_addr_id
+,,,BIOG_MAIN,c_index_addr_type_code,,Integer,True,BIOG_ADDR_CODES,c_addr_type
+107,biog_main,指數年(index year),BIOG_MAIN,c_index_year,,Integer,True,,
+,,,BIOG_MAIN,c_index_year_source_id,,Long,True,TEXT_CODES,c_textid
+,,,BIOG_MAIN,c_index_year_type_code,,Text,True,,
+132,biog_main,(mingzi),BIOG_MAIN,c_mingzi,,Text,True,,
+133,biog_main,名(mingzi_chn),BIOG_MAIN,c_mingzi_chn,,Text,True,,
+,,,BIOG_MAIN,c_mingzi_proper,,Text,True,,
+,,,BIOG_MAIN,c_mingzi_rm,,Text,True,,
+,,,BIOG_MAIN,c_modified_by,,Text,True,,
+,,,BIOG_MAIN,c_modified_date,,Date/Time,True,,
+103,biog_main,姓名(英)(name),BIOG_MAIN,c_name,,Text,False,,
+104,biog_main,姓名(中)(name_chn),BIOG_MAIN,c_name_chn,,Text,False,,
+,,,BIOG_MAIN,c_name_proper,,Text,True,,
+,,,BIOG_MAIN,c_name_rm,,Text,True,,
+138,biog_main,注,BIOG_MAIN,c_notes,,Memo,True,,
+102,biog_main,person id,BIOG_MAIN,c_personid,Primary Key,Long,False,,
+129,biog_main,(surname),BIOG_MAIN,c_surname,,Text,True,,
+130,biog_main,姓(surname_chn),BIOG_MAIN,c_surname_chn,,Text,True,,
+,,,BIOG_MAIN,c_surname_proper,,Text,True,,
+,,,BIOG_MAIN,c_surname_rm,,Text,True,,
+110,biog_main,部、族(tribe),BIOG_MAIN,c_tribe,,Text,True,,
+,,,BIOG_SOURCE_DATA,c_created_by,,Text,True,,
+,,,BIOG_SOURCE_DATA,c_created_date,,Date/Time,True,,
+,,,BIOG_SOURCE_DATA,c_main_source,,Binary,True,,
+,,,BIOG_SOURCE_DATA,c_modified_by,,Text,True,,
+,,,BIOG_SOURCE_DATA,c_modified_date,,Date/Time,True,,
+,,,BIOG_SOURCE_DATA,c_notes,,Memo,True,,
+,,,BIOG_SOURCE_DATA,c_pages,Primary Key,Text,False,,
+,,,BIOG_SOURCE_DATA,c_personid,Primary Key,Long,False,BIOG_MAIN,c_personid
+,,,BIOG_SOURCE_DATA,c_self_bio,,Binary,True,,
+,,,BIOG_SOURCE_DATA,c_textid,Primary Key,Long,False,TEXT_CODES,c_textid
+,,,BIOG_TEXT_DATA,c_created_by,,Text,True,,
+,,,BIOG_TEXT_DATA,c_created_date,,Date/Time,True,,
+,,,BIOG_TEXT_DATA,c_modified_by,,Text,True,,
+,,,BIOG_TEXT_DATA,c_modified_date,,Date/Time,True,,
+,,,BIOG_TEXT_DATA,c_nh_code,,Integer,True,NIAN_HAO,c_nianhao_code
+,,,BIOG_TEXT_DATA,c_nh_year,,Integer,True,,
+,,,BIOG_TEXT_DATA,c_notes,,Memo,True,,
+,,,BIOG_TEXT_DATA,c_pages,,Text,True,,
+70,bare_authors,c_personid,BIOG_TEXT_DATA,c_personid,Primary Key,,False,BIOG_MAIN,c_personid
+,,,BIOG_TEXT_DATA,c_range_code,,Integer,True,YEAR_RANGE_CODES,c_range_code
+,,,BIOG_TEXT_DATA,c_role_id,Primary Key,Integer,False,TEXT_ROLE_CODES,c_role_id
+,,,BIOG_TEXT_DATA,c_source,,Long,True,TEXT_CODES,c_textid
+69,bare_authors,著述代碼(c_textid),BIOG_TEXT_DATA,c_textid,Primary Key,,False,TEXT_CODES,c_textid
+,,,BIOG_TEXT_DATA,c_year,,Integer,True,,
+150,choronym_codes,descchn,CHORONYM_CODES,c_choronym_chn,,Text,False,,
+148,choronym_codes,code,CHORONYM_CODES,c_choronym_code,Primary,Integer,False,,
+149,choronym_codes,desc,CHORONYM_CODES,c_choronym_desc,,Text,False,,
+152,country_codes,code,COUNTRY_CODES,c_country_code,Primary,Integer,False,,
+153,country_codes,desc,COUNTRY_CODES,c_country_desc,,Text,False,,
+154,country_codes,descchn,COUNTRY_CODES,c_country_desc_chn,,Text,False,,
+157,dynasties,dy,DYNASTIES,c_dy,Primary,Integer,False,,
+158,dynasties,dynasty,DYNASTIES,c_dynasty,,Text,False,,
+159,dynasties,dynastychn,DYNASTIES,c_dynasty_chn,,Text,False,,
+161,dynasties,end,DYNASTIES,c_end,,Integer,False,,
+162,dynasties,sort,DYNASTIES,c_sort,,Integer,True,,
+160,dynasties,start,DYNASTIES,c_start,,Integer,False,,
+,,,ENTRY_CODE_TYPE_REL,c_entry_code,Primary Key,Integer,False,ENTRY_CODES,c_entry_code
+,,,ENTRY_CODE_TYPE_REL,c_entry_type,Primary Key,Text,False,ENTRY_TYPES,c_entry_type
+164,entry_codes,code,ENTRY_CODES,c_entry_code,Primary,Integer,False,,
+165,entry_codes,desc,ENTRY_CODES,c_entry_desc,,Text,False,,
+166,entry_codes,descchn,ENTRY_CODES,c_entry_desc_chn,,Text,False,,
+,,,ENTRY_DATA,c_addr_id,,Long,True,ADDR_CODES,c_addr_id
+189,entry_data,入仕年齡(age),ENTRY_DATA,c_age,,Integer,True,,
+186,entry_data,社會關係類別(assoc_code),ENTRY_DATA,c_assoc_code,Primary Key,Integer,False,ASSOC_CODES,c_assoc_code
+198,entry_data,c_assoc_id,ENTRY_DATA,c_assoc_id,Primary Key,Long,False,BIOG_MAIN,c_personid
+,,,ENTRY_DATA,c_attempt_count,,Integer,True,,
+,,,ENTRY_DATA,c_created_by,,Text,True,,
+,,,ENTRY_DATA,c_created_date,,Date/Time,True,,
+181,entry_data,入仕法(entry_code),ENTRY_DATA,c_entry_code,Primary Key,Integer,False,ENTRY_CODES,c_entry_code
+,,,ENTRY_DATA,c_entry_dy,,Integer,True,DYNASTIES,c_dy
+195,entry_data,c_entry_nh_id,ENTRY_DATA,c_entry_nh_id,,Integer,True,nian_hao,c_nianhao_id
+196,entry_data,c_entry_nh_year,ENTRY_DATA,c_entry_nh_year,,Integer,True,,
+197,entry_data,c_entry_range,ENTRY_DATA,c_entry_range,,Integer,True,year_range_codes,c_range_code
+,,,ENTRY_DATA,c_exam_field,,Text,True,,
+184,entry_data,科第名次(exam_rank),ENTRY_DATA,c_exam_rank,,Text,True,,
+,,,ENTRY_DATA,c_inst_code,Primary Key,Integer,False,SOCIAL_INSTITUTION_CODES,c_inst_code
+,,,ENTRY_DATA,c_inst_name_code,Primary Key,Integer,False,SOCIAL_INSTITUTION_NAME_CODES,c_inst_name_code
+185,entry_data,親屬關係類別(kin_code),ENTRY_DATA,c_kin_code,Primary Key,Integer,False,KINSHIP_CODES,c_kincode
+187,entry_data,親戚(kin_id),ENTRY_DATA,c_kin_id,Primary Key,Long,False,BIOG_MAIN,
+,,,ENTRY_DATA,c_modified_by,,Text,True,,
+,,,ENTRY_DATA,c_modified_date,,Date/Time,True,,
+194,entry_data,注(notes),ENTRY_DATA,c_notes,,Memo,True,,
+193,entry_data,頁碼(pages),ENTRY_DATA,c_pages,,Text,True,,
+,,,ENTRY_DATA,c_parental_status_code,,Integer,True,PARENTAL_STATUS_CODES,c_parental_status_code
+180,entry_data,person id,ENTRY_DATA,c_personid,Primary Key,Long,False,BIOG_MAIN,c_personid
+199,entry_data,c_posting_id,ENTRY_DATA,c_posting_id,,Long,True,POSTING_DATA,c_posting_id
+,,,ENTRY_DATA,c_posting_notes,,Text,True,,
+183,entry_data,sequence,ENTRY_DATA,c_sequence,Primary Key,Integer,False,,
+192,entry_data,出處(source),ENTRY_DATA,c_source,,Long,True,TEXT_CODES,c_textid
+188,entry_data,入仕年(year),ENTRY_DATA,c_year,Primary Key,Integer,False,,
+,,,ENTRY_TYPES,c_entry_type,Primary Key,Text,False,,
+,,,ENTRY_TYPES,c_entry_type_desc,,Text,False,,
+,,,ENTRY_TYPES,c_entry_type_desc_chn,,Text,False,,
+,,,ENTRY_TYPES,c_entry_type_level,,Integer,True,,
+,,,ENTRY_TYPES,c_entry_type_parent_id,,Text,True,,
+,,,ENTRY_TYPES,c_entry_type_sortorder,,Integer,True,,
+,,,ETHNICITY_TRIBE_CODES,c_altname_code,,Integer,False,,
+201,ethnicity_codes,c_ethnicity_code,ETHNICITY_TRIBE_CODES,c_ethnicity_code,Primary,Integer,False,,
+,,,ETHNICITY_TRIBE_CODES,c_ethno_legal_cat,,Text,True,,
+,,,ETHNICITY_TRIBE_CODES,c_group_code,,Integer,False,,
+,,,ETHNICITY_TRIBE_CODES,c_name,,Text,False,,
+,,,ETHNICITY_TRIBE_CODES,c_name_chn,,Text,False,,
+206,ethnicity_codes,c_notes,ETHNICITY_TRIBE_CODES,c_notes,,Memo,True,,
+,,,ETHNICITY_TRIBE_CODES,c_romanized,,Text,True,,
+,,,ETHNICITY_TRIBE_CODES,c_subgroup_code,,Integer,False,,
+,,,ETHNICITY_TRIBE_CODES,c_surname,,Text,True,,
+,,,EVENT_CODES,c_addr_id,,Long,True,ADDR_CODES,c_addr_id
+233,event_codes,addr_id(事件發生地),EVENT_CODES,c_dy,,Integer,True,dynasties,c_dy
+218,event_codes,event_code(事件代碼),EVENT_CODES,c_event_code,Primary Key,Integer,False,,
+220,event_codes,event_name(事件名稱-英文),EVENT_CODES,c_event_name,,Text,True,,
+219,event_codes,event_name_chn(事件名稱-中文),EVENT_CODES,c_event_name_chn,,Text,False,,
+236,event_codes,pages(頁數/條目),EVENT_CODES,c_event_notes,,Text,True,,
+227,event_codes,fy_intercalary(始年-閏),EVENT_CODES,c_fy_intercalary,,Binary,True,,
+228,event_codes,fy_month(始月),EVENT_CODES,c_fy_month,,Integer,True,,
+223,event_codes,fy_nh_code(始年年號),EVENT_CODES,c_fy_nh_code,,Integer,True,nian_hao,c_nianhao_id
+225,event_codes,fy_nh_yr(始年),EVENT_CODES,c_fy_nh_yr,,Integer,True,,
+231,event_codes,fy_range(始年時限),EVENT_CODES,c_fy_range,,Integer,True,year_range_codes,c_range_code
+221,event_codes,fy_yr(事件始年),EVENT_CODES,c_fy_yr,,Integer,True,,
+229,event_codes,ly_intercalary(終年-閏),EVENT_CODES,c_ly_intercalary,,Binary,True,,
+230,event_codes,ly_month(終月),EVENT_CODES,c_ly_month,,Integer,True,,
+224,event_codes,ly_nh_code(終年年號),EVENT_CODES,c_ly_nh_code,,Integer,True,nian_hao,c_nianhao_id
+226,event_codes,ly_nh_yr(終年),EVENT_CODES,c_ly_nh_yr,,Integer,True,,
+232,event_codes,ly_range(終年時限),EVENT_CODES,c_ly_range,,Integer,True,year_range_codes,c_range_code
+222,event_codes,ly_yr(事件終年),EVENT_CODES,c_ly_yr,,Integer,True,,
+235,event_codes,source(出處),EVENT_CODES,c_pages,,Text,True,,
+234,event_codes,dy(朝代),EVENT_CODES,c_source,,Long,True,TEXT_CODES,c_textid
+241,events_addr,地名(c_addr_id),EVENTS_ADDR,c_addr_id,Primary Key,Long,False,ADDR_CODES,c_addr_id
+,,,EVENTS_ADDR,c_day,,Integer,True,,
+,,,EVENTS_ADDR,c_day_ganzhi,,Integer,True,GANZHI_CODES,c_ganzhi_code
+240,events_addr,紀錄號(c_event_record_id),EVENTS_ADDR,c_event_code,Primary Key,Long,False,EVENT_CODES,c_event_code
+,,,EVENTS_ADDR,c_intercalary,,Binary,True,,
+,,,EVENTS_ADDR,c_month,,Integer,True,,
+,,,EVENTS_ADDR,c_nh_code,,Integer,True,NIAN_HAO,c_nianhao_id
+,,,EVENTS_ADDR,c_nh_year,,Integer,True,,
+239,events_addr,c_personid,EVENTS_ADDR,c_personid,Primary Key,Long,False,BIOG_MAIN,c_personid
+,,,EVENTS_ADDR,c_sequence,Primary Key,Integer,False,,
+,,,EVENTS_ADDR,c_year,,Integer,True,,
+,,,EVENTS_ADDR,c_yr_range,,Integer,True,YEAR_RANGE_CODES,c_range_code
+256,events_data,地名(c_addr_id),EVENTS_DATA,c_addr_id,,Long,True,ADDR_CODES,c_addr_id
+,,,EVENTS_DATA,c_created_by,,Text,True,,
+,,,EVENTS_DATA,c_created_date,,Date/Time,True,,
+254,events_data,日(c_day),EVENTS_DATA,c_day,,Integer,True,,
+255,events_data,日干支(c_day_ganzhi),EVENTS_DATA,c_day_ganzhi,,Integer,True,GANZHI_CODES,c_ganzhi_code
+259,events_data,大事件(c_event),EVENTS_DATA,c_event,,Memo,True,,
+246,events_data,事件(c_event_code),EVENTS_DATA,c_event_code,Primary Key,Long,False,EVENT_ADDR,c_event_code
+252,events_data,閏(c_intercalary),EVENTS_DATA,c_intercalary,,Binary,True,,
+,,,EVENTS_DATA,c_modified_by,,Text,True,,
+,,,EVENTS_DATA,c_modified_date,,Date/Time,True,,
+253,events_data,月(c_month),EVENTS_DATA,c_month,,Integer,True,,
+249,events_data,事件年號(c_nh_code),EVENTS_DATA,c_nh_code,,Integer,True,nian_hao,c_nianhao_id
+250,events_data,事代年(c_nh_year),EVENTS_DATA,c_nh_year,,Integer,True,,
+260,events_data,注(c_notes),EVENTS_DATA,c_notes,,Memo,True,,
+258,events_data,頁碼/條目(c_pages),EVENTS_DATA,c_pages,,Text,True,,
+243,events_data,c_personid,EVENTS_DATA,c_personid,Primary Key,Long,False,EVENTS_ADDR,c_personid
+247,events_data,傳主在該事件中角色(c_role),EVENTS_DATA,c_role,,Text,True,,
+244,events_data,次序(c_sequence),EVENTS_DATA,c_sequence,Primary Key,Integer,True,EVENTS_ADDR,c_sequence
+257,events_data,出處(c_source),EVENTS_DATA,c_source,,Long,True,TEXT_CODES,c_textid
+248,events_data,事件發生年(c_year),EVENTS_DATA,c_year,,Integer,True,,
+251,events_data,時限(c_yr_range),EVENTS_DATA,c_yr_range,,Integer,True,year_range_codes,c_range_code
+262,extant_codes,code,EXTANT_CODES,c_extant_code,Primary Key,Long,False,,
+263,extant_codes,desc,EXTANT_CODES,c_extant_desc,,Text,False,,
+264,extant_codes,descchn,EXTANT_CODES,c_extant_desc_chn,,Text,False,,
+279,ganzhi_codes,ganzhi_chn,GANZHI_CODES,c_ganzhi_chn,,Text,False,,
+278,ganzhi_codes,ganzhi_code,GANZHI_CODES,c_ganzhi_code,Primary Key,Integer,False,,
+280,ganzhi_codes,ganzhi_py,GANZHI_CODES,c_ganzhi_py,,Text,False,,
+,,,HOUSEHOLD_STATUS_CODES,c_household_status_code,Primary Key,Integer,False,,
+,,,HOUSEHOLD_STATUS_CODES,c_household_status_desc,,Text,False,,
+,,,HOUSEHOLD_STATUS_CODES,c_household_status_desc_chn,,Text,False,,
+,,,INDEXYEAR_TYPE_CODES,c_index_year_type_code,Primary Key,Text,False,,
+,,,INDEXYEAR_TYPE_CODES,c_index_year_type_desc,,Text,False,,
+,,,INDEXYEAR_TYPE_CODES,c_index_year_type_hz,,Text,False,,
+,,,INDEXYEAR_TYPE_CODES,c_notes,,Text,True,,
+309,kin_data,c_autogen_notes,KIN_DATA,c_autogen_notes,,Memo,True,,
+,,,KIN_DATA,c_created_by,,Text,True,,
+,,,KIN_DATA,c_created_date,,Date/Time,True,,
+297,kin_data,c_kin_code,KIN_DATA,c_kin_code,Primary Key,Integer,False,KINSHIP_CODES,c_kincode
+296,kin_data,親戚姓名代碼(c_kin_id),KIN_DATA,c_kin_id,Primary Key,Long,False,BIOG_MAIN,c_personid
+,,,KIN_DATA,c_modified_by,,Text,True,,
+,,,KIN_DATA,c_modified_date,,Date/Time,True,,
+303,kin_data,注(c_notes),KIN_DATA,c_notes,,Memo,True,,
+302,kin_data,頁碼/條目(c_pages),KIN_DATA,c_pages,,Text,True,,
+295,kin_data,c_personid,KIN_DATA,c_personid,Primary Key,Long,False,BIOG_MAIN,c_personid
+301,kin_data,出處(c_source),KIN_DATA,c_source,,Long,True,TEXT_CODES,c_textid
+,,,KIN_MOURNING,c_kindist,,Text,True,,
+,,,KIN_MOURNING,c_kinrel,Primary Key,Text,False,,
+,,,KIN_MOURNING,c_kinrel_alt,,Text,True,,
+,,,KIN_MOURNING,c_kinrel_chn,,Text,True,,
+,,,KIN_MOURNING,c_kintype,,Text,True,,
+,,,KIN_MOURNING,c_kintype_desc,,Text,True,,
+,,,KIN_MOURNING,c_kintype_desc_chn,,Text,True,,
+,,,KIN_MOURNING,c_mourning,,Text,True,,
+,,,KIN_MOURNING,c_mourning_chn,,Text,True,,
+,,,KIN_MOURNING,c_notes,,Text,True,,
+,,,KIN_MOURNING_STEPS,c_colstep,,Integer,False,,
+,,,KIN_MOURNING_STEPS,c_dwnstep,,Integer,False,,
+,,,KIN_MOURNING_STEPS,c_kinrel,Primary Key,Text,False,,
+,,,KIN_MOURNING_STEPS,c_marstep,,Integer,False,,
+,,,KIN_MOURNING_STEPS,c_upstep,,Integer,False,,
+,,,KINSHIP_CODES,c_colstep,,Integer,False,,
+,,,KINSHIP_CODES,c_dwnstep,,Integer,False,,
+314,kinship_codes,pairnotes,KINSHIP_CODES,c_kin_pair_notes,,Text,True,,
+312,kinship_codes,pair1,KINSHIP_CODES,c_kin_pair1,,Integer,False,,
+313,kinship_codes,pair2,KINSHIP_CODES,c_kin_pair2,,Integer,False,,
+311,kinship_codes,code,KINSHIP_CODES,c_kincode,Primary Key,Integer,False,,
+316,kinship_codes,kinrel,KINSHIP_CODES,c_kinrel,,Text,False,,
+317,kinship_codes,kinrelalt,KINSHIP_CODES,c_kinrel_alt,,Text,True,,
+315,kinship_codes,kinrelchn,KINSHIP_CODES,c_kinrel_chn,,Text,False,,
+,,,KINSHIP_CODES,c_kinrel_simplified,,Text,False,,
+,,,KINSHIP_CODES,c_marstep,,Integer,False,,
+325,kinship_codes,sorting,KINSHIP_CODES,c_pick_sorting,,Integer,True,,
+,,,KINSHIP_CODES,c_upstep,,Integer,False,,
+327,literarygenre_codes,code,LITERARYGENRE_CODES,c_lit_genre_code,Primary Key,Integer,False,,
+328,literarygenre_codes,desc,LITERARYGENRE_CODES,c_lit_genre_desc,,Text,False,,
+329,literarygenre_codes,descchn,LITERARYGENRE_CODES,c_lit_genre_desc_chn,,Text,False,,
+330,literarygenre_codes,sortorder,LITERARYGENRE_CODES,c_sortorder,,Integer,True,,
+332,measure_codes,measure_code,MEASURE_CODES,c_measure_code,Primary Key,Integer,False,,
+333,measure_codes,measure_desc,MEASURE_CODES,c_measure_desc,,Text,False,,
+334,measure_codes,measure_chn,MEASURE_CODES,c_measure_desc_chn,,Text,False,,
+,,,MERGED_PERSON_DATA,c_created_by,,Text,True,,
+,,,MERGED_PERSON_DATA,c_created_date,,Date/Time,True,,
+,,,MERGED_PERSON_DATA,c_merged_to_personid,Primary Key,Long Integer,False,BIOG_MAIN,c_personid
+,,,MERGED_PERSON_DATA,c_modified_by,,Text,True,,
+,,,MERGED_PERSON_DATA,c_modified_date,,Date/Time,True,,
+,,,MERGED_PERSON_DATA,c_notes,,Memo,True,,
+,,,MERGED_PERSON_DATA,c_pages,,Text,True,,
+,,,MERGED_PERSON_DATA,c_personid,Primary Key,Long Integer,False,,
+,,,MERGED_PERSON_DATA,c_source,,Long Integer,True,TEXT_CODES,c_textid
+341,nian_hao,dy,NIAN_HAO,c_dy,,Integer,False,dynasties,c_dy
+342,nian_hao,dynastychn,NIAN_HAO,c_dynasty_chn,,Text,True,,
+345,nian_hao,firstyear,NIAN_HAO,c_firstyear,,Integer,False,,
+346,nian_hao,lastyear,NIAN_HAO,c_lastyear,,Integer,False,,
+343,nian_hao,nianhaochn,NIAN_HAO,c_nianhao_chn,,Text,False,,
+340,nian_hao,id,NIAN_HAO,c_nianhao_id,Primary Key,Integer,False,,
+344,nian_hao,nianhaopin,NIAN_HAO,c_nianhao_pin,,Text,True,,
+348,occasion_codes,code,OCCASION_CODES,c_occasion_code,Primary Key,Integer,False,,
+349,occasion_codes,desc,OCCASION_CODES,c_occasion_desc,,Text,False,,
+350,occasion_codes,descchn,OCCASION_CODES,c_occasion_desc_chn,,Text,False,,
+351,occasion_codes,sortorder,OCCASION_CODES,c_sortorder,,Integer,False,,
+354,office_categories,desc,OFFICE_CATEGORIES,c_category_desc,,Text,False,,
+355,office_categories,descchn,OFFICE_CATEGORIES,c_category_desc_chn,,Text,False,,
+356,office_categories,notes,OFFICE_CATEGORIES,c_notes,,Text,True,,
+353,office_categories,id,OFFICE_CATEGORIES,c_office_category_id,Primary Key,Integer,False,,
+,,,OFFICE_CODE_TYPE_REL,c_office_id,Primary Key,Long,False,OFFICE_CODES,c_office_id
+,,,OFFICE_CODE_TYPE_REL,c_office_tree_id,Primary Key,Text,False,OFFICE_TYPE_TREE,c_office_type_node_id
+,office_codes,,OFFICE_CODES,c_dy,,Integer,False,dynasties,c_dy
+376,office_codes,c_notes,OFFICE_CODES,c_notes,,Memo,True,,
+360,office_codes,c_office_chn,OFFICE_CODES,c_office_chn,,Text,False,,
+362,office_codes,c_office_chn_alt,OFFICE_CODES,c_office_chn_alt,,Text,True,,
+358,office_codes,c_office_id,OFFICE_CODES,c_office_id,Primary Key,Long,False,,
+,,,OFFICE_CODES,c_office_id_old,,Long,True,,
+359,office_codes,c_office_pinyin,OFFICE_CODES,c_office_pinyin,,Text,False,,
+361,office_codes,c_office_pinyin_alt,OFFICE_CODES,c_office_pinyin_alt,,Text,True,,
+367,office_codes,c_office_trans,OFFICE_CODES,c_office_trans,,Text,True,,
+368,office_codes,c_office_trans_alt,OFFICE_CODES,c_office_trans_alt,,Text,True,,
+375,office_codes,c_pages,OFFICE_CODES,c_pages,,Text,True,,
+374,office_codes,c_source,OFFICE_CODES,c_source,,Long,True,TEXT_CODES,c_textid
+,,,OFFICE_TYPE_TREE,c_office_type_desc,,Text,False,,
+,,,OFFICE_TYPE_TREE,c_office_type_desc_chn,,Text,False,,
+,,,OFFICE_TYPE_TREE,c_office_type_node_id,Primary Key,Text,False,,
+,,,OFFICE_TYPE_TREE,c_parent_id,,Text,False,OFFICE_TYPE_TREE,c_office_type_node_id
+,,,PARENTAL_STATUS_CODES,c_parental_status_code,Primary Key,Integer,False,,
+,,,PARENTAL_STATUS_CODES,c_parental_status_desc,,Text,False,,
+,,,PARENTAL_STATUS_CODES,c_parental_status_desc_chn,,Text,False,,
+,,,PersonIDSource,LineNum,,Integer,False,,
+,,,PersonIDSource,SourceTable,,Text,False,,
+378,possession_act_codes,act_code,POSSESSION_ACT_CODES,c_possession_act_code,Primary Key,Integer,False,,
+379,possession_act_codes,act_desc,POSSESSION_ACT_CODES,c_possession_act_desc,,Text,False,,
+380,possession_act_codes,act_desc_chn,POSSESSION_ACT_CODES,c_possession_act_desc_chn,,Text,False,,
+384,possession_addr,地名(addr_id),POSSESSION_ADDR,c_addr_id,Primary Key,Long,False,ADDR_CODES,c_addr_id
+383,possession_addr,possession_record_id(紀錄號),POSSESSION_ADDR,c_personid,Primary Key,Long,False,BIOG_MAIN,c_personid
+382,possession_addr,person_id,POSSESSION_ADDR,c_possession_record_id,Primary Key,Long,False,possession_data,c_possession_record_id
+398,possession_data,addr_id,POSSESSION_DATA,c_addr_id,,Long,True,ADDR_CODES,c_addr_id
+,,,POSSESSION_DATA,c_created_by,,Text,True,,
+,,,POSSESSION_DATA,c_created_date,,Date/Time,True,,
+393,possession_data,measure_code(度量單位),POSSESSION_DATA,c_measure_code,,Integer,True,MEASURE_CODES,c_measure_code
+,,,POSSESSION_DATA,c_modified_by,,Text,True,,
+,,,POSSESSION_DATA,c_modified_date,,Date/Time,True,,
+401,possession_data,notes(注),POSSESSION_DATA,c_notes,,Memo,True,,
+400,possession_data,pages(頁碼/條目),POSSESSION_DATA,c_pages,,Text,True,,
+386,possession_data,person_id,POSSESSION_DATA,c_personid,,Long,False,BIOG_MAIN,c_personid
+389,possession_data,possession_act_code(行為<擁有、捐出等>),POSSESSION_DATA,c_possession_act_code,,Integer,False,possession_act_codes,c_possession_act_code
+390,possession_data,possession_desc(財產<英文描述>),POSSESSION_DATA,c_possession_desc,,Text,True,,
+391,possession_data,possession_desc_chn(財產<中文描述>),POSSESSION_DATA,c_possession_desc_chn,,Text,True,,
+395,possession_data,possession_nh_code(年號),POSSESSION_DATA,c_possession_nh_code,,Integer,True,nian_hao,c_nianhao_id
+396,possession_data,possession_nh_yr(年),POSSESSION_DATA,c_possession_nh_yr,,Integer,True,,
+387,possession_data,possession_record_id(紀錄號),POSSESSION_DATA,c_possession_record_id,Primary Key,Long,False,,
+394,possession_data,possession_yr(年份),POSSESSION_DATA,c_possession_yr,,Integer,True,,
+397,possession_data,possession_yr_range(時限),POSSESSION_DATA,c_possession_yr_range,,Integer,True,year_range_codes,c_range_code
+392,possession_data,quantity(數量),POSSESSION_DATA,c_quantity,,Text,True,,
+388,possession_data,sequence(次序),POSSESSION_DATA,c_sequence,,Integer,True,,
+399,possession_data,source(出處),POSSESSION_DATA,c_source,,Long,True,TEXT_CODES,c_textid
+405,post_addr,addrid,POSTED_TO_ADDR_DATA,c_addr_id,Primary Key,Long,False,ADDR_CODES,c_addr_id
+,,,POSTED_TO_ADDR_DATA,c_created_by,,Text,True,,
+,,,POSTED_TO_ADDR_DATA,c_created_date,,Date/Time,True,,
+,,,POSTED_TO_ADDR_DATA,c_modified_by,,Text,True,,
+,,,POSTED_TO_ADDR_DATA,c_modified_date,,Date/Time,True,,
+,,,POSTED_TO_ADDR_DATA,c_office_id,Primary Key,Long,False,OFFICE_CODES,c_office_id
+403,post_addr,personid,POSTED_TO_ADDR_DATA,c_personid,,Long,False,BIOG_MAIN,c_personid
+404,post_addr,postingid,POSTED_TO_ADDR_DATA,c_posting_id,Primary Key,Long,False,POSTING_DATA,c_posting_id
+420,post_data,除授類別(c_appt_type_code),POSTED_TO_OFFICE_DATA,c_appt_code,,Integer,True,appointment_codes,c_appt_code
+421,post_data,是否赴任(c_decline/assume_office_code),POSTED_TO_OFFICE_DATA,c_assume_office_code,,Integer,True,assume_office_codes,c_assume_office_code
+,,,POSTED_TO_OFFICE_DATA,c_created_by,,Text,True,,
+,,,POSTED_TO_OFFICE_DATA,c_created_date,,Date/Time,True,,
+,,,POSTED_TO_OFFICE_DATA,c_dy,,Integer,True,dynasties,c_dy
+412,post_data,始年(firstyear),POSTED_TO_OFFICE_DATA,c_firstyear,,Integer,True,,
+431,post_data,始年(日)c_fy_day,POSTED_TO_OFFICE_DATA,c_fy_day,,Integer,True,,
+433,post_data,始年(日干支)c_fy_day_gz,POSTED_TO_OFFICE_DATA,c_fy_day_gz,,Integer,True,GANZHI_CODES,c_ganzhi_code
+427,post_data,始年(閏)(c_fy_intercalary),POSTED_TO_OFFICE_DATA,c_fy_intercalary,,Binary,True,,
+428,post_data,始年(月)c_fy_month,POSTED_TO_OFFICE_DATA,c_fy_month,,Integer,True,,
+413,post_data,始年年號(fy_nh_code),POSTED_TO_OFFICE_DATA,c_fy_nh_code,,Integer,True,nian_hao,c_nianhao_id
+414,post_data,始年年(fy_nh_year),POSTED_TO_OFFICE_DATA,c_fy_nh_year,,Integer,True,,
+415,post_data,始年年限(fy_range),POSTED_TO_OFFICE_DATA,c_fy_range,,Integer,True,year_range_codes,c_range_code
+,,,POSTED_TO_OFFICE_DATA,c_inst_code,,Long,True,SOCIAL_INSTITUTION_CODES,c_inst_code
+,,,POSTED_TO_OFFICE_DATA,c_inst_name_code,,Integer,True,SOCIAL_INSTITUTION_NAME_CODES,c_inst_name_code
+416,post_data,終年(lastyear),POSTED_TO_OFFICE_DATA,c_lastyear,,Integer,True,,
+432,post_data,終年(日)c_ly_day,POSTED_TO_OFFICE_DATA,c_ly_day,,Integer,True,,
+434,post_data,終年(日干支)c_ly_day_gz,POSTED_TO_OFFICE_DATA,c_ly_day_gz,,Integer,True,GANZHI_CODES,c_ganzhi_code
+429,post_data,終年(閏)c_ly_intercalary,POSTED_TO_OFFICE_DATA,c_ly_intercalary,,Binary,True,,
+430,post_data,終年(月)c_ly_month,POSTED_TO_OFFICE_DATA,c_ly_month,,Integer,True,,
+417,post_data,(ly_nh_code),POSTED_TO_OFFICE_DATA,c_ly_nh_code,,Integer,True,nian_hao,c_nianhao_id
+418,post_data,(ly_nh_year),POSTED_TO_OFFICE_DATA,c_ly_nh_year,,Integer,True,,
+419,post_data,(ly_range),POSTED_TO_OFFICE_DATA,c_ly_range,,Integer,True,year_range_codes,c_range_code
+,,,POSTED_TO_OFFICE_DATA,c_modified_by,,Text,True,,
+,,,POSTED_TO_OFFICE_DATA,c_modified_date,,Date/Time,True,,
+424,post_data,注(c_notes),POSTED_TO_OFFICE_DATA,c_notes,,Memo,True,,
+426,post_data,職官類別(c_office_category_id),POSTED_TO_OFFICE_DATA,c_office_category_id,,Integer,True,OFFICE_CATEGORIES,c_office_category_id
+408,post_data,官名(office_id),POSTED_TO_OFFICE_DATA,c_office_id,Primary Key,Long,False,OFFICE_CODES,c_office_id
+425,post_data,c_office_id_backup,POSTED_TO_OFFICE_DATA,c_office_id_backup,,Long,True,,
+423,post_data,頁碼(pages),POSTED_TO_OFFICE_DATA,c_pages,,Text,True,,
+407,post_data,person_id,POSTED_TO_OFFICE_DATA,c_personid,,Long,False,BIOG_MAIN,c_personid
+410,post_data,posting_id,POSTED_TO_OFFICE_DATA,c_posting_id,Primary Key,Long,False,POSTING_DATA,c_posting_id
+411,post_data,sequence,POSTED_TO_OFFICE_DATA,c_sequence,,Integer,True,,
+422,post_data,出處(source),POSTED_TO_OFFICE_DATA,c_source,,Long,True,TEXT_CODES,c_textid
+,,,POSTING_DATA,c_created_by,,Text,True,,
+,,,POSTING_DATA,c_created_date,,Date/Time,True,,
+,,,POSTING_DATA,c_modified_by,,Text,True,,
+,,,POSTING_DATA,c_modified_date,,Date/Time,True,,
+,,,POSTING_DATA,c_personid,,Long,False,BIOG_MAIN,c_personid
+,,,POSTING_DATA,c_posting_id,Primary Key,Long,False,,
+,,,POSTING_DATA,c_posting_id_old,,Long,True,,
+442,scholarytopic,sortorder,SCHOLARLYTOPIC_CODES,c_sortorder,,Integer,True,,
+,,,SCHOLARLYTOPIC_CODES,c_topic_code,Primary Key,Integer,False,,
+437,scholarytopic,desc,SCHOLARLYTOPIC_CODES,c_topic_desc,,Text,False,,
+438,scholarytopic,descchn,SCHOLARLYTOPIC_CODES,c_topic_desc_chn,,Text,False,,
+439,scholarytopic,tcode,SCHOLARLYTOPIC_CODES,c_topic_type_code,,Integer,True,,
+440,scholarytopic,tdesc,SCHOLARLYTOPIC_CODES,c_topic_type_desc,,Text,True,,
+441,scholarytopic,tdescchn,SCHOLARLYTOPIC_CODES,c_topic_type_desc_chn,,Text,True,,
+,,,SOCIAL_INSTITUTION_ADDR,c_inst_addr_begin_year,,Integer,True,,
+,,,SOCIAL_INSTITUTION_ADDR,c_inst_addr_end_year,,Integer,True,,
+,,,SOCIAL_INSTITUTION_ADDR,c_inst_addr_id,Primary Key,Long,False,ADDR_CODES,c_addr_id
+,,,SOCIAL_INSTITUTION_ADDR,c_inst_addr_type_code,Primary Key,Integer,False,SOCIAL_INSTITUTION_ADDR_TYPES,c_inst_addr_type_code
+,,,SOCIAL_INSTITUTION_ADDR,c_inst_code,Primary Key,Integer,False,SOCIAL_INSTITUTION_CODES,c_inst_code
+,,,SOCIAL_INSTITUTION_ADDR,c_inst_name_code,Primary Key,Integer,False,SOCIAL_INSTITUTION_CODES,c_inst_name_code
+,,,SOCIAL_INSTITUTION_ADDR,c_notes,,Memo,True,,
+,,,SOCIAL_INSTITUTION_ADDR,c_pages,,Text,True,,
+,,,SOCIAL_INSTITUTION_ADDR,c_source,,Long,True,TEXT_CODES,c_textid
+,,,SOCIAL_INSTITUTION_ADDR,inst_xcoord,Primary Key,Double,False,,
+,,,SOCIAL_INSTITUTION_ADDR,inst_ycoord,Primary Key,Double,False,,
+,,,SOCIAL_INSTITUTION_ADDR_TYPES,c_inst_addr_type_chn,,Text,False,,
+,,,SOCIAL_INSTITUTION_ADDR_TYPES,c_inst_addr_type_code,Primary Key,Integer,False,,
+,,,SOCIAL_INSTITUTION_ADDR_TYPES,c_inst_addr_type_desc,,Text,False,,
+,,,SOCIAL_INSTITUTION_ADDR_TYPES,c_notes,,Text,False,,
+448,school_codes,tdesc,SOCIAL_INSTITUTION_CODES,c_by_nianhao_code,,Integer,True,NIAN_HAO,c_nianhao_id
+449,school_codes,tdescchn,SOCIAL_INSTITUTION_CODES,c_by_nianhao_year,,Integer,True,,
+,,,SOCIAL_INSTITUTION_CODES,c_by_year_range,,Integer,True,YEAR_RANGE_CODES,c_range_code
+,,,SOCIAL_INSTITUTION_CODES,c_ey_nianhao_code,,Integer,True,NIAN_HAO,c_nianhao_id
+,,,SOCIAL_INSTITUTION_CODES,c_ey_nianhao_year,,Integer,True,,
+,,,SOCIAL_INSTITUTION_CODES,c_ey_year_range,,Integer,True,YEAR_RANGE_CODES,c_range_code
+,,,SOCIAL_INSTITUTION_CODES,c_inst_begin_dy,,Integer,True,DYNASTIES,c_dy
+446,school_codes,descchn,SOCIAL_INSTITUTION_CODES,c_inst_begin_year,,Integer,True,,
+444,school_codes,code,SOCIAL_INSTITUTION_CODES,c_inst_code,Primary Key,Integer,False,,
+,,,SOCIAL_INSTITUTION_CODES,c_inst_first_known_year,,Integer,True,,
+,,,SOCIAL_INSTITUTION_CODES,c_inst_floruit_dy,,Integer,True,DYNASTIES,c_dy
+,,,SOCIAL_INSTITUTION_CODES,c_inst_last_known_year,,Integer,True,,
+445,school_codes,desc,SOCIAL_INSTITUTION_CODES,c_inst_name_code,Primary Key,Integer,False,SOCIAL_INSTITUTION_NAME_CODES,c_inst_name_code
+447,school_codes,tcode,SOCIAL_INSTITUTION_CODES,c_inst_type_code,,Integer,False,SOCIAL_INSTITUTION_TYPE_CODES,c_inst_type_code
+,,,SOCIAL_INSTITUTION_CODES,c_notes,,Memo,True,,
+,,,SOCIAL_INSTITUTION_CODES,c_pages,,Text,True,,
+,,,SOCIAL_INSTITUTION_CODES,c_source,,Long,True,TEXT_CODES,c_textid
+,,,SOCIAL_INSTITUTION_NAME_CODES,c_inst_name_code,Primary Key,Integer,False,,
+,,,SOCIAL_INSTITUTION_NAME_CODES,c_inst_name_hz,,Text,False,,
+,,,SOCIAL_INSTITUTION_NAME_CODES,c_inst_name_py,,Text,False,,
+,,,SOCIAL_INSTITUTION_TYPES,c_inst_type_code,Primary Key,Integer,False,,
+,,,SOCIAL_INSTITUTION_TYPES,c_inst_type_hz,,Text,False,,
+,,,SOCIAL_INSTITUTION_TYPES,c_inst_type_py,,Text,False,,
+,,,STATUS_CODE_TYPE_REL,c_status_code,Primary Key,Integer,False,STATUS_CODES,c_status_code
+,,,STATUS_CODE_TYPE_REL,c_status_type_code,Primary Key,Text,False,STATUS_TYPES,c_status_type_code
+452,status_codes,code,STATUS_CODES,c_status_code,Primary Key,Integer,False,,
+453,status_codes,desc,STATUS_CODES,c_status_desc,,Text,False,,
+454,status_codes,descchn,STATUS_CODES,c_status_desc_chn,,Text,False,,
+,,,STATUS_DATA,c_created_by,,Text,True,,
+,,,STATUS_DATA,c_created_date,,Date/Time,True,,
+463,status_data,始年(c_firstyear),STATUS_DATA,c_firstyear,,Integer,True,,
+464,status_data,始年年號(c_fy_nh_code),STATUS_DATA,c_fy_nh_code,,Integer,True,nian_hao,c_nianhao_id
+465,status_data,始年年(c_fy_nh_year),STATUS_DATA,c_fy_nh_year,,Integer,True,,
+466,status_data,始年期限(c_fy_range),STATUS_DATA,c_fy_range,,Integer,True,year_range_codes,c_range_code
+467,status_data,終年(c_lastyear),STATUS_DATA,c_lastyear,,Integer,True,,
+468,status_data,終年年號(c_ly_nh_code),STATUS_DATA,c_ly_nh_code,,Integer,True,nian_hao,c_nianhao_id
+469,status_data,終年年(c_ly_nh_year),STATUS_DATA,c_ly_nh_year,,Integer,True,,
+470,status_data,終年期限(c_ly_range),STATUS_DATA,c_ly_range,,Integer,True,year_range_codes,c_range_code
+,,,STATUS_DATA,c_modified_by,,Text,True,,
+,,,STATUS_DATA,c_modified_date,,Date/Time,True,,
+473,status_data,注(c_notes),STATUS_DATA,c_notes,,Memo,True,,
+472,status_data,頁碼/條目(c_pages),STATUS_DATA,c_pages,,Text,True,,
+460,status_data,c_personid,STATUS_DATA,c_personid,Primary Key,Long,False,BIOG_MAIN,c_personid
+461,status_data,c_sequence,STATUS_DATA,c_sequence,Primary Key,Integer,False,,
+471,status_data,出處(c_source),STATUS_DATA,c_source,,Long,True,TEXT_CODES,c_textid
+462,status_data,社會區分(c_status_code),STATUS_DATA,c_status_code,Primary Key,Integer,False,STATUS_CODES,c_status_code
+,,,STATUS_DATA,c_supplement,,Text,True,,
+,,,STATUS_TYPES,c_status_type_chn,,Text,False,,
+,,,STATUS_TYPES,c_status_type_code,Primary Key,Text,False,,
+,,,STATUS_TYPES,c_status_type_desc,,Text,False,,
+,,,TEXT_BIBLCAT_CODE_TYPE_REL,c_text_cat_code,Primary Key,Integer,False,TEXT_CAT_CODES,c_text_cat_code
+,,,TEXT_BIBLCAT_CODE_TYPE_REL,c_text_cat_type_id,Primary Key,Text,False,TEXT_CAT_TYPES,c_text_cat_type_id
+282,genre_codes,code,TEXT_BIBLCAT_CODES,c_text_cat_code,Primary Key,Integer,False,,
+283,genre_codes,desc,TEXT_BIBLCAT_CODES,c_text_cat_desc,,Text,False,,
+284,genre_codes,descchn,TEXT_BIBLCAT_CODES,c_text_cat_desc_chn,,Text,False,,
+285,genre_codes,pinyin,TEXT_BIBLCAT_CODES,c_text_cat_pinyin,,Text,False,,
+293,genre_codes,songshichn,TEXT_BIBLCAT_CODES,c_text_cat_sortorder,,Integer,True,,
+,,,TEXT_BIBLCAT_TYPES,c_text_cat_type_desc,,Text,False,,
+,,,TEXT_BIBLCAT_TYPES,c_text_cat_type_desc_chn,,Text,False,,
+,,,TEXT_BIBLCAT_TYPES,c_text_cat_type_id,Primary Key,Text,False,,
+,,,TEXT_BIBLCAT_TYPES,c_text_cat_type_level,,Integer,True,,
+,,,TEXT_BIBLCAT_TYPES,c_text_cat_type_parent_id,,Text,True,,
+,,,TEXT_BIBLCAT_TYPES,c_text_cat_type_sortorder,,Integer,True,,
+,,,TEXT_CODES,c_bibl_cat_code,,Integer,True,,
+,,,TEXT_CODES,c_counter,,Text,True,,
+,,,TEXT_CODES,c_created_by,,Text,True,,
+,,,TEXT_CODES,c_created_date,,Date/Time,True,,
+487,texts,存佚狀況(c_extant),TEXT_CODES,c_extant,,Integer,True,EXTANT_CODES,c_extant_code
+,,,TEXT_CODES,c_modified_by,,Text,True,,
+,,,TEXT_CODES,c_modified_date,,Date/Time,True,,
+500,texts,注(c_notes),TEXT_CODES,c_notes,,Memo,True,,
+,,,TEXT_CODES,c_number,,Text,True,,
+499,texts,頁碼/條目(c_pages),TEXT_CODES,c_pages,,Text,True,,
+484,texts,作者所屬年代(c_period),TEXT_CODES,c_period,,Text,True,,
+498,texts,出處(c_source),TEXT_CODES,c_source,,Long,True,TEXT_CODES,c_textid
+477,texts,拼音前綴(c_suffix_version),TEXT_CODES,c_suffix_version,,Text,True,,
+488,texts,成書國(c_text_country),TEXT_CODES,c_text_country,,Integer,True,COUNTRY_CODES,c_country_code
+489,texts,成書朝代(c_text_dy),TEXT_CODES,c_text_dy,,Integer,True,DYNASTIES,c_dy
+481,texts,成書(年號)(c_text_nh_code),TEXT_CODES,c_text_nh_code,,Integer,True,NIAN_HAO,c_nianhao_id
+482,texts,成書(年)(c_text_nh_year),TEXT_CODES,c_text_nh_year,,Integer,True,,
+483,texts,成書(時限)(c_text_range_code),TEXT_CODES,c_text_range_code,,Integer,True,YEAR_RANGE_CODES,c_range_code
+480,texts,成書年份(c_text_year),TEXT_CODES,c_text_year,,Integer,True,,
+475,texts,text id,TEXT_CODES,c_textid,Primary Key,Long,False,,
+478,texts,書名拼音(c_title),TEXT_CODES,c_title,,Text,True,,
+,,,TEXT_CODES,c_title_alt_chn,,Text,True,,
+476,texts,書名(c_title_chn),TEXT_CODES,c_title_chn,,Text,False,,
+479,texts,English Title(c_title_trans),TEXT_CODES,c_title_trans,,Text,True,,
+,,,TEXT_CODES,c_url_api,,Text,True,,
+,,,TEXT_CODES,c_url_api_coda,,Text,True,,
+,,,TEXT_CODES,c_url_homepage,,Text,True,,
+,,,TEXT_INSTANCE_DATA,c_counter,,Text,True,,
+,,,TEXT_INSTANCE_DATA,c_created_by,,Text,True,,
+,,,TEXT_INSTANCE_DATA,c_created_date,,Date/Time,True,,
+,,,TEXT_INSTANCE_DATA,c_extant,,Integer,True,EXTANT_CODES,c_extant_code
+,,,TEXT_INSTANCE_DATA,c_instance_title,,Text,True,,
+,,,TEXT_INSTANCE_DATA,c_instance_title_chn,,Text,False,,
+,,,TEXT_INSTANCE_DATA,c_instance_title_trans,,Text,True,,
+,,,TEXT_INSTANCE_DATA,c_modified_by,,Text,True,,
+,,,TEXT_INSTANCE_DATA,c_modified_date,,Date/Time,True,,
+,,,TEXT_INSTANCE_DATA,c_notes,,Memo,True,,
+,,,TEXT_INSTANCE_DATA,c_number,,Text,True,,
+,,,TEXT_INSTANCE_DATA,c_pages,,Text,True,,
+,,,TEXT_INSTANCE_DATA,c_part_of_instance,,Long,True,,
+,,,TEXT_INSTANCE_DATA,c_part_of_instance_notes,,Text,True,,
+,,,TEXT_INSTANCE_DATA,c_print,,Text,True,,
+,,,TEXT_INSTANCE_DATA,c_pub_country,,Integer,True,COUNTRY_CODES,c_country_code
+,,,TEXT_INSTANCE_DATA,c_pub_dy,,Integer,True,DYNASTIES,c_dy
+,,,TEXT_INSTANCE_DATA,c_pub_loc,,Text,True,,
+,,,TEXT_INSTANCE_DATA,c_pub_nh_code,,Integer,True,NIAN_HAO,c_nianhao_id
+,,,TEXT_INSTANCE_DATA,c_pub_nh_year,,Integer,True,,
+,,,TEXT_INSTANCE_DATA,c_pub_notes,,Text,True,,
+,,,TEXT_INSTANCE_DATA,c_pub_range_code,,Integer,True,YEAR_RANGE_CODES,c_range_code
+,,,TEXT_INSTANCE_DATA,c_pub_year,,Integer,True,,
+,,,TEXT_INSTANCE_DATA,c_publisher,,Text,True,,
+,,,TEXT_INSTANCE_DATA,c_source,,Long,True,TEXT_CODES,c_textid
+,,,TEXT_INSTANCE_DATA,c_text_edition_id,Primary Key,Integer,False,,
+,,,TEXT_INSTANCE_DATA,c_text_instance_id,Primary Key,Integer,False,,
+,,,TEXT_INSTANCE_DATA,c_textid,Primary Key,Long,False,TEXT_CODES,c_textid
+,,,TEXT_INSTANCE_DATA,c_title_alt_chn,,Text,True,,
+,,,TEXT_INSTANCE_DATA,c_url_api,,Text,True,,
+,,,TEXT_INSTANCE_DATA,c_url_homepage,,Text,True,,
+,,,TEXT_ROLE_CODES,c_role_desc,,Text,False,,
+,,,TEXT_ROLE_CODES,c_role_desc_chn,,Text,False,,
+,,,TEXT_ROLE_CODES,c_role_id,Primary Key,Integer,False,,
+,,,TEXT_TYPE,c_text_type_code,Primary Key,Text,False,,
+,,,TEXT_TYPE,c_text_type_desc,,Text,False,,
+,,,TEXT_TYPE,c_text_type_desc_chn,,Text,False,,
+,,,TEXT_TYPE,c_text_type_level,,Integer,False,,
+,,,TEXT_TYPE,c_text_type_parent_id,,Text,False,,
+,,,TEXT_TYPE,c_text_type_sortorder,,Integer,False,,
+,,,TMP_ADDR_A,c_addr_id,,Long,True,,
+,,,TMP_ADDR_A,c_admin_type,,Text,True,,
+,,,TMP_ADDR_A,c_belongs_first_year,,Integer,True,,
+,,,TMP_ADDR_A,c_belongs_last_year,,Integer,True,,
+,,,TMP_ADDR_A,c_belongs_to,,Long,True,,
+,,,TMP_ADDR_A,c_belongs_unit_first_year,,Integer,True,,
+,,,TMP_ADDR_A,c_belongs_unit_last_year,,Integer,True,,
+,,,TMP_ADDR_A,c_delete,,Integer,True,,
+,,,TMP_ADDR_A,c_firstyear,,Integer,True,,
+,,,TMP_ADDR_A,c_lastyear,,Integer,True,,
+,,,TMP_ADDR_A,c_name,,Text,True,,
+,,,TMP_ADDR_A,c_name_chn,,Text,True,,
+,,,TMP_ADDR_A,x_coord,,Double,True,,
+,,,TMP_ADDR_A,y_coord,,Double,True,,
+,,,TMP_ADDR_B,c_addr_id,,Long,True,,
+,,,TMP_ADDR_B,c_admin_type,,Text,True,,
+,,,TMP_ADDR_B,c_belongs_chn,,Text,True,,
+,,,TMP_ADDR_B,c_belongs_first_year,,Integer,True,,
+,,,TMP_ADDR_B,c_belongs_last_year,,Integer,True,,
+,,,TMP_ADDR_B,c_belongs_name,,Text,True,,
+,,,TMP_ADDR_B,c_belongs_to,,Long,True,,
+,,,TMP_ADDR_B,c_del,,Integer,True,,
+,,,TMP_ADDR_B,c_firstyear,,Integer,True,,
+,,,TMP_ADDR_B,c_lastyear,,Integer,True,,
+,,,TMP_ADDR_B,c_name,,Text,True,,
+,,,TMP_ADDR_B,c_name_chn,,Text,True,,
+,,,TMP_ADDR_B,x_coord,,Double,True,,
+,,,TMP_ADDR_B,y_coord,,Double,True,,
+,,,TMP_ADDR_BELONGS,belongs_to_chn,,Text,True,,
+,,,TMP_ADDR_BELONGS,belongs_to_ID,,Long,True,,
+,,,TMP_ADDR_BELONGS,belongs_to_py,,Text,True,,
+,,,TMP_ADDR_BELONGS,c_addr_id,,Long,True,,
+,,,TMP_ADDR_BELONGS,c_admin_type,,Text,True,,
+,,,TMP_ADDR_BELONGS,c_firstyear,,Integer,True,,
+,,,TMP_ADDR_BELONGS,c_lastyear,,Integer,True,,
+,,,TMP_ADDR_BELONGS,c_name,,Text,True,,
+,,,TMP_ADDR_BELONGS,c_name_chn,,Text,True,,
+,,,TMP_ADDR_BELONGS,x_coord,,Double,True,,
+,,,TMP_ADDR_BELONGS,y_coord,,Double,True,,
+,,,TMP_ADDR_C,c_addr_id,,Long,True,,
+,,,TMP_ADDR_C,c_admin_type,,Text,True,,
+,,,TMP_ADDR_C,c_firstyear,,Integer,True,,
+,,,TMP_ADDR_C,c_lastyear,,Integer,True,,
+,,,TMP_ADDR_C,c_name,,Text,True,,
+,,,TMP_ADDR_C,c_name_chn,,Text,True,,
+,,,TMP_ADDR_C,Max_c_belongs_first_year,,Integer,True,,
+,,,TMP_ADDR_C,Max_c_belongs_last_year,,Integer,True,,
+,,,TMP_ADDR_C,x_coord,,Double,True,,
+,,,TMP_ADDR_C,y_coord,,Double,True,,
+,,,TMP_ADDR_D,belongs_first_year,,Integer,True,,
+,,,TMP_ADDR_D,belongs_last_year,,Integer,True,,
+,,,TMP_ADDR_D,belongs1_first_year,,Integer,True,,
+,,,TMP_ADDR_D,belongs1_ID,,Long,True,,
+,,,TMP_ADDR_D,belongs1_last_year,,Integer,True,,
+,,,TMP_ADDR_D,belongs1_name,,Text,True,,
+,,,TMP_ADDR_D,belongs1_name_chn,,Text,True,,
+,,,TMP_ADDR_D,belongs2_first_year,,Integer,True,,
+,,,TMP_ADDR_D,belongs2_ID,,Long,True,,
+,,,TMP_ADDR_D,belongs2_last_year,,Integer,True,,
+,,,TMP_ADDR_D,belongs2_name,,Text,True,,
+,,,TMP_ADDR_D,belongs2_name_chn,,Text,True,,
+,,,TMP_ADDR_D,belongs3_first_year,,Integer,True,,
+,,,TMP_ADDR_D,belongs3_ID,,Long,True,,
+,,,TMP_ADDR_D,belongs3_last_year,,Integer,True,,
+,,,TMP_ADDR_D,belongs3_name,,Text,True,,
+,,,TMP_ADDR_D,belongs3_name_chn,,Text,True,,
+,,,TMP_ADDR_D,belongs4_first_year,,Integer,True,,
+,,,TMP_ADDR_D,belongs4_ID,,Long,True,,
+,,,TMP_ADDR_D,belongs4_last_year,,Integer,True,,
+,,,TMP_ADDR_D,belongs4_name,,Text,True,,
+,,,TMP_ADDR_D,belongs4_name_chn,,Text,True,,
+,,,TMP_ADDR_D,belongs5_first_year,,Integer,True,,
+,,,TMP_ADDR_D,belongs5_ID,,Long,True,,
+,,,TMP_ADDR_D,belongs5_last_year,,Integer,True,,
+,,,TMP_ADDR_D,belongs5_name,,Text,True,,
+,,,TMP_ADDR_D,belongs5_name_chn,,Text,True,,
+,,,TMP_ADDR_D,c_addr_id,,Long,True,,
+,,,TMP_ADDR_D,c_admin_type,,Text,True,,
+,,,TMP_ADDR_D,c_delete,,Integer,True,,
+,,,TMP_ADDR_D,c_firstyear,,Integer,True,,
+,,,TMP_ADDR_D,c_lastyear,,Integer,True,,
+,,,TMP_ADDR_D,c_name,,Text,True,,
+,,,TMP_ADDR_D,c_name_chn,,Text,True,,
+,,,TMP_ADDR_D,x_coord,,Double,True,,
+,,,TMP_ADDR_D,y_coord,,Double,True,,
+,,,TMP_ADDR_E,belongs_first_year,,Integer,True,,
+,,,TMP_ADDR_E,belongs_last_year,,Integer,True,,
+,,,TMP_ADDR_E,belongs1_first_year,,Integer,True,,
+,,,TMP_ADDR_E,belongs1_ID,,Long,True,,
+,,,TMP_ADDR_E,belongs1_last_year,,Integer,True,,
+,,,TMP_ADDR_E,belongs1_name,,Text,True,,
+,,,TMP_ADDR_E,belongs1_name_chn,,Text,True,,
+,,,TMP_ADDR_E,belongs2_first_year,,Integer,True,,
+,,,TMP_ADDR_E,belongs2_ID,,Long,True,,
+,,,TMP_ADDR_E,belongs2_last_year,,Integer,True,,
+,,,TMP_ADDR_E,belongs2_name,,Text,True,,
+,,,TMP_ADDR_E,belongs2_name_chn,,Text,True,,
+,,,TMP_ADDR_E,belongs3_first_year,,Integer,True,,
+,,,TMP_ADDR_E,belongs3_ID,,Long,True,,
+,,,TMP_ADDR_E,belongs3_last_year,,Integer,True,,
+,,,TMP_ADDR_E,belongs3_name,,Text,True,,
+,,,TMP_ADDR_E,belongs3_name_chn,,Text,True,,
+,,,TMP_ADDR_E,belongs4_first_year,,Integer,True,,
+,,,TMP_ADDR_E,belongs4_ID,,Long,True,,
+,,,TMP_ADDR_E,belongs4_last_year,,Integer,True,,
+,,,TMP_ADDR_E,belongs4_name,,Text,True,,
+,,,TMP_ADDR_E,belongs4_name_chn,,Text,True,,
+,,,TMP_ADDR_E,belongs5_first_year,,Integer,True,,
+,,,TMP_ADDR_E,belongs5_ID,,Long,True,,
+,,,TMP_ADDR_E,belongs5_last_year,,Integer,True,,
+,,,TMP_ADDR_E,belongs5_name,,Text,True,,
+,,,TMP_ADDR_E,belongs5_name_chn,,Text,True,,
+,,,TMP_ADDR_E,c_addr_id,,Long,True,,
+,,,TMP_ADDR_E,c_admin_type,,Text,True,,
+,,,TMP_ADDR_E,c_delete,,Integer,True,,
+,,,TMP_ADDR_E,c_firstyear,,Integer,True,,
+,,,TMP_ADDR_E,c_lastyear,,Integer,True,,
+,,,TMP_ADDR_E,c_name,,Text,True,,
+,,,TMP_ADDR_E,c_name_chn,,Text,True,,
+,,,TMP_ADDR_E,x_coord,,Double,True,,
+,,,TMP_ADDR_E,y_coord,,Double,True,,
+,,,TMP_BELONGS_TO,c_addr_id,,Long,True,,
+,,,TMP_BELONGS_TO,c_belongs_to,,Long,True,,
+,,,TMP_BELONGS_TO,c_firstyear,,Integer,True,,
+,,,TMP_BELONGS_TO,c_name_chn,,Text,True,,
+,,,TMP_INDEX_YEAR,c_index_year,,Integer,True,,
+,,,TMP_INDEX_YEAR,c_index_year_source_id,,Long,True,,
+,,,TMP_INDEX_YEAR,c_personid,Primary Key,Long,False,,
+518,year_range_codes,approx,YEAR_RANGE_CODES,c_approx,,Text,True,,
+519,year_range_codes,approxchn,YEAR_RANGE_CODES,c_approx_chn,,Text,True,,
+516,year_range_codes,range,YEAR_RANGE_CODES,c_range,,Text,False,,
+517,year_range_codes,chn,YEAR_RANGE_CODES,c_range_chn,,Text,False,,
+515,year_range_codes,code,YEAR_RANGE_CODES,c_range_code,Primary Key,Integer,False,,
+,,,ZZZ_ADDRESSES,belongs1_ID,,Long,True,,
+,,,ZZZ_ADDRESSES,belongs1_name,,Text,True,,
+,,,ZZZ_ADDRESSES,belongs1_name_chn,,Text,True,,
+,,,ZZZ_ADDRESSES,belongs2_ID,,Long,True,,
+,,,ZZZ_ADDRESSES,belongs2_name,,Text,True,,
+,,,ZZZ_ADDRESSES,belongs2_name_chn,,Text,True,,
+,,,ZZZ_ADDRESSES,belongs3_ID,,Long,True,,
+,,,ZZZ_ADDRESSES,belongs3_name,,Text,True,,
+,,,ZZZ_ADDRESSES,belongs3_name_chn,,Text,True,,
+,,,ZZZ_ADDRESSES,belongs4_ID,,Long,True,,
+,,,ZZZ_ADDRESSES,belongs4_name,,Text,True,,
+,,,ZZZ_ADDRESSES,belongs4_name_chn,,Text,True,,
+,,,ZZZ_ADDRESSES,belongs5_ID,,Long,True,,
+,,,ZZZ_ADDRESSES,belongs5_name,,Text,True,,
+,,,ZZZ_ADDRESSES,belongs5_name_chn,,Text,True,,
+,,,ZZZ_ADDRESSES,c_addr_id,,Long,True,,
+,,,ZZZ_ADDRESSES,c_admin_type,,Text,True,,
+,,,ZZZ_ADDRESSES,c_belongs_firstyear,,Integer,True,,
+,,,ZZZ_ADDRESSES,c_belongs_lastyear,,Integer,True,,
+,,,ZZZ_ADDRESSES,c_firstyear,,Integer,True,,
+,,,ZZZ_ADDRESSES,c_lastyear,,Integer,True,,
+,,,ZZZ_ADDRESSES,c_name,,Text,True,,
+,,,ZZZ_ADDRESSES,c_name_chn,,Text,True,,
+,,,ZZZ_ADDRESSES,x_coord,,Double,True,,
+,,,ZZZ_ADDRESSES,y_coord,,Double,True,,
+,,,ZZZ_BELONGS_TO,c_addr_id,Primary Key,Long,False,,
+,,,ZZZ_BELONGS_TO,c_belongs_to,Primary Key,Long,False,,
+,,,ZZZ_BELONGS_TO,c_firstyear,Primary Key,Integer,False,,
+,,,ZZZ_BELONGS_TO,c_lastyear,Primary Key,Integer,False,,
+,,,ZZZ_DISTANCE_DATA,c_assoc_id,Primary Key,Long,False,BIOG_MAIN,c_personid
+,,,ZZZ_DISTANCE_DATA,c_distance,,Double,False,,
+,,,ZZZ_DISTANCE_DATA,c_personid,Primary Key,Long,False,BIOG_MAIN,c_personid
+,,,ZZZ_NAMES,c_name,,Text,False,,
+,,,ZZZ_NAMES,c_name_chn,,Text,False,,
+,,,ZZZ_NAMES,c_personid,,Long,False,,

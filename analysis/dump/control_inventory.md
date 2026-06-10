@@ -2,28 +2,27 @@
 
 | Form | #ctrls | #buttons | #with-events | VBA lines |
 |---|---:|---:|---:|---:|
-| `LookAtNetworks` | 99 | 21 | 58 | 6983 |
-| `LookAtGroupData` | 34 | 10 | 15 | 5668 |
+| `LookAtNetworks` | 99 | 21 | 58 | 7060 |
+| `LookAtGroupData` | 34 | 10 | 15 | 5674 |
 | `LookAtKinship` | 40 | 14 | 16 | 4460 |
 | `LookAtAssociationPairs` | 49 | 18 | 19 | 4055 |
 | `LookAtOffice` | 60 | 21 | 22 | 4019 |
-| `LookAtAssociations` | 57 | 19 | 22 | 3978 |
-| `LookAtPlace` | 49 | 14 | 22 | 3406 |
-| `LookAtStatus` | 48 | 16 | 19 | 3305 |
+| `LookAtAssociations` | 57 | 19 | 22 | 3983 |
+| `LookAtPlace` | 53 | 15 | 23 | 3415 |
 | `LookAtEntry` | 48 | 17 | 18 | 3124 |
 | `LookAtTexts` | 48 | 16 | 19 | 2397 |
+| `LookAtStatus` | 48 | 16 | 19 | 2277 |
 | `CBDB_Browser_2` | 9 | 5 | 7 | 1563 |
 | `frmIndexAddr` | 20 | 11 | 11 | 1061 |
 | `frmPickASSOC_multi` | 15 | 5 | 8 | 729 |
 | `frmPickTextCat_multi` | 15 | 5 | 8 | 686 |
 | `frmPickStatus_multi` | 15 | 5 | 8 | 639 |
 | `frmPickEntry_multi` | 14 | 4 | 7 | 638 |
-| `BIOG_MAIN_2_Subform` | 81 | 1 | 12 | 609 |
 | `frmPickOfficeTree_multi_2` | 20 | 4 | 7 | 598 |
 | `frmPeopleLookup2` | 3 | 0 | 0 | 586 |
 | `NAVIGATION_PANE` | 16 | 16 | 15 | 571 |
-| `KIN_DATA Subform` | 23 | 6 | 6 | 530 |
 | `subTreeView` | 0 | 0 | 0 | 348 |
+| `BIOG_MAIN_2_Subform` | 81 | 1 | 2 | 256 |
 | `frmPickAddresses_multi` | 10 | 5 | 7 | 235 |
 | `frmSelectPerson` | 6 | 3 | 5 | 196 |
 | `frmPickBAC_multi` | 6 | 3 | 4 | 160 |
@@ -36,16 +35,16 @@
 | `STATUS_DATA_2 Subform` | 23 | 0 | 0 | 76 |
 | `BIOG_ADDR_DATA_2 Subform` | 36 | 0 | 0 | 74 |
 | `frmKinReductionWarning` | 1 | 1 | 1 | 73 |
-| `EVENTS_DATA_2 Subform` | 27 | 0 | 0 | 72 |
-| `ENTRY_DATA_2 Subform` | 32 | 0 | 0 | 70 |
+| `EVENTS_DATA_2 Subform` | 26 | 0 | 0 | 72 |
 | `KIN_DATA_2 Subform` | 15 | 0 | 0 | 70 |
+| `ENTRY_DATA_2 Subform` | 32 | 0 | 0 | 70 |
 | `frmPickTEXTS` | 5 | 3 | 4 | 66 |
 | `frmGetDataVersion` | 4 | 3 | 3 | 65 |
 | `frmBIOG_SOURCE_DATA` | 7 | 0 | 1 | 65 |
 | `TEXT_DATA_2 Subform` | 9 | 0 | 0 | 64 |
 | `frmPickTEXT_BIBLCAT` | 6 | 3 | 4 | 61 |
-| `POSTING_DATA_2 Subform` | 2 | 0 | 0 | 61 |
 | `EVENT_ADDR_2 Subform` | 3 | 0 | 0 | 61 |
+| `POSTING_DATA_2 Subform` | 2 | 0 | 0 | 61 |
 | `ALTNAME_DATA_2 Subform` | 9 | 0 | 0 | 60 |
 | `frmBIOG_INST_CODES` | 16 | 0 | 0 | 59 |
 | `frmSTATUS_CODES` | 3 | 0 | 3 | 59 |

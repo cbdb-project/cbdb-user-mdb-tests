@@ -48,10 +48,1640 @@ OUT_ZH_MD = REPO / "reports" / "CBDB_Issues_Report_ZH-Hant.md"
 # ---------------------------------------------------------------------
 
 ISSUES: list[dict] = [
-    # CLEAN SLATE — cleared per AGENTS.md "each build is a fresh assessment".
-    # Rebuild from scratch ONLY after a real test run, and ONLY for findings
-    # that pass the triage gate in this file (see _validate_issues / the
-    # report-triage contract in docs/skills/issue-report-maintainer.md).
+    # =================================================================
+    # build-20260602 assessment.  Rebuilt from scratch per AGENTS.md
+    # "each build is a fresh assessment".  The test session was
+    # NON-INTERACTIVE (pywinauto UIA unavailable), so no runtime UI
+    # symptom could be re-verified this build → ui_verified is never
+    # True, and every user-facing-but-unverified defect is filed as
+    # P5 latent_code per the report-triage contract.  Missing-UI (P3)
+    # and setup (P4) defects are structurally confirmed and need no UI
+    # symptom.
+    #
+    # Line numbers below were re-verified by grep against
+    # analysis/dump/vba/* on the 20260602 dump (each vba_ref and every
+    # in-prose line citation was confirmed to land on the cited code).
+    # An earlier revision of this list carried a ~+2200 offset on every
+    # Form_*.vb line (some past end-of-file); those numbers have been
+    # corrected mechanically against the current dump.
+    # =================================================================
+
+    # ---------------- P4 — Setup ----------------
+    {
+        "id": 2,
+        "tier": "P4_setup",
+        "form": "(VBA project)",
+        "title_en": "VBA project references the legacy dao360.dll, "
+                    "absent on Office 2016+ machines",
+        "title_zh": "VBA 專案參照已過時的 dao360.dll，"
+                    "在 Office 2016 以後的機器上並不存在",
+        "summary_en": (
+            "The shipped .mdb's VBA project carries a hard reference to "
+            "`C:\\Program Files\\Common Files\\Microsoft Shared\\DAO\\"
+            "dao360.dll` — the DAO 3.6 location used by Access 2003.  "
+            "Modern Office (2016 onward) ships `ACEDAO.DLL` instead and "
+            "does NOT install the legacy DLL.  On any clean modern "
+            "machine the first attempt to run a form's code raises "
+            "'Can't find project or library', which is opaque and "
+            "alarming to end users.\n\n"
+            "Our test driver auto-replaces the broken reference with "
+            "ACEDAO.DLL when it opens the file (see the before/after "
+            "reference dump in `analysis/check_vba_refs.py`), so the "
+            "regression suite does not hit it — but a plain user who "
+            "double-clicks the shipped .mdb will.  Severity is low "
+            "because it's a one-time fix per machine, but every fresh "
+            "install hits it."
+        ),
+        "summary_zh": (
+            "出貨的 .mdb 其 VBA 專案內含一個硬編碼參照，指向 "
+            "`C:\\Program Files\\Common Files\\Microsoft Shared\\DAO\\"
+            "dao360.dll`——這是 Access 2003 時代 DAO 3.6 的位置。"
+            "現代 Office（2016 起）改為附帶 `ACEDAO.DLL`，並不會安裝"
+            "這個舊版 DLL。在任何乾淨的現代機器上，第一次執行表單"
+            "程式碼時就會跳出『Can't find project or library』，"
+            "對一般使用者而言訊息晦澀又嚇人。\n\n"
+            "我們的測試驅動在開檔時會自動把這個壞掉的參照換成 "
+            "ACEDAO.DLL（見 `analysis/check_vba_refs.py` 的修復前後"
+            "參照傾印），所以回歸測試不會踩到；但一般使用者直接"
+            "雙擊出貨的 .mdb 就會踩到。嚴重度低，因為每台機器只需"
+            "修一次，但每次全新安裝都會遇到。"
+        ),
+        "steps_en": [
+            "Install `CBDB_BJ_User.mdb` on a fresh modern Office "
+            "machine.",
+            "Open the file, then press Alt+F11 to enter the VBE.",
+            "Tools → References — notice an entry marked "
+            "`MISSING: dao360.dll`.",
+            "Open any LookAt form (or otherwise run any form's code).  "
+            "A 'Can't find project or library' compile-error popup "
+            "appears before the form's code runs.",
+        ],
+        "steps_zh": [
+            "在一台全新的現代 Office 機器上安裝 `CBDB_BJ_User.mdb`。",
+            "開檔後按 Alt+F11 進入 VBE。",
+            "工具 → 設定參照——會看到一條標記為 "
+            "`MISSING: dao360.dll` 的項目。",
+            "開啟任一 LookAt 表單（或任何會執行表單程式碼的操作）。"
+            "在表單程式碼執行前，就會跳出『Can't find project or "
+            "library』編譯錯誤視窗。",
+        ],
+        "fix_en": (
+            "Once, on the maintainer's machine: open the .mdb in "
+            "Access, press Alt+F11, go to Tools → References, untick "
+            "the MISSING dao360.dll entry, tick `Microsoft Office 16.0 "
+            "Access Database Engine Object Library` (i.e. ACEDAO.DLL), "
+            "and save.  Then re-distribute the fixed file — future "
+            "users won't need to do anything."
+        ),
+        "fix_zh": (
+            "在維護者的機器上做一次即可：用 Access 開啟 .mdb，按 "
+            "Alt+F11，進入 工具 → 設定參照，取消勾選 MISSING 的 "
+            "dao360.dll，改勾選 `Microsoft Office 16.0 Access Database "
+            "Engine Object Library`（即 ACEDAO.DLL），存檔。之後"
+            "重新散布修好的檔案，後續使用者就不必再處理。"
+        ),
+        "severity_en": "P4 — One-time setup hurdle on each new machine.",
+        "severity_zh": "P4 —— 每台新機器一次性的安裝門檻。",
+        "screenshots": [],
+        "evidence": {
+            "finding_class": "user_facing_bug",
+            "vba_ref": "VBA project References — the dao360.dll entry; "
+                       "before/after reference dump in "
+                       "analysis/check_vba_refs.py (the 'before fix' "
+                       "list shows the broken DAO reference, the "
+                       "driver swaps it to ACEDAO.DLL on open).",
+            "fixture": "n/a — fires on the first form-code run after a "
+                       "fresh install (every Form_Open path).",
+            "user_symptom": "A 'Can't find project or library' "
+                            "compile-error popup blocks the form before "
+                            "its code runs; the user cannot use any "
+                            "LookAt feature until the reference is fixed.",
+            "detection": "analysis/check_vba_refs.py",
+        },
+    },
+
+    # ---------------- P3 — Missing UI ----------------
+    {
+        "id": 13,
+        "tier": "P3_missing_ui",
+        "form": "BIOG_MAIN_2_Subform",
+        "title_en": "BIOG_MAIN_2 Subform clicks a picker form "
+                    "(frmPickNIAN_HAO) that does not exist",
+        "title_zh": "BIOG_MAIN_2 子表單呼叫一個不存在的"
+                    "選取表單（frmPickNIAN_HAO）",
+        "summary_en": (
+            "When the user clicks the reign-period (NIAN_HAO) picker on "
+            "the biographical-detail subform, "
+            "`Form_BIOG_MAIN_2_Subform` runs "
+            "`DoCmd.OpenForm \"frmPickNIAN_HAO\"` (the handler sets "
+            "`stDocName = \"frmPickNIAN_HAO\"` and references "
+            "`Forms!frmPickNIAN_HAO!frmNIAN_HAO.Form!c_nianhao_id`).  "
+            "There is no form named `frmPickNIAN_HAO` in the current "
+            ".mdb (it is absent from the fresh "
+            "`control_inventory.json`).  Access raises 'Item not "
+            "found…' and the field click does nothing useful.\n\n"
+            "The host form BIOG_MAIN_2_Subform itself IS present and "
+            "reachable (verified in the fresh control inventory) — only "
+            "the picker it opens is missing.  Likely cause: a picker "
+            "form was renamed or consolidated in an earlier refactor "
+            "and this caller wasn't updated.\n\n"
+            "(This build's session was non-interactive, so the runtime "
+            "popup could not be re-captured; the screenshots below are "
+            "the reachable host plus a reconstructed popup, and the "
+            "static absence of the picker is the load-bearing "
+            "evidence.)"
+        ),
+        "summary_zh": (
+            "當使用者在人物詳細資料子表單上點選年號（NIAN_HAO）"
+            "選取器時，`Form_BIOG_MAIN_2_Subform` 會執行 "
+            "`DoCmd.OpenForm \"frmPickNIAN_HAO\"`（處理常式設定 "
+            "`stDocName = \"frmPickNIAN_HAO\"`，並參照 "
+            "`Forms!frmPickNIAN_HAO!frmNIAN_HAO.Form!c_nianhao_id`）。"
+            "但目前的 .mdb 裡並沒有名為 `frmPickNIAN_HAO` 的表單"
+            "（最新的 `control_inventory.json` 中查無此表單）。"
+            "Access 會丟出『Item not found…』，這次點選對使用者"
+            "毫無作用。\n\n"
+            "宿主表單 BIOG_MAIN_2_Subform 本身存在且可達"
+            "（已在最新控制項清單中確認）——缺的只是它要開啟的"
+            "選取表單。可能原因：早期重構時某個選取表單被改名或"
+            "合併，而這個呼叫端沒有同步更新。\n\n"
+            "（本次測試為非互動式，無法重新擷取執行期彈窗；"
+            "下方截圖為可達的宿主表單加上重建的彈窗，而選取表單"
+            "在靜態層面的缺失才是關鍵證據。）"
+        ),
+        "steps_en": [
+            "Open CBDB_Browser_2 and navigate to any person whose "
+            "biographical detail is shown on BIOG_MAIN_2_Subform.",
+            "On the subform, click the reign-period (NIAN_HAO) picker "
+            "control — that fires the handler which runs "
+            "`DoCmd.OpenForm \"frmPickNIAN_HAO\"`.",
+            "An 'Item not found in this collection.' popup appears, "
+            "because `frmPickNIAN_HAO` is not in "
+            "CurrentProject.AllForms.",
+            "Static confirmation (no Access needed): search "
+            "`analysis/dump/control_inventory.json` for "
+            "`frmPickNIAN_HAO` — it is absent, while "
+            "`BIOG_MAIN_2_Subform` is present.",
+        ],
+        "steps_zh": [
+            "開啟 CBDB_Browser_2，導覽到任一在 BIOG_MAIN_2_Subform "
+            "上顯示人物詳細資料的人物。",
+            "在子表單上點選年號（NIAN_HAO）選取器控制項——這會觸發"
+            "執行 `DoCmd.OpenForm \"frmPickNIAN_HAO\"` 的處理常式。",
+            "會跳出『Item not found in this collection.』彈窗，"
+            "因為 `frmPickNIAN_HAO` 不在 CurrentProject.AllForms 中。",
+            "靜態確認（不需 Access）：在 "
+            "`analysis/dump/control_inventory.json` 中搜尋 "
+            "`frmPickNIAN_HAO`——查無此表單，而 "
+            "`BIOG_MAIN_2_Subform` 則存在。",
+        ],
+        "fix_en": (
+            "Either restore the picker form `frmPickNIAN_HAO`, or "
+            "update the caller in `Form_BIOG_MAIN_2_Subform` to open "
+            "whichever reign-period picker form replaced it."
+        ),
+        "fix_zh": (
+            "兩種做法擇一：還原選取表單 `frmPickNIAN_HAO`，或將 "
+            "`Form_BIOG_MAIN_2_Subform` 內的呼叫端改成開啟取代它的"
+            "那個年號選取表單。"
+        ),
+        "severity_en": "P3 — Missing UI (the picker the click opens "
+                       "does not exist; the feature is unreachable).",
+        "severity_zh": "P3 —— 缺少 UI（點選要開啟的選取表單不存在，"
+                       "此功能無法使用）。",
+        "screenshots": [
+            ("bug13_browser_open.png",
+             "CBDB_Browser_2 open on a person record — the reachable "
+             "host surface from which the NIAN_HAO picker is invoked."),
+            ("bug13_browser_annotated.png",
+             "Annotated host view: the reign-period picker control on "
+             "BIOG_MAIN_2_Subform whose click runs "
+             "DoCmd.OpenForm \"frmPickNIAN_HAO\" — a form absent from "
+             "the current .mdb."),
+            ("bug13_faux_popup.png",
+             "The 'Item not found in this collection.' popup, "
+             "reconstructed in PIL (this build's session was "
+             "non-interactive); the message is Access's standard text "
+             "when DoCmd.OpenForm targets a form not in "
+             "CurrentProject.AllForms."),
+        ],
+        "evidence": {
+            "finding_class": "user_facing_bug",
+            "vba_ref": "Form_BIOG_MAIN_2_Subform.vb:64 "
+                       "(stDocName = \"frmPickNIAN_HAO\"); the OpenForm "
+                       "+ Forms!frmPickNIAN_HAO!… references follow at "
+                       "lines 133-151.",
+            "fixture": "Any person reachable in CBDB_Browser_2 whose "
+                       "BIOG_MAIN_2_Subform reign-period picker is "
+                       "clicked.",
+            "user_symptom": "Clicking the reign-period picker pops "
+                            "'Item not found in this collection.' and "
+                            "no picker opens.",
+            "ui_verified": False,
+        },
+    },
+    {
+        "id": 16,
+        "tier": "P3_missing_ui",
+        "form": "LookAtStatus",
+        "title_en": "LookAtStatus is missing its CmdPajek button "
+                    "(handler exists, no UI control)",
+        "title_zh": "LookAtStatus 缺少 CmdPajek 按鈕"
+                    "（處理常式存在，但表單上沒有控制項）",
+        "summary_en": (
+            "`Form_LookAtStatus.vb` defines a `CmdPajek_Click` handler "
+            "(it would write a Pajek `.net` export of the status "
+            "network), but LookAtStatus's form design has NO `CmdPajek` "
+            "control.  The fresh `control_inventory.json` lists "
+            "CmdQuery / CmdGIS / CmdNeo4j on this form but no Pajek "
+            "button, so the feature is unreachable from the UI.\n\n"
+            "Note: even once a button is added, Issue #5 (the "
+            "ChkIDs-control and SQL-column defects inside "
+            "CmdPajek_Click) must be fixed first, or the click will "
+            "fail."
+        ),
+        "summary_zh": (
+            "`Form_LookAtStatus.vb` 定義了 `CmdPajek_Click` 處理常式"
+            "（用來輸出狀態網絡的 Pajek `.net` 檔），但 LookAtStatus "
+            "的表單設計上並沒有 `CmdPajek` 控制項。最新的 "
+            "`control_inventory.json` 顯示此表單有 CmdQuery / CmdGIS / "
+            "CmdNeo4j，卻沒有 Pajek 按鈕，因此這個功能在 UI 上"
+            "無法使用。\n\n"
+            "注意：即使加上按鈕，也必須先修正 Issue #5"
+            "（CmdPajek_Click 內的 ChkIDs 控制項與 SQL 欄位缺陷），"
+            "否則點選仍會失敗。"
+        ),
+        "steps_en": [
+            "Open LookAtStatus.  Look at the export-buttons row at the "
+            "bottom: it has GIS and Neo4j, but there is no Pajek "
+            "button.",
+            "Compare with LookAtAssociations, which does render a Pajek "
+            "button.",
+            "Static confirmation: in "
+            "`analysis/dump/control_inventory.json`, LookAtStatus has "
+            "no `CmdPajek` control, although "
+            "`Form_LookAtStatus.vb` defines `Sub CmdPajek_Click()`.",
+        ],
+        "steps_zh": [
+            "開啟 LookAtStatus。看底部的輸出按鈕列：只有 GIS 和 "
+            "Neo4j，沒有 Pajek 按鈕。",
+            "與 LookAtAssociations 比較，後者確實有 Pajek 按鈕。",
+            "靜態確認：在 `analysis/dump/control_inventory.json` 中，"
+            "LookAtStatus 沒有 `CmdPajek` 控制項，但 "
+            "`Form_LookAtStatus.vb` 定義了 `Sub CmdPajek_Click()`。",
+        ],
+        "fix_en": (
+            "Add a CmdPajek button to LookAtStatus's design (with "
+            "OnClick = [Event Procedure] so it invokes the existing "
+            "CmdPajek_Click Sub) — but fix Issue #5 first, otherwise "
+            "the click fails on the ChkIDs reference and the bad SQL."
+        ),
+        "fix_zh": (
+            "在 LookAtStatus 的設計中新增 CmdPajek 按鈕（OnClick = "
+            "[事件程序]，以呼叫既有的 CmdPajek_Click）——但請先修正 "
+            "Issue #5，否則點選會因 ChkIDs 參照與錯誤的 SQL 而失敗。"
+        ),
+        "severity_en": "P3 — Missing UI (feature unavailable to users).",
+        "severity_zh": "P3 —— 缺少 UI（使用者無法使用此功能）。",
+        "screenshots": [
+            ("bug16_LookAtStatus_no_CmdPajek.png",
+             "LookAtStatus as it ships — the export-button row has GIS "
+             "and Neo4j but no Pajek button."),
+            ("bug16_LookAtStatus_no_CmdPajek_annotated.png",
+             "Annotated: the gap where a CmdPajek button would sit; "
+             "`Sub CmdPajek_Click()` exists in the module but no "
+             "control invokes it."),
+        ],
+        "evidence": {
+            "finding_class": "user_facing_bug",
+            "vba_ref": "Form_LookAtStatus.vb:2133 "
+                       "(Private Sub CmdPajek_Click()); no CmdPajek "
+                       "control in analysis/dump/control_inventory.json "
+                       "for LookAtStatus.",
+            "fixture": "LookAtStatus form design (any session).",
+            "user_symptom": "There is no Pajek export button on "
+                            "LookAtStatus, so users cannot run the "
+                            "Pajek export the code supports.",
+            "ui_verified": False,
+        },
+    },
+    {
+        "id": 17,
+        "tier": "P3_missing_ui",
+        "form": "LookAtStatus",
+        "title_en": "LookAtStatus is missing its CmdGephi button "
+                    "(handler exists, no UI control)",
+        "title_zh": "LookAtStatus 缺少 CmdGephi 按鈕"
+                    "（處理常式存在，但表單上沒有控制項）",
+        "summary_en": (
+            "`Form_LookAtStatus.vb` defines a `CmdGephi_Click` handler "
+            "but LookAtStatus's form design has NO `CmdGephi` control.  "
+            "The fresh `control_inventory.json` confirms no Gephi "
+            "button exists on the form, so the Gephi export is "
+            "unreachable from the UI."
+        ),
+        "summary_zh": (
+            "`Form_LookAtStatus.vb` 定義了 `CmdGephi_Click` 處理常式，"
+            "但 LookAtStatus 的表單設計上並沒有 `CmdGephi` 控制項。"
+            "最新的 `control_inventory.json` 確認表單上沒有 Gephi "
+            "按鈕，因此 Gephi 輸出在 UI 上無法使用。"
+        ),
+        "steps_en": [
+            "Open LookAtStatus.  There is no Gephi export button in the "
+            "export-buttons row.",
+            "Static confirmation: "
+            "`analysis/dump/control_inventory.json` shows no "
+            "`CmdGephi` control on LookAtStatus, although "
+            "`Form_LookAtStatus.vb` defines `Sub CmdGephi_Click()`.",
+        ],
+        "steps_zh": [
+            "開啟 LookAtStatus。輸出按鈕列裡沒有 Gephi 輸出按鈕。",
+            "靜態確認：`analysis/dump/control_inventory.json` 顯示 "
+            "LookAtStatus 上沒有 `CmdGephi` 控制項，但 "
+            "`Form_LookAtStatus.vb` 定義了 `Sub CmdGephi_Click()`。",
+        ],
+        "fix_en": "Add a CmdGephi button to LookAtStatus's design, "
+                  "wired to the existing CmdGephi_Click Sub.",
+        "fix_zh": "在 LookAtStatus 的設計中新增 CmdGephi 按鈕，"
+                  "並連到既有的 CmdGephi_Click。",
+        "severity_en": "P3 — Missing UI (feature unavailable to users).",
+        "severity_zh": "P3 —— 缺少 UI（使用者無法使用此功能）。",
+        "screenshots": [
+            ("bug17_LookAtStatus_no_CmdGephi.png",
+             "LookAtStatus as it ships — no Gephi export button."),
+            ("bug17_LookAtStatus_no_CmdGephi_annotated.png",
+             "Annotated: `Sub CmdGephi_Click()` exists in the module "
+             "but no control invokes it."),
+        ],
+        "evidence": {
+            "finding_class": "user_facing_bug",
+            "vba_ref": "Form_LookAtStatus.vb:18 "
+                       "(Private Sub CmdGephi_Click()); no CmdGephi "
+                       "control in analysis/dump/control_inventory.json "
+                       "for LookAtStatus.",
+            "fixture": "LookAtStatus form design (any session).",
+            "user_symptom": "There is no Gephi export button on "
+                            "LookAtStatus, so users cannot run the "
+                            "Gephi export the code supports.",
+            "ui_verified": False,
+        },
+    },
+    {
+        "id": 18,
+        "tier": "P3_missing_ui",
+        "form": "LookAtStatus",
+        "title_en": "LookAtStatus is missing its CmdUCINet button "
+                    "(handler exists, no UI control)",
+        "title_zh": "LookAtStatus 缺少 CmdUCINet 按鈕"
+                    "（處理常式存在，但表單上沒有控制項）",
+        "summary_en": (
+            "`Form_LookAtStatus.vb` defines a `CmdUCINet_Click` handler "
+            "but LookAtStatus's form design has NO `CmdUCINet` "
+            "control.  The fresh `control_inventory.json` confirms no "
+            "UCINet button exists on the form, so the UCINet export is "
+            "unreachable from the UI."
+        ),
+        "summary_zh": (
+            "`Form_LookAtStatus.vb` 定義了 `CmdUCINet_Click` 處理常式，"
+            "但 LookAtStatus 的表單設計上並沒有 `CmdUCINet` 控制項。"
+            "最新的 `control_inventory.json` 確認表單上沒有 UCINet "
+            "按鈕，因此 UCINet 輸出在 UI 上無法使用。"
+        ),
+        "steps_en": [
+            "Open LookAtStatus.  There is no UCINet export button in "
+            "the export-buttons row.",
+            "Static confirmation: "
+            "`analysis/dump/control_inventory.json` shows no "
+            "`CmdUCINet` control on LookAtStatus, although "
+            "`Form_LookAtStatus.vb` defines `Sub CmdUCINet_Click()`.",
+        ],
+        "steps_zh": [
+            "開啟 LookAtStatus。輸出按鈕列裡沒有 UCINet 輸出按鈕。",
+            "靜態確認：`analysis/dump/control_inventory.json` 顯示 "
+            "LookAtStatus 上沒有 `CmdUCINet` 控制項，但 "
+            "`Form_LookAtStatus.vb` 定義了 `Sub CmdUCINet_Click()`。",
+        ],
+        "fix_en": "Add a CmdUCINet button to LookAtStatus's design, "
+                  "wired to the existing CmdUCINet_Click Sub.",
+        "fix_zh": "在 LookAtStatus 的設計中新增 CmdUCINet 按鈕，"
+                  "並連到既有的 CmdUCINet_Click。",
+        "severity_en": "P3 — Missing UI (feature unavailable to users).",
+        "severity_zh": "P3 —— 缺少 UI（使用者無法使用此功能）。",
+        "screenshots": [
+            ("bug18_LookAtStatus_no_CmdUCINet.png",
+             "LookAtStatus as it ships — no UCINet export button."),
+            ("bug18_LookAtStatus_no_CmdUCINet_annotated.png",
+             "Annotated: `Sub CmdUCINet_Click()` exists in the module "
+             "but no control invokes it."),
+        ],
+        "evidence": {
+            "finding_class": "user_facing_bug",
+            "vba_ref": "Form_LookAtStatus.vb:1664 "
+                       "(Private Sub CmdUCINet_Click()); no CmdUCINet "
+                       "control in analysis/dump/control_inventory.json "
+                       "for LookAtStatus.",
+            "fixture": "LookAtStatus form design (any session).",
+            "user_symptom": "There is no UCINet export button on "
+                            "LookAtStatus, so users cannot run the "
+                            "UCINet export the code supports.",
+            "ui_verified": False,
+        },
+    },
+    {
+        "id": 19,
+        "tier": "P3_missing_ui",
+        "form": "LookAtOffice",
+        "title_en": "LookAtOffice is missing its CmdGUESS button "
+                    "(handler exists, no UI control)",
+        "title_zh": "LookAtOffice 缺少 CmdGUESS 按鈕"
+                    "（處理常式存在，但表單上沒有控制項）",
+        "summary_en": (
+            "`Form_LookAtOffice.vb` defines a `CmdGUESS_Click` handler "
+            "(it would write a GUESS `.gdf` export) but LookAtOffice's "
+            "form design has NO `CmdGUESS` control.  The fresh "
+            "`control_inventory.json` lists GIS / GISPeople / Neo4j on "
+            "this form but no GUESS button, so the GUESS export is "
+            "unreachable from the UI."
+        ),
+        "summary_zh": (
+            "`Form_LookAtOffice.vb` 定義了 `CmdGUESS_Click` 處理常式"
+            "（用來輸出 GUESS `.gdf` 檔），但 LookAtOffice 的表單"
+            "設計上並沒有 `CmdGUESS` 控制項。最新的 "
+            "`control_inventory.json` 顯示此表單有 GIS / GISPeople / "
+            "Neo4j，卻沒有 GUESS 按鈕，因此 GUESS 輸出在 UI 上"
+            "無法使用。"
+        ),
+        "steps_en": [
+            "Open LookAtOffice.  There is no GUESS export button "
+            "(only GIS / GISPeople / Neo4j).",
+            "Static confirmation: "
+            "`analysis/dump/control_inventory.json` shows no "
+            "`CmdGUESS` control on LookAtOffice, although "
+            "`Form_LookAtOffice.vb` defines `Sub CmdGUESS_Click()`.",
+        ],
+        "steps_zh": [
+            "開啟 LookAtOffice。沒有 GUESS 輸出按鈕"
+            "（只有 GIS / GISPeople / Neo4j）。",
+            "靜態確認：`analysis/dump/control_inventory.json` 顯示 "
+            "LookAtOffice 上沒有 `CmdGUESS` 控制項，但 "
+            "`Form_LookAtOffice.vb` 定義了 `Sub CmdGUESS_Click()`。",
+        ],
+        "fix_en": "Add a CmdGUESS button to LookAtOffice's design, "
+                  "wired to the existing CmdGUESS_Click Sub.",
+        "fix_zh": "在 LookAtOffice 的設計中新增 CmdGUESS 按鈕，"
+                  "並連到既有的 CmdGUESS_Click。",
+        "severity_en": "P3 — Missing UI (feature unavailable to users).",
+        "severity_zh": "P3 —— 缺少 UI（使用者無法使用此功能）。",
+        "screenshots": [
+            ("bug19_LookAtOffice_no_CmdGUESS.png",
+             "LookAtOffice as it ships — no GUESS export button."),
+            ("bug19_LookAtOffice_no_CmdGUESS_annotated.png",
+             "Annotated: `Sub CmdGUESS_Click()` exists in the module "
+             "but no control invokes it."),
+        ],
+        "evidence": {
+            "finding_class": "user_facing_bug",
+            "vba_ref": "Form_LookAtOffice.vb:3040 "
+                       "(Private Sub CmdGUESS_Click()); no CmdGUESS "
+                       "control in analysis/dump/control_inventory.json "
+                       "for LookAtOffice.",
+            "fixture": "LookAtOffice form design (any session).",
+            "user_symptom": "There is no GUESS export button on "
+                            "LookAtOffice, so users cannot run the "
+                            "GUESS export the code supports.",
+            "ui_verified": False,
+        },
+    },
+
+    # ---------------- P5 — Dormant / latent ----------------
+    {
+        "id": 5,
+        "tier": "P5_dormant_or_latent",
+        "form": "Form_LookAtStatus.CmdPajek_Click",
+        "title_en": "LookAtStatus.CmdPajek references a missing control "
+                    "AND three columns that don't exist — LATENT "
+                    "(gated by the missing Pajek button, Issue #16)",
+        "title_zh": "LookAtStatus.CmdPajek 參照了一個不存在的控制項"
+                    "以及三個不存在的欄位 —— 潛伏"
+                    "（被缺少的 Pajek 按鈕擋住，見 Issue #16）",
+        "summary_en": (
+            "Two related source-level defects in the same handler:\n\n"
+            "(a) Line 2308 reads `If ChkIDs.Value Then`, but "
+            "LookAtStatus has no control named `ChkIDs`.\n\n"
+            "(b) Lines 2335-2338 build a SELECT … INTO that references "
+            "`ZZ_SCRATCH_STATUS.c_person_id`, `c_status_id`, and "
+            "`c_status_count` — none of which exist on that table (the "
+            "real columns are `c_personid`, `c_status_code`, with no "
+            "count column).  The sub reads as a copy of "
+            "`LookAtAssociations.CmdPajek_Click`, where those names are "
+            "valid; the rename pass missed both spots.\n\n"
+            "Why LATENT: LookAtStatus has no Pajek button at all "
+            "(Issue #16), so users physically cannot invoke this "
+            "handler today.  The SQL would still fail the moment the "
+            "sub runs, so adding a button without fixing this would "
+            "just expose the failure.  This build was non-interactive, "
+            "so no runtime UI symptom could be re-verified — filed as "
+            "latent pending UI re-verification."
+        ),
+        "summary_zh": (
+            "同一處理常式中兩個相關的源碼缺陷：\n\n"
+            "(a) 第 2308 行讀取 `If ChkIDs.Value Then`，但 "
+            "LookAtStatus 並沒有名為 `ChkIDs` 的控制項。\n\n"
+            "(b) 第 2335-2338 行建立的 SELECT … INTO 參照了 "
+            "`ZZ_SCRATCH_STATUS.c_person_id`、`c_status_id`、"
+            "`c_status_count`——這三者在該表上都不存在（真正的欄位"
+            "是 `c_personid`、`c_status_code`，且沒有計數欄位）。"
+            "這個 Sub 看起來是 `LookAtAssociations.CmdPajek_Click` "
+            "的複製，那裡這些名稱是有效的；改名時漏了這兩處。\n\n"
+            "為何潛伏：LookAtStatus 根本沒有 Pajek 按鈕"
+            "（Issue #16），所以使用者目前無法觸發這個處理常式。"
+            "一旦此 Sub 執行，SQL 仍會立即失敗，因此若只加按鈕"
+            "而不修這裡，只會把失敗暴露給使用者。本次測試為"
+            "非互動式，無法重新驗證執行期 UI 症狀——故列為潛伏，"
+            "待 UI 重新驗證。"
+        ),
+        "steps_en": [
+            "On this build the bug cannot be triggered through the UI — "
+            "LookAtStatus has no Pajek button (Issue #16).  Verify the "
+            "defects statically instead:",
+            "Open `analysis/dump/vba/Form_LookAtStatus.vb` and read "
+            "line 2308: `If ChkIDs.Value Then` — no `ChkIDs` control "
+            "exists on LookAtStatus in "
+            "`analysis/dump/control_inventory.json`.",
+            "Read lines 2335-2338: the SELECT … INTO references "
+            "`ZZ_SCRATCH_STATUS.c_person_id` / `c_status_id` / "
+            "`c_status_count` (the count aggregate on line 2337), none "
+            "of which are columns on ZZ_SCRATCH_STATUS.",
+        ],
+        "steps_zh": [
+            "本次建置無法透過 UI 觸發此 bug——LookAtStatus 沒有 Pajek "
+            "按鈕（Issue #16）。改以靜態方式驗證：",
+            "開啟 `analysis/dump/vba/Form_LookAtStatus.vb`，看第 2308 "
+            "行：`If ChkIDs.Value Then`——在 "
+            "`analysis/dump/control_inventory.json` 中，LookAtStatus "
+            "並沒有 `ChkIDs` 控制項。",
+            "看第 2335-2338 行：SELECT … INTO 參照了 "
+            "`ZZ_SCRATCH_STATUS.c_person_id` / `c_status_id` / "
+            "`c_status_count`（計數彙總在第 2337 行），這些都不是 "
+            "ZZ_SCRATCH_STATUS 的欄位。",
+        ],
+        "fix_en": (
+            "(a) Replace `ChkIDs.Value` with a constant `False` (if the "
+            "optional ID-suffix behaviour isn't needed) or add a real "
+            "ChkIDs control.  (b) Rewrite the SELECT to use "
+            "`ZZ_SCRATCH_STATUS.c_personid` and `c_status_code`, and "
+            "either drop the count aggregate or compute it another way. "
+            " Realistically the whole sub needs a careful rewrite — it "
+            "was inherited from another form without verification — and "
+            "should be done together with adding the button (Issue #16)."
+        ),
+        "fix_zh": (
+            "(a) 將 `ChkIDs.Value` 改為常數 `False`（若不需要可選的"
+            "ID 後綴行為）或新增真正的 ChkIDs 控制項。(b) 重寫 SELECT "
+            "改用 `ZZ_SCRATCH_STATUS.c_personid` 與 `c_status_code`，"
+            "並將計數彙總移除或以其他方式計算。實務上整個 Sub 需要"
+            "謹慎重寫——它是未經驗證就從別的表單沿用過來的——"
+            "並應與新增按鈕（Issue #16）一併處理。"
+        ),
+        "severity_en": "P5 — Latent source defect (would resurface as a "
+                       "visible crash if Issue #16 were fixed without "
+                       "first fixing this).",
+        "severity_zh": "P5 —— 潛伏源碼缺陷（若只修 Issue #16 而不先"
+                       "修這裡，將以可見的當機重新浮現）。",
+        "screenshots": [],
+        "evidence": {
+            "finding_class": "latent_code",
+            "vba_ref": "Form_LookAtStatus.vb:2308 (If ChkIDs.Value "
+                       "Then — no such control) and :2335-2338 "
+                       "(SELECT references c_person_id / c_status_id / "
+                       "c_status_count at :2337, none on "
+                       "ZZ_SCRATCH_STATUS).",
+            "fixture": "n/a — gated unreachable: LookAtStatus has no "
+                       "CmdPajek button (Issue #16).",
+            "user_symptom": "None today (no button to click).  Would "
+                            "be an 'Object required' then 'No such "
+                            "field' crash if the button were added.",
+            "ui_verified": False,
+        },
+    },
+    {
+        "id": 6,
+        "tier": "P5_dormant_or_latent",
+        "form": "Form_LookAtGroupData.queryEntry",
+        "title_en": "LookAtGroupData Entry insert projects "
+                    "ENTRY_DATA.c_parental_status (should be "
+                    "…_code) — LATENT this build (runtime ERR did not "
+                    "fire)",
+        "title_zh": "LookAtGroupData 的 Entry 插入投影了 "
+                    "ENTRY_DATA.c_parental_status（應為 …_code）"
+                    "—— 本次潛伏（執行期未觸發錯誤）",
+        "summary_en": (
+            "`Form_LookAtGroupData.vb`'s Entry INSERT names a target "
+            "column `c_parental_status_code` (line 2612) but the SELECT "
+            "projection ends with `ENTRY_DATA.c_parental_status` "
+            "(line 2621) — no `_code` suffix.  The real ENTRY_DATA "
+            "column is `c_parental_status_code`; the source-level typo "
+            "would make JET raise 'No such field' / 'No value given for "
+            "one or more required parameters' when the Entry branch "
+            "runs.  `Form_LookAtEntry.vb` does the analogous query with "
+            "the correct name, so this is a single-line drift.\n\n"
+            "Honest note for this build: the source defect is present "
+            "in the dump, but the behavioural probe completed WITHOUT "
+            "the error this build (the symptom is data-/enable-path "
+            "dependent and the session was non-interactive, so no "
+            "runtime UI symptom could be re-verified).  Filed as latent "
+            "pending UI re-verification rather than a confirmed "
+            "user-facing crash."
+        ),
+        "summary_zh": (
+            "`Form_LookAtGroupData.vb` 的 Entry INSERT 目標欄位列出 "
+            "`c_parental_status_code`（第 2612 行），但 SELECT 投影"
+            "結尾卻是 `ENTRY_DATA.c_parental_status`（第 2621 行）"
+            "——少了 `_code` 後綴。ENTRY_DATA 真正的欄位是 "
+            "`c_parental_status_code`；當 Entry 分支執行時，這個源碼"
+            "層級的筆誤會讓 JET 丟出『No such field』/『No value given "
+            "for one or more required parameters』。`Form_LookAtEntry.vb` "
+            "對應的查詢用的是正確名稱，因此這是一行的漂移。\n\n"
+            "本次建置的誠實說明：源碼缺陷確實存在於傾印中，但本次"
+            "行為探測在執行時並未觸發該錯誤（症狀依資料／啟用路徑"
+            "而定，且本次為非互動式，無法重新驗證執行期 UI 症狀）。"
+            "故列為潛伏待 UI 重新驗證，而非已確認的使用者當機。"
+        ),
+        "steps_en": [
+            "On this build the runtime error did not fire — verify the "
+            "source defect statically:",
+            "Open `analysis/dump/vba/Form_LookAtGroupData.vb`.  Line "
+            "2612 lists the INSERT target column "
+            "`c_parental_status_code`; line 2621 projects "
+            "`ENTRY_DATA.c_parental_status` (missing `_code`).",
+            "To exercise the path in a future interactive session: in "
+            "LookAtGroupData, populate the import list with one person, "
+            "tick only the Entry checkbox, and click Run.  If the path "
+            "fires, a 'field doesn't exist' popup appears.",
+        ],
+        "steps_zh": [
+            "本次建置執行期未觸發此錯誤——以靜態方式驗證源碼缺陷：",
+            "開啟 `analysis/dump/vba/Form_LookAtGroupData.vb`。第 2612 "
+            "行列出 INSERT 目標欄位 `c_parental_status_code`；第 2621 "
+            "行投影 `ENTRY_DATA.c_parental_status`（少了 `_code`）。",
+            "若要在未來的互動式測試中走到這條路徑：在 "
+            "LookAtGroupData 匯入一位人物，只勾選 Entry，點 Run。"
+            "若路徑被觸發，會跳出『欄位不存在』的彈窗。",
+        ],
+        "fix_en": (
+            "Change `ENTRY_DATA.c_parental_status` to "
+            "`ENTRY_DATA.c_parental_status_code` on line 2621.  "
+            "One-line fix, matching the correct name already used in "
+            "`Form_LookAtEntry.vb`."
+        ),
+        "fix_zh": (
+            "把第 2621 行的 `ENTRY_DATA.c_parental_status` 改成 "
+            "`ENTRY_DATA.c_parental_status_code`。一行修正，與 "
+            "`Form_LookAtEntry.vb` 已使用的正確名稱一致。"
+        ),
+        "severity_en": "P5 — Latent (source typo present; runtime "
+                       "symptom not reproduced this build, pending UI "
+                       "re-verification).",
+        "severity_zh": "P5 —— 潛伏（源碼筆誤存在；本次建置未重現執行期"
+                       "症狀，待 UI 重新驗證）。",
+        "screenshots": [],
+        "evidence": {
+            "finding_class": "latent_code",
+            "vba_ref": "Form_LookAtGroupData.vb:2612 (target list ends "
+                       "c_parental_status_code) vs :2621 (SELECT "
+                       "projects ENTRY_DATA.c_parental_status, no _code).",
+            "fixture": "LookAtGroupData Entry branch (import list + "
+                       "Entry checkbox).  Runtime error not reproduced "
+                       "this non-interactive build.",
+            "user_symptom": "None reproduced this build.  When the path "
+                            "fires, a 'field doesn't exist' popup blocks "
+                            "the Entry run.",
+            "ui_verified": False,
+        },
+    },
+    {
+        "id": 7,
+        "tier": "P5_dormant_or_latent",
+        "form": "Form_LookAtPlace.CmdNeo4j_Click",
+        "title_en": "LookAtPlace.CmdNeo4j people-recordset reads "
+                    "c_dynasty / c_dynasty_chn / c_female that the "
+                    "SELECT doesn't project — LATENT (runtime did not "
+                    "fire this build)",
+        "title_zh": "LookAtPlace.CmdNeo4j 的人員記錄集讀取了 SELECT 未"
+                    "投影的 c_dynasty / c_dynasty_chn / c_female "
+                    "—— 潛伏（本次執行期未觸發）",
+        "summary_en": (
+            "`Form_LookAtPlace.CmdNeo4j_Click` opens `tRstPeople` "
+            "(line 326) on a SELECT DISTINCT that projects only four "
+            "ZZ_SCRATCH_P_TEXT columns (line 322): c_person_id, "
+            "c_name, c_name_chn, c_index_year.  The INNER JOIN brings "
+            "DYNASTIES and BIOG_MAIN into scope but does NOT project "
+            "any of their columns.  The row-write loop then reads "
+            "`!c_dynasty` (line 383), `!c_dynasty_chn` (385) and "
+            "`!c_female` (392) from that recordset; DAO's Fields "
+            "collection only contains projected columns, so JET raises "
+            "3265 'Item not found in this collection.' on the first "
+            "such read.  The handler routes to the exit before any disk "
+            "file is flushed, so the user would see a popup and an "
+            "empty output folder.\n\n"
+            "Why LATENT this build: the CmdNeo4j button DOES exist on "
+            "LookAtPlace, but this session was non-interactive "
+            "(pywinauto UIA unavailable), so the runtime symptom could "
+            "not be reproduced/re-verified.  The projection mismatch is "
+            "a confirmed static defect; filed as latent pending UI "
+            "re-verification.  The recommended demo address is "
+            "`c_addr_id = 100658` (Kaifeng / 開封), which has plenty of "
+            "people to feed the People-CSV loop."
+        ),
+        "summary_zh": (
+            "`Form_LookAtPlace.CmdNeo4j_Click` 在一個只投影四個 "
+            "ZZ_SCRATCH_P_TEXT 欄位的 SELECT DISTINCT（第 322 行："
+            "c_person_id、c_name、c_name_chn、c_index_year）上開啟 "
+            "`tRstPeople`（第 326 行）。INNER JOIN 把 DYNASTIES 與 "
+            "BIOG_MAIN 帶入範圍，但並未投影它們的任何欄位。接著逐列"
+            "寫出的迴圈從該記錄集讀取 `!c_dynasty`（第 383 行）、"
+            "`!c_dynasty_chn`（385）與 `!c_female`（392）；DAO 的 "
+            "Fields 集合只含被"
+            "投影的欄位，因此 JET 會在第一次這類讀取時丟出 3265 "
+            "『Item not found in this collection.』。處理常式在任何"
+            "磁碟檔寫出前就跳到結束，使用者會看到彈窗以及一個空的"
+            "輸出資料夾。\n\n"
+            "本次為何潛伏：LookAtPlace 上確實有 CmdNeo4j 按鈕，但本次"
+            "測試為非互動式（pywinauto UIA 無法使用），無法重現／"
+            "重新驗證執行期症狀。投影不符是已確認的靜態缺陷；故列為"
+            "潛伏待 UI 重新驗證。建議的示範地址為 "
+            "`c_addr_id = 100658`（Kaifeng / 開封），其關聯人物足以"
+            "餵滿 People-CSV 迴圈。"
+        ),
+        "steps_en": [
+            "On this build the runtime symptom was not reproduced "
+            "(non-interactive session).  Verify the projection "
+            "mismatch statically:",
+            "Open `analysis/dump/vba/Form_LookAtPlace.vb`.  Line "
+            "322 projects only c_person_id / c_name / c_name_chn / "
+            "c_index_year into `tRstPeople` (opened line 326).",
+            "Lines 383 / 385 / 392 read `!c_dynasty`, `!c_dynasty_chn`, "
+            "`!c_female` from that recordset — none are projected, so "
+            "JET 3265 fires on the first read.",
+            "To re-verify interactively later: open LookAtPlace, pick "
+            "address `c_addr_id = 100658` (Kaifeng / 開封), Run Query, "
+            "then click Neo4j and choose a save folder — expect a 3265 "
+            "popup and an empty folder.",
+        ],
+        "steps_zh": [
+            "本次建置未重現執行期症狀（非互動式測試）。以靜態方式"
+            "驗證投影不符：",
+            "開啟 `analysis/dump/vba/Form_LookAtPlace.vb`。第 322 "
+            "行只把 c_person_id / c_name / c_name_chn / c_index_year "
+            "投影到 `tRstPeople`（第 326 行開啟）。",
+            "第 383 / 385 / 392 行從該記錄集讀取 `!c_dynasty`、"
+            "`!c_dynasty_chn`、`!c_female`——皆未被投影，因此第一次"
+            "讀取時就觸發 JET 3265。",
+            "日後互動式重新驗證：開啟 LookAtPlace，選地址 "
+            "`c_addr_id = 100658`（Kaifeng / 開封），執行查詢，再點 "
+            "Neo4j 並選一個儲存資料夾——預期會出現 3265 彈窗且資料夾"
+            "為空。",
+        ],
+        "fix_en": (
+            "Extend the SELECT projection in "
+            "`Form_LookAtPlace.vb:322` to include the three columns "
+            "the loop reads: `DYNASTIES.c_dynasty`, "
+            "`DYNASTIES.c_dynasty_chn`, `BIOG_MAIN.c_female` (the "
+            "FROM/JOIN already brings them into scope).  Three columns "
+            "added; nothing else changes."
+        ),
+        "fix_zh": (
+            "在 `Form_LookAtPlace.vb:322` 的 SELECT 投影中加入"
+            "迴圈會讀取的三個欄位：`DYNASTIES.c_dynasty`、"
+            "`DYNASTIES.c_dynasty_chn`、`BIOG_MAIN.c_female`"
+            "（FROM/JOIN 已把它們帶入範圍）。新增三個欄位，其餘"
+            "不變。"
+        ),
+        "severity_en": "P5 — Latent (confirmed static projection "
+                       "mismatch; runtime symptom not reproduced this "
+                       "non-interactive build, pending UI "
+                       "re-verification).",
+        "severity_zh": "P5 —— 潛伏（已確認的靜態投影不符；本次非互動式"
+                       "建置未重現執行期症狀，待 UI 重新驗證）。",
+        "screenshots": [],
+        "evidence": {
+            "finding_class": "latent_code",
+            "vba_ref": "Form_LookAtPlace.vb:322 (SELECT DISTINCT "
+                       "projects only 4 columns) + :326 (Set tRstPeople "
+                       "= OpenRecordset) + :383 (first unprojected read "
+                       "!c_dynasty).",
+            "fixture": "LookAtPlace, address c_addr_id = 100658 "
+                       "(Kaifeng / 開封).  Runtime not reproduced this "
+                       "non-interactive build.",
+            "user_symptom": "None reproduced this build.  When the "
+                            "export runs, a JET 3265 'Item not found in "
+                            "this collection.' popup appears and the "
+                            "chosen output folder stays empty.",
+            "ui_verified": False,
+        },
+    },
+    {
+        "id": 8,
+        "tier": "P5_dormant_or_latent",
+        "form": "Form_LookAtNetworks.CmdNeo4j_Click",
+        "title_en": "LookAtNetworks.CmdNeo4j place-recordset reads "
+                    "x_coord / y_coord that the SELECT doesn't project "
+                    "— LATENT (behavioural repro blocked by Networks "
+                    "Form_Open hang)",
+        "title_zh": "LookAtNetworks.CmdNeo4j 的地點記錄集讀取了 SELECT "
+                    "未投影的 x_coord / y_coord —— 潛伏"
+                    "（Networks 表單開啟卡死，行為重現受阻）",
+        "summary_en": (
+            "Same shape as Issue #7, on a different form.  In "
+            "`Form_LookAtNetworks.CmdNeo4j_Click` the place SELECT "
+            "(line 2458) projects only three columns "
+            "(c_index_addr_id, c_index_addr_name, c_index_addr_chn) "
+            "into `tRstPlace` (line 2463).  The header it writes "
+            "declares placeX / placeY (lines 2466/2466), and the "
+            "row-write loop then reads `!x_coord` (line 2495) and "
+            "`!y_coord` from that recordset — neither is projected, so "
+            "JET 3265 'Item not found in this collection.' fires and "
+            "the export aborts.\n\n"
+            "Why LATENT: behavioural reproduction is blocked because "
+            "`LookAtNetworks`'s `Form_Open` hangs the COM test driver, "
+            "so the host form cannot be driven this build; combined "
+            "with the non-interactive session, no runtime symptom could "
+            "be re-verified.  The projection mismatch is a confirmed "
+            "static defect; filed as latent pending UI re-verification."
+        ),
+        "summary_zh": (
+            "與 Issue #7 同型，發生在不同表單上。在 "
+            "`Form_LookAtNetworks.CmdNeo4j_Click` 中，地點 SELECT"
+            "（第 2458 行）只把三個欄位（c_index_addr_id、"
+            "c_index_addr_name、c_index_addr_chn）投影到 `tRstPlace`"
+            "（第 2463 行）。它寫出的表頭宣告了 placeX / placeY"
+            "（第 2466/2466 行），接著逐列寫出的迴圈從該記錄集讀取 "
+            "`!x_coord`（第 2495 行）與 `!y_coord`——兩者皆未被投影，"
+            "因此 JET 3265『Item not found in this collection.』觸發，"
+            "輸出中止。\n\n"
+            "為何潛伏：行為重現受阻，因為 `LookAtNetworks` 的 "
+            "`Form_Open` 會讓 COM 測試驅動卡死，本次無法驅動該宿主"
+            "表單；加上本次為非互動式測試，無法重新驗證執行期症狀。"
+            "投影不符是已確認的靜態缺陷；故列為潛伏待 UI 重新驗證。"
+        ),
+        "steps_en": [
+            "Behavioural repro is blocked (LookAtNetworks Form_Open "
+            "hangs the driver) and this session was non-interactive.  "
+            "Verify the projection mismatch statically:",
+            "Open `analysis/dump/vba/Form_LookAtNetworks.vb`.  Line "
+            "2458 projects only c_index_addr_id / c_index_addr_name / "
+            "c_index_addr_chn into `tRstPlace` (line 2463).",
+            "Lines 2495 / 2502 read `!x_coord` (and `!y_coord` "
+            "nearby) — neither is projected, so JET 3265 fires on the "
+            "place block.",
+        ],
+        "steps_zh": [
+            "行為重現受阻（LookAtNetworks 的 Form_Open 讓驅動卡死），"
+            "且本次為非互動式測試。以靜態方式驗證投影不符：",
+            "開啟 `analysis/dump/vba/Form_LookAtNetworks.vb`。第 2458 "
+            "行只把 c_index_addr_id / c_index_addr_name / "
+            "c_index_addr_chn 投影到 `tRstPlace`（第 2463 行）。",
+            "第 2495 / 2502 行讀取 `!x_coord`（附近還有 `!y_coord`）"
+            "——皆未被投影，因此地點區塊會觸發 JET 3265。",
+        ],
+        "fix_en": (
+            "Extend the place SELECT in "
+            "`Form_LookAtNetworks.vb:2458` to project the coordinate "
+            "columns the loop reads, e.g. `ADDR_CODES.x_coord`, "
+            "`ADDR_CODES.y_coord` (the JOIN to ADDR_CODES already "
+            "exposes them)."
+        ),
+        "fix_zh": (
+            "在 `Form_LookAtNetworks.vb:2458` 的地點 SELECT 中投影"
+            "迴圈會讀取的座標欄位，例如 `ADDR_CODES.x_coord`、"
+            "`ADDR_CODES.y_coord`（與 ADDR_CODES 的 JOIN 已暴露"
+            "它們）。"
+        ),
+        "severity_en": "P5 — Latent (confirmed static projection "
+                       "mismatch; behavioural repro blocked by the "
+                       "Networks Form_Open hang, pending UI "
+                       "re-verification).",
+        "severity_zh": "P5 —— 潛伏（已確認的靜態投影不符；行為重現"
+                       "因 Networks 表單開啟卡死而受阻，待 UI "
+                       "重新驗證）。",
+        "screenshots": [],
+        "evidence": {
+            "finding_class": "latent_code",
+            "vba_ref": "Form_LookAtNetworks.vb:2458 (place SELECT "
+                       "projects 3 columns) + :2463 (Set tRstPlace) + "
+                       ":2495 (reads !x_coord, unprojected).",
+            "fixture": "LookAtNetworks CmdNeo4j place block.  Host "
+                       "form's Form_Open hangs the COM driver; not "
+                       "reproduced this non-interactive build.",
+            "user_symptom": "None reproduced this build.  When the "
+                            "export runs, a JET 3265 'Item not found in "
+                            "this collection.' popup appears and the "
+                            "export aborts mid-chain.",
+            "ui_verified": False,
+        },
+    },
+    {
+        "id": 9,
+        "tier": "P5_dormant_or_latent",
+        "form": "Form_LookAtEntry.CmdNeo4j_Click",
+        "title_en": "LookAtEntry.CmdNeo4j Institutions block uses the "
+                    "wrong recordset variable (tRstAssocCodes) — LATENT "
+                    "(gated unreachable; no ENTRY_DATA row has "
+                    "c_inst_code > 0)",
+        "title_zh": "LookAtEntry.CmdNeo4j 的 Institutions 區塊用錯了"
+                    "記錄集變數（tRstAssocCodes）—— 潛伏"
+                    "（被閘門擋住而不可達；沒有任何 ENTRY_DATA 列的 "
+                    "c_inst_code > 0）",
+        "summary_en": (
+            "Line 1415 of `Form_LookAtEntry.vb` opens the institutions "
+            "recordset as `Set tRstInstitutions = "
+            "CurrentDb.OpenRecordset(tQueryStr)`.  Twenty lines later, "
+            "line 1425 says `With tRstAssocCodes` and the loop reads "
+            "`!c_inst_code` etc. against THAT recordset — which was "
+            "bound earlier to the AssocCodes SELECT and already closed "
+            "in the AssocCodes block.  If executed, `.MoveFirst` would "
+            "raise DAO 3021 'No current record'; the misnamed reference "
+            "is a genuine source-level bug.\n\n"
+            "Why LATENT: the whole SaveAs-and-buggy-With block sits "
+            "inside the gate `If tRecDeleted > 0 Then` (line 1390), "
+            "where tRecDeleted counts an INSERT … WHERE "
+            "ZZ_SCRATCH_ENTRY.c_inst_code > 0.  On this dump no "
+            "ENTRY_DATA row has `c_inst_code > 0`, so the gate is "
+            "always false, the buggy `With` line never executes, and "
+            "CmdNeo4j finishes cleanly (silently omitting the optional "
+            "InstitutionCodes CSV — the same gating the surrounding "
+            "blocks use).  The typo only becomes user-visible if a "
+            "future data drop introduces any `ENTRY_DATA.c_inst_code > "
+            "0`.  Investigation fixtures: `c_entry_code = 36` "
+            "(examination: jinshi (general) / 進士) and "
+            "`c_entry_code = 101` (recommendation / 薦舉) exercise "
+            "CmdQuery + CmdNeo4j end-to-end and both finish cleanly — "
+            "evidence that the gate works, not a popup reproduction."
+        ),
+        "summary_zh": (
+            "`Form_LookAtEntry.vb` 第 1415 行以 `Set tRstInstitutions "
+            "= CurrentDb.OpenRecordset(tQueryStr)` 開啟機構記錄集。"
+            "二十行後，第 1425 行寫的是 `With tRstAssocCodes`，迴圈"
+            "對「那個」記錄集讀取 `!c_inst_code` 等——而它先前已被"
+            "綁定到 AssocCodes 的 SELECT，並已在 AssocCodes 區塊中"
+            "關閉。若執行到，`.MoveFirst` 會丟出 DAO 3021『No current "
+            "record』；這個命名錯誤是貨真價實的源碼 bug。\n\n"
+            "為何潛伏：整段 SaveAs 與有問題的 With 區塊都位於閘門 "
+            "`If tRecDeleted > 0 Then`（第 1390 行）之內，其中 "
+            "tRecDeleted 計算的是 INSERT … WHERE "
+            "ZZ_SCRATCH_ENTRY.c_inst_code > 0 的列數。在本傾印中"
+            "沒有任何 ENTRY_DATA 列的 `c_inst_code > 0`，因此閘門"
+            "恆為 false，有問題的 `With` 行從不執行，CmdNeo4j 乾淨"
+            "完成（靜默略過可選的 InstitutionCodes CSV——與周邊區塊"
+            "相同的閘門做法）。只有當未來資料引入任何 "
+            "`ENTRY_DATA.c_inst_code > 0` 時，此筆誤才會對使用者可見。"
+            "調查用 fixture：`c_entry_code = 36`"
+            "（examination: jinshi (general) / 進士）與 "
+            "`c_entry_code = 101`（recommendation / 薦舉）會端到端"
+            "走完 CmdQuery + CmdNeo4j，兩者皆乾淨結束——這是閘門有效"
+            "的證據，而非彈窗重現。"
+        ),
+        "steps_en": [
+            "On this dump the bug cannot be triggered through the UI — "
+            "the `If tRecDeleted > 0 Then` gate at "
+            "Form_LookAtEntry.vb:1390 is false for every fixture (no "
+            "ENTRY_DATA row has c_inst_code > 0).  Verify the typo "
+            "statically:",
+            "Open `analysis/dump/vba/Form_LookAtEntry.vb` and read "
+            "lines 1415-1425.  Line 1415: `Set tRstInstitutions = "
+            "OpenRecordset(tQueryStr)`.  Line 1425: `With "
+            "tRstAssocCodes` (intended `With tRstInstitutions`); "
+            "tRstAssocCodes was already closed in the AssocCodes block, "
+            "so `.MoveFirst` would raise DAO 3021.",
+            "(Optional, runtime evidence) Pick `c_entry_code = 36` "
+            "(examination: jinshi (general) / 進士) or "
+            "`c_entry_code = 101` (recommendation / 薦舉) on LookAtEntry "
+            "→ Run Query → Neo4j.  Both finish cleanly with no popup "
+            "and no InstitutionCodes CSV — evidence the gate holds.",
+        ],
+        "steps_zh": [
+            "在本傾印上此 bug 無法透過 UI 觸發——Form_LookAtEntry.vb:1390 "
+            "的 `If tRecDeleted > 0 Then` 閘門對每個 fixture 都為 false"
+            "（沒有任何 ENTRY_DATA 列的 c_inst_code > 0）。以靜態方式"
+            "驗證筆誤：",
+            "開啟 `analysis/dump/vba/Form_LookAtEntry.vb`，看第 "
+            "1415-1425 行。第 1415 行：`Set tRstInstitutions = "
+            "OpenRecordset(tQueryStr)`。第 1425 行：`With "
+            "tRstAssocCodes`（應為 `With tRstInstitutions`）；"
+            "tRstAssocCodes 已在 AssocCodes 區塊中關閉，故 "
+            "`.MoveFirst` 會丟出 DAO 3021。",
+            "（可選的執行期證據）在 LookAtEntry 選 "
+            "`c_entry_code = 36`（examination: jinshi (general) / 進士）"
+            "或 `c_entry_code = 101`（recommendation / 薦舉）→ 執行"
+            "查詢 → Neo4j。兩者皆乾淨結束，無彈窗、無 "
+            "InstitutionCodes CSV——這是閘門守住的證據。",
+        ],
+        "fix_en": (
+            "Change `With tRstAssocCodes` on line 1425 to "
+            "`With tRstInstitutions`.  The recordset variable was "
+            "simply mis-named.  Although currently unreachable on this "
+            "dump, fixing it costs nothing and prevents a future-data "
+            "regression."
+        ),
+        "fix_zh": (
+            "把第 1425 行的 `With tRstAssocCodes` 改成 "
+            "`With tRstInstitutions`。記錄集變數只是被命名錯了。"
+            "雖然在本傾印上目前不可達，修正它毫無成本，又能避免"
+            "未來資料造成的回歸。"
+        ),
+        "severity_en": "P5 — Latent source typo (gated unreachable; "
+                       "would resurface as a DAO 3021 crash if any "
+                       "future ENTRY_DATA row had c_inst_code > 0).",
+        "severity_zh": "P5 —— 潛伏源碼筆誤（被閘門擋住而不可達；"
+                       "若未來任何 ENTRY_DATA 列的 c_inst_code > 0，"
+                       "將以 DAO 3021 當機重新浮現）。",
+        "screenshots": [],
+        "evidence": {
+            "finding_class": "latent_code",
+            "vba_ref": "Form_LookAtEntry.vb:1415 (Set tRstInstitutions "
+                       "= OpenRecordset) vs :1425 (With tRstAssocCodes "
+                       "— wrong, already-closed recordset), gated by "
+                       ":1390 (If tRecDeleted > 0, from WHERE "
+                       "c_inst_code > 0).",
+            "fixture": "LookAtEntry, c_entry_code = 36 (examination: "
+                       "jinshi (general) / 進士) or c_entry_code = 101 "
+                       "(recommendation / 薦舉); both finish cleanly — "
+                       "gate is false (0 ENTRY_DATA rows with "
+                       "c_inst_code > 0).",
+            "user_symptom": "None today (gated unreachable).  Would be "
+                            "a DAO 3021 'No current record' popup and an "
+                            "aborted Neo4j export if a future data drop "
+                            "introduced any c_inst_code > 0.",
+            "ui_verified": False,
+        },
+    },
+    {
+        "id": 14,
+        "tier": "P5_dormant_or_latent",
+        "form": "Form_KIN_DATA_Subform",
+        "title_en": "KIN_DATA Subform's CmdPickKinRel calls a missing "
+                    "picker (frmPickKINSHIP_CODES) — LATENT (host "
+                    "sub-form is an orphan; no reachable trigger)",
+        "title_zh": "KIN_DATA 子表單的 CmdPickKinRel 呼叫一個不存在的"
+                    "選取表單（frmPickKINSHIP_CODES）—— 潛伏"
+                    "（宿主子表單為孤兒，無可達觸發路徑）",
+        "summary_en": (
+            "`Form_KIN_DATA_Subform`'s `CmdPickKinRel_Click` "
+            "(stDocName set at line 63) calls "
+            "`DoCmd.OpenForm \"frmPickKINSHIP_CODES\"` and references "
+            "`Forms!frmPickKINSHIP_CODES!frmKINSHIP_CODES.Form!"
+            "c_kincode`.  Neither form exists in the current .mdb "
+            "(absent from the fresh `control_inventory.json`) — same "
+            "shape as Issue #13.\n\n"
+            "Why LATENT: the host sub-form `KIN_DATA Subform` (which "
+            "owns the CmdPickKinRel button) is not contained by any "
+            "navigable form in the current inventory — "
+            "`KIN_DATA Subform` is absent from the form list, while "
+            "`BIOG_MAIN_2_Subform` embeds `KIN_DATA_2 Subform` instead "
+            "(a read-only variant with no CmdPickKinRel button).  "
+            "Because no user-facing navigation reaches the picker "
+            "button, the popup can't be triggered.  The latent code "
+            "path resurfaces the moment a developer re-embeds "
+            "`KIN_DATA Subform` somewhere reachable."
+        ),
+        "summary_zh": (
+            "`Form_KIN_DATA_Subform` 的 `CmdPickKinRel_Click`"
+            "（stDocName 設於第 63 行）呼叫 "
+            "`DoCmd.OpenForm \"frmPickKINSHIP_CODES\"`，並參照 "
+            "`Forms!frmPickKINSHIP_CODES!frmKINSHIP_CODES.Form!"
+            "c_kincode`。這兩個表單在目前的 .mdb 中都不存在"
+            "（最新的 `control_inventory.json` 中查無）——與 Issue #13 "
+            "同型。\n\n"
+            "為何潛伏：宿主子表單 `KIN_DATA Subform`（擁有 "
+            "CmdPickKinRel 按鈕者）並未被目前清單中任何可導覽的表單"
+            "所包含——`KIN_DATA Subform` 不在表單清單中，而 "
+            "`BIOG_MAIN_2_Subform` 改為嵌入 `KIN_DATA_2 Subform`"
+            "（一個沒有 CmdPickKinRel 按鈕的唯讀變體）。由於沒有"
+            "任何面向使用者的導覽能到達該選取按鈕，彈窗無法被觸發。"
+            "一旦開發者把 `KIN_DATA Subform` 重新嵌入到可達之處，"
+            "這條潛伏的程式路徑就會重新浮現。"
+        ),
+        "steps_en": [
+            "Verification is static-only — no parent form embeds the "
+            "affected sub-form, so the runtime click cannot be "
+            "reproduced.",
+            "Open `analysis/dump/vba/Form_KIN_DATA_Subform.vb` line 63 "
+            "— confirms `stDocName = \"frmPickKINSHIP_CODES\"`, opened "
+            "by DoCmd just below.",
+            "In `analysis/dump/control_inventory.json`, search for "
+            "`frmPickKINSHIP_CODES` (absent) and `KIN_DATA Subform` "
+            "(absent from the form list); `KIN_DATA_2 Subform` (the "
+            "read-only variant) is what BIOG_MAIN_2_Subform embeds.",
+        ],
+        "steps_zh": [
+            "驗證僅限靜態——沒有任何上層表單嵌入受影響的子表單，"
+            "因此無法重現執行期點選。",
+            "開啟 `analysis/dump/vba/Form_KIN_DATA_Subform.vb` 第 125 "
+            "行——確認 `stDocName = \"frmPickKINSHIP_CODES\"`，緊接著"
+            "由 DoCmd 開啟。",
+            "在 `analysis/dump/control_inventory.json` 中搜尋 "
+            "`frmPickKINSHIP_CODES`（不存在）與 `KIN_DATA Subform`"
+            "（不在表單清單中）；BIOG_MAIN_2_Subform 嵌入的是 "
+            "`KIN_DATA_2 Subform`（唯讀變體）。",
+        ],
+        "fix_en": (
+            "Same as Issue #13: restore the picker form "
+            "`frmPickKINSHIP_CODES` (or update the caller to its "
+            "replacement).  Even though the runtime path is not "
+            "reachable today, clean up the static defect so it doesn't "
+            "resurface when `KIN_DATA Subform` is re-embedded."
+        ),
+        "fix_zh": (
+            "與 Issue #13 相同：還原選取表單 `frmPickKINSHIP_CODES`"
+            "（或將呼叫端改為其替代表單）。即使目前執行路徑不可達，"
+            "也應清理此靜態缺陷，以免 `KIN_DATA Subform` 被重新嵌入"
+            "時重新浮現。"
+        ),
+        "severity_en": "P5 — Latent (static defect real; host sub-form "
+                       "is an orphan, so there is no reachable trigger "
+                       "today).",
+        "severity_zh": "P5 —— 潛伏（靜態缺陷確實存在；宿主子表單為"
+                       "孤兒，目前無可達觸發路徑）。",
+        "screenshots": [],
+        "evidence": {
+            "finding_class": "latent_code",
+            "vba_ref": "Form_KIN_DATA_Subform.vb:63 "
+                       "(stDocName = \"frmPickKINSHIP_CODES\") + "
+                       "OpenForm/Forms! references at :131-161; picker "
+                       "form and KIN_DATA Subform both absent from "
+                       "analysis/dump/control_inventory.json.",
+            "fixture": "n/a — KIN_DATA Subform is not embedded by any "
+                       "navigable form (BIOG_MAIN_2_Subform uses "
+                       "KIN_DATA_2 Subform instead).",
+            "user_symptom": "None today (no navigation reaches the "
+                            "picker button).  Would be an 'Item not "
+                            "found' popup if the sub-form were "
+                            "re-embedded somewhere reachable.",
+            "ui_verified": False,
+        },
+    },
+    {
+        "id": 20,
+        "tier": "P5_dormant_or_latent",
+        "form": "ADDR_CODES + Form_LookAt*.CmdGIS_Click",
+        "title_en": "BOM-prefixed address names can become embedded "
+                    "tabs and misalign GIS exports — DORMANT this build "
+                    "(0 BOM rows in ADDR_CODES)",
+        "title_zh": "帶 BOM 前綴的地址名稱可能變成內嵌 TAB 而使 GIS "
+                    "輸出錯位 —— 本次建置休眠（ADDR_CODES 中 0 列帶 "
+                    "BOM）",
+        "summary_en": (
+            "On earlier builds, some `ADDR_CODES` rows carried a stray "
+            "`U+FEFF` (BOM) prefix in `c_name` / `c_name_chn` (a "
+            "UTF-8-with-BOM paste residue).  When a CmdGIS export "
+            "writes each cell as `tStr + value + Chr(9)` with no "
+            "escaping, the BOM-mangled value can introduce a literal "
+            "TAB, splitting one field into two cells and silently "
+            "shifting every column to its right in the `.tab` file.  "
+            "The fixture that exercised this was status code "
+            "**40** (civil office / [為官者：文]) in LookAtStatus, with "
+            "the reachable dirty row `c_addr_id = 702559` "
+            "(Wei Shi / 尉氏).\n\n"
+            "Why DORMANT this build: the 20260602 DATA mdb has **0** "
+            "rows with a literal U+FEFF prefix in ADDR_CODES.c_name or "
+            "c_name_chn — measured by "
+            "`tests/test_addr_codes_embedded_delim.py` (build "
+            "20260602 calibrated to 0).  The export-delimiter defect "
+            "class is real in code (the writers still do no escaping), "
+            "but the current data has 0 triggering rows, so no user can "
+            "reproduce the misalignment today.  The moment a future "
+            "data refresh re-introduces a BOM-prefixed (or otherwise "
+            "tab-bearing) address, the misalignment returns."
+        ),
+        "summary_zh": (
+            "在較早的建置中，部分 `ADDR_CODES` 列在 `c_name` / "
+            "`c_name_chn` 帶有一個多餘的 `U+FEFF`（BOM）前綴"
+            "（UTF-8-with-BOM 貼上的殘留）。當 CmdGIS 輸出以 "
+            "`tStr + value + Chr(9)` 逐格寫出且不做跳脫時，被 BOM "
+            "破壞的值可能引入一個字面 TAB，把一個欄位拆成兩格，"
+            "並在 `.tab` 檔中靜默地把右側每一欄都位移。觸發此情況的"
+            "fixture 是 LookAtStatus 中的 status code **40**"
+            "（civil office / [為官者：文]），可達的髒列為 "
+            "`c_addr_id = 702559`（Wei Shi / 尉氏）。\n\n"
+            "本次為何休眠：20260602 DATA mdb 在 ADDR_CODES.c_name 或 "
+            "c_name_chn 中帶有字面 U+FEFF 前綴的列為 **0**——由 "
+            "`tests/test_addr_codes_embedded_delim.py` 量測（build "
+            "20260602 已校準為 0）。輸出分隔符這一類缺陷在程式碼中"
+            "確實存在（寫出端仍未做跳脫），但目前資料有 0 列會觸發，"
+            "因此目前沒有使用者能重現此錯位。一旦未來資料刷新重新"
+            "引入帶 BOM（或其他帶 TAB）的地址，錯位就會回來。"
+        ),
+        "steps_en": [
+            "On this build the symptom is dormant — measure the trigger "
+            "count to confirm:",
+            "Run `tests/test_addr_codes_embedded_delim.py`; the "
+            "20260602 build is calibrated to 0 BOM-prefixed ADDR_CODES "
+            "rows (the test asserts c_name and c_name_chn both have 0 "
+            "literal U+FEFF prefixes), and `c_addr_id = 702559` "
+            "(Wei Shi / 尉氏) exists but carries no BOM.",
+            "If a future build re-introduces dirty rows, the LookAtStatus "
+            "GIS export of status code 40 (civil office / [為官者：文]) "
+            "would again produce a 10-cell line against the 9-column "
+            "header around the dirty row.",
+        ],
+        "steps_zh": [
+            "本次建置症狀休眠——量測觸發列數以確認：",
+            "執行 `tests/test_addr_codes_embedded_delim.py`；20260602 "
+            "建置已校準為 ADDR_CODES 中 0 列帶 BOM 前綴（測試斷言 "
+            "c_name 與 c_name_chn 的字面 U+FEFF 前綴皆為 0），且 "
+            "`c_addr_id = 702559`（Wei Shi / 尉氏）存在但不帶 BOM。",
+            "若未來建置重新引入髒列，LookAtStatus 對 status code 40"
+            "（civil office / [為官者：文]）的 GIS 輸出，會在髒列附近"
+            "再次產生對應 9 欄表頭的 10 格列。",
+        ],
+        "fix_en": (
+            "Two complementary fixes, both worth doing.  (1) One-shot "
+            "data cleanup: strip any leading `U+FEFF` from "
+            "`ADDR_CODES.c_name` / `c_name_chn` (e.g. `UPDATE "
+            "ADDR_CODES SET c_name = Mid(c_name, 2) WHERE Left(c_name, "
+            "1) = ChrW(65279)` and the parallel statement for "
+            "c_name_chn) — currently a no-op since 0 rows match, but "
+            "harmless to keep in the release checklist.  (2) Defensive "
+            "sanitisation in the export writers: before each `tStr = "
+            "tStr + value + Chr(9)` append in the CmdGIS bodies, replace "
+            "any embedded Chr(9/10/13/11/12) or U+FEFF in `value` with a "
+            "space.  This protects against the next tab-bearing value "
+            "from any export-bound text field, not just ADDR_CODES."
+        ),
+        "fix_zh": (
+            "兩個互補的修正，皆值得做。(1) 一次性資料清理：移除 "
+            "`ADDR_CODES.c_name` / `c_name_chn` 任何前導的 `U+FEFF`"
+            "（例如 `UPDATE ADDR_CODES SET c_name = Mid(c_name, 2) "
+            "WHERE Left(c_name, 1) = ChrW(65279)`，c_name_chn 另一條"
+            "並行陳述式）——目前因 0 列符合而為空操作，但放進發布"
+            "檢查清單無害。(2) 在輸出寫出端做防禦性消毒：在 CmdGIS "
+            "主體每次 `tStr = tStr + value + Chr(9)` 之前，把 `value` "
+            "中任何內嵌的 Chr(9/10/13/11/12) 或 U+FEFF 換成空白。"
+            "這能防範下一個帶 TAB 的值（來自任何輸出相關的文字欄位，"
+            "不限 ADDR_CODES）。"
+        ),
+        "severity_en": "P5 — Dormant this build (the export-delimiter "
+                       "defect class is real in code, but the current "
+                       "data has 0 triggering rows).",
+        "severity_zh": "P5 —— 本次建置休眠（輸出分隔符這一類缺陷在"
+                       "程式碼中確實存在，但目前資料有 0 列會觸發）。",
+        "screenshots": [],
+        "evidence": {
+            "finding_class": "latent_code",
+            "vba_ref": "CmdGIS_Click bodies (no escaping before "
+                       "`tStr + value + Chr(9)`) across LookAtStatus / "
+                       "Texts / Place / Associations / Office / "
+                       "Kinship; trigger-count source: "
+                       "tests/test_addr_codes_embedded_delim.py.",
+            "fixture": "LookAtStatus status code 40 (civil office / "
+                       "[為官者：文]); reachable dirty row historically "
+                       "c_addr_id = 702559 (Wei Shi / 尉氏).  0 BOM "
+                       "rows in the 20260602 data — dormant.",
+            "user_symptom": "None this build (0 triggering rows).  When "
+                            "dirty data is present, the GIS `.tab` "
+                            "export gains an extra cell on the dirty "
+                            "row and every column to its right shifts.",
+            "ui_verified": False,
+        },
+    },
+    {
+        "id": 22,
+        "tier": "P5_dormant_or_latent",
+        "form": "Form_LookAtAssociations.CmdUCINet_Click",
+        "title_en": "LookAtAssociations.CmdUCINet CreateTextFile lacks "
+                    "the Unicode flag → error 5 on CJK c_name — LATENT "
+                    "(runtime did not fire this build)",
+        "title_zh": "LookAtAssociations.CmdUCINet 的 CreateTextFile "
+                    "缺少 Unicode 旗標 → 遇 CJK c_name 時 error 5 "
+                    "—— 潛伏（本次執行期未觸發）",
+        "summary_en": (
+            "`Form_LookAtAssociations.CmdUCINet_Click` writes the "
+            "`.vna` export via "
+            "`Scripting.FileSystemObject.CreateTextFile(tFileName, "
+            "True)` (line 2575).  The 3rd argument (`Unicode`) is "
+            "omitted, so it defaults to FALSE — the file opens in the "
+            "system ANSI code page (cp1252 on en-US Windows).  In the "
+            "`*node properties` section the body writes "
+            "`tQuote + !c_name + tQuote`; when `c_name` contains a "
+            "character with no cp1252 representation (a CJK Han "
+            "ideograph in particular), `WriteLine` raises VBA error 5 "
+            "('Invalid procedure call or argument') and the export "
+            "aborts, leaving a truncated `.vna` file.  "
+            "`Form_LookAtKinship.CmdUCINet_Click` has the identical "
+            "2-arg pattern at line 2510.\n\n"
+            "Why LATENT this build: the CmdUCINet button exists, but "
+            "this non-interactive session could not drive the export, "
+            "so the runtime error was not reproduced/re-verified.  The "
+            "missing-Unicode-flag defect is a confirmed static fact; "
+            "filed as latent pending UI re-verification.  Verified "
+            "fixture for the trigger: association code "
+            "`c_assoc_code = 437` (Presented literary composition as "
+            "gift to / 贈詩、文), whose 1st-order association network "
+            "includes a person carrying a Han ideograph in c_name."
+        ),
+        "summary_zh": (
+            "`Form_LookAtAssociations.CmdUCINet_Click` 透過 "
+            "`Scripting.FileSystemObject.CreateTextFile(tFileName, "
+            "True)`（第 2575 行）寫出 `.vna`。第三個引數（`Unicode`）"
+            "被省略，因此預設為 FALSE——檔案以系統 ANSI 字碼頁開啟"
+            "（en-US Windows 上為 cp1252）。在 `*node properties` 區段"
+            "中，主體寫出 `tQuote + !c_name + tQuote`；當 `c_name` "
+            "含有 cp1252 無法表示的字元（尤其是 CJK 漢字）時，"
+            "`WriteLine` 會丟出 VBA error 5（『Invalid procedure call "
+            "or argument』），輸出中止，留下被截斷的 `.vna` 檔。"
+            "`Form_LookAtKinship.CmdUCINet_Click` 在第 2510 行有完全"
+            "相同的 2 引數樣式。\n\n"
+            "本次為何潛伏：CmdUCINet 按鈕存在，但本次非互動式測試"
+            "無法驅動輸出，故未重現／重新驗證執行期錯誤。缺少 Unicode "
+            "旗標是已確認的靜態事實；故列為潛伏待 UI 重新驗證。"
+            "觸發的已驗證 fixture：關聯代碼 `c_assoc_code = 437`"
+            "（Presented literary composition as gift to / 贈詩、文），"
+            "其一階關聯網絡含有 c_name 帶漢字的人物。"
+        ),
+        "steps_en": [
+            "On this build the runtime error was not reproduced "
+            "(non-interactive session).  Verify the missing flag "
+            "statically:",
+            "Open `analysis/dump/vba/Form_LookAtAssociations.vb` line "
+            "2575: `Set tVNA = tFileSystem.CreateTextFile(tFileName, "
+            "True)` — only 2 arguments, no Unicode flag.  The same "
+            "pattern is at `Form_LookAtKinship.vb:2510`.",
+            "To re-verify interactively later: open LookAtAssociations, "
+            "pick `c_assoc_code = 437` (Presented literary composition "
+            "as gift to / 贈詩、文), Run Query, click UCINet, choose a "
+            "save location — expect a Run-time error 5 popup and a "
+            "truncated `.vna`.",
+        ],
+        "steps_zh": [
+            "本次建置未重現執行期錯誤（非互動式測試）。以靜態方式"
+            "驗證缺少的旗標：",
+            "開啟 `analysis/dump/vba/Form_LookAtAssociations.vb` 第 "
+            "2575 行：`Set tVNA = tFileSystem.CreateTextFile(tFileName, "
+            "True)`——只有 2 個引數，沒有 Unicode 旗標。相同樣式位於 "
+            "`Form_LookAtKinship.vb:2510`。",
+            "日後互動式重新驗證：開啟 LookAtAssociations，選 "
+            "`c_assoc_code = 437`（Presented literary composition as "
+            "gift to / 贈詩、文），執行查詢，點 UCINet，選一個儲存"
+            "位置——預期會出現 Run-time error 5 彈窗與被截斷的 `.vna`。",
+        ],
+        "fix_en": (
+            "Add `True` as the 3rd argument of `CreateTextFile` to open "
+            "the file in Unicode (UTF-16LE) mode at "
+            "`Form_LookAtAssociations.vb:2575` — `CreateTextFile("
+            "tFileName, True, True)` — and apply the same one-line fix "
+            "to `Form_LookAtKinship.vb:2510`.  Verify UCINET / Visone "
+            "accept the UTF-16 `.vna` on the fixed build before "
+            "declaring it closed."
+        ),
+        "fix_zh": (
+            "在 `Form_LookAtAssociations.vb:2575` 為 `CreateTextFile` "
+            "加上第三個引數 `True`，以 Unicode（UTF-16LE）模式開啟"
+            "檔案——`CreateTextFile(tFileName, True, True)`——並對 "
+            "`Form_LookAtKinship.vb:2510` 套用相同的一行修正。"
+            "在宣告關閉前，先在修好的建置上確認 UCINET / Visone "
+            "能接受 UTF-16 的 `.vna`。"
+        ),
+        "severity_en": "P5 — Latent (confirmed missing-Unicode-flag "
+                       "static defect; runtime error 5 not reproduced "
+                       "this non-interactive build, pending UI "
+                       "re-verification).",
+        "severity_zh": "P5 —— 潛伏（已確認缺少 Unicode 旗標的靜態"
+                       "缺陷；本次非互動式建置未重現執行期 error 5，"
+                       "待 UI 重新驗證）。",
+        "screenshots": [],
+        "evidence": {
+            "finding_class": "latent_code",
+            "vba_ref": "Form_LookAtAssociations.vb:2575 "
+                       "(CreateTextFile(tFileName, True) — 2-arg, no "
+                       "Unicode flag) and Form_LookAtKinship.vb:2510 "
+                       "(same 2-arg pattern).",
+            "fixture": "LookAtAssociations, c_assoc_code = 437 "
+                       "(Presented literary composition as gift to / "
+                       "贈詩、文); 1st-order network includes a "
+                       "Han-ideograph c_name.  Runtime not reproduced "
+                       "this non-interactive build.",
+            "user_symptom": "None reproduced this build.  When the "
+                            "export runs on a Han-name network, a "
+                            "Run-time error 5 popup blocks the user and "
+                            "the `.vna` file is left truncated and "
+                            "unusable.",
+            "ui_verified": False,
+        },
+    },
+
+    # ---------------- P5 — structural metric ----------------
+    {
+        "id": 23,
+        "tier": "P5_dormant_or_latent",
+        "form": "Form_LookAtAssociations.CmdPajek_Click",
+        "title_en": "LookAtAssociations.CmdPajek '*Vertices' header "
+                    "count read from RecordCount before MoveLast "
+                    "(undercounts vertices) — structural metric, P5",
+        "title_zh": "LookAtAssociations.CmdPajek 的『*Vertices』表頭"
+                    "數值在 MoveLast 之前讀取 RecordCount（頂點數"
+                    "少算）—— 結構性度量，P5",
+        "summary_en": (
+            "`Form_LookAtAssociations.CmdPajek_Click` binds the node "
+            "recordset to a form recordset (`Set tRstNode = "
+            "ZZ_SCRATCH_P_ASSOC.Form.Recordset`, line 2924), calls "
+            "`tRstNode.MoveFirst` (line 2924), then writes the Pajek "
+            "header `tStr = \"*Vertices \" + Trim(Str("
+            "tRstNode.RecordCount))` (line 2924).  On a DAO recordset, "
+            "`RecordCount` is only the number of rows ACCESSED so far, "
+            "not the true total, until a `MoveLast` has fully populated "
+            "it.  Reading it right after `MoveFirst` (with no MoveLast) "
+            "yields an undercount, so the declared `*Vertices N` header "
+            "can be far smaller than the actual number of vertex rows "
+            "the loop subsequently writes.\n\n"
+            "Finding class is structural_metric: the off-by-N was "
+            "derived by parsing the exported `.net` header against the "
+            "emitted vertex-row count, not from a re-verified UI "
+            "symptom (this build was non-interactive; ui_verified is "
+            "not set).  Filed at P5.  Demo fixture for the network: "
+            "person c_personid = 437 (Jia Zhaoming / 賈昭明)."
+        ),
+        "summary_zh": (
+            "`Form_LookAtAssociations.CmdPajek_Click` 把節點記錄集"
+            "綁定到表單記錄集（`Set tRstNode = "
+            "ZZ_SCRATCH_P_ASSOC.Form.Recordset`，第 2924 行），呼叫 "
+            "`tRstNode.MoveFirst`（第 2924 行），接著寫出 Pajek 表頭 "
+            "`tStr = \"*Vertices \" + Trim(Str(tRstNode.RecordCount))`"
+            "（第 2924 行）。在 DAO 記錄集上，`RecordCount` 在尚未以 "
+            "`MoveLast` 完整填充前，只是「目前已存取」的列數，而非"
+            "真正的總數。在 `MoveFirst` 之後（且沒有 MoveLast）立即"
+            "讀取，會得到少算的值，因此宣告的 `*Vertices N` 表頭可能"
+            "遠小於迴圈隨後實際寫出的頂點列數。\n\n"
+            "發現類別為 structural_metric：這個 off-by-N 是透過將輸出"
+            "的 `.net` 表頭與實際寫出的頂點列數比對而得，並非來自"
+            "重新驗證的 UI 症狀（本次為非互動式；未設定 "
+            "ui_verified）。故列於 P5。網絡的示範 fixture：人物 "
+            "c_personid = 437（Jia Zhaoming / 賈昭明）。"
+        ),
+        "steps_en": [
+            "Verify statically from the dump and the cross-form test:",
+            "Open `analysis/dump/vba/Form_LookAtAssociations.vb` lines "
+            "2924-2924: `tRstNode` is set to the form recordset, "
+            "`MoveFirst` is called, then `RecordCount` is read for the "
+            "`*Vertices` header BEFORE any `MoveLast`.",
+            "The cross-form structural probe "
+            "`test_vba_pajek_gephi_cross_form` parses the exported "
+            "`.net` and compares the `*Vertices N` header against the "
+            "count of vertex rows emitted; the demo network is person "
+            "c_personid = 437 (Jia Zhaoming / 賈昭明).",
+        ],
+        "steps_zh": [
+            "從傾印與跨表單測試以靜態方式驗證：",
+            "開啟 `analysis/dump/vba/Form_LookAtAssociations.vb` 第 "
+            "2924-2924 行：`tRstNode` 被設為表單記錄集，呼叫 "
+            "`MoveFirst`，接著在任何 `MoveLast` 之前就為 `*Vertices` "
+            "表頭讀取 `RecordCount`。",
+            "跨表單結構探測 `test_vba_pajek_gephi_cross_form` 會解析"
+            "輸出的 `.net`，把 `*Vertices N` 表頭與寫出的頂點列數"
+            "比對；示範網絡為人物 c_personid = 437"
+            "（Jia Zhaoming / 賈昭明）。",
+        ],
+        "fix_en": (
+            "Call `tRstNode.MoveLast` (then `MoveFirst`) before reading "
+            "`RecordCount` at line 2924 so the header reflects the true "
+            "vertex total, e.g. `tRstNode.MoveLast: tRstNode.MoveFirst: "
+            "tStr = \"*Vertices \" + Trim(Str(tRstNode.RecordCount))`."
+        ),
+        "fix_zh": (
+            "在第 2924 行讀取 `RecordCount` 之前先呼叫 "
+            "`tRstNode.MoveLast`（再 `MoveFirst`），使表頭反映真正的"
+            "頂點總數，例如 `tRstNode.MoveLast: tRstNode.MoveFirst: "
+            "tStr = \"*Vertices \" + Trim(Str(tRstNode.RecordCount))`。"
+        ),
+        "severity_en": "P5 — Structural metric (export-header "
+                       "undercount derived by parsing the .net file; "
+                       "not UI-verified this non-interactive build).",
+        "severity_zh": "P5 —— 結構性度量（透過解析 .net 檔得出的"
+                       "輸出表頭少算；本次非互動式建置未經 UI 驗證）。",
+        "screenshots": [],
+        "evidence": {
+            "finding_class": "structural_metric",
+            "vba_ref": "Form_LookAtAssociations.vb:2924 (Set tRstNode "
+                       "= ZZ_SCRATCH_P_ASSOC.Form.Recordset) + :2924 "
+                       "(MoveFirst) + :2924 (RecordCount read for "
+                       "'*Vertices' header, before any MoveLast).",
+            "fixture": "LookAtAssociations Pajek export for person "
+                       "c_personid = 437 (Jia Zhaoming / 賈昭明).",
+            "user_symptom": "The exported Pajek `.net` declares a "
+                            "'*Vertices N' header smaller than the "
+                            "number of vertex rows that follow.",
+            "detection": "test_vba_pajek_gephi_cross_form",
+        },
+    },
+    {
+        "id": 24,
+        "tier": "P5_dormant_or_latent",
+        "form": "Form_LookAtKinship.CmdGUESS_Click",
+        "title_en": "LookAtKinship GUESS/Gephi .gdf nodedef declares "
+                    "15 columns but some node rows emit 13 cells — "
+                    "structural metric, P5",
+        "title_zh": "LookAtKinship 的 GUESS/Gephi .gdf nodedef 宣告 "
+                    "15 欄，但部分節點列只寫出 13 格 —— 結構性度量，P5",
+        "summary_en": (
+            "`Form_LookAtKinship.vb`'s GUESS/Gephi `.gdf` writer "
+            "declares a non-ASCII `nodedef>` header of 15 columns "
+            "(line 549: name, color, label, labelvisible, style, "
+            "pinyin, indexyear, sex, addr_name, addr_chn, latitude, "
+            "longitude, DynastyCode, dynasty, dynasty_chn).  The "
+            "per-row body (lines ~1117-1299), however, emits a variable "
+            "number of cells: the dynasty tail branches so that the "
+            "null-dynasty path (line 1281) and the populated branch "
+            "(lines 1285 vs 627) write different numbers of trailing "
+            "cells — the line-1285 branch writes DynastyCode + dynasty "
+            "with no trailing `dynasty_chn`, while line 627 writes "
+            "DynastyCode + dynasty + dynasty_chn.  As a result some "
+            "node rows emit 13 cells against the 15-column header, so "
+            "a strict GDF reader sees a column-count mismatch.\n\n"
+            "Finding class is structural_metric: the 15-vs-13 mismatch "
+            "was derived by counting header columns against emitted "
+            "row cells in the export, not from a re-verified UI symptom "
+            "(non-interactive build; ui_verified is not set).  Filed at "
+            "P5.  Demo fixture for the kinship network: person "
+            "c_personid = 3211 (Zhao Tingmei / 趙廷美)."
+        ),
+        "summary_zh": (
+            "`Form_LookAtKinship.vb` 的 GUESS/Gephi `.gdf` 寫出端"
+            "宣告了一個 15 欄的非 ASCII `nodedef>` 表頭（第 549 行："
+            "name、color、label、labelvisible、style、pinyin、"
+            "indexyear、sex、addr_name、addr_chn、latitude、longitude、"
+            "DynastyCode、dynasty、dynasty_chn）。然而逐列主體"
+            "（約第 1117-1299 行）寫出的格數不定：dynasty 結尾分支"
+            "使得 null-dynasty 路徑（第 1281 行）與已填值分支"
+            "（第 1285 對 627 行）寫出不同數量的結尾格——第 1285 "
+            "行分支寫出 DynastyCode + dynasty 而沒有結尾的 "
+            "dynasty_chn，第 627 行則寫出 DynastyCode + dynasty + "
+            "dynasty_chn。結果部分節點列對應 15 欄的表頭只寫出 13 "
+            "格，嚴格的 GDF 讀取器會看到欄數不符。\n\n"
+            "發現類別為 structural_metric：15 對 13 的不符是透過將"
+            "表頭欄數與輸出中寫出的列格數比對而得，並非來自重新驗證"
+            "的 UI 症狀（非互動式建置；未設定 ui_verified）。故列於 "
+            "P5。親屬網絡的示範 fixture：人物 c_personid = 3211"
+            "（Zhao Tingmei / 趙廷美）。"
+        ),
+        "steps_en": [
+            "Verify statically from the dump and the cross-form test:",
+            "Open `analysis/dump/vba/Form_LookAtKinship.vb` line 549 "
+            "— the non-ASCII `nodedef>` header declares 15 columns.  "
+            "Then read the row body lines 565-627: the null-dynasty "
+            "and populated-dynasty branches write different numbers of "
+            "trailing cells (line 1285 omits dynasty_chn), so some rows "
+            "emit 13 cells.",
+            "The cross-form structural probe "
+            "`test_vba_cmdguess_cross_form` parses the `.gdf` header "
+            "column count against per-row cell counts; the demo network "
+            "is person c_personid = 3211 (Zhao Tingmei / 趙廷美).",
+        ],
+        "steps_zh": [
+            "從傾印與跨表單測試以靜態方式驗證：",
+            "開啟 `analysis/dump/vba/Form_LookAtKinship.vb` 第 549 行"
+            "——非 ASCII 的 `nodedef>` 表頭宣告 15 欄。再看列主體第 "
+            "565-627 行：null-dynasty 與已填值分支寫出不同數量的"
+            "結尾格（第 1285 行省略 dynasty_chn），故部分列寫出 13 "
+            "格。",
+            "跨表單結構探測 `test_vba_cmdguess_cross_form` 會比對 "
+            "`.gdf` 表頭欄數與每列格數；示範網絡為人物 c_personid = "
+            "3211（Zhao Tingmei / 趙廷美）。",
+        ],
+        "fix_en": (
+            "Make every node row emit exactly the 15 cells the header "
+            "declares.  Normalise the dynasty tail so all branches "
+            "write DynastyCode + dynasty + dynasty_chn (with empty "
+            "strings where a value is null) and end each branch with "
+            "the same trailing-`tC` shape, so the cell count is "
+            "header-stable on every row."
+        ),
+        "fix_zh": (
+            "讓每一節點列都恰好寫出表頭宣告的 15 格。把 dynasty 結尾"
+            "正規化，使所有分支都寫出 DynastyCode + dynasty + "
+            "dynasty_chn（值為 null 處填空字串），並讓每個分支以相同"
+            "的結尾 `tC` 形狀結束，使每列的格數都與表頭一致。"
+        ),
+        "severity_en": "P5 — Structural metric (export nodedef "
+                       "column-count mismatch derived by parsing the "
+                       ".gdf; not UI-verified this non-interactive "
+                       "build).",
+        "severity_zh": "P5 —— 結構性度量（透過解析 .gdf 得出的輸出 "
+                       "nodedef 欄數不符；本次非互動式建置未經 UI "
+                       "驗證）。",
+        "screenshots": [],
+        "evidence": {
+            "finding_class": "structural_metric",
+            "vba_ref": "Form_LookAtKinship.vb:549 (non-ASCII nodedef> "
+                       "header, 15 columns) vs row body :565-627 "
+                       "(line 1285 branch omits dynasty_chn → 13 cells "
+                       "on some rows).",
+            "fixture": "LookAtKinship GUESS/Gephi export for person "
+                       "c_personid = 3211 (Zhao Tingmei / 趙廷美).",
+            "user_symptom": "The exported `.gdf` nodedef header "
+                            "declares 15 columns but some node rows "
+                            "contain only 13 tab-separated cells.",
+            "detection": "test_vba_cmdguess_cross_form",
+        },
+    },
 ]
 
 

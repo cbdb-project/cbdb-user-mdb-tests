@@ -303,246 +303,6 @@
     ],
     "code_lines": 0
   },
-  "frmBIOG_INST_CODES": {
-    "record_source": "View_BiogInstAddrData",
-    "controls": [
-      {
-        "name": "c_bi_begin_year",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_bi_begin_year",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_bi_end_year",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_bi_end_year",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_source",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_source_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_pages",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_pages",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_notes",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_notes",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_bi_role_desc",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_bi_role_desc",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_bi_role_chn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_bi_role_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_inst_name_hz",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_inst_name_hz",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_inst_name_py",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_inst_name_py",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "inst_xcoord",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "inst_xcoord",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "inst_ycoord",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "inst_ycoord",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_name",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_inst_addr_pinyin",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_name_chn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_inst_addr_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_inst_addr_type_desc",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_inst_addr_type_desc",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_inst_addr_type_chn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_inst_addr_type_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "Text43",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_source_py",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      }
-    ],
-    "code_lines": 59
-  },
-  "frmPickTEXT_BIBLCAT": {
-    "record_source": "",
-    "controls": [
-      {
-        "name": "frmTEXT_BIBLCAT",
-        "type": "Subform/Subreport",
-        "type_code": 112,
-        "control_source": "",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "CmdCancel",
-        "type": "CommandButton",
-        "type_code": 104,
-        "control_source": "",
-        "row_source": "",
-        "tag": "",
-        "caption": "Cancel",
-        "events": [
-          "CmdCancel_Click"
-        ]
-      },
-      {
-        "name": "CmdSelect",
-        "type": "CommandButton",
-        "type_code": 104,
-        "control_source": "",
-        "row_source": "",
-        "tag": "",
-        "caption": "Select",
-        "events": [
-          "CmdSelect_Click"
-        ]
-      },
-      {
-        "name": "TxtSearch",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": [
-          "TxtSearch_Change"
-        ]
-      },
-      {
-        "name": "CmdFind",
-        "type": "CommandButton",
-        "type_code": 104,
-        "control_source": "",
-        "row_source": "",
-        "tag": "",
-        "caption": "查詢",
-        "events": [
-          "CmdFind_Click"
-        ]
-      },
-      {
-        "name": "TxtCatCode",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      }
-    ],
-    "code_lines": 61
-  },
   "ZZ_SCRATCH_ASSOC": {
     "record_source": "ZZ_SCRATCH_ASSOC",
     "controls": [
@@ -1009,6 +769,246 @@
     ],
     "code_lines": 2
   },
+  "frmPickTEXT_BIBLCAT": {
+    "record_source": "",
+    "controls": [
+      {
+        "name": "frmTEXT_BIBLCAT",
+        "type": "Subform/Subreport",
+        "type_code": 112,
+        "control_source": "",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "CmdCancel",
+        "type": "CommandButton",
+        "type_code": 104,
+        "control_source": "",
+        "row_source": "",
+        "tag": "",
+        "caption": "Cancel",
+        "events": [
+          "CmdCancel_Click"
+        ]
+      },
+      {
+        "name": "CmdSelect",
+        "type": "CommandButton",
+        "type_code": 104,
+        "control_source": "",
+        "row_source": "",
+        "tag": "",
+        "caption": "Select",
+        "events": [
+          "CmdSelect_Click"
+        ]
+      },
+      {
+        "name": "TxtSearch",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": [
+          "TxtSearch_Change"
+        ]
+      },
+      {
+        "name": "CmdFind",
+        "type": "CommandButton",
+        "type_code": 104,
+        "control_source": "",
+        "row_source": "",
+        "tag": "",
+        "caption": "查詢",
+        "events": [
+          "CmdFind_Click"
+        ]
+      },
+      {
+        "name": "TxtCatCode",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      }
+    ],
+    "code_lines": 61
+  },
+  "frmBIOG_INST_CODES": {
+    "record_source": "View_BiogInstAddrData",
+    "controls": [
+      {
+        "name": "c_bi_begin_year",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_bi_begin_year",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_bi_end_year",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_bi_end_year",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_source",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_source_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_pages",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_pages",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_notes",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_notes",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_bi_role_desc",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_bi_role_desc",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_bi_role_chn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_bi_role_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_inst_name_hz",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_inst_name_hz",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_inst_name_py",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_inst_name_py",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "inst_xcoord",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "inst_xcoord",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "inst_ycoord",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "inst_ycoord",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_name",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_inst_addr_pinyin",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_name_chn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_inst_addr_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_inst_addr_type_desc",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_inst_addr_type_desc",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_inst_addr_type_chn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_inst_addr_type_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "Text43",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_source_py",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      }
+    ],
+    "code_lines": 59
+  },
   "ZZ_SCRATCH_STATUS": {
     "record_source": "ZZ_SCRATCH_STATUS",
     "controls": [
@@ -1204,70 +1204,6 @@
       }
     ],
     "code_lines": 2
-  },
-  "frmPickTEXTS": {
-    "record_source": "",
-    "controls": [
-      {
-        "name": "frmTEXTS",
-        "type": "Subform/Subreport",
-        "type_code": 112,
-        "control_source": "",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "CmdCancel",
-        "type": "CommandButton",
-        "type_code": 104,
-        "control_source": "",
-        "row_source": "",
-        "tag": "",
-        "caption": "Cancel",
-        "events": [
-          "CmdCancel_Click"
-        ]
-      },
-      {
-        "name": "CmdSelect",
-        "type": "CommandButton",
-        "type_code": 104,
-        "control_source": "",
-        "row_source": "",
-        "tag": "",
-        "caption": "Select",
-        "events": [
-          "CmdSelect_Click"
-        ]
-      },
-      {
-        "name": "CmdFind",
-        "type": "CommandButton",
-        "type_code": 104,
-        "control_source": "",
-        "row_source": "",
-        "tag": "",
-        "caption": "查詢",
-        "events": [
-          "CmdFind_Click"
-        ]
-      },
-      {
-        "name": "TxtSearch",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": [
-          "TxtSearch_Change"
-        ]
-      }
-    ],
-    "code_lines": 66
   },
   "LookAtKinship": {
     "record_source": "",
@@ -1706,6 +1642,70 @@
       }
     ],
     "code_lines": 4460
+  },
+  "frmPickTEXTS": {
+    "record_source": "",
+    "controls": [
+      {
+        "name": "frmTEXTS",
+        "type": "Subform/Subreport",
+        "type_code": 112,
+        "control_source": "",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "CmdCancel",
+        "type": "CommandButton",
+        "type_code": 104,
+        "control_source": "",
+        "row_source": "",
+        "tag": "",
+        "caption": "Cancel",
+        "events": [
+          "CmdCancel_Click"
+        ]
+      },
+      {
+        "name": "CmdSelect",
+        "type": "CommandButton",
+        "type_code": 104,
+        "control_source": "",
+        "row_source": "",
+        "tag": "",
+        "caption": "Select",
+        "events": [
+          "CmdSelect_Click"
+        ]
+      },
+      {
+        "name": "CmdFind",
+        "type": "CommandButton",
+        "type_code": 104,
+        "control_source": "",
+        "row_source": "",
+        "tag": "",
+        "caption": "查詢",
+        "events": [
+          "CmdFind_Click"
+        ]
+      },
+      {
+        "name": "TxtSearch",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": [
+          "TxtSearch_Change"
+        ]
+      }
+    ],
+    "code_lines": 66
   },
   "frmTEXT_BIBLCAT": {
     "record_source": "TEXT_BIBLCAT_CODES",
@@ -2176,6 +2176,47 @@
       }
     ],
     "code_lines": 65
+  },
+  "frmZZZ_OFFICE_CODE": {
+    "record_source": "ZZ_OFFICE_CODE",
+    "controls": [
+      {
+        "name": "c_office_code",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_office_id",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_office_desc",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_office_trans",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": [
+          "c_office_desc_Click",
+          "c_office_desc_chn_Click"
+        ]
+      },
+      {
+        "name": "c_office_desc_chn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_office_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": [
+          "c_office_desc_chn_Click"
+        ]
+      }
+    ],
+    "code_lines": 37
   },
   "ZZ_SCRATCH_GROUP_OFFICE": {
     "record_source": "ZZ_SCRATCH_OFFICE",
@@ -2908,47 +2949,6 @@
       }
     ],
     "code_lines": 0
-  },
-  "frmZZZ_OFFICE_CODE": {
-    "record_source": "ZZ_OFFICE_CODE",
-    "controls": [
-      {
-        "name": "c_office_code",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_office_id",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_office_desc",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_office_trans",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": [
-          "c_office_desc_Click",
-          "c_office_desc_chn_Click"
-        ]
-      },
-      {
-        "name": "c_office_desc_chn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_office_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": [
-          "c_office_desc_chn_Click"
-        ]
-      }
-    ],
-    "code_lines": 37
   },
   "ZZ_SOCIAL_NETWORK_AGGREGATED": {
     "record_source": "ZZ_SOCIAL_NETWORK_AGGREGATE",
@@ -4046,31 +4046,51 @@
     ],
     "code_lines": 0
   },
-  "ZZ_SOCIAL_NETWORK": {
-    "record_source": "ZZ_SOCIAL_NETWORK",
+  "ASSOC_DATA_2 Subform": {
+    "record_source": "View_AssociationData",
     "controls": [
       {
-        "name": "c_name",
+        "name": "c_pages",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_name",
+        "control_source": "c_pages",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "c_name_chn",
+        "name": "c_assoc_year",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_name_chn",
+        "control_source": "c_assoc_first_year",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "c_node_name",
+        "name": "c_assoc_nh_year",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_assoc_fy_nh_year",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtAssocNH",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_assoc_fy_nh_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtAssocNM",
         "type": "TextBox",
         "type_code": 109,
         "control_source": "c_node_name",
@@ -4080,7 +4100,7 @@
         "events": []
       },
       {
-        "name": "c_node_chn",
+        "name": "TxtAssocNM_CHN",
         "type": "TextBox",
         "type_code": 109,
         "control_source": "c_node_chn",
@@ -4090,17 +4110,7 @@
         "events": []
       },
       {
-        "name": "c_link_type",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_link_type",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_link_desc",
+        "name": "TxtAssocDesc",
         "type": "TextBox",
         "type_code": 109,
         "control_source": "c_link_desc",
@@ -4110,7 +4120,7 @@
         "events": []
       },
       {
-        "name": "c_link_chn",
+        "name": "TxtAssocDesc_CHN",
         "type": "TextBox",
         "type_code": 109,
         "control_source": "c_link_chn",
@@ -4120,413 +4130,47 @@
         "events": []
       },
       {
-        "name": "c_addr_name",
+        "name": "TxtTitle_CHN",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_addr_name",
+        "control_source": "c_source_chn",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "c_addr_chn",
+        "name": "c_notes",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_addr_chn",
+        "control_source": "c_notes",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "TxtIndexYear",
+        "name": "c_sequence",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_index_year",
+        "control_source": "c_sequence",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "TxtNodeIndexYear",
+        "name": "TxtKinRel",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_node_index_year",
+        "control_source": "c_kinrel",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "TxtPersonID",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_person_id",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtNodeID",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_node_id",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtXCoord",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "x_coord",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtYCoord",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "y_coord",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtNodeXCoord",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "node_xcoord",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtNodeYCoord",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "node_ycoord",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtEdgeDist",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_edge_dist",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_node_addr_chn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_node_addr_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_node_addr_name",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_node_addr_name",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtAddrDesc",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_addr_desc",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtAddrDescChn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_addr_desc_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtNodeAddrType",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_node_addr_desc",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtNodeAddrDescChn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_node_addr_desc_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_link_count",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_link_count",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtTextTitle",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_text_title",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_distance",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_distance",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_index_year_type_desc",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_index_year_type_desc",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_index_year_type_hz",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_index_year_type_hz",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_index_year_type_code",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_index_year_type_code",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_node_index_year_type_desc",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_node_index_year_type_desc",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_node_index_year_type_hz",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_node_index_year_type_hz",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_node_index_year_type_code",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_node_index_year_type_code",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_dynasty",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_dynasty",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_dynasty_chn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_dynasty_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_dy",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_dy",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_node_dynasty",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_node_dynasty",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_node_dynasty_chn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_node_dynasty_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_node_dy",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_node_dy",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_source_text",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_source_text",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_source_txt_chn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_source_txt_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_link_addr_name",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_link_addr_name",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_link_addr_chn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_link_addr_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_link_first_year",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_link_first_year",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_link_last_year",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_link_last_year",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      }
-    ],
-    "code_lines": 2
-  },
-  "frmZZ_SCRATCH_KIN": {
-    "record_source": "ZZ_SCRATCH_KIN",
-    "controls": [
-      {
-        "name": "c_name",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_name",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_name_chn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_name_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_kin_name",
+        "name": "TxtKinPY",
         "type": "TextBox",
         "type_code": 109,
         "control_source": "c_kin_name",
@@ -4536,7 +4180,107 @@
         "events": []
       },
       {
-        "name": "c_kin_chn",
+        "name": "TxtAssocKinRel",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_assoc_kinrel",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtAssocKinNM",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_assoc_kin_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_text_title",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_text_title",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtTopic_CHN",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_topic_desc_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtInst_CHN",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_inst_name_hz",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtAddrCHN",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_assoc_addr_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtClaimer_CHN",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_assoc_claimer_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_assoc_intercalary",
+        "type": "CheckBox",
+        "type_code": 106,
+        "control_source": "c_assoc_fy_intercalary",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_assoc_month",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_assoc_fy_month",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_assoc_day",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_assoc_fy_day",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtKinNMChn",
         "type": "TextBox",
         "type_code": 109,
         "control_source": "c_kin_chn",
@@ -4546,15 +4290,437 @@
         "events": []
       },
       {
-        "name": "c_person_id",
+        "name": "c_assoc_count",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_person_id",
+        "control_source": "c_link_count",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
+      {
+        "name": "TxtKinrelChn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_kinrel_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtAssocKinRelChn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_assoc_kinrel_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtAssocKinPY",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_assoc_kin_name",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtAddrPY",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_assoc_addr_name",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtAssocClaimerPY",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_assoc_claimer_name",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtTopicDesc",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_topic_desc",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtInstNamePY",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_inst_name_py",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtOccassionEng",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_occasion_desc",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtLitGenre",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_lit_genre_desc",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtSourcePY",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_source_title",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtRangeChn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_range_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtOccasionChn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_occasion_desc",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtLitGenreChn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_lit_genre_desc_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtNHPY",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_assoc_fy_nh_py",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "Text196",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_range",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtGZHZ",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_ganzhi_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtGZPY",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_ganzhi_py",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      }
+    ],
+    "code_lines": 87
+  },
+  "POSSESSION_DATA_2 Subform": {
+    "record_source": "View_PossessionsAddrData",
+    "controls": [
+      {
+        "name": "c_possession_record_id",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_possession_record_id",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_sequence",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_sequence",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_possession_desc",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_possession_desc",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_possession_desc_chn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_possession_desc_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_quantity",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_quantity",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_possession_yr",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_possession_yr",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_possession_nh_code",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_possession_nh_code",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_possession_nh_yr",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_possession_nh_yr",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_source",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_source",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_pages",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_pages",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_notes",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_notes",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtNH",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_nianhao_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "LastRecordID",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtAddrCHN",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_addr_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtAddrPY",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_aadr_name",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtTitle_CHN",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_title_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_addr_id",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_addr_id",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtTitlePY",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_title",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtActChn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_possession_act_desc_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtActEng",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_possession_act_desc",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtUnitChn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_measure_desc_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtUnitEng",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_measure_desc",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtRangeChn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_range_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtRangeEng",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_range",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      }
+    ],
+    "code_lines": 77
+  },
+  "KIN_DATA_2 Subform": {
+    "record_source": "SELECT ZZ_SCRATCH_KIN.c_kin_id, ZZ_SCRATCH_KIN.c_kin_name, ZZ_SCRATCH_KIN.c_kin_chn, ZZ_SCRATCH_KIN.c_kin_code, ZZ_SCRATCH_KIN.c_kin_rel_total, ZZ_SCRATCH_KIN.c_kin_rel, ZZ_SCRATCH_KIN.c_person_id, ZZ_SCRATCH_KIN.c_source, ZZ_SCRATCH_KIN.c_source_text, ZZ_SCRATCH_KIN.c_source_text_chn, ZZ_SCRATCH_KIN.c_notes, ZZ_SCRATCH_KIN.c_up, ZZ_SCRATCH_KIN.c_down, ZZ_SCRATCH_KIN.c_marriage, ZZ_SCRATCH_KIN.c_collateral, ZZ_SCRATCH_KIN.c_pages FROM ZZ_SCRATCH_KIN;",
+    "controls": [
       {
         "name": "c_kin_id",
         "type": "TextBox",
@@ -4566,10 +4732,100 @@
         "events": []
       },
       {
-        "name": "c_kin_rel",
+        "name": "c_kin_code",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_kin_code",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_source",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_source",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_pages",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_pages",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_notes",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_notes",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtTitle_CHN",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_source_text_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtKinNM",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_kin_name",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtKinNM_CHN",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_kin_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtKinRel",
         "type": "TextBox",
         "type_code": 109,
         "control_source": "c_kin_rel_total",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtKinRel_CHN",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_kin_rel",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtSourcePY",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_source_text",
         "row_source": "",
         "tag": "",
         "caption": "",
@@ -4580,6 +4836,16 @@
         "type": "TextBox",
         "type_code": 109,
         "control_source": "c_up",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_collateral",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_collateral",
         "row_source": "",
         "tag": "",
         "caption": "",
@@ -4604,17 +4870,13 @@
         "tag": "",
         "caption": "",
         "events": []
-      },
-      {
-        "name": "c_collateral",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_collateral",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
+      }
+    ],
+    "code_lines": 70
+  },
+  "EVENT_ADDR_2 Subform": {
+    "record_source": "View_EventAddrData",
+    "controls": [
       {
         "name": "c_addr_id",
         "type": "TextBox",
@@ -4626,187 +4888,63 @@
         "events": []
       },
       {
-        "name": "c_addr_name",
+        "name": "TxtAddrCHN",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_kin_addr_name",
+        "control_source": "c_event_addr_chn",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "c_addr_chn",
+        "name": "TxtAddrPY",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_kin_addr_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_xcoord",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "kin_x_coord",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_ycoord",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "kin_y_coord",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_notes",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_notes",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "Text36",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_kin_rel_0",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "Text38",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_kin_index_year",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtXYCount",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "xy_count",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtAddrDesc",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_kin_addr_desc",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtAddrDescChn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_kin_addr_desc_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_distance",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_distance",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_kin_index_year_type_desc",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_kin_index_year_type_desc",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_kin_index_year_type_hz",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_kin_index_year_type_hz",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_kin_index_year_type_code",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_kin_index_year_type_code",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_kin_sex",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_kin_sex",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_kin_dy",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_kin_dy",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_kin_dynasty",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_kin_dynasty",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_kin_dynasty_chn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_kin_dynasty_chn",
+        "control_source": "c_event_addr_name",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       }
     ],
-    "code_lines": 0
+    "code_lines": 61
+  },
+  "POSTED_TO_ADDR_DATA_2 Subform": {
+    "record_source": "View_PostingAddrData",
+    "controls": [
+      {
+        "name": "c_addr_id",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_addr_id",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtAddrChn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_office_addr_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtAddr",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_office_addr_name",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      }
+    ],
+    "code_lines": 88
   },
   "STATUS_DATA_2 Subform": {
     "record_source": "View_StatusData",
@@ -5232,16 +5370,6 @@
         "type": "TextBox",
         "type_code": 109,
         "control_source": "c_addr_id",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_event_record_id",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_event_record_id",
         "row_source": "",
         "tag": "",
         "caption": "",
@@ -6131,9 +6259,7 @@
         "row_source": "",
         "tag": "",
         "caption": "",
-        "events": [
-          "c_by_nh_code_AfterUpdate"
-        ]
+        "events": []
       },
       {
         "name": "c_dy_nh_code",
@@ -6143,9 +6269,7 @@
         "row_source": "",
         "tag": "",
         "caption": "",
-        "events": [
-          "c_dy_nh_code_AfterUpdate"
-        ]
+        "events": []
       },
       {
         "name": "c_surname",
@@ -6155,10 +6279,7 @@
         "row_source": "",
         "tag": "",
         "caption": "",
-        "events": [
-          "c_surname_AfterUpdate",
-          "c_surname_chn_BeforeUpdate"
-        ]
+        "events": []
       },
       {
         "name": "c_surname_proper",
@@ -6178,11 +6299,7 @@
         "row_source": "",
         "tag": "",
         "caption": "",
-        "events": [
-          "c_mingzi_GotFocus",
-          "c_mingzi_chn_AfterUpdate",
-          "c_mingzi_chn_GotFocus"
-        ]
+        "events": []
       },
       {
         "name": "c_mingzi_proper",
@@ -6242,9 +6359,7 @@
         "row_source": "",
         "tag": "",
         "caption": "",
-        "events": [
-          "c_fl_ey_notes_Click"
-        ]
+        "events": []
       },
       {
         "name": "TxtFlEyNH",
@@ -6304,9 +6419,7 @@
         "row_source": "",
         "tag": "",
         "caption": "",
-        "events": [
-          "c_fl_ey_nh_code_AfterUpdate"
-        ]
+        "events": []
       },
       {
         "name": "c_deathyear",
@@ -6336,9 +6449,7 @@
         "row_source": "",
         "tag": "",
         "caption": "",
-        "events": [
-          "c_fl_ly_nh_code_AfterUpdate"
-        ]
+        "events": []
       },
       {
         "name": "TxtDYNH",
@@ -6408,9 +6519,7 @@
         "row_source": "",
         "tag": "",
         "caption": "",
-        "events": [
-          "c_dy_nh_code_AfterUpdate"
-        ]
+        "events": []
       },
       {
         "name": "TxtBYNH",
@@ -6890,9 +6999,7 @@
         "row_source": "",
         "tag": "",
         "caption": "",
-        "events": [
-          "c_surname_chn_BeforeUpdate"
-        ]
+        "events": []
       },
       {
         "name": "c_mingzi_pinyin",
@@ -6912,10 +7019,7 @@
         "row_source": "",
         "tag": "",
         "caption": "",
-        "events": [
-          "c_mingzi_chn_AfterUpdate",
-          "c_mingzi_chn_GotFocus"
-        ]
+        "events": []
       },
       {
         "name": "TxtIndexYearHZ",
@@ -6950,7 +7054,7 @@
         ]
       }
     ],
-    "code_lines": 609
+    "code_lines": 256
   },
   "POSTING_DATA_2 Subform": {
     "record_source": "POSTING_DATA",
@@ -7062,10 +7166,10 @@
         "events": []
       },
       {
-        "name": "c_appt_type_code",
+        "name": "c_appt_code",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_appt_type_code",
+        "control_source": "c_appt_code",
         "row_source": "",
         "tag": "",
         "caption": "",
@@ -7460,131 +7564,31 @@
     ],
     "code_lines": 64
   },
-  "ASSOC_DATA_2 Subform": {
-    "record_source": "View_AssociationData",
+  "frmZZ_SCRATCH_KIN": {
+    "record_source": "ZZ_SCRATCH_KIN",
     "controls": [
       {
-        "name": "c_pages",
+        "name": "c_name",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_pages",
+        "control_source": "c_name",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "c_assoc_year",
+        "name": "c_name_chn",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_assoc_first_year",
+        "control_source": "c_name_chn",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "c_assoc_nh_year",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_assoc_fy_nh_year",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtAssocNH",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_assoc_fy_nh_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtAssocNM",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_node_name",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtAssocNM_CHN",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_node_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtAssocDesc",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_link_desc",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtAssocDesc_CHN",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_link_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtTitle_CHN",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_source_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_notes",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_notes",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_sequence",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_sequence",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtKinRel",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_kinrel",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtKinPY",
+        "name": "c_kin_name",
         "type": "TextBox",
         "type_code": 109,
         "control_source": "c_kin_name",
@@ -7594,107 +7598,7 @@
         "events": []
       },
       {
-        "name": "TxtAssocKinRel",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_assoc_kinrel",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtAssocKinNM",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_assoc_kin_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_text_title",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_text_title",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtTopic_CHN",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_topic_desc_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtInst_CHN",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_inst_name_hz",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtAddrCHN",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_assoc_addr_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtClaimer_CHN",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_assoc_claimer_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_assoc_intercalary",
-        "type": "CheckBox",
-        "type_code": 106,
-        "control_source": "c_assoc_fy_intercalary",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_assoc_month",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_assoc_fy_month",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_assoc_day",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_assoc_fy_day",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtKinNMChn",
+        "name": "c_kin_chn",
         "type": "TextBox",
         "type_code": 109,
         "control_source": "c_kin_chn",
@@ -7704,437 +7608,15 @@
         "events": []
       },
       {
-        "name": "c_assoc_count",
+        "name": "c_person_id",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_link_count",
+        "control_source": "c_person_id",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
-      {
-        "name": "TxtKinrelChn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_kinrel_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtAssocKinRelChn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_assoc_kinrel_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtAssocKinPY",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_assoc_kin_name",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtAddrPY",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_assoc_addr_name",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtAssocClaimerPY",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_assoc_claimer_name",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtTopicDesc",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_topic_desc",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtInstNamePY",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_inst_name_py",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtOccassionEng",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_occasion_desc",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtLitGenre",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_lit_genre_desc",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtSourcePY",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_source_title",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtRangeChn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_range_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtOccasionChn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_occasion_desc",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtLitGenreChn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_lit_genre_desc_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtNHPY",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_assoc_fy_nh_py",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "Text196",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_range",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtGZHZ",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_ganzhi_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtGZPY",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_ganzhi_py",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      }
-    ],
-    "code_lines": 87
-  },
-  "POSSESSION_DATA_2 Subform": {
-    "record_source": "View_PossessionsAddrData",
-    "controls": [
-      {
-        "name": "c_possession_record_id",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_possession_record_id",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_sequence",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_sequence",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_possession_desc",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_possession_desc",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_possession_desc_chn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_possession_desc_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_quantity",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_quantity",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_possession_yr",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_possession_yr",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_possession_nh_code",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_possession_nh_code",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_possession_nh_yr",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_possession_nh_yr",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_source",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_source",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_pages",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_pages",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_notes",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_notes",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtNH",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_nianhao_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "LastRecordID",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtAddrCHN",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_addr_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtAddrPY",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_aadr_name",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtTitle_CHN",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_title_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_addr_id",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_addr_id",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtTitlePY",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_title",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtActChn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_possession_act_desc_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtActEng",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_possession_act_desc",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtUnitChn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_measure_desc_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtUnitEng",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_measure_desc",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtRangeChn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_range_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtRangeEng",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_range",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      }
-    ],
-    "code_lines": 77
-  },
-  "KIN_DATA_2 Subform": {
-    "record_source": "SELECT ZZ_SCRATCH_KIN.c_kin_id, ZZ_SCRATCH_KIN.c_kin_name, ZZ_SCRATCH_KIN.c_kin_chn, ZZ_SCRATCH_KIN.c_kin_code, ZZ_SCRATCH_KIN.c_kin_rel_total, ZZ_SCRATCH_KIN.c_kin_rel, ZZ_SCRATCH_KIN.c_person_id, ZZ_SCRATCH_KIN.c_source, ZZ_SCRATCH_KIN.c_source_text, ZZ_SCRATCH_KIN.c_source_text_chn, ZZ_SCRATCH_KIN.c_notes, ZZ_SCRATCH_KIN.c_up, ZZ_SCRATCH_KIN.c_down, ZZ_SCRATCH_KIN.c_marriage, ZZ_SCRATCH_KIN.c_collateral, ZZ_SCRATCH_KIN.c_pages FROM ZZ_SCRATCH_KIN;",
-    "controls": [
       {
         "name": "c_kin_id",
         "type": "TextBox",
@@ -8146,100 +7628,10 @@
         "events": []
       },
       {
-        "name": "c_kin_code",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_kin_code",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_source",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_source",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_pages",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_pages",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_notes",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_notes",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtTitle_CHN",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_source_text_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtKinNM",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_kin_name",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtKinNM_CHN",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_kin_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtKinRel",
+        "name": "c_kin_rel",
         "type": "TextBox",
         "type_code": 109,
         "control_source": "c_kin_rel_total",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtKinRel_CHN",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_kin_rel",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "TxtSourcePY",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_source_text",
         "row_source": "",
         "tag": "",
         "caption": "",
@@ -8250,16 +7642,6 @@
         "type": "TextBox",
         "type_code": 109,
         "control_source": "c_up",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_collateral",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_collateral",
         "row_source": "",
         "tag": "",
         "caption": "",
@@ -8284,72 +7666,62 @@
         "tag": "",
         "caption": "",
         "events": []
-      }
-    ],
-    "code_lines": 70
-  },
-  "KIN_DATA Subform": {
-    "record_source": "SELECT KIN_DATA.c_kin_id, KIN_DATA.c_kin_code, KIN_DATA.c_source, KIN_DATA.c_pages, KIN_DATA.c_notes, KINSHIP_CODES.c_kinrel, KINSHIP_CODES.c_kinrel_chn, KIN_DATA.c_personid, KIN_DATA.c_autogen_notes FROM KINSHIP_CODES INNER JOIN KIN_DATA ON KINSHIP_CODES.c_kincode = KIN_DATA.c_kin_code;",
-    "controls": [
+      },
       {
-        "name": "c_kin_id",
+        "name": "c_collateral",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_kin_id",
+        "control_source": "c_collateral",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "c_kin_code",
+        "name": "c_addr_id",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_kin_code",
+        "control_source": "c_addr_id",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "c_source",
+        "name": "c_addr_name",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_source",
+        "control_source": "c_kin_addr_name",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "CmdPickKinID",
-        "type": "CommandButton",
-        "type_code": 104,
-        "control_source": "",
-        "row_source": "",
-        "tag": "",
-        "caption": "親戚姓名",
-        "events": [
-          "CmdPickKinID_Click"
-        ]
-      },
-      {
-        "name": "CmdPickKinRel",
-        "type": "CommandButton",
-        "type_code": 104,
-        "control_source": "",
-        "row_source": "",
-        "tag": "",
-        "caption": "親屬關係類別",
-        "events": [
-          "CmdPickKinRel_Click"
-        ]
-      },
-      {
-        "name": "c_pages",
+        "name": "c_addr_chn",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_pages",
+        "control_source": "c_kin_addr_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_xcoord",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "kin_x_coord",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_ycoord",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "kin_y_coord",
         "row_source": "",
         "tag": "",
         "caption": "",
@@ -8366,191 +7738,153 @@
         "events": []
       },
       {
-        "name": "TxtTitle_CHN",
+        "name": "Text36",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "",
+        "control_source": "c_kin_rel_0",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "CmdPickSource",
-        "type": "CommandButton",
-        "type_code": 104,
-        "control_source": "",
-        "row_source": "",
-        "tag": "",
-        "caption": "出處",
-        "events": [
-          "CmdPickSource_Click"
-        ]
-      },
-      {
-        "name": "TxtKinNM",
+        "name": "Text38",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "",
+        "control_source": "c_kin_index_year",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "TxtKinNM_CHN",
+        "name": "TxtXYCount",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "",
+        "control_source": "xy_count",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "TxtKinRel",
+        "name": "TxtAddrDesc",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "",
+        "control_source": "c_kin_addr_desc",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "TxtKinRel_CHN",
+        "name": "TxtAddrDescChn",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "",
+        "control_source": "c_kin_addr_desc_chn",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "CmdDelete",
-        "type": "CommandButton",
-        "type_code": 104,
-        "control_source": "",
-        "row_source": "",
-        "tag": "",
-        "caption": "刪除親屬！",
-        "events": [
-          "CmdDelete_Click"
-        ]
-      },
-      {
-        "name": "TxtDelPersonID",
+        "name": "c_distance",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "",
+        "control_source": "c_distance",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "TxtDelKinID",
+        "name": "c_kin_index_year_type_desc",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "",
+        "control_source": "c_kin_index_year_type_desc",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "TxtDelKinCode",
+        "name": "c_kin_index_year_type_hz",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "",
+        "control_source": "c_kin_index_year_type_hz",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "TxtDelSource",
+        "name": "c_kin_index_year_type_code",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "",
+        "control_source": "c_kin_index_year_type_code",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "TxtDelPages",
+        "name": "c_kin_sex",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "",
+        "control_source": "c_kin_sex",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "TxtDelNotes",
+        "name": "c_kin_dy",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "",
+        "control_source": "c_kin_dy",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "CmdAddNew",
-        "type": "CommandButton",
-        "type_code": 104,
-        "control_source": "",
-        "row_source": "",
-        "tag": "",
-        "caption": "添加新的親屬",
-        "events": [
-          "CmdAddNew_Click"
-        ]
-      },
-      {
-        "name": "CmdAutoGen",
-        "type": "CommandButton",
-        "type_code": 104,
-        "control_source": "",
-        "row_source": "",
-        "tag": "",
-        "caption": "Autogen",
-        "events": [
-          "CmdAutoGen_Click"
-        ]
-      },
-      {
-        "name": "c_autogen_notes",
+        "name": "c_kin_dynasty",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_autogen_notes",
+        "control_source": "c_kin_dynasty",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_kin_dynasty_chn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_kin_dynasty_chn",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       }
     ],
-    "code_lines": 530
+    "code_lines": 0
   },
-  "EVENT_ADDR_2 Subform": {
-    "record_source": "View_EventAddrData",
+  "ZZ_SOCIAL_NETWORK": {
+    "record_source": "ZZ_SOCIAL_NETWORK",
     "controls": [
       {
-        "name": "c_addr_id",
+        "name": "c_name",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_addr_id",
+        "control_source": "c_name",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "TxtAddrCHN",
+        "name": "c_name_chn",
         "type": "TextBox",
         "type_code": 109,
         "control_source": "c_name_chn",
@@ -8560,53 +7894,437 @@
         "events": []
       },
       {
-        "name": "TxtAddrPY",
+        "name": "c_node_name",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_name",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      }
-    ],
-    "code_lines": 61
-  },
-  "POSTED_TO_ADDR_DATA_2 Subform": {
-    "record_source": "View_PostingAddrData",
-    "controls": [
-      {
-        "name": "c_addr_id",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_addr_id",
+        "control_source": "c_node_name",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "TxtAddrChn",
+        "name": "c_node_chn",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_office_addr_chn",
+        "control_source": "c_node_chn",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       },
       {
-        "name": "TxtAddr",
+        "name": "c_link_type",
         "type": "TextBox",
         "type_code": 109,
-        "control_source": "c_office_addr_name",
+        "control_source": "c_link_type",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_link_desc",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_link_desc",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_link_chn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_link_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_addr_name",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_addr_name",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_addr_chn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_addr_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtIndexYear",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_index_year",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtNodeIndexYear",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_node_index_year",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtPersonID",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_person_id",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtNodeID",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_node_id",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtXCoord",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "x_coord",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtYCoord",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "y_coord",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtNodeXCoord",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "node_xcoord",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtNodeYCoord",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "node_ycoord",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtEdgeDist",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_edge_dist",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_node_addr_chn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_node_addr_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_node_addr_name",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_node_addr_name",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtAddrDesc",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_addr_desc",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtAddrDescChn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_addr_desc_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtNodeAddrType",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_node_addr_desc",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtNodeAddrDescChn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_node_addr_desc_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_link_count",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_link_count",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "TxtTextTitle",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_text_title",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_distance",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_distance",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_index_year_type_desc",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_index_year_type_desc",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_index_year_type_hz",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_index_year_type_hz",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_index_year_type_code",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_index_year_type_code",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_node_index_year_type_desc",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_node_index_year_type_desc",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_node_index_year_type_hz",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_node_index_year_type_hz",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_node_index_year_type_code",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_node_index_year_type_code",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_dynasty",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_dynasty",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_dynasty_chn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_dynasty_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_dy",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_dy",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_node_dynasty",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_node_dynasty",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_node_dynasty_chn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_node_dynasty_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_node_dy",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_node_dy",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_source_text",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_source_text",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_source_txt_chn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_source_txt_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_link_addr_name",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_link_addr_name",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_link_addr_chn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_link_addr_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_link_first_year",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_link_first_year",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "c_link_last_year",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_link_last_year",
         "row_source": "",
         "tag": "",
         "caption": "",
         "events": []
       }
     ],
-    "code_lines": 88
+    "code_lines": 2
   },
   "LookAtStatus": {
     "record_source": "",
@@ -9130,7 +8848,7 @@
         ]
       }
     ],
-    "code_lines": 3305
+    "code_lines": 2277
   },
   "ZZ_SCRATCH_GROUP_STATUS": {
     "record_source": "ZZ_SCRATCH_STATUS",
@@ -9327,6 +9045,46 @@
       }
     ],
     "code_lines": 2
+  },
+  "frmImportNewPlaceList": {
+    "record_source": "",
+    "controls": [
+      {
+        "name": "CmdYes",
+        "type": "CommandButton",
+        "type_code": 104,
+        "control_source": "",
+        "row_source": "",
+        "tag": "",
+        "caption": "Yes",
+        "events": [
+          "CmdYes_Click"
+        ]
+      },
+      {
+        "name": "c_list",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "CmdCancel",
+        "type": "CommandButton",
+        "type_code": 104,
+        "control_source": "",
+        "row_source": "",
+        "tag": "",
+        "caption": "Cancel",
+        "events": [
+          "CmdCancel_Click"
+        ]
+      }
+    ],
+    "code_lines": 32
   },
   "LookAtAssociations": {
     "record_source": "",
@@ -9946,47 +9704,49 @@
         ]
       }
     ],
-    "code_lines": 3978
+    "code_lines": 3983
   },
-  "frmImportNewPlaceList": {
+  "ZZZ_Data_Dump_Import": {
     "record_source": "",
     "controls": [
       {
-        "name": "CmdYes",
+        "name": "cmdAddCol",
         "type": "CommandButton",
         "type_code": 104,
         "control_source": "",
         "row_source": "",
         "tag": "",
-        "caption": "Yes",
+        "caption": "2. Add Columns",
         "events": [
-          "CmdYes_Click"
+          "cmdAddCol_Click"
         ]
       },
       {
-        "name": "c_list",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "CmdCancel",
+        "name": "CmdDropCol",
         "type": "CommandButton",
         "type_code": 104,
         "control_source": "",
         "row_source": "",
         "tag": "",
-        "caption": "Cancel",
+        "caption": "3. Drop Columns",
         "events": [
-          "CmdCancel_Click"
+          "CmdDropCol_Click"
+        ]
+      },
+      {
+        "name": "cmdClear",
+        "type": "CommandButton",
+        "type_code": 104,
+        "control_source": "",
+        "row_source": "",
+        "tag": "",
+        "caption": "1. Clear Existing Data",
+        "events": [
+          "cmdClear_Click"
         ]
       }
     ],
-    "code_lines": 32
+    "code_lines": 142
   },
   "frmImportNewList": {
     "record_source": "",
@@ -10046,47 +9806,41 @@
     ],
     "code_lines": 16
   },
-  "ZZZ_Data_Dump_Import": {
-    "record_source": "",
+  "frmPeopleLookup2": {
+    "record_source": "BIOG_MAIN",
     "controls": [
       {
-        "name": "cmdAddCol",
-        "type": "CommandButton",
-        "type_code": 104,
-        "control_source": "",
+        "name": "c_name",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_name",
         "row_source": "",
         "tag": "",
-        "caption": "2. Add Columns",
-        "events": [
-          "cmdAddCol_Click"
-        ]
+        "caption": "",
+        "events": []
       },
       {
-        "name": "CmdDropCol",
-        "type": "CommandButton",
-        "type_code": 104,
-        "control_source": "",
+        "name": "c_name_chn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_name_chn",
         "row_source": "",
         "tag": "",
-        "caption": "3. Drop Columns",
-        "events": [
-          "CmdDropCol_Click"
-        ]
+        "caption": "",
+        "events": []
       },
       {
-        "name": "cmdClear",
-        "type": "CommandButton",
-        "type_code": 104,
-        "control_source": "",
+        "name": "c_personid",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_personid",
         "row_source": "",
         "tag": "",
-        "caption": "1. Clear Existing Data",
-        "events": [
-          "cmdClear_Click"
-        ]
+        "caption": "",
+        "events": []
       }
     ],
-    "code_lines": 142
+    "code_lines": 586
   },
   "ZZ_SCRATCH_GROUP_TEXT": {
     "record_source": "ZZ_SCRATCH_BIOG_TEXT_DATA",
@@ -11014,42 +10768,6 @@
     ],
     "code_lines": 0
   },
-  "frmPeopleLookup2": {
-    "record_source": "BIOG_MAIN",
-    "controls": [
-      {
-        "name": "c_name",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_name",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_name_chn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_name_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      },
-      {
-        "name": "c_personid",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_personid",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": []
-      }
-    ],
-    "code_lines": 586
-  },
   "frmTEXTS": {
     "record_source": "TEXT_CODES",
     "controls": [
@@ -11188,6 +10906,49 @@
     ],
     "code_lines": 19
   },
+  "frmSTATUS_CODES": {
+    "record_source": "STATUS_CODES",
+    "controls": [
+      {
+        "name": "c_status_desc",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_status_desc",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": [
+          "c_status_desc_Click",
+          "c_status_desc_chn_Click"
+        ]
+      },
+      {
+        "name": "c_status_desc_chn",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_status_desc_chn",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": [
+          "c_status_desc_chn_Click"
+        ]
+      },
+      {
+        "name": "c_status_code",
+        "type": "TextBox",
+        "type_code": 109,
+        "control_source": "c_status_code",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": [
+          "c_status_code_Click"
+        ]
+      }
+    ],
+    "code_lines": 59
+  },
   "frmPickDynasty": {
     "record_source": "",
     "controls": [
@@ -11251,49 +11012,6 @@
       }
     ],
     "code_lines": 80
-  },
-  "frmSTATUS_CODES": {
-    "record_source": "STATUS_CODES",
-    "controls": [
-      {
-        "name": "c_status_desc",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_status_desc",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": [
-          "c_status_desc_Click",
-          "c_status_desc_chn_Click"
-        ]
-      },
-      {
-        "name": "c_status_desc_chn",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_status_desc_chn",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": [
-          "c_status_desc_chn_Click"
-        ]
-      },
-      {
-        "name": "c_status_code",
-        "type": "TextBox",
-        "type_code": 109,
-        "control_source": "c_status_code",
-        "row_source": "",
-        "tag": "",
-        "caption": "",
-        "events": [
-          "c_status_code_Click"
-        ]
-      }
-    ],
-    "code_lines": 59
   },
   "frmZZ_SCRATCH_KINNET": {
     "record_source": "ZZ_SCRATCH_KINNET",
@@ -16509,7 +16227,7 @@
         ]
       }
     ],
-    "code_lines": 6983
+    "code_lines": 7060
   },
   "frmKinReductionWarning": {
     "record_source": "",
@@ -16903,7 +16621,7 @@
         ]
       }
     ],
-    "code_lines": 5668
+    "code_lines": 5674
   },
   "ZZ_SCRATCH_GROUP_ENTRY": {
     "record_source": "ZZ_SCRATCH_ENTRY",
@@ -18658,8 +18376,50 @@
         "events": [
           "CmdPickBAC_Click"
         ]
+      },
+      {
+        "name": "CmdGIS",
+        "type": "CommandButton",
+        "type_code": 104,
+        "control_source": "",
+        "row_source": "",
+        "tag": "",
+        "caption": "Save to GIS",
+        "events": [
+          "CmdGIS_Click"
+        ]
+      },
+      {
+        "name": "GISFrame",
+        "type": "OptionGroup",
+        "type_code": 107,
+        "control_source": "",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "Opt_UTF8",
+        "type": "OptionButton",
+        "type_code": 105,
+        "control_source": "",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
+      },
+      {
+        "name": "Opt_GB18030",
+        "type": "OptionButton",
+        "type_code": 105,
+        "control_source": "",
+        "row_source": "",
+        "tag": "",
+        "caption": "",
+        "events": []
       }
     ],
-    "code_lines": 3406
+    "code_lines": 3415
   }
 }

@@ -9297,7 +9297,7 @@
   },
   {
     "name": "TempImportList",
-    "record_count": 2,
+    "record_count": 1,
     "columns": [
       {
         "name": "ImportID",
@@ -10433,7 +10433,7 @@
   },
   {
     "name": "tmpXY",
-    "record_count": 34,
+    "record_count": 3,
     "columns": [
       {
         "name": "x_coord",
@@ -12280,7 +12280,7 @@
   },
   {
     "name": "Z_SCRATCH_DUMMY_OC",
-    "record_count": 0,
+    "record_count": 24,
     "columns": [
       {
         "name": "c_office_id",
@@ -16437,7 +16437,7 @@
   },
   {
     "name": "ZZ_ADDRESSES",
-    "record_count": 0,
+    "record_count": 7,
     "columns": [
       {
         "name": "c_addr_id",
@@ -16937,7 +16937,7 @@
   },
   {
     "name": "ZZ_KIN_LIST",
-    "record_count": 175,
+    "record_count": 20,
     "columns": [
       {
         "name": "c_personid",
@@ -17172,7 +17172,7 @@
   },
   {
     "name": "ZZ_KIN_LIST_TMP",
-    "record_count": 134,
+    "record_count": 16,
     "columns": [
       {
         "name": "c_personid",
@@ -17933,7 +17933,7 @@
   },
   {
     "name": "ZZ_OFFICE_CODE_TMP",
-    "record_count": 433,
+    "record_count": 24,
     "columns": [
       {
         "name": "c_office_id",
@@ -17999,7 +17999,7 @@
   },
   {
     "name": "ZZ_PLACE",
-    "record_count": 0,
+    "record_count": 1,
     "columns": [
       {
         "name": "c_personid",
@@ -19256,7 +19256,7 @@
   },
   {
     "name": "ZZ_SCRATCH_BIOG_ADDR_DATA",
-    "record_count": 16,
+    "record_count": 0,
     "columns": [
       {
         "name": "c_personid",
@@ -20109,7 +20109,7 @@
   },
   {
     "name": "ZZ_SCRATCH_BIOG_TEXT_DATA",
-    "record_count": 40,
+    "record_count": 0,
     "columns": [
       {
         "name": "c_personid",
@@ -21252,7 +21252,7 @@
   },
   {
     "name": "ZZ_SCRATCH_IMPORT_PEOPLE",
-    "record_count": 133,
+    "record_count": 1,
     "columns": [
       {
         "name": "c_person_id",
@@ -21455,7 +21455,7 @@
   },
   {
     "name": "ZZ_SCRATCH_KIN",
-    "record_count": 141,
+    "record_count": 16,
     "columns": [
       {
         "name": "c_person_id",
@@ -21947,7 +21947,7 @@
   },
   {
     "name": "ZZ_SCRATCH_KINNET",
-    "record_count": 0,
+    "record_count": 17,
     "columns": [
       {
         "name": "c_person_id",
@@ -22883,7 +22883,7 @@
   },
   {
     "name": "ZZ_SCRATCH_OFFICE",
-    "record_count": 9,
+    "record_count": 12,
     "columns": [
       {
         "name": "c_person_name",
@@ -23662,7 +23662,7 @@
   },
   {
     "name": "ZZ_SCRATCH_P_OFFICE",
-    "record_count": 5,
+    "record_count": 13,
     "columns": [
       {
         "name": "c_personid",
@@ -23825,7 +23825,7 @@
   },
   {
     "name": "ZZ_SCRATCH_P_STATUS",
-    "record_count": 50,
+    "record_count": 1,
     "columns": [
       {
         "name": "c_person_id",
@@ -23993,7 +23993,7 @@
   },
   {
     "name": "ZZ_SCRATCH_P_TEXT",
-    "record_count": 3421,
+    "record_count": 2,
     "columns": [
       {
         "name": "c_person_id",
@@ -24610,7 +24610,7 @@
   },
   {
     "name": "ZZ_SCRATCH_PEOPLE",
-    "record_count": 1148,
+    "record_count": 16,
     "columns": [
       {
         "name": "c_person_id",
@@ -25367,7 +25367,7 @@
   },
   {
     "name": "ZZ_SCRATCH_STATUS",
-    "record_count": 50,
+    "record_count": 2,
     "columns": [
       {
         "name": "c_personid",
