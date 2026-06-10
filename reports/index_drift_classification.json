@@ -1,0 +1,757 @@
+{
+  "summary": {
+    "user_mdb_total": 658762,
+    "sqlite_total": 657478,
+    "common": 657157,
+    "in_user_only": 1605,
+    "in_sqlite_only": 321,
+    "buckets": {
+      "exact_match": 656199,
+      "source_drift_index_agrees": 2,
+      "source_drift_index_diffs_too": 30,
+      "index_year_only_diff": 108,
+      "index_addr_only_diff": 796,
+      "index_both_diff": 22
+    }
+  },
+  "bucket_meaning": {
+    "exact_match": "All four compared fields (c_index_year, c_index_addr_id, c_birthyear, c_deathyear) agree.",
+    "source_drift_index_agrees": "c_birthyear or c_deathyear differs but BOTH index fields agree.  Both implementations tolerated the underlying source drift and produced compatible outputs.",
+    "source_drift_index_diffs_too": "c_birthyear or c_deathyear differs AND at least one index field differs.  Consistent with the simple data-drift hypothesis, but doesn't prove it.",
+    "index_year_only_diff": "c_birthyear and c_deathyear identical; only c_index_year differs.  Could be PHP IndexYearRebuild vs (Admin) VBA divergence on year picking; could also be drift in evidence tables we don't compare (ENTRY_DATA exam years, NIAN_HAO mappings, fl_earliest_year / fl_latest_year, etc.).",
+    "index_addr_only_diff": "c_birthyear and c_deathyear identical; only c_index_addr_id differs.  Could be PHP IndexAddressRebuild vs VBA Form_frmIndexAddr divergence on rank order / tie-break; could also be drift in BIOG_ADDR_DATA (which we don't compare).",
+    "index_both_diff": "c_birthyear and c_deathyear identical; BOTH index fields differ.  Strongest single-row signal of compound divergence; warrants per-row investigation."
+  },
+  "limitations": [
+    "Source-data comparison is restricted to the four fields available on both BIOG_MAIN tables (c_index_year, c_index_addr_id, c_birthyear, c_deathyear).  Drift in evidence tables (BIOG_ADDR_DATA, ENTRY_DATA, NIAN_HAO, fl_*_year, etc.) is invisible to this classifier and can show up in any of the index_*_diff buckets.",
+    "We have not line-by-line audited PHP IndexYearRebuildService.php / IndexAddressRebuildService.php.  See `analysis/index_drift_algorithm_notes.md` for what we do know about each side.",
+    "Buckets 4-6 are NOT automatically bugs.  They are the unclassified remainder that needs per-row investigation."
+  ],
+  "samples": {
+    "exact_match": [],
+    "source_drift_index_agrees": [
+      {
+        "personid": 63413,
+        "name_py": "Zhu Dingyan",
+        "name_chn": "朱鼎延",
+        "user": {
+          "index_year": 1614,
+          "index_addr_id": 7995,
+          "birthyear": 1614,
+          "deathyear": 1669,
+          "index_year_source_id": null,
+          "index_year_type_code": "01"
+        },
+        "sqlite": {
+          "index_year": 1614,
+          "index_addr_id": 7995,
+          "birthyear": 1614,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": "01"
+        }
+      },
+      {
+        "personid": 697013,
+        "name_py": "Zhang Zhaixiang",
+        "name_chn": "張宅相",
+        "user": {
+          "index_year": 1347,
+          "index_addr_id": 5417,
+          "birthyear": 1347,
+          "deathyear": 1393,
+          "index_year_source_id": null,
+          "index_year_type_code": "01"
+        },
+        "sqlite": {
+          "index_year": 1347,
+          "index_addr_id": 5417,
+          "birthyear": 0,
+          "deathyear": 1393,
+          "index_year_source_id": null,
+          "index_year_type_code": "02"
+        }
+      }
+    ],
+    "source_drift_index_diffs_too": [
+      {
+        "personid": 263,
+        "name_py": "Zhang Muzhi",
+        "name_chn": "張穆之",
+        "user": {
+          "index_year": 1016,
+          "index_addr_id": 0,
+          "birthyear": 1016,
+          "deathyear": 1079,
+          "index_year_source_id": null,
+          "index_year_type_code": "01"
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_addr_id": 0,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": ""
+        }
+      },
+      {
+        "personid": 1455,
+        "name_py": "Shen Miao",
+        "name_chn": "沈邈",
+        "user": {
+          "index_year": 1001,
+          "index_addr_id": 12887,
+          "birthyear": 1001,
+          "deathyear": 1047,
+          "index_year_source_id": null,
+          "index_year_type_code": "01"
+        },
+        "sqlite": {
+          "index_year": 1008,
+          "index_addr_id": 12887,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": "05"
+        }
+      },
+      {
+        "personid": 19149,
+        "name_py": "Li Xiaoji",
+        "name_chn": "李孝基",
+        "user": {
+          "index_year": 1016,
+          "index_addr_id": 100658,
+          "birthyear": 1016,
+          "deathyear": 1076,
+          "index_year_source_id": null,
+          "index_year_type_code": "01"
+        },
+        "sqlite": {
+          "index_year": 1026,
+          "index_addr_id": 100658,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": 41030,
+          "index_year_type_code": "11"
+        }
+      },
+      {
+        "personid": 38307,
+        "name_py": "Lin Shi (Wife of Fang Da Cong )",
+        "name_chn": "林氏(方大琮妻)",
+        "user": {
+          "index_year": 0,
+          "index_addr_id": 0,
+          "birthyear": 0,
+          "deathyear": 1239,
+          "index_year_source_id": null,
+          "index_year_type_code": "02"
+        },
+        "sqlite": {
+          "index_year": 1186,
+          "index_addr_id": 0,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": 11328,
+          "index_year_type_code": "03"
+        }
+      },
+      {
+        "personid": 40008,
+        "name_py": "Wang Zongchen",
+        "name_chn": "汪宗臣",
+        "user": {
+          "index_year": 1239,
+          "index_addr_id": 12855,
+          "birthyear": 1239,
+          "deathyear": 1330,
+          "index_year_source_id": null,
+          "index_year_type_code": "01"
+        },
+        "sqlite": {
+          "index_year": 1173,
+          "index_addr_id": 12855,
+          "birthyear": 1173,
+          "deathyear": 1264,
+          "index_year_source_id": null,
+          "index_year_type_code": "01"
+        }
+      },
+      {
+        "personid": 40822,
+        "name_py": "Li Bingyi",
+        "name_chn": "李秉彝",
+        "user": {
+          "index_year": 1223,
+          "index_addr_id": 100185,
+          "birthyear": 1223,
+          "deathyear": 1287,
+          "index_year_source_id": null,
+          "index_year_type_code": "01"
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_addr_id": 100185,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": ""
+        }
+      },
+      {
+        "personid": 40845,
+        "name_py": "Li Zhongji",
+        "name_chn": "李中吉",
+        "user": {
+          "index_year": 1012,
+          "index_addr_id": 100402,
+          "birthyear": 0,
+          "deathyear": 1075,
+          "index_year_source_id": null,
+          "index_year_type_code": "29"
+        },
+        "sqlite": {
+          "index_year": 983,
+          "index_addr_id": 0,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": 577857,
+          "index_year_type_code": "14"
+        }
+      },
+      {
+        "personid": 46642,
+        "name_py": "Zhang Geng",
+        "name_chn": "張庚",
+        "user": {
+          "index_year": 999,
+          "index_addr_id": 100409,
+          "birthyear": 999,
+          "deathyear": 1049,
+          "index_year_source_id": null,
+          "index_year_type_code": "01"
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_addr_id": 0,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": ""
+        }
+      }
+    ],
+    "index_year_only_diff": [
+      {
+        "personid": 3501,
+        "name_py": "Li Xiaocheng",
+        "name_chn": "李孝稱",
+        "user": {
+          "index_year": 1018,
+          "index_addr_id": 100658,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": 19149,
+          "index_year_type_code": "19"
+        },
+        "sqlite": {
+          "index_year": 1028,
+          "index_addr_id": 100658,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": 3479,
+          "index_year_type_code": "1912"
+        }
+      },
+      {
+        "personid": 15971,
+        "name_py": "Guo Shilong",
+        "name_chn": "郭世隆",
+        "user": {
+          "index_year": 960,
+          "index_addr_id": 100658,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": 24426,
+          "index_year_type_code": "14"
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_addr_id": 100658,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": ""
+        }
+      },
+      {
+        "personid": 16266,
+        "name_py": "Qian Menghui",
+        "name_chn": "錢孟回",
+        "user": {
+          "index_year": 1004,
+          "index_addr_id": 12723,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": 700103,
+          "index_year_type_code": "13"
+        },
+        "sqlite": {
+          "index_year": 992,
+          "index_addr_id": 12723,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": 3035,
+          "index_year_type_code": "0512"
+        }
+      },
+      {
+        "personid": 16267,
+        "name_py": "Qian Zhixiong",
+        "name_chn": "錢知雄",
+        "user": {
+          "index_year": 1034,
+          "index_addr_id": 12723,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": 16266,
+          "index_year_type_code": "1312"
+        },
+        "sqlite": {
+          "index_year": 1071,
+          "index_addr_id": 12723,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": 16269,
+          "index_year_type_code": "14"
+        }
+      },
+      {
+        "personid": 19771,
+        "name_py": "Li Peng",
+        "name_chn": "李彭",
+        "user": {
+          "index_year": 1253,
+          "index_addr_id": 100185,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": 40822,
+          "index_year_type_code": "11"
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_addr_id": 100185,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": ""
+        }
+      },
+      {
+        "personid": 20658,
+        "name_py": "Lv Shilong",
+        "name_chn": "呂師龍",
+        "user": {
+          "index_year": 1232,
+          "index_addr_id": 12603,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": 20660,
+          "index_year_type_code": "19"
+        },
+        "sqlite": {
+          "index_year": 1230,
+          "index_addr_id": 12603,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": 20654,
+          "index_year_type_code": "1312"
+        }
+      },
+      {
+        "personid": 24424,
+        "name_py": "Zhao Zhongji (2)",
+        "name_chn": "趙仲寂",
+        "user": {
+          "index_year": 1017,
+          "index_addr_id": 100658,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": 701142,
+          "index_year_type_code": "14"
+        },
+        "sqlite": {
+          "index_year": 1032,
+          "index_addr_id": 100658,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": 24423,
+          "index_year_type_code": "291212"
+        }
+      },
+      {
+        "personid": 24426,
+        "name_py": "Guo Chengyan",
+        "name_chn": "郭承彥",
+        "user": {
+          "index_year": 990,
+          "index_addr_id": 100658,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": 24424,
+          "index_year_type_code": "24"
+        },
+        "sqlite": {
+          "index_year": 1005,
+          "index_addr_id": 100658,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": 24424,
+          "index_year_type_code": "24"
+        }
+      }
+    ],
+    "index_addr_only_diff": [
+      {
+        "personid": 1,
+        "name_py": "An Dun",
+        "name_chn": "安惇",
+        "user": {
+          "index_year": 1042,
+          "index_addr_id": 101117,
+          "birthyear": 1042,
+          "deathyear": 1104,
+          "index_year_source_id": null,
+          "index_year_type_code": "01"
+        },
+        "sqlite": {
+          "index_year": 1042,
+          "index_addr_id": 0,
+          "birthyear": 1042,
+          "deathyear": 1104,
+          "index_year_source_id": null,
+          "index_year_type_code": "01"
+        }
+      },
+      {
+        "personid": 470,
+        "name_py": "Jin Junqing",
+        "name_chn": "金君卿",
+        "user": {
+          "index_year": 1012,
+          "index_addr_id": 12879,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": "05"
+        },
+        "sqlite": {
+          "index_year": 1012,
+          "index_addr_id": 12785,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": "05"
+        }
+      },
+      {
+        "personid": 481,
+        "name_py": "Zhou Zhi",
+        "name_chn": "周秩",
+        "user": {
+          "index_year": 1043,
+          "index_addr_id": 100416,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": "05"
+        },
+        "sqlite": {
+          "index_year": 1043,
+          "index_addr_id": 12785,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": "05"
+        }
+      },
+      {
+        "personid": 485,
+        "name_py": "Zhou Tong",
+        "name_chn": "周穜",
+        "user": {
+          "index_year": 1046,
+          "index_addr_id": 100416,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": "05"
+        },
+        "sqlite": {
+          "index_year": 1046,
+          "index_addr_id": 12785,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": "05"
+        }
+      },
+      {
+        "personid": 562,
+        "name_py": "Fan Chong",
+        "name_chn": "范沖",
+        "user": {
+          "index_year": 1067,
+          "index_addr_id": 100658,
+          "birthyear": 1067,
+          "deathyear": 1141,
+          "index_year_source_id": null,
+          "index_year_type_code": "01"
+        },
+        "sqlite": {
+          "index_year": 1067,
+          "index_addr_id": 13292,
+          "birthyear": 1067,
+          "deathyear": 1141,
+          "index_year_source_id": null,
+          "index_year_type_code": "01"
+        }
+      },
+      {
+        "personid": 927,
+        "name_py": "Gao Zunhui",
+        "name_chn": "高遵惠",
+        "user": {
+          "index_year": 0,
+          "index_addr_id": 100658,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": ""
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_addr_id": 12449,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": ""
+        }
+      },
+      {
+        "personid": 1000,
+        "name_py": "Li Zhichun",
+        "name_chn": "李之純",
+        "user": {
+          "index_year": 0,
+          "index_addr_id": 12466,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": ""
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_addr_id": 11599,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": ""
+        }
+      },
+      {
+        "personid": 1005,
+        "name_py": "Li Zhuo",
+        "name_chn": "李擢",
+        "user": {
+          "index_year": 1128,
+          "index_addr_id": 12793,
+          "birthyear": 0,
+          "deathyear": 1191,
+          "index_year_source_id": null,
+          "index_year_type_code": "29"
+        },
+        "sqlite": {
+          "index_year": 1128,
+          "index_addr_id": 11232,
+          "birthyear": 0,
+          "deathyear": 1191,
+          "index_year_source_id": null,
+          "index_year_type_code": "29"
+        }
+      }
+    ],
+    "index_both_diff": [
+      {
+        "personid": 40258,
+        "name_py": "Chen Zhi",
+        "name_chn": "陳埴",
+        "user": {
+          "index_year": 1157,
+          "index_addr_id": 12780,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": 47622,
+          "index_year_type_code": "11"
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_addr_id": 0,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": ""
+        }
+      },
+      {
+        "personid": 54062,
+        "name_py": "Lin Yanchao",
+        "name_chn": "林衍潮",
+        "user": {
+          "index_year": 1776,
+          "index_addr_id": 7541,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": 82700,
+          "index_year_type_code": "11"
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_addr_id": 0,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": ""
+        }
+      },
+      {
+        "personid": 63311,
+        "name_py": "Feng Ren",
+        "name_chn": "馮任",
+        "user": {
+          "index_year": 1577,
+          "index_addr_id": 5408,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": "05"
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_addr_id": 0,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": ""
+        }
+      },
+      {
+        "personid": 93859,
+        "name_py": "Zheng Zhun",
+        "name_chn": "鄭准",
+        "user": {
+          "index_year": 0,
+          "index_addr_id": 0,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": ""
+        },
+        "sqlite": {
+          "index_year": 1434,
+          "index_addr_id": 6034,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": "05"
+        }
+      },
+      {
+        "personid": 107178,
+        "name_py": "Zhang Weida",
+        "name_chn": "張惟大",
+        "user": {
+          "index_year": 1315,
+          "index_addr_id": 12798,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": 107187,
+          "index_year_type_code": "22"
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_addr_id": 0,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": ""
+        }
+      },
+      {
+        "personid": 122141,
+        "name_py": "Wu Zongwen",
+        "name_chn": "吳宗文",
+        "user": {
+          "index_year": 1570,
+          "index_addr_id": 4611,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": 128144,
+          "index_year_type_code": "11"
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_addr_id": 0,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": ""
+        }
+      },
+      {
+        "personid": 129702,
+        "name_py": "Sun Ziliang",
+        "name_chn": "孫子良",
+        "user": {
+          "index_year": 1374,
+          "index_addr_id": 5335,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": "05"
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_addr_id": 0,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": ""
+        }
+      },
+      {
+        "personid": 131912,
+        "name_py": "Ge Yinliang",
+        "name_chn": "葛寅亮",
+        "user": {
+          "index_year": 1571,
+          "index_addr_id": 5373,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": "05"
+        },
+        "sqlite": {
+          "index_year": 0,
+          "index_addr_id": 5333,
+          "birthyear": 0,
+          "deathyear": 0,
+          "index_year_source_id": null,
+          "index_year_type_code": ""
+        }
+      }
+    ]
+  }
+}

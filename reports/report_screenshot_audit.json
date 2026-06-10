@@ -1,0 +1,168 @@
+{
+  "summary": {
+    "n_issues_total": 16,
+    "n_issues_with_screenshots": 5,
+    "n_screenshots_total": 11,
+    "n_mismatches": 0,
+    "n_rule_a_violations": 0,
+    "n_rule_b_violations": 0
+  },
+  "mismatches": [],
+  "all_rows": [
+    {
+      "issue_id": 13,
+      "tier": "P3_missing_ui",
+      "filename": "bug13_browser_open.png",
+      "caption_excerpt": "CBDB_Browser_2 open on a person record — the reachable host surface from which the NIAN_HAO picker is invoked.",
+      "caption_is_none": false,
+      "filename_trigger_keywords": [],
+      "caption_hedge_keywords": [],
+      "caption_active_trigger_phrases": [],
+      "issue_latent_markers": [],
+      "rule_a_violation": false,
+      "rule_b_violation": false
+    },
+    {
+      "issue_id": 13,
+      "tier": "P3_missing_ui",
+      "filename": "bug13_browser_annotated.png",
+      "caption_excerpt": "Annotated host view: the reign-period picker control on BIOG_MAIN_2_Subform whose click runs DoCmd.OpenForm \"frmPickNIAN_HAO\" — a form absent from the current .mdb.",
+      "caption_is_none": false,
+      "filename_trigger_keywords": [
+        "annotated"
+      ],
+      "caption_hedge_keywords": [],
+      "caption_active_trigger_phrases": [],
+      "issue_latent_markers": [],
+      "rule_a_violation": false,
+      "rule_b_violation": false
+    },
+    {
+      "issue_id": 13,
+      "tier": "P3_missing_ui",
+      "filename": "bug13_faux_popup.png",
+      "caption_excerpt": "The 'Item not found in this collection.' popup, reconstructed in PIL (this build's session was non-interactive); the message is Access's standard text when DoCmd.OpenForm targets a form not in Current",
+      "caption_is_none": false,
+      "filename_trigger_keywords": [
+        "popup"
+      ],
+      "caption_hedge_keywords": [],
+      "caption_active_trigger_phrases": [],
+      "issue_latent_markers": [],
+      "rule_a_violation": false,
+      "rule_b_violation": false
+    },
+    {
+      "issue_id": 16,
+      "tier": "P3_missing_ui",
+      "filename": "bug16_LookAtStatus_no_CmdPajek.png",
+      "caption_excerpt": "LookAtStatus as it ships — the export-button row has GIS and Neo4j but no Pajek button.",
+      "caption_is_none": false,
+      "filename_trigger_keywords": [],
+      "caption_hedge_keywords": [],
+      "caption_active_trigger_phrases": [],
+      "issue_latent_markers": [],
+      "rule_a_violation": false,
+      "rule_b_violation": false
+    },
+    {
+      "issue_id": 16,
+      "tier": "P3_missing_ui",
+      "filename": "bug16_LookAtStatus_no_CmdPajek_annotated.png",
+      "caption_excerpt": "Annotated: the gap where a CmdPajek button would sit; `Sub CmdPajek_Click()` exists in the module but no control invokes it.",
+      "caption_is_none": false,
+      "filename_trigger_keywords": [
+        "annotated"
+      ],
+      "caption_hedge_keywords": [],
+      "caption_active_trigger_phrases": [],
+      "issue_latent_markers": [],
+      "rule_a_violation": false,
+      "rule_b_violation": false
+    },
+    {
+      "issue_id": 17,
+      "tier": "P3_missing_ui",
+      "filename": "bug17_LookAtStatus_no_CmdGephi.png",
+      "caption_excerpt": "LookAtStatus as it ships — no Gephi export button.",
+      "caption_is_none": false,
+      "filename_trigger_keywords": [],
+      "caption_hedge_keywords": [],
+      "caption_active_trigger_phrases": [],
+      "issue_latent_markers": [],
+      "rule_a_violation": false,
+      "rule_b_violation": false
+    },
+    {
+      "issue_id": 17,
+      "tier": "P3_missing_ui",
+      "filename": "bug17_LookAtStatus_no_CmdGephi_annotated.png",
+      "caption_excerpt": "Annotated: `Sub CmdGephi_Click()` exists in the module but no control invokes it.",
+      "caption_is_none": false,
+      "filename_trigger_keywords": [
+        "annotated"
+      ],
+      "caption_hedge_keywords": [],
+      "caption_active_trigger_phrases": [],
+      "issue_latent_markers": [],
+      "rule_a_violation": false,
+      "rule_b_violation": false
+    },
+    {
+      "issue_id": 18,
+      "tier": "P3_missing_ui",
+      "filename": "bug18_LookAtStatus_no_CmdUCINet.png",
+      "caption_excerpt": "LookAtStatus as it ships — no UCINet export button.",
+      "caption_is_none": false,
+      "filename_trigger_keywords": [],
+      "caption_hedge_keywords": [],
+      "caption_active_trigger_phrases": [],
+      "issue_latent_markers": [],
+      "rule_a_violation": false,
+      "rule_b_violation": false
+    },
+    {
+      "issue_id": 18,
+      "tier": "P3_missing_ui",
+      "filename": "bug18_LookAtStatus_no_CmdUCINet_annotated.png",
+      "caption_excerpt": "Annotated: `Sub CmdUCINet_Click()` exists in the module but no control invokes it.",
+      "caption_is_none": false,
+      "filename_trigger_keywords": [
+        "annotated"
+      ],
+      "caption_hedge_keywords": [],
+      "caption_active_trigger_phrases": [],
+      "issue_latent_markers": [],
+      "rule_a_violation": false,
+      "rule_b_violation": false
+    },
+    {
+      "issue_id": 19,
+      "tier": "P3_missing_ui",
+      "filename": "bug19_LookAtOffice_no_CmdGUESS.png",
+      "caption_excerpt": "LookAtOffice as it ships — no GUESS export button.",
+      "caption_is_none": false,
+      "filename_trigger_keywords": [],
+      "caption_hedge_keywords": [],
+      "caption_active_trigger_phrases": [],
+      "issue_latent_markers": [],
+      "rule_a_violation": false,
+      "rule_b_violation": false
+    },
+    {
+      "issue_id": 19,
+      "tier": "P3_missing_ui",
+      "filename": "bug19_LookAtOffice_no_CmdGUESS_annotated.png",
+      "caption_excerpt": "Annotated: `Sub CmdGUESS_Click()` exists in the module but no control invokes it.",
+      "caption_is_none": false,
+      "filename_trigger_keywords": [
+        "annotated"
+      ],
+      "caption_hedge_keywords": [],
+      "caption_active_trigger_phrases": [],
+      "issue_latent_markers": [],
+      "rule_a_violation": false,
+      "rule_b_violation": false
+    }
+  ]
+}

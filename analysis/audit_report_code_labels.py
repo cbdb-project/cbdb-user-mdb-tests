@@ -121,18 +121,11 @@ MANIFEST: list[dict] = [
         },
         "forbidden_labels": {"en": [], "zh": []},
     },
-    {
-        "issue_id": 10,
-        "table": "ADDR_CODES",
-        "code_col": "c_addr_id",
-        "code_value": 12603,
-        "desc_cols": ["c_name", "c_name_chn"],
-        "expected_labels": {
-            "en": ["c_addr_id = 12603", "Anfeng"],
-            "zh": ["c_addr_id = 12603", "安豐"],
-        },
-        "forbidden_labels": {"en": [], "zh": []},
-    },
+    # Issue #10 removed for build 20260602 (evidence-based, per the
+    # marker-failure policy): the EVENT_ADDR_2 Subform controls now bind to
+    # the projected aliases (c_event_addr_chn / c_event_addr_name) in the
+    # fresh forms.json dump and no blank-column symptom reproduces, so the
+    # issue is dropped from the report this build (build-independence).
     {
         "issue_id": 20,
         "table": "STATUS_CODES",

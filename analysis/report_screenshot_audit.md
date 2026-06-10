@@ -1,6 +1,6 @@
 # Report screenshot consistency audit
 
-**Generated:** 2026-06-05T06:45:46+00:00
+**Generated:** 2026-06-10T12:16:12+00:00
 **Generator:** `analysis/audit_report_screenshot_consistency.py`
 **Companion JSON:** `reports/report_screenshot_audit.json`
 
@@ -21,9 +21,9 @@ This audit cross-checks every screenshot caption in `reports/generate_report.py:
 
 | Metric | Value |
 |---|---:|
-| Issues total | 18 |
-| Issues with at least one screenshot | 0 |
-| Screenshots inspected | 0 |
+| Issues total | 16 |
+| Issues with at least one screenshot | 5 |
+| Screenshots inspected | 11 |
 | Rule A violations (P5) | 0 |
 | Rule B violations (all) | 0 |
 | **Mismatches** | **0** |
@@ -36,3 +36,14 @@ This audit cross-checks every screenshot caption in `reports/generate_report.py:
 
 | Issue | Tier | Filename | Filename trigger | Caption hedge | Active phrase | Issue latent? | Rule A | Rule B |
 |---:|---|---|---|---|---|---|---|---|
+| #13 | `P3_missing_ui` | `bug13_browser_open.png` | — | — | — | — | ✓ | ✓ |
+| #13 | `P3_missing_ui` | `bug13_browser_annotated.png` | annotated | — | — | — | ✓ | ✓ |
+| #13 | `P3_missing_ui` | `bug13_faux_popup.png` | popup | — | — | — | ✓ | ✓ |
+| #16 | `P3_missing_ui` | `bug16_LookAtStatus_no_CmdPajek.png` | — | — | — | — | ✓ | ✓ |
+| #16 | `P3_missing_ui` | `bug16_LookAtStatus_no_CmdPajek_annotated.png` | annotated | — | — | — | ✓ | ✓ |
+| #17 | `P3_missing_ui` | `bug17_LookAtStatus_no_CmdGephi.png` | — | — | — | — | ✓ | ✓ |
+| #17 | `P3_missing_ui` | `bug17_LookAtStatus_no_CmdGephi_annotated.png` | annotated | — | — | — | ✓ | ✓ |
+| #18 | `P3_missing_ui` | `bug18_LookAtStatus_no_CmdUCINet.png` | — | — | — | — | ✓ | ✓ |
+| #18 | `P3_missing_ui` | `bug18_LookAtStatus_no_CmdUCINet_annotated.png` | annotated | — | — | — | ✓ | ✓ |
+| #19 | `P3_missing_ui` | `bug19_LookAtOffice_no_CmdGUESS.png` | — | — | — | — | ✓ | ✓ |
+| #19 | `P3_missing_ui` | `bug19_LookAtOffice_no_CmdGUESS_annotated.png` | annotated | — | — | — | ✓ | ✓ |

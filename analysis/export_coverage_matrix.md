@@ -12,10 +12,10 @@ Static parse only — depth classification is best-effort based on keyword hints
 ## Headline counts
 
 - Total LookAt* export buttons: **57**
-- depth `none`: 3
-- depth `smoke`: 3
+- depth `none`: 0
+- depth `smoke`: 0
 - depth `structural`: 0
-- depth `manifest`: 43
+- depth `manifest`: 49
 - depth `byte_golden`: 8
 
 ## By export family
@@ -26,22 +26,22 @@ Static parse only — depth classification is best-effort based on keyword hints
 | GUESS / Gephi-family | 5 | 0 | 0 | 0 | 5 | 0 |
 | Import-list | 17 | 0 | 0 | 0 | 17 | 0 |
 | Neo4j (CSVs) | 10 | 0 | 0 | 0 | 7 | 3 |
-| Pajek | 5 | 1 | 0 | 0 | 4 | 0 |
+| Pajek | 5 | 0 | 0 | 0 | 5 | 0 |
 | Save-list | 5 | 0 | 0 | 0 | 5 | 0 |
-| UCINet | 5 | 2 | 3 | 0 | 0 | 0 |
+| UCINet | 5 | 0 | 0 | 0 | 5 | 0 |
 
 ## By form
 
 | Form | Total | none | smoke | structural | manifest | byte_golden |
 |---|---:|---:|---:|---:|---:|---:|
-| `LookAtAssociationPairs` | 6 | 1 | 0 | 0 | 5 | 0 |
-| `LookAtAssociations` | 8 | 0 | 1 | 0 | 6 | 1 |
+| `LookAtAssociationPairs` | 6 | 0 | 0 | 0 | 6 | 0 |
+| `LookAtAssociations` | 8 | 0 | 0 | 0 | 7 | 1 |
 | `LookAtEntry` | 5 | 0 | 0 | 0 | 3 | 2 |
 | `LookAtGroupData` | 3 | 0 | 0 | 0 | 3 | 0 |
-| `LookAtKinship` | 6 | 2 | 0 | 0 | 3 | 1 |
-| `LookAtNetworks` | 7 | 0 | 1 | 0 | 6 | 0 |
+| `LookAtKinship` | 6 | 0 | 0 | 0 | 5 | 1 |
+| `LookAtNetworks` | 7 | 0 | 0 | 0 | 7 | 0 |
 | `LookAtOffice` | 7 | 0 | 0 | 0 | 6 | 1 |
-| `LookAtPlace` | 5 | 0 | 1 | 0 | 3 | 1 |
+| `LookAtPlace` | 5 | 0 | 0 | 0 | 4 | 1 |
 | `LookAtStatus` | 5 | 0 | 0 | 0 | 4 | 1 |
 | `LookAtTexts` | 5 | 0 | 0 | 0 | 4 | 1 |
 
@@ -51,113 +51,109 @@ Static parse only — depth classification is best-effort based on keyword hints
 
 | Button | Family | Depth | Tests |
 |---|---|---|---|
-| `CmdGIS` | GIS (.tab spatial) | `manifest` | `vba_session.py` |
-| `CmdGephi` | GUESS / Gephi-family | `manifest` | `vba_session.py` |
+| `CmdGIS` | GIS (.tab spatial) | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_associationpairs_probe.py` (+3 more) |
+| `CmdGephi` | GUESS / Gephi-family | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_associationpairs_probe.py` (+2 more) |
 | `CmdImportList` | Import-list | `manifest` | `form_specs.py`, `vba_session.py` |
-| `CmdNeo4j` | Neo4j (CSVs) | `manifest` | `vba_session.py`, `test_vba_cmdneo4j_cross_form.py` |
-| `CmdPajek` | Pajek | `manifest` | `vba_session.py` |
-| `CmdUCINet` | UCINet | `none` | — |
+| `CmdNeo4j` | Neo4j (CSVs) | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_associationpairs_probe.py` (+3 more) |
+| `CmdPajek` | Pajek | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_associationpairs_probe.py` (+3 more) |
+| `CmdUCINet` | UCINet | `manifest` | `test_known_bugs.py`, `test_vba_bug_behaviors.py` |
 
 ### LookAtAssociations
 
 | Button | Family | Depth | Tests |
 |---|---|---|---|
-| `CmdGIS` | GIS (.tab spatial) | `byte_golden` | `vba_session.py`, `test_known_bugs.py`, `test_vba_cmdgis_other_forms.py` |
-| `CmdGephi` | GUESS / Gephi-family | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_pajek_gephi_cross_form.py` |
+| `CmdGIS` | GIS (.tab spatial) | `byte_golden` | `vba_session.py`, `test_known_bugs.py`, `test_vba_bug_behaviors.py` (+2 more) |
+| `CmdGephi` | GUESS / Gephi-family | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_cmdneo4j_cross_form.py` (+1 more) |
 | `CmdImportAssociations` | Import-list | `manifest` | `form_specs.py`, `vba_session.py` |
 | `CmdImportPlaces` | Import-list | `manifest` | `form_specs.py`, `vba_session.py` |
-| `CmdNeo4j` | Neo4j (CSVs) | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_cmdneo4j_cross_form.py` |
-| `CmdPajek` | Pajek | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_pajek_gephi_cross_form.py` |
+| `CmdNeo4j` | Neo4j (CSVs) | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_report_triage_gate.py` (+3 more) |
+| `CmdPajek` | Pajek | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_bug_behaviors.py` (+2 more) |
 | `CmdSaveAssociations` | Save-list | `manifest` | `form_specs.py`, `vba_session.py` |
-| `CmdUCINet` | UCINet | `smoke` | `test_known_bugs.py` |
+| `CmdUCINet` | UCINet | `manifest` | `test_known_bugs.py`, `test_vba_bug_behaviors.py` |
 
 ### LookAtEntry
 
 | Button | Family | Depth | Tests |
 |---|---|---|---|
-| `CmdGIS` | GIS (.tab spatial) | `byte_golden` | `vba_session.py`, `exports.py`, `test_infra_smoke.py` (+6 more) |
+| `CmdGIS` | GIS (.tab spatial) | `byte_golden` | `vba_session.py`, `exports.py`, `test_infra_smoke.py` (+7 more) |
 | `CmdImportEntryCodes` | Import-list | `manifest` | `form_specs.py`, `vba_session.py` |
 | `CmdImportPlaces` | Import-list | `manifest` | `form_specs.py`, `vba_session.py` |
-| `CmdNeo4j` | Neo4j (CSVs) | `byte_golden` | `vba_session.py`, `exports.py`, `test_infra_smoke.py` (+6 more) |
+| `CmdNeo4j` | Neo4j (CSVs) | `byte_golden` | `vba_session.py`, `exports.py`, `test_infra_smoke.py` (+7 more) |
 | `CmdSaveEntryCodes` | Save-list | `manifest` | `form_specs.py`, `vba_session.py` |
 
 ### LookAtGroupData
 
 | Button | Family | Depth | Tests |
 |---|---|---|---|
-| `CmdGIS` | GIS (.tab spatial) | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_bug_behaviors.py` |
+| `CmdGIS` | GIS (.tab spatial) | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_bug_behaviors.py` (+2 more) |
 | `CmdImport` | Import-list | `manifest` | `form_specs.py`, `vba_session.py` |
-| `CmdNeo4j` | Neo4j (CSVs) | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_bug_behaviors.py` (+1 more) |
+| `CmdNeo4j` | Neo4j (CSVs) | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_report_triage_gate.py` (+3 more) |
 
 ### LookAtKinship
 
 | Button | Family | Depth | Tests |
 |---|---|---|---|
-| `CmdGIS` | GIS (.tab spatial) | `manifest` | `vba_session.py`, `test_vba_cmdgis_other_forms.py` |
-| `CmdGUESS` | GUESS / Gephi-family | `manifest` | `vba_session.py`, `test_vba_cmdguess_cross_form.py`, `test_vba_pajek_gephi_cross_form.py` |
+| `CmdGIS` | GIS (.tab spatial) | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_bug_behaviors.py` (+2 more) |
+| `CmdGUESS` | GUESS / Gephi-family | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_cmdguess_cross_form.py` (+1 more) |
 | `CmdImport` | Import-list | `manifest` | `form_specs.py`, `vba_session.py` |
-| `CmdNeo4j` | Neo4j (CSVs) | `byte_golden` | `vba_session.py`, `test_vba_cmdneo4j_cross_form.py` |
-| `CmdUCINet` | UCINet | `none` | — |
-| `CmdUTF8Pajek` | Pajek | `none` | — |
+| `CmdNeo4j` | Neo4j (CSVs) | `byte_golden` | `vba_session.py`, `test_known_bugs.py`, `test_vba_bug_behaviors.py` (+2 more) |
+| `CmdUCINet` | UCINet | `manifest` | `test_known_bugs.py`, `test_vba_bug_behaviors.py`, `test_vba_cmducinet_kinship.py` |
+| `CmdUTF8Pajek` | Pajek | `manifest` | `vba_session.py`, `test_vba_pajek_gephi_cross_form.py` |
 
 ### LookAtNetworks
 
 | Button | Family | Depth | Tests |
 |---|---|---|---|
-| `CmdGIS` | GIS (.tab spatial) | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_bug_behaviors.py` (+1 more) |
+| `CmdGIS` | GIS (.tab spatial) | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_bug_behaviors.py` (+2 more) |
 | `CmdGUESS` | GUESS / Gephi-family | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_cmdguess_cross_form.py` |
 | `CmdImportPeople` | Import-list | `manifest` | `form_specs.py`, `vba_session.py` |
 | `CmdImportPlaces` | Import-list | `manifest` | `form_specs.py`, `vba_session.py` |
-| `CmdNeo4j` | Neo4j (CSVs) | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_bug_behaviors.py` (+1 more) |
-| `CmdPajek` | Pajek | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_bug_behaviors.py` |
-| `CmdUCINet` | UCINet | `smoke` | `test_known_bugs.py` |
+| `CmdNeo4j` | Neo4j (CSVs) | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_bug_behaviors.py` (+2 more) |
+| `CmdPajek` | Pajek | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_bug_behaviors.py` (+1 more) |
+| `CmdUCINet` | UCINet | `manifest` | `test_known_bugs.py`, `test_vba_bug_behaviors.py` |
 
 ### LookAtOffice
 
 | Button | Family | Depth | Tests |
 |---|---|---|---|
-| `CmdGIS` | GIS (.tab spatial) | `byte_golden` | `vba_session.py`, `test_known_bugs.py`, `test_vba_bug_design_time.py` (+2 more) |
+| `CmdGIS` | GIS (.tab spatial) | `byte_golden` | `vba_session.py`, `test_known_bugs.py`, `test_vba_bug_design_time.py` (+3 more) |
 | `CmdGISPeople` | GIS (.tab spatial) | `manifest` | `vba_session.py`, `test_vba_cmdgispeople_office.py` |
 | `CmdImportOffices` | Import-list | `manifest` | `form_specs.py`, `vba_session.py` |
 | `CmdImportPlaceOffice` | Import-list | `manifest` | `form_specs.py`, `vba_session.py` |
 | `CmdImportPlacePeople` | Import-list | `manifest` | `form_specs.py`, `vba_session.py` |
-| `CmdNeo4j` | Neo4j (CSVs) | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_cmdneo4j_cross_form.py` |
+| `CmdNeo4j` | Neo4j (CSVs) | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_cmdneo4j_cross_form.py` (+1 more) |
 | `CmdSaveOffices` | Save-list | `manifest` | `form_specs.py`, `vba_session.py` |
 
 ### LookAtPlace
 
 | Button | Family | Depth | Tests |
 |---|---|---|---|
-| `CmdGephi` | GUESS / Gephi-family | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_bug_design_time.py` (+1 more) |
+| `CmdGephi` | GUESS / Gephi-family | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_associationpairs_probe.py` (+3 more) |
 | `CmdImportPlaces` | Import-list | `manifest` | `form_specs.py`, `vba_session.py` |
-| `CmdNeo4j` | Neo4j (CSVs) | `byte_golden` | `vba_session.py`, `test_known_bugs.py`, `test_vba_bug_behaviors.py` (+1 more) |
-| `CmdPajek` | Pajek | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_bug_behaviors.py` (+2 more) |
-| `CmdUCINet` | UCINet | `smoke` | `test_known_bugs.py`, `test_vba_bug_design_time.py` |
+| `CmdNeo4j` | Neo4j (CSVs) | `byte_golden` | `vba_session.py`, `test_coverage_floor.py`, `test_known_bugs.py` (+5 more) |
+| `CmdPajek` | Pajek | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_associationpairs_probe.py` (+4 more) |
+| `CmdUCINet` | UCINet | `manifest` | `test_known_bugs.py`, `test_vba_bug_behaviors.py`, `test_vba_bug_design_time.py` |
 
 ### LookAtStatus
 
 | Button | Family | Depth | Tests |
 |---|---|---|---|
-| `CmdGIS` | GIS (.tab spatial) | `byte_golden` | `vba_session.py`, `test_addr_codes_embedded_delim.py`, `test_known_bugs.py` (+3 more) |
+| `CmdGIS` | GIS (.tab spatial) | `byte_golden` | `vba_session.py`, `test_addr_codes_embedded_delim.py`, `test_coverage_floor.py` (+6 more) |
 | `CmdImportPlaces` | Import-list | `manifest` | `form_specs.py`, `vba_session.py` |
 | `CmdImportStatusCodes` | Import-list | `manifest` | `form_specs.py`, `vba_session.py` |
-| `CmdNeo4j` | Neo4j (CSVs) | `manifest` | `vba_session.py`, `test_known_bugs.py`, `test_vba_bug_behaviors.py` (+1 more) |
+| `CmdNeo4j` | Neo4j (CSVs) | `manifest` | `vba_session.py`, `test_coverage_floor.py`, `test_known_bugs.py` (+4 more) |
 | `CmdSaveStatusCodes` | Save-list | `manifest` | `form_specs.py`, `vba_session.py` |
 
 ### LookAtTexts
 
 | Button | Family | Depth | Tests |
 |---|---|---|---|
-| `CmdGIS` | GIS (.tab spatial) | `byte_golden` | `vba_session.py`, `test_vba_cmdgis_other_forms.py` |
+| `CmdGIS` | GIS (.tab spatial) | `byte_golden` | `vba_session.py`, `test_vba_cmdgis_other_forms.py`, `test_vba_matrix_all_forms.py` |
 | `CmdImportPlaces` | Import-list | `manifest` | `form_specs.py`, `vba_session.py` |
 | `CmdImportTextCategories` | Import-list | `manifest` | `form_specs.py`, `vba_session.py` |
-| `CmdNeo4j` | Neo4j (CSVs) | `manifest` | `vba_session.py`, `test_vba_cmdneo4j_cross_form.py` |
+| `CmdNeo4j` | Neo4j (CSVs) | `manifest` | `vba_session.py`, `test_vba_cmdneo4j_cross_form.py`, `test_vba_matrix_all_forms.py` |
 | `CmdSaveTextCategories` | Save-list | `manifest` | `form_specs.py`, `vba_session.py` |
 
 ## Buttons with depth=`none` (no test reference)
 
-| Form | Button | Family |
-|---|---|---|
-| `LookAtAssociationPairs` | `CmdUCINet` | UCINet |
-| `LookAtKinship` | `CmdUCINet` | UCINet |
-| `LookAtKinship` | `CmdUTF8Pajek` | Pajek |
+(none)
