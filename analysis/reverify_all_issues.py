@@ -18,6 +18,7 @@ banner) are flagged for follow-up.
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -83,6 +84,22 @@ def _has_control(form: str, ctl: str) -> bool:
     return ctl.lower() in _form_controls(form)
 
 
+def _control_source_used(col: str) -> list[tuple[str, str]]:
+    """[(form, control_name), ...] for every control whose ControlSource is
+    exactly ``col``, across all forms in the dump.  Lets a re-verify check
+    decide whether an issue's offending binding STILL EXISTS, instead of
+    trusting a stale hardcoded "the control is hidden" note (the binding may
+    have been removed or re-pointed in a later build)."""
+    hits: list[tuple[str, str]] = []
+    for k, info in INV.items():
+        if not isinstance(info, dict):
+            continue
+        for c in info.get("controls", []):
+            if str(c.get("control_source") or "").lower() == col.lower():
+                hits.append((k, c.get("name") or ""))
+    return hits
+
+
 def main() -> int:
     print("=" * 70)
     print("Issue-by-issue re-verification (UI reachability + symptom)")
@@ -101,8 +118,23 @@ def main() -> int:
                 "WHERE c_fy_range > 0 AND c_ly_range > 0 "
                 "  AND c_fy_range <> c_ly_range")
     n = int(cur.fetchone()[0])
-    findings.append((1, "DORMANT" if n == 0 else "REAL",
-                     f"{n} STATUS_DATA rows trigger the alias swap"))
+    # The defect is an ALIAS SWAP in View_StatusData: c_fy_range_desc/_chn
+    # aliased off YEAR_RANGE_CODES_1 (the c_ly_range join) instead of the
+    # plain YEAR_RANGE_CODES.  Re-derive presence from the saved-query SQL —
+    # do NOT assume it is still there (it was corrected on build 20260602).
+    sql1 = _saved_query_sql("View_StatusData")
+    swap_present = bool(re.search(
+        r"YEAR_RANGE_CODES_1\s*\.\s*\[?c_range(?:_chn)?\]?\s+AS\s+"
+        r"\[?c_fy_range", sql1, re.IGNORECASE))
+    if not swap_present:
+        findings.append((1, "REVIEW",
+                         "alias swap corrected in source — c_fy_range_desc/"
+                         "_chn now alias off YEAR_RANGE_CODES (not "
+                         "YEAR_RANGE_CODES_1); defect not present this dump"))
+    else:
+        findings.append((1, "DORMANT" if n == 0 else "REAL",
+                         f"alias swap present in View_StatusData; "
+                         f"{n} STATUS_DATA rows trigger it"))
 
     # ---- Bug #2: dao360 — handled by check_vba_refs.py at open ----
     findings.append((2, "REAL", "shipped .mdb has broken dao360 ref; "
@@ -227,27 +259,44 @@ def main() -> int:
     sql10 = _saved_query_sql("View_EventAddrData")
     has10 = ("c_name_chn" in sql10.lower().split())  # rough
     # More precise: scan for ' c_name_chn,' or ' c_name_chn ' as a token
-    import re as _re
-    proj_tokens = set(_re.findall(r"\b([a-z_][\w]*)\b", sql10.lower()))
+    proj_tokens = set(re.findall(r"\b([a-z_][\w]*)\b", sql10.lower()))
     # Check the OUTPUT name (what control_source can resolve to).
     # The projection has aliases; what matters is the alias names.
-    aliased_names = set(_re.findall(
-        r"as\s+([a-z_]\w*)", sql10, flags=_re.IGNORECASE
+    aliased_names = set(re.findall(
+        r"as\s+([a-z_]\w*)", sql10, flags=re.IGNORECASE
     ))
     aliased_names = {n.lower() for n in aliased_names}
     # Plus un-aliased trailing-identifier columns (e.g. plain
     # "EVENTS_ADDR.c_personid" exposes "c_personid").
     unaliased = set()
-    for tok in _re.findall(
+    for tok in re.findall(
         r"[A-Za-z_]\w*\.([a-z_]\w*)(?=\s*(?:,|FROM|from))", sql10
     ):
         unaliased.add(tok.lower())
     output_names = aliased_names | unaliased
     bad10 = [n for n in ("c_name_chn", "c_name") if n not in output_names]
-    if bad10:
+    # Re-derive whether the offending BINDING still exists, not just whether
+    # the view projects the column.  On build 20260602 the EVENT_ADDR_2
+    # Subform controls were re-bound from c_name_chn/c_name to the projected
+    # aliases (c_event_addr_chn / c_event_addr_name), so no control renders
+    # blank even though those column names remain absent from the projection.
+    subform10 = _form_controls("EVENT_ADDR_2 Subform")
+    still_bound10 = sorted({
+        (c.get("control_source") or "").lower()
+        for c in subform10.values()
+        if (c.get("control_source") or "").lower() in ("c_name_chn", "c_name")
+    })
+    if not still_bound10:
+        findings.append((10, "REVIEW",
+                         "EVENT_ADDR_2 Subform controls re-bound to the "
+                         "projected aliases (c_event_addr_chn / "
+                         "c_event_addr_name); no control binds c_name_chn/"
+                         "c_name — blank-column defect not present this dump"))
+    elif bad10:
         findings.append((10, "REAL",
-                         f"View_EventAddrData projection lacks {bad10}; "
-                         f"sub-form controls bound to those names show blank"))
+                         f"View_EventAddrData projection lacks {bad10} AND "
+                         f"controls still bind {still_bound10}; sub-form "
+                         f"controls render blank"))
     else:
         findings.append((10, "REVIEW",
                          "view actually exposes c_name_chn / c_name now"))
@@ -261,24 +310,31 @@ def main() -> int:
     # See `analysis/probe_bug_10_11_12_visibility.py` for the probe
     # and `analysis/dump/bug_10_11_12_visibility.json` for the result.
     sql11 = _saved_query_sql("View_EventsData")
-    aliased11 = {n.lower() for n in _re.findall(
-        r"as\s+([a-z_]\w*)", sql11, flags=_re.IGNORECASE
+    aliased11 = {n.lower() for n in re.findall(
+        r"as\s+([a-z_]\w*)", sql11, flags=re.IGNORECASE
     )}
     unaliased11 = set()
-    for tok in _re.findall(
+    for tok in re.findall(
         r"[A-Za-z_]\w*\.([a-z_]\w*)(?=\s*(?:,|FROM|from))", sql11
     ):
         unaliased11.add(tok.lower())
     out11 = aliased11 | unaliased11
     in_evts = "c_event_record_id" in _table_cols("EVENTS_DATA")
     in_view = "c_event_record_id" in out11
-    if not in_evts and not in_view:
+    # Re-derive whether a control actually BINDS the column before judging it
+    # latent — do NOT trust a stale hardcoded "Visible=False/240 twips" note.
+    bound11 = _control_source_used("c_event_record_id")
+    if not bound11:
+        findings.append((11, "REVIEW",
+                         "no control binds ControlSource=c_event_record_id "
+                         "in the current forms dump — the offending binding "
+                         "is gone; defect not present this dump"))
+    elif not in_evts and not in_view:
         findings.append((11, "LATENT",
-                         "c_event_record_id is in NEITHER EVENTS_DATA "
-                         "nor View_EventsData → would render blank, BUT "
-                         "the control is Visible=False (hidden internal "
-                         "control, width=240 twips per COM probe) — user "
-                         "doesn't see it"))
+                         f"c_event_record_id is in NEITHER EVENTS_DATA nor "
+                         f"View_EventsData (would render blank); bound by "
+                         f"{bound11} — confirm the control's visibility with "
+                         f"a live COM probe before promoting"))
     else:
         findings.append((11, "REVIEW",
                          f"in EVENTS_DATA={in_evts}, in view projection={in_view}"))
@@ -289,24 +345,30 @@ def main() -> int:
     # c_appt_desc_chn, which ARE in View_PostingOfficeData and render
     # correctly.
     sql12 = _saved_query_sql("View_PostingOfficeData")
-    aliased12 = {n.lower() for n in _re.findall(
-        r"as\s+([a-z_]\w*)", sql12, flags=_re.IGNORECASE
+    aliased12 = {n.lower() for n in re.findall(
+        r"as\s+([a-z_]\w*)", sql12, flags=re.IGNORECASE
     )}
     unaliased12 = set()
-    for tok in _re.findall(
+    for tok in re.findall(
         r"[A-Za-z_]\w*\.([a-z_]\w*)(?=\s*(?:,|FROM|from))", sql12
     ):
         unaliased12.add(tok.lower())
     out12 = aliased12 | unaliased12
-    if "c_appt_type_code" not in out12:
+    # Re-derive whether a control actually BINDS the column (the user-facing
+    # TxtApptType / TxtApptTypeChn bind c_appt_desc / c_appt_desc_chn, which
+    # ARE projected and work) — do NOT trust a stale "Visible=False/180 twips".
+    bound12 = _control_source_used("c_appt_type_code")
+    if not bound12:
+        findings.append((12, "REVIEW",
+                         "no control binds ControlSource=c_appt_type_code "
+                         "in the current forms dump — the offending binding "
+                         "is gone; defect not present this dump"))
+    elif "c_appt_type_code" not in out12:
         findings.append((12, "LATENT",
-                         "c_appt_type_code not in View_PostingOfficeData "
-                         "projection → would render blank, BUT the "
-                         "control is Visible=False (hidden internal "
-                         "control, width=180 twips per COM probe).  "
-                         "The user-facing TxtApptType / TxtApptTypeChn "
-                         "are bound to c_appt_desc / c_appt_desc_chn "
-                         "which ARE in projection and work correctly."))
+                         f"c_appt_type_code not in View_PostingOfficeData "
+                         f"projection (would render blank); bound by "
+                         f"{bound12} — confirm the control's visibility with "
+                         f"a live COM probe before promoting"))
     else:
         findings.append((12, "REVIEW",
                          "view now exposes c_appt_type_code"))
