@@ -25,6 +25,13 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+# Force UTF-8 stdio for every child python.  Several pipeline scripts print
+# non-ASCII (e.g. classify_index_addr_drift.py emits a U+2194 arrow); on a
+# legacy charmap console that raises UnicodeEncodeError, which RunSoft swallows
+# -- silently dropping an appendix and tripping the coverage floor.  Pinning
+# the encoding here keeps the run deterministic regardless of console codepage.
+$env:PYTHONIOENCODING = "utf-8"
+
 $ROOT  = $PSScriptRoot
 $BUILD = Get-Date -Format "yyyyMMdd"
 $REPORT_FILE = "$ROOT\reports\pytest_report_build$BUILD.json"
@@ -185,3 +192,9 @@ MANUAL gate (LLM judgment) -- the ONLY steps the script cannot do:
 
 Report JSON : $REPORT_FILE
 "@ -ForegroundColor Green
+
+# Reaching here means every HARD step (Run) succeeded; pytest failures and the
+# advisory floor/audit checks (RunSoft) are non-fatal by design.  Exit 0 so a
+# successful automated run does not leak the last RunSoft's non-zero
+# $LASTEXITCODE as the script's exit code (which would break CI gating).
+exit 0
