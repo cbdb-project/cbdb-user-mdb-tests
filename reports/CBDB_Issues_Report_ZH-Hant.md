@@ -463,14 +463,14 @@ _本層的條目作為歷史 / 潛伏記錄保留。可分為三類：(a) DORMAN
 
 #### 問題描述
 
-`Form_LookAtKinship.vb` 的 GUESS/Gephi `.gdf` 寫出端宣告了一個 15 欄的非 ASCII `nodedef>` 表頭（第 549 行：name、color、label、labelvisible、style、pinyin、indexyear、sex、addr_name、addr_chn、latitude、longitude、DynastyCode、dynasty、dynasty_chn）。然而逐列主體（約第 1117-1299 行）寫出的格數不定：dynasty 結尾分支使得 null-dynasty 路徑（第 1281 行）與已填值分支（第 1285 對 627 行）寫出不同數量的結尾格——第 1285 行分支寫出 DynastyCode + dynasty 而沒有結尾的 dynasty_chn，第 627 行則寫出 DynastyCode + dynasty + dynasty_chn。結果部分節點列對應 15 欄的表頭只寫出 13 格，嚴格的 GDF 讀取器會看到欄數不符。
+`Form_LookAtKinship.vb` 的 GUESS/Gephi `.gdf` 寫出端宣告了一個 15 欄的非 ASCII `nodedef>` 表頭（第 549 行：name、color、label、labelvisible、style、pinyin、indexyear、sex、addr_name、addr_chn、latitude、longitude、DynastyCode、dynasty、dynasty_chn）。然而逐列主體（第 565-650 行）寫出的格數不定：非 ASCII 的 dynasty 結尾分支（第 645-649 行）只在 c_dynasty 非 null 時才附加 DynastyCode + dynasty + dynasty_chn（第 647 行）——第 646 行的 `If Not IsNull(!c_dynasty)` 沒有 `Else`，因此 dynasty 為 null 的節點列會完全略過那幾個結尾格，對應 15 欄的表頭只寫出較少的格，嚴格的 GDF 讀取器會看到欄數不符。
 
 發現類別為 structural_metric：15 對 13 的不符是透過將表頭欄數與輸出中寫出的列格數比對而得，並非來自重新驗證的 UI 症狀（非互動式建置；未設定 ui_verified）。故列於 P5。親屬網路的示範 fixture：人物 c_personid = 3211（Zhao Tingmei / 趙廷美）。
 
 #### 復現步驟
 
 1. 從傾印與跨表單測試以靜態方式驗證：
-2. 開啟 `analysis/dump/vba/Form_LookAtKinship.vb` 第 549 行——非 ASCII 的 `nodedef>` 表頭宣告 15 欄。再看列主體第 565-627 行：null-dynasty 與已填值分支寫出不同數量的結尾格（第 1285 行省略 dynasty_chn），故部分列寫出 13 格。
+2. 開啟 `analysis/dump/vba/Form_LookAtKinship.vb` 第 549 行——非 ASCII 的 `nodedef>` 表頭宣告 15 欄。再看列主體第 565-650 行：非 ASCII 的 dynasty 分支（第 645-649 行）只在 c_dynasty 非 null 時才附加 DynastyCode/dynasty/dynasty_chn——第 646 行的 `If Not IsNull(!c_dynasty)` 沒有 `Else`，故 null-dynasty 列寫出的格數少於 15 欄表頭。
 3. 跨表單結構探測 `test_vba_cmdguess_cross_form` 會比對 `.gdf` 表頭欄數與每列格數；示範網路為人物 c_personid = 3211（Zhao Tingmei / 趙廷美）。
 
 #### 建議修復方案
