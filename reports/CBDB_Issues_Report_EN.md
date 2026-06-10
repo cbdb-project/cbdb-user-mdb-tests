@@ -463,14 +463,14 @@ Call `tRstNode.MoveLast` (then `MoveFirst`) before reading `RecordCount` at line
 
 #### Description
 
-`Form_LookAtKinship.vb`'s GUESS/Gephi `.gdf` writer declares a non-ASCII `nodedef>` header of 15 columns (line 549: name, color, label, labelvisible, style, pinyin, indexyear, sex, addr_name, addr_chn, latitude, longitude, DynastyCode, dynasty, dynasty_chn).  The per-row body (lines ~1117-1299), however, emits a variable number of cells: the dynasty tail branches so that the null-dynasty path (line 1281) and the populated branch (lines 1285 vs 627) write different numbers of trailing cells — the line-1285 branch writes DynastyCode + dynasty with no trailing `dynasty_chn`, while line 627 writes DynastyCode + dynasty + dynasty_chn.  As a result some node rows emit 13 cells against the 15-column header, so a strict GDF reader sees a column-count mismatch.
+`Form_LookAtKinship.vb`'s GUESS/Gephi `.gdf` writer declares a non-ASCII `nodedef>` header of 15 columns (line 549: name, color, label, labelvisible, style, pinyin, indexyear, sex, addr_name, addr_chn, latitude, longitude, DynastyCode, dynasty, dynasty_chn).  The per-row body (lines 565-650), however, emits a variable number of cells: the non-ASCII dynasty tail (lines 645-649) appends DynastyCode + dynasty + dynasty_chn only when c_dynasty is non-null (line 647) — the `If Not IsNull(!c_dynasty)` at line 646 has NO `Else`, so a node row whose dynasty is null skips those trailing cells entirely and emits fewer cells than the 15-column header, so a strict GDF reader sees a column-count mismatch.
 
 Finding class is structural_metric: the 15-vs-13 mismatch was derived by counting header columns against emitted row cells in the export, not from a re-verified UI symptom (non-interactive build; ui_verified is not set).  Filed at P5.  Demo fixture for the kinship network: person c_personid = 3211 (Zhao Tingmei / 趙廷美).
 
 #### Steps to reproduce
 
 1. Verify statically from the dump and the cross-form test:
-2. Open `analysis/dump/vba/Form_LookAtKinship.vb` line 549 — the non-ASCII `nodedef>` header declares 15 columns.  Then read the row body lines 565-627: the null-dynasty and populated-dynasty branches write different numbers of trailing cells (line 1285 omits dynasty_chn), so some rows emit 13 cells.
+2. Open `analysis/dump/vba/Form_LookAtKinship.vb` line 549 — the non-ASCII `nodedef>` header declares 15 columns.  Then read the row body lines 565-650: the non-ASCII dynasty branch (lines 645-649) appends the DynastyCode/dynasty/dynasty_chn cells only when c_dynasty is non-null — the `If Not IsNull(!c_dynasty)` at line 646 has no `Else`, so null-dynasty rows emit fewer cells than the 15-column header.
 3. The cross-form structural probe `test_vba_cmdguess_cross_form` parses the `.gdf` header column count against per-row cell counts; the demo network is person c_personid = 3211 (Zhao Tingmei / 趙廷美).
 
 #### Suggested fix
