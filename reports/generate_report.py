@@ -2806,6 +2806,59 @@ def _build(lang: str, out_path: Path) -> None:
     print(f"wrote {out_path}")
 
 
+def _load_ui_fallbacks(build, reports_dir=None):
+    """Live-UI fallback events recorded for ``build``'s pytest run.
+
+    The conftest pytest-json-report hook writes ``environment.ui_fallbacks`` —
+    every prefer="ui" trigger that degraded to the headless COM path (NOT
+    ui_verified).  Reads the newest ``reports/pytest_report_build*.json`` whose
+    ``environment.cbdb_data_build`` matches ``build``.  Missing file/field, or a
+    run that predates the instrumentation, yields ``[]`` (nothing to disclose).
+
+    A falsy ``build`` (e.g. build_stamp failed -> the report's build is unknown)
+    also yields ``[]``: with no build to match against we cannot prove a JSON
+    belongs to THIS report's run, and surfacing the newest run's fallbacks could
+    bind a stale/unrelated disclosure into the report.  Disclose nothing rather
+    than something mismatched."""
+    import json as _json
+    if not build:
+        return []
+    reports_dir = reports_dir or (REPO / "reports")
+    try:
+        cands = sorted(reports_dir.glob("pytest_report_build*.json"),
+                       key=lambda q: q.stat().st_mtime, reverse=True)
+    except Exception:
+        return []
+    for p in cands:
+        try:
+            env = _json.loads(p.read_text(encoding="utf-8")).get("environment", {})
+        except Exception:
+            continue
+        if env.get("cbdb_data_build") != build:
+            continue
+        return list(env.get("ui_fallbacks") or [])
+    return []
+
+
+def _ui_fallback_note(fallbacks, is_en):
+    """One-line disclosure that N prefer="ui" triggers degraded to the headless
+    COM path this run, so their results are NOT ui_verified — keeps the session
+    line honest.  Returns None on a clean run (no fallbacks)."""
+    if not fallbacks:
+        return None
+    n = len(fallbacks)
+    pairs = sorted({f"{e.get('form')}.{e.get('ctl')}" for e in fallbacks})
+    joined = ", ".join(pairs)
+    if is_en:
+        return (f"⚠ Live-UI fallback: {n} UI-verification trigger(s) this "
+                f"run degraded to the headless COM path ({joined}) — those "
+                f"results are logic-triggered, NOT ui_verified, so they cannot "
+                f"support P0/P1/P2.")
+    return (f"⚠ 实时 UI 回退：本次有 {n} 处 UI 验证触发降级到无头 COM "
+            f"路径（{joined}）——这些结果为逻辑触发、非 ui_verified，"
+            f"不能支撑 P0/P1/P2。")
+
+
 def _build_md(lang: str, out_path: Path) -> None:
     """Markdown sibling of `_build` — same content, different format,
     suitable for in-browser viewing on GitHub."""
@@ -2870,6 +2923,15 @@ def _build_md(lang: str, out_path: Path) -> None:
                  "运行的限制，并非『不存在用户级 bug』。")
     lines.append(f"_{Z(_sess)}_")
     lines.append("")
+
+    # Live-UI fallback disclosure — keeps the session line honest: any
+    # prefer="ui" trigger that degraded to the headless COM path this run is NOT
+    # ui_verified.  Sourced from the run's pytest JSON (written by conftest);
+    # absent on a clean / non-instrumented run, so nothing is appended.
+    _fb_note = _ui_fallback_note(_load_ui_fallbacks(_build), is_en)
+    if _fb_note:
+        lines.append(f"_{Z(_fb_note)}_")
+        lines.append("")
 
     intro = (
         "Dear maintainer,\n\n"
