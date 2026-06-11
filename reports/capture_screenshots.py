@@ -259,6 +259,11 @@ def capture_bug15_19(app):
         ("LookAtStatus", "CmdUCINet", 18),
         ("LookAtOffice", "CmdGUESS", 19),
     ]
+    # Per-bug hygiene: skip cases for issues dropped from the current report
+    # (empty ids -> keep all, the safe fallback).
+    _ids = _current_issue_ids()
+    if _ids:
+        cases = [c for c in cases if c[2] in _ids]
     for form, btn, bug in cases:
         try:
             app.DoCmd.OpenForm(form, 0, "", "", 0, 0)
@@ -378,6 +383,10 @@ def capture_bug11_12_10(app):
          "every row (control bound to `c_appt_type_code`, missing "
          "from `View_PostingOfficeData`'s projection)."),
     ]
+    # Per-bug hygiene: skip cases for issues dropped from the current report.
+    _ids = _current_issue_ids()
+    if _ids:
+        targets = [t for t in targets if t[0] in _ids]
     last_personid = None
     for bug, personid, page_name, caption in targets:
         if personid != last_personid:
@@ -538,6 +547,35 @@ _ALL_CAPTURES = {
 }
 
 
+# Which documented bug id(s) each capture routine produces shots for.  Used to
+# skip routines for issues that have been DROPPED from the current report --
+# otherwise Step 6 re-shoots them every build and leaves orphan screenshots.
+_CAPTURE_BUGS: dict[str, set[int]] = {
+    "bug4": {4}, "bug6": {6}, "bug7": {7}, "bug8": {8}, "bug13": {13},
+    "bug15_19": {15, 16, 17, 18, 19}, "bug10_11_12": {10, 11, 12},
+}
+
+
+def _current_issue_ids() -> set[int]:
+    """Bug ids in the live ISSUES list.  Empty (e.g. generate_report can't be
+    imported) -> capture everything, a safe default."""
+    try:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        import generate_report
+        return {it["id"] for it in generate_report.ISSUES}
+    except Exception:
+        return set()
+
+
+def _select_capture_keys(issue_ids: set[int]) -> list[str]:
+    """Capture routines whose bug(s) are still in the current report.  An empty
+    issue_ids set selects ALL routines (safe default when ids are unavailable)."""
+    if not issue_ids:
+        return list(_ALL_CAPTURES)
+    return [k for k in _ALL_CAPTURES
+            if _CAPTURE_BUGS.get(k, set()) & issue_ids]
+
+
 def main(only: list[str] | None = None) -> int:
     """Run all (or a subset of) capture routines.
 
@@ -547,8 +585,16 @@ def main(only: list[str] | None = None) -> int:
     one bug's screenshot).
     """
     global _ACCESS_HWND
-    targets = (_ALL_CAPTURES if not only
-               else {k: _ALL_CAPTURES[k] for k in only})
+    if only:
+        targets = {k: _ALL_CAPTURES[k] for k in only}
+    else:
+        # Data-driven: skip routines for issues dropped from the current report
+        # (they would just regenerate orphan screenshots every build).
+        keys = _select_capture_keys(_current_issue_ids())
+        targets = {k: _ALL_CAPTURES[k] for k in keys}
+        skipped = [k for k in _ALL_CAPTURES if k not in targets]
+        if skipped:
+            print(f"  skipping (issues dropped this build): {skipped}")
     app = _open_session()
     try:
         _ACCESS_HWND = int(app.hWndAccessApp())
