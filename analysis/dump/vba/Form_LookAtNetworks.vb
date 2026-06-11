@@ -2455,10 +2455,11 @@ On Error GoTo Err_CmdNeo4j_Click
             '
             '  now process the file
             '
-            tQueryStr = "SELECT DISTINCT BIOG_MAIN.c_index_addr_id, ADDR_CODES.c_name AS c_index_addr_name, BIOG_MAIN.c_name_chn AS c_index_addr_chn " + _
-            "FROM ( ZZ_SCRATCH_P_TEXT INNER JOIN BIOG_MAIN ON ZZ_SCRATCH_P_TEXT.c_person_id = BIOG_MAIN.c_personid ) " + _
-                "INNER JOIN ADDR_CODES ON BIOG_MAIN.c_index_addr_id = ADDR_CODES.c_addr_id " + _
-                        "WHERE (BIOG_MAIN.c_index_addr_id > 0)"
+            tQueryStr = "SELECT DISTINCT BIOG_MAIN.c_index_addr_id, ADDR_CODES.c_name AS c_index_addr_name, BIOG_MAIN.c_name_chn AS c_index_addr_chn, " + _
+                    "ADDR_CODES.x_coord, ADDR_CODES.y_coord " + _
+                "FROM ( ZZ_SCRATCH_P_TEXT INNER JOIN BIOG_MAIN ON ZZ_SCRATCH_P_TEXT.c_person_id = BIOG_MAIN.c_personid ) " + _
+                    "INNER JOIN ADDR_CODES ON BIOG_MAIN.c_index_addr_id = ADDR_CODES.c_addr_id " + _
+                "WHERE (BIOG_MAIN.c_index_addr_id > 0)"
 
             Set tRstPlace = CurrentDb.OpenRecordset(tQueryStr)
             '
@@ -2549,7 +2550,7 @@ On Error GoTo Err_CmdNeo4j_Click
             gStream.Open
             '
             tQueryStr = "SELECT DISTINCT BIOG_MAIN.c_personid, BIOG_MAIN.c_index_addr_type_code, BIOG_ADDR_CODES.c_addr_desc AS c_index_addr_type_desc, " + _
-                "BIOG_ADDR_CODES.c_addr_desc_chn AS c_index_addr_type_chn " + _
+                "BIOG_ADDR_CODES.c_addr_desc_chn AS c_index_addr_type_chn, BIOG_MAIN.c_index_addr_id " + _
             "FROM ( ZZ_SCRATCH_P_TEXT INNER JOIN BIOG_MAIN ON ZZ_SCRATCH_P_TEXT.c_person_id = BIOG_MAIN.c_personid ) " + _
                 "INNER JOIN BIOG_ADDR_CODES ON BIOG_MAIN.c_index_addr_type_code = BIOG_ADDR_CODES.c_addr_type " + _
                         "WHERE (BIOG_MAIN.c_index_addr_id > 0)"
@@ -2569,7 +2570,7 @@ On Error GoTo Err_CmdNeo4j_Click
                 Do While Not .EOF
                     If Not IsNull(!c_index_addr_id) Then
                         '
-                        tStr = Trim(Str(!c_person_id)) + tC
+                        tStr = Trim(Str(!c_personid)) + tC
                         '
                         tStr = tStr + Trim(Str(!c_index_addr_id)) + tC
                         '
@@ -2629,8 +2630,8 @@ On Error GoTo Err_CmdNeo4j_Click
             '
             Set tRstAssoc = CurrentDb.OpenRecordset("ZZ_SOCIAL_NETWORK", dbOpenDynaset)
             '
-            tStr = "Person1_ID" + tC + "Person2_ID" + tC + "Association_Code" + tC + "Association_FirstYear" + tC + "Kin_ID" + tC + "Kin_Code" + tC + _
-                    "AssocKin_ID" + tC + "AssocKin_Code" + tC + "LiteraryGenreCode" + tC + "OccasionCode" + tC + _
+            tStr = "Person1_ID" + tC + "Person2_ID" + tC + "Association_Code" + tC + "Association_FirstYear" + tC + "Kin_ID" + tC + _
+                    "Kin_Code" + tC + "AssocKin_ID" + tC + "AssocKin_Code" + tC + "LiteraryGenreCode" + tC + "OccasionCode" + tC + _
                     "TopicCode" + tC + "InstitutionCode" + tC + "TextTitle" + tC + "AssociationClaimer_ID"
             gStream.WriteText tStr, adWriteLine
             'tGDF.WriteLine (tStr)
@@ -2741,6 +2742,10 @@ On Error GoTo Err_CmdNeo4j_Click
             cmdSQL.CommandText = "DELETE * FROM ZZ_KIN_LIST_TMP"
             cmdSQL.Execute tRecDeleted
             '
+            ' debug
+            '
+            'MsgBox "Testing for associations through kinship"
+            '
             tQueryStr = "INSERT INTO ZZ_KIN_LIST_TMP ( c_kin_code, c_kinrel, c_kinrel_total ) " + _
                         "SELECT DISTINCT ZZ_SOCIAL_NETWORK.c_link_code, ZZ_SOCIAL_NETWORK.c_link_desc, ZZ_SOCIAL_NETWORK.c_link_chn " + _
                         "FROM ZZ_SOCIAL_NETWORK " + _
@@ -2748,7 +2753,11 @@ On Error GoTo Err_CmdNeo4j_Click
             '
             cmdSQL.CommandText = tQueryStr
             cmdSQL.Execute tRecDeleted
-
+            '
+            ' debug
+            '
+            'MsgBox "number of kinship records = " + Trim(Str(tRecDeleted))
+            '
             If tRecDeleted > 0 Then
                 dlgSaveAs.InitialFileName = "KinshipRelations_" + tCodeStr + ".csv"
                 If dlgSaveAs.Show = -1 Then
@@ -2787,9 +2796,9 @@ On Error GoTo Err_CmdNeo4j_Click
                                 '
                                 tStr = Trim(Str(!c_person_id)) + tC
                                 '
-                                tStr = Trim(Str(!c_node_id)) + tC
+                                tStr = tStr + Trim(Str(!c_node_id)) + tC
                                 '
-                                tStr = Trim(Str(!c_link_code))
+                                tStr = tStr + Trim(Str(!c_link_code))
                                 '
                                 gStream.WriteText tStr, adWriteLine
                             End If
@@ -2883,9 +2892,22 @@ On Error GoTo Err_CmdNeo4j_Click
         '
         '  test for kin codes
         '
-        '  tRecDeleted is the number of kinship codes inserted into ZZ_KIN_LIST_TEMP for the earlier test
+        cmdSQL.CommandText = "DELETE * FROM ZZ_KIN_LIST_TMP"
+        cmdSQL.Execute tRecDeleted
         '
+        ' debug
+        '
+        'MsgBox "Testing for associations through kinship"
+        '
+        tQueryStr = "INSERT INTO ZZ_KIN_LIST_TMP ( c_kin_code, c_kinrel, c_kinrel_total ) " + _
+                    "SELECT DISTINCT ZZ_SOCIAL_NETWORK.c_link_code, ZZ_SOCIAL_NETWORK.c_link_desc, ZZ_SOCIAL_NETWORK.c_link_chn " + _
+                    "FROM ZZ_SOCIAL_NETWORK " + _
+                    "WHERE (((ZZ_SOCIAL_NETWORK.c_link_type)='K') AND ((ZZ_SOCIAL_NETWORK.c_link_code)>0))"
+        '
+        cmdSQL.CommandText = tQueryStr
+        cmdSQL.Execute tRecDeleted
         tTempLong = tRecDeleted
+        
         tQueryStr = "INSERT INTO ZZ_KIN_LIST_TMP ( c_kin_code, c_kinrel, c_kinrel_total ) " + _
                     "SELECT DISTINCT ZZ_SOCIAL_NETWORK.c_kin_code, ZZ_SOCIAL_NETWORK.c_kin_desc, ZZ_SOCIAL_NETWORK.c_kin_desc_chn " + _
                     "FROM ZZ_SOCIAL_NETWORK " + _
@@ -2895,6 +2917,7 @@ On Error GoTo Err_CmdNeo4j_Click
         cmdSQL.Execute tRecDeleted
         
         tTempLong = tTempLong + tRecDeleted
+        
         tQueryStr = "INSERT INTO ZZ_KIN_LIST_TMP ( c_kin_code, c_kinrel, c_kinrel_total ) " + _
                     "SELECT DISTINCT ZZ_SOCIAL_NETWORK.c_assoc_kin_code, ZZ_SOCIAL_NETWORK.c_assoc_kin_desc, ZZ_SOCIAL_NETWORK.c_assoc_kin_desc_chn " + _
                     "FROM ZZ_SOCIAL_NETWORK " + _
@@ -2978,6 +3001,10 @@ On Error GoTo Err_CmdNeo4j_Click
         End If
         '
         '  test for literary genre codes
+        '
+        ' debug
+        '
+        'MsgBox "Testing for Literary genre code records "
         '
         tQueryStr = "INSERT INTO ZZ_SCRATCH_P_TEXT ( c_person_id ) " + _
                     "SELECT DISTINCT ZZ_SOCIAL_NETWORK.c_person_id " + _
@@ -4848,12 +4875,62 @@ On Error GoTo Err_CmdRun_Click
     cmdSQL.CommandText = tQueryStr
     cmdSQL.Execute tRecCount
     '
-    ' Get Kinship descriptions
+    ' Get Kinship descriptions for the basic link
     '
     tQueryStr = "UPDATE ZZ_SOCIAL_NETWORK INNER JOIN KINSHIP_CODES ON ZZ_SOCIAL_NETWORK.c_link_code = KINSHIP_CODES.c_kincode " + _
         "SET ZZ_SOCIAL_NETWORK.c_link_desc = [KINSHIP_CODES].[c_kinrel], " + _
             "ZZ_SOCIAL_NETWORK.c_link_chn = [KINSHIP_CODES].[c_kinrel_chn] " + _
         "WHERE (((ZZ_SOCIAL_NETWORK.c_link_type) = 'K'))"
+    cmdSQL.CommandText = tQueryStr
+    cmdSQL.Execute tRecCount
+    '
+    ' Get Kinship descriptions for the supplemental role (c_kin_code)
+    '
+    tQueryStr = "UPDATE ZZ_SOCIAL_NETWORK INNER JOIN KINSHIP_CODES ON ZZ_SOCIAL_NETWORK.c_kin_code = KINSHIP_CODES.c_kincode " + _
+                "SET ZZ_SOCIAL_NETWORK.c_kin_desc = [KINSHIP_CODES].[c_kinrel], " + _
+                    "ZZ_SOCIAL_NETWORK.c_kin_desc_chn = [KINSHIP_CODES].[c_kinrel_chn]"
+    cmdSQL.CommandText = tQueryStr
+    cmdSQL.Execute tRecCount
+    '
+    ' Get Kinship descriptions for the supplemental role (c_assoc_kin_code)
+    '
+    tQueryStr = "UPDATE ZZ_SOCIAL_NETWORK INNER JOIN KINSHIP_CODES ON ZZ_SOCIAL_NETWORK.c_assoc_kin_code = KINSHIP_CODES.c_kincode " + _
+                "SET ZZ_SOCIAL_NETWORK.c_assoc_kin_desc = [KINSHIP_CODES].[c_kinrel], " + _
+                    "ZZ_SOCIAL_NETWORK.c_assoc_kin_desc_chn = [KINSHIP_CODES].[c_kinrel_chn]"
+    cmdSQL.CommandText = tQueryStr
+    cmdSQL.Execute tRecCount
+    '
+    ' get the descriptions for other types of information: literary genre, occasion, topic, institution names, and association claimer name
+    '
+    tQueryStr = "UPDATE ZZ_SOCIAL_NETWORK INNER JOIN LITERARYGENRE_CODES ON ZZ_SOCIAL_NETWORK.c_litgenre_code = LITERARYGENRE_CODES.c_lit_genre_code " + _
+                "SET ZZ_SOCIAL_NETWORK.c_litgenre_desc = [LITERARYGENRE_CODES].[c_lit_genre_desc], " + _
+                    "ZZ_SOCIAL_NETWORK.c_litgenre_desc_chn = [LITERARYGENRE_CODES].[c_lit_genre_desc_chn]"
+    cmdSQL.CommandText = tQueryStr
+    cmdSQL.Execute tRecCount
+    '
+    tQueryStr = "UPDATE ZZ_SOCIAL_NETWORK INNER JOIN OCCASION_CODES ON ZZ_SOCIAL_NETWORK.c_occasion_code = OCCASION_CODES.c_occasion_code " + _
+                "SET ZZ_SOCIAL_NETWORK.c_occasion_desc = [OCCASION_CODES].[c_occasion_desc], " + _
+                    "ZZ_SOCIAL_NETWORK.c_occasion_desc_chn = [OCCASION_CODES].[c_occasion_desc_chn]"
+    cmdSQL.CommandText = tQueryStr
+    cmdSQL.Execute tRecCount
+    '
+    tQueryStr = "UPDATE ZZ_SOCIAL_NETWORK INNER JOIN SCHOLARLYTOPIC_CODES ON ZZ_SOCIAL_NETWORK.c_topic_code = SCHOLARLYTOPIC_CODES.c_topic_code " + _
+                "SET ZZ_SOCIAL_NETWORK.c_topic_desc = [SCHOLARLYTOPIC_CODES].[c_topic_desc], " + _
+                    "ZZ_SOCIAL_NETWORK.c_topic_desc_chn = [SCHOLARLYTOPIC_CODES].[c_topic_desc_chn]"
+    cmdSQL.CommandText = tQueryStr
+    cmdSQL.Execute tRecCount
+    '
+    tQueryStr = "UPDATE ZZ_SOCIAL_NETWORK " + _
+                    "INNER JOIN SOCIAL_INSTITUTION_NAME_CODES ON ZZ_SOCIAL_NETWORK.c_inst_name_code = SOCIAL_INSTITUTION_NAME_CODES.c_inst_name_code " + _
+                "SET ZZ_SOCIAL_NETWORK.c_inst_name_py = [SOCIAL_INSTITUTION_NAME_CODES].[c_inst_name_py], " + _
+                    "ZZ_SOCIAL_NETWORK.c_inst_name_hz = [SOCIAL_INSTITUTION_NAME_CODES].[c_inst_name_hz]"
+    cmdSQL.CommandText = tQueryStr
+    cmdSQL.Execute tRecCount
+    '
+    tQueryStr = "UPDATE ZZ_SOCIAL_NETWORK INNER JOIN BIOG_MAIN ON ZZ_SOCIAL_NETWORK.c_assoc_claimer_id = BIOG_MAIN.c_personid " + _
+                "SET ZZ_SOCIAL_NETWORK.c_assoc_claimer_name = [BIOG_MAIN].[c_name], " + _
+                    "ZZ_SOCIAL_NETWORK.c_assoc_claimer_name_chn = [BIOG_MAIN].[c_name_chn], " + _
+                    "ZZ_SOCIAL_NETWORK.c_assoc_claimer_index_year = [BIOG_MAIN].[c_index_year]"
     cmdSQL.CommandText = tQueryStr
     cmdSQL.Execute tRecCount
     '

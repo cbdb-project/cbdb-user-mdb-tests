@@ -23,9 +23,24 @@ TYPE_NAME = {
 }
 
 
+def _access_pids() -> set[int]:
+    """Currently-running MSACCESS.EXE PIDs (empty set if psutil unavailable)."""
+    try:
+        import psutil
+        return {p.pid for p in psutil.process_iter(["name"])
+                if (p.info["name"] or "").upper() == "MSACCESS.EXE"}
+    except Exception:
+        return set()
+
+
 def main():
     print("opening Access...")
-    app = win32com.client.Dispatch("Access.Application")
+    # DispatchEx (NOT Dispatch): force a FRESH out-of-process Access instance.
+    # Dispatch can bind to a developer's already-running Access via the ROT,
+    # and the OpenCurrentDatabase/CloseCurrentDatabase/Quit below would then
+    # commandeer + close THEIR window.  DispatchEx + the scoped PID-kill in
+    # __main__ keep this script's Access entirely its own (cf. landmine #9).
+    app = win32com.client.DispatchEx("Access.Application")
     app.Visible = False
     app.OpenCurrentDatabase(str(USER_MDB))
 
@@ -71,11 +86,17 @@ def main():
 
 if __name__ == "__main__":
     t0 = time.time()
+    # Scope-kill ONLY Access instances that appeared DURING this run (in case
+    # Quit() leaves one lingering) -- never a window already open before it.  A blanket
+    # `taskkill /IM MSACCESS.EXE` (the old behaviour) would violate the
+    # scoped-kill discipline the harness keeps (conftest.pytest_sessionfinish),
+    # which matters now that this runs as a hard step in run_tests.ps1 (Step 5a).
+    pre_pids = _access_pids()
     try:
         main()
     finally:
-        # Clean up any lingering Access processes
         import subprocess
-        subprocess.run(["taskkill", "/F", "/IM", "MSACCESS.EXE"],
-                       capture_output=True)
+        for pid in _access_pids() - pre_pids:
+            subprocess.run(["taskkill", "/F", "/PID", str(pid)],
+                           capture_output=True)
     print(f"done in {time.time() - t0:.1f}s")

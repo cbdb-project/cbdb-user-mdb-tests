@@ -1210,211 +1210,217 @@ On Error GoTo Err_CmdNeo4j_Click
     '
     ' now the PeopleEntry file
     '
-    dlgSaveAs.InitialFileName = "PeopleEntry_" + tCodeStr + ".csv"
-    If dlgSaveAs.Show = -1 Then
-        '
-        tFileName = ""
-        For Each tFN In dlgSaveAs.SelectedItems
-            tFileName = tFN
-            If Not tFileName = "" Then
-                Exit For
-            End If
-        Next
-        If tFileName = "" Then
-            MsgBox "Bad file Name."
-            GoTo Exit_CmdNeo4j_Click
-        Else
-            '  make sure the file name has a txt extension
-            If Len(tFileName) < 5 Then
-                tFileName = tFileName + ".csv"
-            ElseIf Not (LCase(Right(tFileName, 4)) = ".csv") Then
-                tFileName = tFileName + ".csv"
-            End If
-        End If
-        '
-        gStream.Mode = adModeReadWrite
-        gStream.Type = adTypeText
-        gStream.Open
-
-        tStr = "NameID" + tC + "EntryCode" + tC + "EntryPlaceID" + tC + "KinID" + tC + "KinRelCode" + tC + _
-                "AssocPersonID" + tC + "AssocRelCode" + tC + "SocialInstID" + tC + "SocialInstNameID" + tC + "EntryYear" + tC + "EntryDynasty"
-        gStream.WriteText tStr, adWriteLine
-        '
-        Set tRstPeopleEntry = CurrentDb.OpenRecordset("ZZ_SCRATCH_ENTRY", dbOpenDynaset)
-        With tRstPeopleEntry
-            .MoveFirst
-            Do While Not .EOF
-                '  the ID of the person
-                tStr = Trim(Str(!c_personid)) + tC
-                '
-                '  entry code
-                '
-                If IsNull(!c_entry_code) Then
-                    tStr = tStr + "0" + tC
-                Else
-                    tStr = tStr + Trim(Str(!c_entry_code)) + tC
-                End If
-                '
-                '  entry addr id
-                '
-                If IsNull(!c_entry_addr_id) Then
-                    tStr = tStr + "0" + tC
-                Else
-                    tStr = tStr + Trim(Str(!c_entry_addr_id)) + tC
-                End If
-                '
-                '  kin ID
-                '
-                If IsNull(!c_kin_id) Then
-                    tStr = tStr + "0" + tC
-                Else
-                    tStr = tStr + Trim(Str(!c_kin_id)) + tC
-                End If
-                '
-                '  kin rel ID
-                '
-                If IsNull(!c_kin_code) Then
-                    tStr = tStr + "0" + tC
-                Else
-                    tStr = tStr + Trim(Str(!c_kin_code)) + tC
-                End If
-                '
-                '  assoc ID
-                '
-                If IsNull(!c_assoc_id) Then
-                    tStr = tStr + "0" + tC
-                Else
-                    tStr = tStr + Trim(Str(!c_assoc_id)) + tC
-                End If
-                '
-                '  assoc desc
-                '
-                If IsNull(!c_assoc_code) Then
-                    tStr = tStr + "N/A" + tC
-                Else
-                    tStr = tStr + Trim(Str(!c_assoc_code)) + tC
-                End If
-                '
-                '  social inst IDs
-                '
-                If IsNull(!c_inst_code) Then
-                    tStr = tStr + "0" + tC
-                Else
-                    tStr = tStr + Trim(Str(!c_inst_code)) + tC
-                End If
-                '
-                If IsNull(!c_inst_name_code) Then
-                    tStr = tStr + "0" + tC
-                Else
-                    tStr = tStr + Trim(Str(!c_inst_name_code)) + tC
-                End If
-                '
-                '  entry year
-                '
-                If IsNull(!c_year) Then
-                    tStr = tStr + "0" + tC
-                Else
-                    tStr = tStr + Trim(Str(!c_year)) + tC
-                End If
-                '
-                '  dynasty
-                '
-                If IsNull(!c_dy) Then
-                    tStr = tStr + "0"
-                Else
-                    tStr = tStr + Trim(Str(!c_dy))
-                End If
-                '
-                gStream.WriteText tStr, adWriteLine
-                '
-                .MoveNext
-            Loop
-        End With
-        ' now make sure all the data is copied to tStream
-        gStream.Flush
-        ' and write the stream to the file
-        gStream.SaveToFile tFileName, adSaveCreateOverWrite
-        '
-        gStream.Close
-    Else
-        'The user pressed Cancel.
-        GoTo Exit_CmdNeo4j_Click
-    End If
+    ' Are there any records to process
     '
-    ' now the EntryCode file
-    '
-    dlgSaveAs.InitialFileName = "EntryCode_" + tCodeStr + ".csv"
-    If dlgSaveAs.Show = -1 Then
-        '
-        tFileName = ""
-        For Each tFN In dlgSaveAs.SelectedItems
-            tFileName = tFN
-            If Not tFileName = "" Then
-                Exit For
+    If DCount("c_entry_code", "ZZ_SCRATCH_ENTRY") > 0 Then
+        dlgSaveAs.InitialFileName = "PeopleEntry_" + tCodeStr + ".csv"
+        If dlgSaveAs.Show = -1 Then
+            '
+            tFileName = ""
+            For Each tFN In dlgSaveAs.SelectedItems
+                tFileName = tFN
+                If Not tFileName = "" Then
+                    Exit For
+                End If
+            Next
+            If tFileName = "" Then
+                MsgBox "Bad file Name."
+                GoTo Exit_CmdNeo4j_Click
+            Else
+                '  make sure the file name has a txt extension
+                If Len(tFileName) < 5 Then
+                    tFileName = tFileName + ".csv"
+                ElseIf Not (LCase(Right(tFileName, 4)) = ".csv") Then
+                    tFileName = tFileName + ".csv"
+                End If
             End If
-        Next
-        If tFileName = "" Then
-            MsgBox "Bad file Name."
+            '
+            gStream.Mode = adModeReadWrite
+            gStream.Type = adTypeText
+            gStream.Open
+    
+            tStr = "NameID" + tC + "EntryCode" + tC + "EntryPlaceID" + tC + "KinID" + tC + "KinRelCode" + tC + _
+                    "AssocPersonID" + tC + "AssocRelCode" + tC + "SocialInstID" + tC + "SocialInstNameID" + tC + "EntryYear" + tC + "EntryDynasty"
+            gStream.WriteText tStr, adWriteLine
+            '
+            Set tRstPeopleEntry = CurrentDb.OpenRecordset("ZZ_SCRATCH_ENTRY", dbOpenDynaset)
+            With tRstPeopleEntry
+                If Not .EOF Then
+                    .MoveFirst
+                    Do While Not .EOF
+                        '  the ID of the person
+                        tStr = Trim(Str(!c_personid)) + tC
+                        '
+                        '  entry code
+                        '
+                        If IsNull(!c_entry_code) Then
+                            tStr = tStr + "0" + tC
+                        Else
+                            tStr = tStr + Trim(Str(!c_entry_code)) + tC
+                        End If
+                        '
+                        '  entry addr id
+                        '
+                        If IsNull(!c_entry_addr_id) Then
+                            tStr = tStr + "0" + tC
+                        Else
+                            tStr = tStr + Trim(Str(!c_entry_addr_id)) + tC
+                        End If
+                        '
+                        '  kin ID
+                        '
+                        If IsNull(!c_kin_id) Then
+                            tStr = tStr + "0" + tC
+                        Else
+                            tStr = tStr + Trim(Str(!c_kin_id)) + tC
+                        End If
+                        '
+                        '  kin rel ID
+                        '
+                        If IsNull(!c_kin_code) Then
+                            tStr = tStr + "0" + tC
+                        Else
+                            tStr = tStr + Trim(Str(!c_kin_code)) + tC
+                        End If
+                        '
+                        '  assoc ID
+                        '
+                        If IsNull(!c_assoc_id) Then
+                            tStr = tStr + "0" + tC
+                        Else
+                            tStr = tStr + Trim(Str(!c_assoc_id)) + tC
+                        End If
+                        '
+                        '  assoc desc
+                        '
+                        If IsNull(!c_assoc_code) Then
+                            tStr = tStr + "N/A" + tC
+                        Else
+                            tStr = tStr + Trim(Str(!c_assoc_code)) + tC
+                        End If
+                        '
+                        '  social inst IDs
+                        '
+                        If IsNull(!c_inst_code) Then
+                            tStr = tStr + "0" + tC
+                        Else
+                            tStr = tStr + Trim(Str(!c_inst_code)) + tC
+                        End If
+                        '
+                        If IsNull(!c_inst_name_code) Then
+                            tStr = tStr + "0" + tC
+                        Else
+                            tStr = tStr + Trim(Str(!c_inst_name_code)) + tC
+                        End If
+                        '
+                        '  entry year
+                        '
+                        If IsNull(!c_year) Then
+                            tStr = tStr + "0" + tC
+                        Else
+                            tStr = tStr + Trim(Str(!c_year)) + tC
+                        End If
+                        '
+                        '  dynasty
+                        '
+                        If IsNull(!c_dy) Then
+                            tStr = tStr + "0"
+                        Else
+                            tStr = tStr + Trim(Str(!c_dy))
+                        End If
+                        '
+                        gStream.WriteText tStr, adWriteLine
+                        '
+                        .MoveNext
+                    Loop
+                End If
+            End With
+            ' now make sure all the data is copied to tStream
+            gStream.Flush
+            ' and write the stream to the file
+            gStream.SaveToFile tFileName, adSaveCreateOverWrite
+            '
+            gStream.Close
+        Else
+            'The user pressed Cancel.
             GoTo Exit_CmdNeo4j_Click
-        Else
-            '  make sure the file name has a txt extension
-            If Len(tFileName) < 5 Then
-                tFileName = tFileName + ".csv"
-            ElseIf Not (LCase(Right(tFileName, 4)) = ".csv") Then
-                tFileName = tFileName + ".csv"
+        End If
+        '
+        ' now the EntryCode file
+        '
+        dlgSaveAs.InitialFileName = "EntryCode_" + tCodeStr + ".csv"
+        If dlgSaveAs.Show = -1 Then
+            '
+            tFileName = ""
+            For Each tFN In dlgSaveAs.SelectedItems
+                tFileName = tFN
+                If Not tFileName = "" Then
+                    Exit For
+                End If
+            Next
+            If tFileName = "" Then
+                MsgBox "Bad file Name."
+                GoTo Exit_CmdNeo4j_Click
+            Else
+                '  make sure the file name has a txt extension
+                If Len(tFileName) < 5 Then
+                    tFileName = tFileName + ".csv"
+                ElseIf Not (LCase(Right(tFileName, 4)) = ".csv") Then
+                    tFileName = tFileName + ".csv"
+                End If
             End If
-        End If
-        '
-        gStream.Mode = adModeReadWrite
-        gStream.Type = adTypeText
-        gStream.Open
-
-        If tCodeStr = "ascii" Then
-            tStr = "EntryCode" + tC + "EntryDesc"
+            '
+            gStream.Mode = adModeReadWrite
+            gStream.Type = adTypeText
+            gStream.Open
+    
+            If tCodeStr = "ascii" Then
+                tStr = "EntryCode" + tC + "EntryDesc"
+            Else
+                tStr = "EntryCode" + tC + "EntryDesc" + tC + "EntryDescHZ"
+            End If
+            gStream.WriteText tStr, adWriteLine
+            '
+            ' get the codes
+            '
+            tQueryStr = "SELECT DISTINCT ZZ_SCRATCH_ENTRY.c_entry_code, ZZ_SCRATCH_ENTRY.c_entry_desc, ZZ_SCRATCH_ENTRY.c_entry_chn " + _
+                        "FROM ZZ_SCRATCH_ENTRY WHERE (ZZ_SCRATCH_ENTRY.c_entry_code > -1)"
+            Set tRstEntryCodes = CurrentDb.OpenRecordset(tQueryStr)
+            With tRstEntryCodes
+                .MoveFirst
+                Do While Not .EOF
+                    '
+                    tStr = Trim(Str(!c_entry_code)) + tC
+                    '
+                    '  entry desc
+                    '
+                    If IsNull(!c_entry_desc) Then
+                        tStr = tStr + "Missing"
+                    Else
+                        tStr = tStr + Trim(!c_entry_desc)
+                    End If
+                    '
+                    '  kin ID
+                    '
+                    If Not (tCodeStr = "ascii") Then
+                        tStr = tStr + tC + Trim(!c_entry_chn)
+                    End If
+                    '
+                    gStream.WriteText tStr, adWriteLine
+                    '
+                    .MoveNext
+                Loop
+            End With
+            ' now make sure all the data is copied to tStream
+            gStream.Flush
+            ' and write the stream to the file
+            gStream.SaveToFile tFileName, adSaveCreateOverWrite
+            '
+            gStream.Close
         Else
-            tStr = "EntryCode" + tC + "EntryDesc" + tC + "EntryDescHZ"
+            'The user pressed Cancel.
+            GoTo Exit_CmdNeo4j_Click
         End If
-        gStream.WriteText tStr, adWriteLine
-        '
-        ' get the codes
-        '
-        tQueryStr = "SELECT DISTINCT ZZ_SCRATCH_ENTRY.c_entry_code, ZZ_SCRATCH_ENTRY.c_entry_desc, ZZ_SCRATCH_ENTRY.c_entry_chn " + _
-                    "FROM ZZ_SCRATCH_ENTRY WHERE (ZZ_SCRATCH_ENTRY.c_entry_code > -1)"
-        Set tRstEntryCodes = CurrentDb.OpenRecordset(tQueryStr)
-        With tRstEntryCodes
-            .MoveFirst
-            Do While Not .EOF
-                '
-                tStr = Trim(Str(!c_entry_code)) + tC
-                '
-                '  entry desc
-                '
-                If IsNull(!c_entry_desc) Then
-                    tStr = tStr + "Missing"
-                Else
-                    tStr = tStr + Trim(!c_entry_desc)
-                End If
-                '
-                '  kin ID
-                '
-                If Not (tCodeStr = "ascii") Then
-                    tStr = tStr + tC + Trim(!c_entry_chn)
-                End If
-                '
-                gStream.WriteText tStr, adWriteLine
-                '
-                .MoveNext
-            Loop
-        End With
-        ' now make sure all the data is copied to tStream
-        gStream.Flush
-        ' and write the stream to the file
-        gStream.SaveToFile tFileName, adSaveCreateOverWrite
-        '
-        gStream.Close
-    Else
-        'The user pressed Cancel.
-        GoTo Exit_CmdNeo4j_Click
     End If
     '
     ' the last step is to collect institution codes from Entry and Office
@@ -2618,7 +2624,7 @@ Private Sub queryEntry()
                 "ZZ_SCRATCH_IMPORT_PEOPLE.c_addr_desc_chn, ZZ_SCRATCH_IMPORT_PEOPLE.x_coord, ZZ_SCRATCH_IMPORT_PEOPLE.y_coord, ENTRY_DATA.c_entry_code, " + _
                 "ENTRY_CODES.c_entry_desc, ENTRY_CODES.c_entry_desc_chn, ENTRY_DATA.c_sequence,  ENTRY_DATA.c_exam_rank, ENTRY_DATA.c_kin_code, " + _
                 "ENTRY_DATA.c_kin_id, ENTRY_DATA.c_assoc_code, ENTRY_DATA.c_assoc_id, ENTRY_DATA.c_year, ENTRY_DATA.c_age, ENTRY_DATA.c_inst_code, " + _
-                "ENTRY_DATA.c_inst_name_code, ENTRY_DATA.c_entry_addr_id, ENTRY_DATA.c_source, ENTRY_DATA.c_parental_status "
+                "ENTRY_DATA.c_inst_name_code, ENTRY_DATA.c_entry_addr_id, ENTRY_DATA.c_source, ENTRY_DATA.c_parental_status_code "
     tStrFrom = "FROM ZZ_SCRATCH_IMPORT_PEOPLE INNER JOIN ( ENTRY_CODES INNER JOIN ENTRY_DATA ON ENTRY_CODES.c_entry_code = ENTRY_DATA.c_entry_code ) " + _
                 "ON ZZ_SCRATCH_IMPORT_PEOPLE.c_person_id = ENTRY_DATA.c_personid"
    

@@ -319,9 +319,10 @@ On Error GoTo Err_CmdNeo4j_Click
         cmdSQL.CommandText = tQueryStr
         cmdSQL.Execute tRecDeleted
         '
-        tQueryStr = "SELECT DISTINCT ZZ_SCRATCH_P_TEXT.c_person_id, ZZ_SCRATCH_P_TEXT.c_name, ZZ_SCRATCH_P_TEXT.c_name_chn, ZZ_SCRATCH_P_TEXT.c_index_year " + _
-                "FROM ZZ_SCRATCH_P_TEXT INNER JOIN ( DYNASTIES RIGHT JOIN BIOG_MAIN ON DYNASTIES.c_dy = BIOG_MAIN.c_dy ) " + _
-                "ON ZZ_SCRATCH_P_TEXT.c_person_id = BIOG_MAIN.c_personid"
+        tQueryStr = "SELECT DISTINCT ZZ_SCRATCH_P_TEXT.c_person_id, ZZ_SCRATCH_P_TEXT.c_name, ZZ_SCRATCH_P_TEXT.c_name_chn, ZZ_SCRATCH_P_TEXT.c_index_year, " + _
+                        "DYNASTIES.c_dynasty, DYNASTIES.c_dynasty_chn, BIOG_MAIN.c_female " + _
+                    "FROM ZZ_SCRATCH_P_TEXT INNER JOIN ( DYNASTIES RIGHT JOIN BIOG_MAIN ON DYNASTIES.c_dy = BIOG_MAIN.c_dy ) " + _
+                        "ON ZZ_SCRATCH_P_TEXT.c_person_id = BIOG_MAIN.c_personid"
 
         Set tRstPeople = CurrentDb.OpenRecordset(tQueryStr, dbOpenDynaset)
         tRstPeople.MoveLast
@@ -1486,9 +1487,11 @@ Private Sub CmdQuery_Click()
         
         CmdStoreID.Enabled = True
         CmdNeo4j.Enabled = True
+        CmdGIS.Enabled = True
     Else
         CmdStoreID.Enabled = False
         CmdNeo4j.Enabled = False
+        CmdGIS.Enabled = False
     End If
 
     If tSNA_count > 0 Then
@@ -1528,7 +1531,7 @@ On Error GoTo Err_CmdGIS_Click
     '
     '  This program will dump the results to a .gis file
     '
-    If frmZZZ_PLACE.Form.Recordset.RecordCount = 0 Then
+    If DCount("*", "ZZ_PLACE") = 0 Then
         MsgBox "There are no records to save."
         GoTo Exit_CmdGIS_Click
     End If
@@ -1578,77 +1581,83 @@ On Error GoTo Err_CmdGIS_Click
         '
         ' process the table
         '
-        Set tRstNode = frmZZZ_PLACE.Form.Recordset
+        Set tRstNode = CurrentDb.OpenRecordset("ZZ_Place", dbOpenDynaset)
         tC = Chr(44) ' the comma
         '
         With tRstNode
             '
             ' write the header
             '
-            tStr = "Name" + tC + "NameChn" + tC + "IndexYear" + tC
+            tStr = "Name" + tC + "NameChn" + tC + "IndexYear" + tC + "PlaceRelationCategory" + tC
             tStr = tStr + "AddrName" + tC + "AddrChn" + tC + "X" + tC + "Y" + tC
             tStr = tStr + "xy_count"
             tStream.WriteText tStr, adWriteLine
             .MoveFirst
             Do While Not .EOF
-                ' must guard against NULLs
                 '
-                If Trim(!c_name) = "" Then
-                    tStr = "[?]" + tC
-                Else
-                    tStr = !c_name + tC
+                ' must guard against NULLs (no point adding records with no coordinates or with x = 0)
+                '
+                If Not IsNull(!x_coord) Then
+                    If !x_coord > 0 Then
+                        If Trim(!c_name) = "" Then
+                            tStr = "[?]" + tC
+                        Else
+                            tStr = !c_name + tC
+                        End If
+                        
+                        If Trim(!c_name_chn) = "" Then
+                            tStr = tStr + "[?]" + tC
+                        Else
+                            tStr = tStr + !c_name_chn + tC
+                        End If
+                        
+                        If IsNull(!c_index_year) Then
+                            tStr = tStr + "-2000" + tC
+                        Else
+                            tStr = tStr + Str(!c_index_year) + tC
+                        End If
+                        
+                        If IsNull(!c_rel_type) Then
+                            tStr = tStr + "Unknown" + tC
+                        Else
+                            tStr = tStr + Trim(!c_rel_type) + tC
+                        End If
+                        
+                        ' here guard against blanks as well
+                        
+                        If IsNull(!c_addr_name) Then
+                            tStr = tStr + "[?]" + tC
+                        ElseIf Trim(!c_addr_name) = "" Then
+                            tStr = tStr + "[?]" + tC
+                        Else
+                            tStr = tStr + !c_addr_name + tC
+                        End If
+                        
+                        If IsNull(!c_addr_chn) Then
+                            tStr = tStr + "[?]" + tC
+                        ElseIf Trim(!c_addr_chn) = "" Then
+                            tStr = tStr + "[?]" + tC
+                        Else
+                            tStr = tStr + !c_addr_chn + tC
+                        End If
+                        
+                        tStr = tStr + Str(!x_coord) + tC
+                        
+                        If IsNull(!y_coord) Then
+                            tStr = tStr + "0" + tC
+                        Else
+                            tStr = tStr + Str(!y_coord) + tC
+                        End If
+                        
+                        If IsNull(!xy_count) Then
+                            tStr = tStr + "0"
+                        Else
+                            tStr = tStr + Str(!xy_count)
+                        End If
+                        
+                        tStream.WriteText tStr, adWriteLine
+                    End If
                 End If
-                
-                If Trim(!c_name_chn) = "" Then
-                    tStr = tStr + "[?]" + tC
-                Else
-                    tStr = tStr + !c_name_chn + tC
-                End If
-                
-                If IsNull(!c_index_year) Then
-                    tStr = tStr + "-2000" + tC
-                Else
-                    tStr = tStr + Str(!c_index_year) + tC
-                End If
-                
-                ' here guard against blanks as well
-                
-                If IsNull(!c_addr_name) Then
-                    tStr = tStr + "[?]" + tC
-                ElseIf Trim(!c_addr_name) = "" Then
-                    tStr = tStr + "[?]" + tC
-                Else
-                    tStr = tStr + !c_addr_name + tC
-                End If
-                
-                If IsNull(!c_addr_chn) Then
-                    tStr = tStr + "[?]" + tC
-                ElseIf Trim(!c_addr_chn) = "" Then
-                    tStr = tStr + "[?]" + tC
-                Else
-                    tStr = tStr + !c_addr_chn + tC
-                End If
-                
-                If IsNull(!x_coord) Then
-                    tStr = tStr + "0" + tC
-                Else
-                    tStr = tStr + Str(!x_coord) + tC
-                End If
-                
-                If IsNull(!y_coord) Then
-                    tStr = tStr + "0" + tC
-                Else
-                    tStr = tStr + Str(!y_coord) + tC
-                End If
-                
-                If IsNull(!xy_count) Then
-                    tStr = tStr + "0"
-                Else
-                    tStr = tStr + Str(!xy_count)
-                End If
-                
-                
-                tStream.WriteText tStr, adWriteLine
                 .MoveNext
             Loop
         End With

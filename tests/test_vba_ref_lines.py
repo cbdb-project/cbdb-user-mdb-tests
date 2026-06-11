@@ -58,8 +58,9 @@ def test_colon_ref_with_prose_lines_not_rejected():
 
 
 def test_check_ref_correct_passes():
-    assert av._check_ref("Form_LookAtStatus", 2308, None,
-                         "(If ChkIDs.Value Then)", require_anchor=True) is None
+    # a real, current citation (Issue #24 — the non-ASCII nodedef> header)
+    assert av._check_ref("Form_LookAtKinship", 549, None,
+                         "(non-ASCII nodedef> header)", require_anchor=True) is None
 
 
 def test_check_ref_out_of_range_flagged():

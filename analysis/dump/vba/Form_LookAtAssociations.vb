@@ -641,7 +641,7 @@ On Error GoTo Err_CmdNeo4j_Click
             cmdSQL.CommandText = "Delete * from ZZ_SCRATCH_PEOPLE"
             cmdSQL.Execute tRecDeleted
             '
-            tQueryStr = "INSERT INTO ZZ_SCRATCH_PEOPLE ( c_person_id, c_name, c_name_chn, c_index_year, c_index_year_type_code, c_dy, c_addr_id, c_index_addr_type_code, c_female ) " + _
+            tQueryStr = "INSERT INTO ZZ_SCRATCH_PEOPLE ( c_person_id, c_name, c_name_chn, c_index_year, c_index_year_type_code, c_dy, c_addr_id, c_addr_type, c_female ) " + _
                         "SELECT DISTINCT ZZ_SCRATCH_P_TEXT.c_person_id, BIOG_MAIN.c_name, BIOG_MAIN.c_name_chn, BIOG_MAIN.c_index_year, BIOG_MAIN.c_index_year_type_code, " + _
                             "BIOG_MAIN.c_dy, BIOG_MAIN.c_index_addr_id, BIOG_MAIN.c_index_addr_type_code, BIOG_MAIN.c_female " + _
                         "FROM ZZ_SCRATCH_P_TEXT INNER JOIN BIOG_MAIN ON ZZ_SCRATCH_P_TEXT.c_person_id = BIOG_MAIN.c_personid"
@@ -878,7 +878,7 @@ On Error GoTo Err_CmdNeo4j_Click
 
             Set tRstPeoplePlace = CurrentDb.OpenRecordset(tQueryStr)
             
-            tStr = "nameID" + tC + "placeID" + tC + "personPlaceTrans" + tC + "personPlaceHZ"
+            tStr = "nameID" + tC + "placeID" + tC + "personPlaceTypeCode" + tC + "personPlaceTypeTrans" + tC + "personPlaceTypeHZ"
             
             gStream.WriteText tStr, adWriteLine
             
@@ -891,7 +891,12 @@ On Error GoTo Err_CmdNeo4j_Click
                         '
                         tStr = tStr + Trim(Str(!c_addr_id)) + tC
                         '
-                        tStr = tStr + Trim(Str(!c_addr_type))
+                        tStr = tStr + Trim(Str(!c_addr_type)) + tC
+                        '
+                        tStr = tStr + Trim(!c_addr_desc) + tC
+                        '
+                        tStr = tStr + Trim(!c_addr_desc_chn)
+                        '
                         gStream.WriteText tStr, adWriteLine
                     End If
                     .MoveNext

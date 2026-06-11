@@ -223,7 +223,7 @@ python analysis/run_all_audits.py
 Add this to the per-release workflow:
 
 ```
-1. analysis/dump_metadata.py + analysis/dump_vba.py (refresh dumps)
+1. analysis/dump_metadata.py + analysis/dump_vba.py + analysis/extract_form_code.py (refresh dumps; extract_form_code writes the per-form dump/vba/*.vb files the audits read)
 2. analysis/run_all_audits.py (this catalogue)
 3. python analysis/discover_test_inputs.py
 4. fast suite + slow VBA suite

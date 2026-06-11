@@ -30,20 +30,10 @@ _PASS: 30 · FAIL: 10 · ERROR: 0 · SKIP: 4 · NOT RUN: 0 · N/A: 56_
 ## Table of Contents
 
 - [P3 — Missing UI](#p3--missing-ui)
-  - [Issue #13 — BIOG_MAIN_2 Subform clicks a picker form (frmPickNIAN_HAO) that does not exist](#issue-13--biog_main_2-subform-clicks-a-picker-form-frmpicknian_hao-that-does-not-exist)
-  - [Issue #16 — LookAtStatus is missing its CmdPajek button (handler exists, no UI control)](#issue-16--lookatstatus-is-missing-its-cmdpajek-button-handler-exists-no-ui-control)
-  - [Issue #17 — LookAtStatus is missing its CmdGephi button (handler exists, no UI control)](#issue-17--lookatstatus-is-missing-its-cmdgephi-button-handler-exists-no-ui-control)
-  - [Issue #18 — LookAtStatus is missing its CmdUCINet button (handler exists, no UI control)](#issue-18--lookatstatus-is-missing-its-cmducinet-button-handler-exists-no-ui-control)
   - [Issue #19 — LookAtOffice is missing its CmdGUESS button (handler exists, no UI control)](#issue-19--lookatoffice-is-missing-its-cmdguess-button-handler-exists-no-ui-control)
 - [P4 — Setup](#p4--setup)
   - [Issue #2 — VBA project references the legacy dao360.dll, absent on Office 2016+ machines](#issue-2--vba-project-references-the-legacy-dao360dll-absent-on-office-2016-machines)
 - [P5 — Dormant / latent / not currently reproducible](#p5--dormant--latent--not-currently-reproducible)
-  - [Issue #5 — LookAtStatus.CmdPajek references a missing control AND three columns that don't exist — LATENT (gated by the missing Pajek button, Issue #16)](#issue-5--lookatstatuscmdpajek-references-a-missing-control-and-three-columns-that-dont-exist--latent-gated-by-the-missing-pajek-button-issue-16)
-  - [Issue #6 — LookAtGroupData Entry insert projects ENTRY_DATA.c_parental_status (should be …_code) — LATENT this build (runtime ERR did not fire)](#issue-6--lookatgroupdata-entry-insert-projects-entry_datac_parental_status-should-be-_code--latent-this-build-runtime-err-did-not-fire)
-  - [Issue #7 — LookAtPlace.CmdNeo4j people-recordset reads c_dynasty / c_dynasty_chn / c_female that the SELECT doesn't project — LATENT (runtime did not fire this build)](#issue-7--lookatplacecmdneo4j-people-recordset-reads-c_dynasty--c_dynasty_chn--c_female-that-the-select-doesnt-project--latent-runtime-did-not-fire-this-build)
-  - [Issue #8 — LookAtNetworks.CmdNeo4j place-recordset reads x_coord / y_coord that the SELECT doesn't project — LATENT (behavioural repro blocked by Networks Form_Open hang)](#issue-8--lookatnetworkscmdneo4j-place-recordset-reads-x_coord--y_coord-that-the-select-doesnt-project--latent-behavioural-repro-blocked-by-networks-form_open-hang)
-  - [Issue #9 — LookAtEntry.CmdNeo4j Institutions block uses the wrong recordset variable (tRstAssocCodes) — LATENT (gated unreachable; no ENTRY_DATA row has c_inst_code > 0)](#issue-9--lookatentrycmdneo4j-institutions-block-uses-the-wrong-recordset-variable-trstassoccodes--latent-gated-unreachable-no-entry_data-row-has-c_inst_code--0)
-  - [Issue #14 — KIN_DATA Subform's CmdPickKinRel calls a missing picker (frmPickKINSHIP_CODES) — LATENT (host sub-form is an orphan; no reachable trigger)](#issue-14--kin_data-subforms-cmdpickkinrel-calls-a-missing-picker-frmpickkinship_codes--latent-host-sub-form-is-an-orphan-no-reachable-trigger)
   - [Issue #20 — BOM-prefixed address names can become embedded tabs and misalign GIS exports — DORMANT this build (0 BOM rows in ADDR_CODES)](#issue-20--bom-prefixed-address-names-can-become-embedded-tabs-and-misalign-gis-exports--dormant-this-build-0-bom-rows-in-addr_codes)
   - [Issue #22 — LookAtAssociations.CmdUCINet CreateTextFile lacks the Unicode flag → error 5 on CJK c_name — LATENT (runtime did not fire this build)](#issue-22--lookatassociationscmducinet-createtextfile-lacks-the-unicode-flag--error-5-on-cjk-c_name--latent-runtime-did-not-fire-this-build)
   - [Issue #23 — LookAtAssociations.CmdPajek '*Vertices' header count read from RecordCount before MoveLast (undercounts vertices) — structural metric, P5](#issue-23--lookatassociationscmdpajek-vertices-header-count-read-from-recordcount-before-movelast-undercounts-vertices--structural-metric-p5)
@@ -64,135 +54,6 @@ _PASS: 30 · FAIL: 10 · ERROR: 0 · SKIP: 4 · NOT RUN: 0 · N/A: 56_
 - P5 — Dormant / latent / not currently reproducible: kept as historical record; we re-checked on the current dump and could not trigger the symptom.
 
 ## P3 — Missing UI
-
-### Issue #13 — BIOG_MAIN_2 Subform clicks a picker form (frmPickNIAN_HAO) that does not exist
-
-**Affected sub:** `BIOG_MAIN_2_Subform`
-
-**Severity:** P3 — Missing UI (the picker the click opens does not exist; the feature is unreachable).
-
-#### Description
-
-When the user clicks the reign-period (NIAN_HAO) picker on the biographical-detail subform, `Form_BIOG_MAIN_2_Subform` runs `DoCmd.OpenForm "frmPickNIAN_HAO"` (the handler sets `stDocName = "frmPickNIAN_HAO"` and references `Forms!frmPickNIAN_HAO!frmNIAN_HAO.Form!c_nianhao_id`).  There is no form named `frmPickNIAN_HAO` in the current .mdb (it is absent from the fresh `control_inventory.json`).  Access raises 'Item not found…' and the field click does nothing useful.
-
-The host form BIOG_MAIN_2_Subform itself IS present and reachable (verified in the fresh control inventory) — only the picker it opens is missing.  Likely cause: a picker form was renamed or consolidated in an earlier refactor and this caller wasn't updated.
-
-(This build's session was non-interactive, so the runtime popup could not be re-captured; the screenshots below are the reachable host plus a reconstructed popup, and the static absence of the picker is the load-bearing evidence.)
-
-#### Steps to reproduce
-
-1. Open CBDB_Browser_2 and navigate to any person whose biographical detail is shown on BIOG_MAIN_2_Subform.
-2. On the subform, click the reign-period (NIAN_HAO) picker control — that fires the handler which runs `DoCmd.OpenForm "frmPickNIAN_HAO"`.
-3. An 'Item not found in this collection.' popup appears, because `frmPickNIAN_HAO` is not in CurrentProject.AllForms.
-4. Static confirmation (no Access needed): search `analysis/dump/control_inventory.json` for `frmPickNIAN_HAO` — it is absent, while `BIOG_MAIN_2_Subform` is present.
-
-#### Screenshots
-
-![bug13_browser_open.png](screenshots/bug13_browser_open.png)
-
-_CBDB_Browser_2 open on a person record — the reachable host surface from which the NIAN_HAO picker is invoked._
-
-![bug13_browser_annotated.png](screenshots/bug13_browser_annotated.png)
-
-_Annotated host view: the reign-period picker control on BIOG_MAIN_2_Subform whose click runs DoCmd.OpenForm "frmPickNIAN_HAO" — a form absent from the current .mdb._
-
-![bug13_faux_popup.png](screenshots/bug13_faux_popup.png)
-
-_The 'Item not found in this collection.' popup, reconstructed in PIL (this build's session was non-interactive); the message is Access's standard text when DoCmd.OpenForm targets a form not in CurrentProject.AllForms._
-
-#### Suggested fix
-
-Either restore the picker form `frmPickNIAN_HAO`, or update the caller in `Form_BIOG_MAIN_2_Subform` to open whichever reign-period picker form replaced it.
-
-### Issue #16 — LookAtStatus is missing its CmdPajek button (handler exists, no UI control)
-
-**Affected sub:** `LookAtStatus`
-
-**Severity:** P3 — Missing UI (feature unavailable to users).
-
-#### Description
-
-`Form_LookAtStatus.vb` defines a `CmdPajek_Click` handler (it would write a Pajek `.net` export of the status network), but LookAtStatus's form design has NO `CmdPajek` control.  The fresh `control_inventory.json` lists CmdQuery / CmdGIS / CmdNeo4j on this form but no Pajek button, so the feature is unreachable from the UI.
-
-Note: even once a button is added, Issue #5 (the ChkIDs-control and SQL-column defects inside CmdPajek_Click) must be fixed first, or the click will fail.
-
-#### Steps to reproduce
-
-1. Open LookAtStatus.  Look at the export-buttons row at the bottom: it has GIS and Neo4j, but there is no Pajek button.
-2. Compare with LookAtAssociations, which does render a Pajek button.
-3. Static confirmation: in `analysis/dump/control_inventory.json`, LookAtStatus has no `CmdPajek` control, although `Form_LookAtStatus.vb` defines `Sub CmdPajek_Click()`.
-
-#### Screenshots
-
-![bug16_LookAtStatus_no_CmdPajek.png](screenshots/bug16_LookAtStatus_no_CmdPajek.png)
-
-_LookAtStatus as it ships — the export-button row has GIS and Neo4j but no Pajek button._
-
-![bug16_LookAtStatus_no_CmdPajek_annotated.png](screenshots/bug16_LookAtStatus_no_CmdPajek_annotated.png)
-
-_Annotated: the gap where a CmdPajek button would sit; `Sub CmdPajek_Click()` exists in the module but no control invokes it._
-
-#### Suggested fix
-
-Add a CmdPajek button to LookAtStatus's design (with OnClick = [Event Procedure] so it invokes the existing CmdPajek_Click Sub) — but fix Issue #5 first, otherwise the click fails on the ChkIDs reference and the bad SQL.
-
-### Issue #17 — LookAtStatus is missing its CmdGephi button (handler exists, no UI control)
-
-**Affected sub:** `LookAtStatus`
-
-**Severity:** P3 — Missing UI (feature unavailable to users).
-
-#### Description
-
-`Form_LookAtStatus.vb` defines a `CmdGephi_Click` handler but LookAtStatus's form design has NO `CmdGephi` control.  The fresh `control_inventory.json` confirms no Gephi button exists on the form, so the Gephi export is unreachable from the UI.
-
-#### Steps to reproduce
-
-1. Open LookAtStatus.  There is no Gephi export button in the export-buttons row.
-2. Static confirmation: `analysis/dump/control_inventory.json` shows no `CmdGephi` control on LookAtStatus, although `Form_LookAtStatus.vb` defines `Sub CmdGephi_Click()`.
-
-#### Screenshots
-
-![bug17_LookAtStatus_no_CmdGephi.png](screenshots/bug17_LookAtStatus_no_CmdGephi.png)
-
-_LookAtStatus as it ships — no Gephi export button._
-
-![bug17_LookAtStatus_no_CmdGephi_annotated.png](screenshots/bug17_LookAtStatus_no_CmdGephi_annotated.png)
-
-_Annotated: `Sub CmdGephi_Click()` exists in the module but no control invokes it._
-
-#### Suggested fix
-
-Add a CmdGephi button to LookAtStatus's design, wired to the existing CmdGephi_Click Sub.
-
-### Issue #18 — LookAtStatus is missing its CmdUCINet button (handler exists, no UI control)
-
-**Affected sub:** `LookAtStatus`
-
-**Severity:** P3 — Missing UI (feature unavailable to users).
-
-#### Description
-
-`Form_LookAtStatus.vb` defines a `CmdUCINet_Click` handler but LookAtStatus's form design has NO `CmdUCINet` control.  The fresh `control_inventory.json` confirms no UCINet button exists on the form, so the UCINet export is unreachable from the UI.
-
-#### Steps to reproduce
-
-1. Open LookAtStatus.  There is no UCINet export button in the export-buttons row.
-2. Static confirmation: `analysis/dump/control_inventory.json` shows no `CmdUCINet` control on LookAtStatus, although `Form_LookAtStatus.vb` defines `Sub CmdUCINet_Click()`.
-
-#### Screenshots
-
-![bug18_LookAtStatus_no_CmdUCINet.png](screenshots/bug18_LookAtStatus_no_CmdUCINet.png)
-
-_LookAtStatus as it ships — no UCINet export button._
-
-![bug18_LookAtStatus_no_CmdUCINet_annotated.png](screenshots/bug18_LookAtStatus_no_CmdUCINet_annotated.png)
-
-_Annotated: `Sub CmdUCINet_Click()` exists in the module but no control invokes it._
-
-#### Suggested fix
-
-Add a CmdUCINet button to LookAtStatus's design, wired to the existing CmdUCINet_Click Sub.
 
 ### Issue #19 — LookAtOffice is missing its CmdGUESS button (handler exists, no UI control)
 
@@ -252,143 +113,6 @@ Once, on the maintainer's machine: open the .mdb in Access, press Alt+F11, go to
 
 _Items in this tier are kept as historical / latent record.  They fall into three categories: (a) DORMANT — verified that current source data doesn't trigger the symptom; (b) NOT CURRENTLY REPRODUCIBLE — the symptom no longer surfaces even though the suspect code is still present (we have NOT confirmed an upstream source-level fix; could be a JET / Office behaviour change, a fixture / driver change on our side, or the original diagnosis was a false positive); (c) LATENT — the source-code defect is real, but the user can't reach it because another issue (e.g. a missing UI button) blocks the path.  None of these are user-facing today; **none have been verified as fixed upstream** — please consult before treating any of them as either urgent or closed._
 
-### Issue #5 — LookAtStatus.CmdPajek references a missing control AND three columns that don't exist — LATENT (gated by the missing Pajek button, Issue #16)
-
-**Affected sub:** `Form_LookAtStatus.CmdPajek_Click`
-
-**Severity:** P5 — Latent source defect (would resurface as a visible crash if Issue #16 were fixed without first fixing this).
-
-#### Description
-
-Two related source-level defects in the same handler:
-
-(a) Line 2308 reads `If ChkIDs.Value Then`, but LookAtStatus has no control named `ChkIDs`.
-
-(b) Lines 2335-2338 build a SELECT … INTO that references `ZZ_SCRATCH_STATUS.c_person_id`, `c_status_id`, and `c_status_count` — none of which exist on that table (the real columns are `c_personid`, `c_status_code`, with no count column).  The sub reads as a copy of `LookAtAssociations.CmdPajek_Click`, where those names are valid; the rename pass missed both spots.
-
-Why LATENT: LookAtStatus has no Pajek button at all (Issue #16), so users physically cannot invoke this handler today.  The SQL would still fail the moment the sub runs, so adding a button without fixing this would just expose the failure.  This build was non-interactive, so no runtime UI symptom could be re-verified — filed as latent pending UI re-verification.
-
-#### Steps to reproduce
-
-1. On this build the bug cannot be triggered through the UI — LookAtStatus has no Pajek button (Issue #16).  Verify the defects statically instead:
-2. Open `analysis/dump/vba/Form_LookAtStatus.vb` and read line 2308: `If ChkIDs.Value Then` — no `ChkIDs` control exists on LookAtStatus in `analysis/dump/control_inventory.json`.
-3. Read lines 2335-2338: the SELECT … INTO references `ZZ_SCRATCH_STATUS.c_person_id` / `c_status_id` / `c_status_count` (the count aggregate on line 2337), none of which are columns on ZZ_SCRATCH_STATUS.
-
-#### Suggested fix
-
-(a) Replace `ChkIDs.Value` with a constant `False` (if the optional ID-suffix behaviour isn't needed) or add a real ChkIDs control.  (b) Rewrite the SELECT to use `ZZ_SCRATCH_STATUS.c_personid` and `c_status_code`, and either drop the count aggregate or compute it another way.  Realistically the whole sub needs a careful rewrite — it was inherited from another form without verification — and should be done together with adding the button (Issue #16).
-
-### Issue #6 — LookAtGroupData Entry insert projects ENTRY_DATA.c_parental_status (should be …_code) — LATENT this build (runtime ERR did not fire)
-
-**Affected sub:** `Form_LookAtGroupData.queryEntry`
-
-**Severity:** P5 — Latent (source typo present; runtime symptom not reproduced this build, pending UI re-verification).
-
-#### Description
-
-`Form_LookAtGroupData.vb`'s Entry INSERT names a target column `c_parental_status_code` (line 2612) but the SELECT projection ends with `ENTRY_DATA.c_parental_status` (line 2621) — no `_code` suffix.  The real ENTRY_DATA column is `c_parental_status_code`; the source-level typo would make JET raise 'No such field' / 'No value given for one or more required parameters' when the Entry branch runs.  `Form_LookAtEntry.vb` does the analogous query with the correct name, so this is a single-line drift.
-
-Honest note for this build: the source defect is present in the dump, but the behavioural probe completed WITHOUT the error this build (the symptom is data-/enable-path dependent and the session was non-interactive, so no runtime UI symptom could be re-verified).  Filed as latent pending UI re-verification rather than a confirmed user-facing crash.
-
-#### Steps to reproduce
-
-1. On this build the runtime error did not fire — verify the source defect statically:
-2. Open `analysis/dump/vba/Form_LookAtGroupData.vb`.  Line 2612 lists the INSERT target column `c_parental_status_code`; line 2621 projects `ENTRY_DATA.c_parental_status` (missing `_code`).
-3. To exercise the path in a future interactive session: in LookAtGroupData, populate the import list with one person, tick only the Entry checkbox, and click Run.  If the path fires, a 'field doesn't exist' popup appears.
-
-#### Suggested fix
-
-Change `ENTRY_DATA.c_parental_status` to `ENTRY_DATA.c_parental_status_code` on line 2621.  One-line fix, matching the correct name already used in `Form_LookAtEntry.vb`.
-
-### Issue #7 — LookAtPlace.CmdNeo4j people-recordset reads c_dynasty / c_dynasty_chn / c_female that the SELECT doesn't project — LATENT (runtime did not fire this build)
-
-**Affected sub:** `Form_LookAtPlace.CmdNeo4j_Click`
-
-**Severity:** P5 — Latent (confirmed static projection mismatch; runtime symptom not reproduced this non-interactive build, pending UI re-verification).
-
-#### Description
-
-`Form_LookAtPlace.CmdNeo4j_Click` opens `tRstPeople` (line 326) on a SELECT DISTINCT that projects only four ZZ_SCRATCH_P_TEXT columns (line 322): c_person_id, c_name, c_name_chn, c_index_year.  The INNER JOIN brings DYNASTIES and BIOG_MAIN into scope but does NOT project any of their columns.  The row-write loop then reads `!c_dynasty` (line 383), `!c_dynasty_chn` (385) and `!c_female` (392) from that recordset; DAO's Fields collection only contains projected columns, so JET raises 3265 'Item not found in this collection.' on the first such read.  The handler routes to the exit before any disk file is flushed, so the user would see a popup and an empty output folder.
-
-Why LATENT this build: the CmdNeo4j button DOES exist on LookAtPlace, but this session was non-interactive (pywinauto UIA unavailable), so the runtime symptom could not be reproduced/re-verified.  The projection mismatch is a confirmed static defect; filed as latent pending UI re-verification.  The recommended demo address is `c_addr_id = 100658` (Kaifeng / 開封), which has plenty of people to feed the People-CSV loop.
-
-#### Steps to reproduce
-
-1. On this build the runtime symptom was not reproduced (non-interactive session).  Verify the projection mismatch statically:
-2. Open `analysis/dump/vba/Form_LookAtPlace.vb`.  Line 322 projects only c_person_id / c_name / c_name_chn / c_index_year into `tRstPeople` (opened line 326).
-3. Lines 383 / 385 / 392 read `!c_dynasty`, `!c_dynasty_chn`, `!c_female` from that recordset — none are projected, so JET 3265 fires on the first read.
-4. To re-verify interactively later: open LookAtPlace, pick address `c_addr_id = 100658` (Kaifeng / 開封), Run Query, then click Neo4j and choose a save folder — expect a 3265 popup and an empty folder.
-
-#### Suggested fix
-
-Extend the SELECT projection in `Form_LookAtPlace.vb:322` to include the three columns the loop reads: `DYNASTIES.c_dynasty`, `DYNASTIES.c_dynasty_chn`, `BIOG_MAIN.c_female` (the FROM/JOIN already brings them into scope).  Three columns added; nothing else changes.
-
-### Issue #8 — LookAtNetworks.CmdNeo4j place-recordset reads x_coord / y_coord that the SELECT doesn't project — LATENT (behavioural repro blocked by Networks Form_Open hang)
-
-**Affected sub:** `Form_LookAtNetworks.CmdNeo4j_Click`
-
-**Severity:** P5 — Latent (confirmed static projection mismatch; behavioural repro blocked by the Networks Form_Open hang, pending UI re-verification).
-
-#### Description
-
-Same shape as Issue #7, on a different form.  In `Form_LookAtNetworks.CmdNeo4j_Click` the place SELECT (line 2458) projects only three columns (c_index_addr_id, c_index_addr_name, c_index_addr_chn) into `tRstPlace` (line 2463).  The header it writes declares placeX / placeY (lines 2466/2466), and the row-write loop then reads `!x_coord` (line 2495) and `!y_coord` from that recordset — neither is projected, so JET 3265 'Item not found in this collection.' fires and the export aborts.
-
-Why LATENT: behavioural reproduction is blocked because `LookAtNetworks`'s `Form_Open` hangs the COM test driver, so the host form cannot be driven this build; combined with the non-interactive session, no runtime symptom could be re-verified.  The projection mismatch is a confirmed static defect; filed as latent pending UI re-verification.
-
-#### Steps to reproduce
-
-1. Behavioural repro is blocked (LookAtNetworks Form_Open hangs the driver) and this session was non-interactive.  Verify the projection mismatch statically:
-2. Open `analysis/dump/vba/Form_LookAtNetworks.vb`.  Line 2458 projects only c_index_addr_id / c_index_addr_name / c_index_addr_chn into `tRstPlace` (line 2463).
-3. Lines 2495 / 2502 read `!x_coord` (and `!y_coord` nearby) — neither is projected, so JET 3265 fires on the place block.
-
-#### Suggested fix
-
-Extend the place SELECT in `Form_LookAtNetworks.vb:2458` to project the coordinate columns the loop reads, e.g. `ADDR_CODES.x_coord`, `ADDR_CODES.y_coord` (the JOIN to ADDR_CODES already exposes them).
-
-### Issue #9 — LookAtEntry.CmdNeo4j Institutions block uses the wrong recordset variable (tRstAssocCodes) — LATENT (gated unreachable; no ENTRY_DATA row has c_inst_code > 0)
-
-**Affected sub:** `Form_LookAtEntry.CmdNeo4j_Click`
-
-**Severity:** P5 — Latent source typo (gated unreachable; would resurface as a DAO 3021 crash if any future ENTRY_DATA row had c_inst_code > 0).
-
-#### Description
-
-Line 1415 of `Form_LookAtEntry.vb` opens the institutions recordset as `Set tRstInstitutions = CurrentDb.OpenRecordset(tQueryStr)`.  Twenty lines later, line 1425 says `With tRstAssocCodes` and the loop reads `!c_inst_code` etc. against THAT recordset — which was bound earlier to the AssocCodes SELECT and already closed in the AssocCodes block.  If executed, `.MoveFirst` would raise DAO 3021 'No current record'; the misnamed reference is a genuine source-level bug.
-
-Why LATENT: the whole SaveAs-and-buggy-With block sits inside the gate `If tRecDeleted > 0 Then` (line 1390), where tRecDeleted counts an INSERT … WHERE ZZ_SCRATCH_ENTRY.c_inst_code > 0.  On this dump no ENTRY_DATA row has `c_inst_code > 0`, so the gate is always false, the buggy `With` line never executes, and CmdNeo4j finishes cleanly (silently omitting the optional InstitutionCodes CSV — the same gating the surrounding blocks use).  The typo only becomes user-visible if a future data drop introduces any `ENTRY_DATA.c_inst_code > 0`.  Investigation fixtures: `c_entry_code = 36` (examination: jinshi (general) / 進士) and `c_entry_code = 101` (recommendation / 薦舉) exercise CmdQuery + CmdNeo4j end-to-end and both finish cleanly — evidence that the gate works, not a popup reproduction.
-
-#### Steps to reproduce
-
-1. On this dump the bug cannot be triggered through the UI — the `If tRecDeleted > 0 Then` gate at Form_LookAtEntry.vb:1390 is false for every fixture (no ENTRY_DATA row has c_inst_code > 0).  Verify the typo statically:
-2. Open `analysis/dump/vba/Form_LookAtEntry.vb` and read lines 1415-1425.  Line 1415: `Set tRstInstitutions = OpenRecordset(tQueryStr)`.  Line 1425: `With tRstAssocCodes` (intended `With tRstInstitutions`); tRstAssocCodes was already closed in the AssocCodes block, so `.MoveFirst` would raise DAO 3021.
-3. (Optional, runtime evidence) Pick `c_entry_code = 36` (examination: jinshi (general) / 進士) or `c_entry_code = 101` (recommendation / 薦舉) on LookAtEntry → Run Query → Neo4j.  Both finish cleanly with no popup and no InstitutionCodes CSV — evidence the gate holds.
-
-#### Suggested fix
-
-Change `With tRstAssocCodes` on line 1425 to `With tRstInstitutions`.  The recordset variable was simply mis-named.  Although currently unreachable on this dump, fixing it costs nothing and prevents a future-data regression.
-
-### Issue #14 — KIN_DATA Subform's CmdPickKinRel calls a missing picker (frmPickKINSHIP_CODES) — LATENT (host sub-form is an orphan; no reachable trigger)
-
-**Affected sub:** `Form_KIN_DATA_Subform`
-
-**Severity:** P5 — Latent (static defect real; host sub-form is an orphan, so there is no reachable trigger today).
-
-#### Description
-
-`Form_KIN_DATA_Subform`'s `CmdPickKinRel_Click` (stDocName set at line 63) calls `DoCmd.OpenForm "frmPickKINSHIP_CODES"` and references `Forms!frmPickKINSHIP_CODES!frmKINSHIP_CODES.Form!c_kincode`.  Neither form exists in the current .mdb (absent from the fresh `control_inventory.json`) — same shape as Issue #13.
-
-Why LATENT: the host sub-form `KIN_DATA Subform` (which owns the CmdPickKinRel button) is not contained by any navigable form in the current inventory — `KIN_DATA Subform` is absent from the form list, while `BIOG_MAIN_2_Subform` embeds `KIN_DATA_2 Subform` instead (a read-only variant with no CmdPickKinRel button).  Because no user-facing navigation reaches the picker button, the popup can't be triggered.  The latent code path resurfaces the moment a developer re-embeds `KIN_DATA Subform` somewhere reachable.
-
-#### Steps to reproduce
-
-1. Verification is static-only — no parent form embeds the affected sub-form, so the runtime click cannot be reproduced.
-2. Open `analysis/dump/vba/Form_KIN_DATA_Subform.vb` line 63 — confirms `stDocName = "frmPickKINSHIP_CODES"`, opened by DoCmd just below.
-3. In `analysis/dump/control_inventory.json`, search for `frmPickKINSHIP_CODES` (absent) and `KIN_DATA Subform` (absent from the form list); `KIN_DATA_2 Subform` (the read-only variant) is what BIOG_MAIN_2_Subform embeds.
-
-#### Suggested fix
-
-Same as Issue #13: restore the picker form `frmPickKINSHIP_CODES` (or update the caller to its replacement).  Even though the runtime path is not reachable today, clean up the static defect so it doesn't resurface when `KIN_DATA Subform` is re-embedded.
-
 ### Issue #20 — BOM-prefixed address names can become embedded tabs and misalign GIS exports — DORMANT this build (0 BOM rows in ADDR_CODES)
 
 **Affected sub:** `ADDR_CODES + Form_LookAt*.CmdGIS_Click`
@@ -419,19 +143,19 @@ Two complementary fixes, both worth doing.  (1) One-shot data cleanup: strip any
 
 #### Description
 
-`Form_LookAtAssociations.CmdUCINet_Click` writes the `.vna` export via `Scripting.FileSystemObject.CreateTextFile(tFileName, True)` (line 2575).  The 3rd argument (`Unicode`) is omitted, so it defaults to FALSE — the file opens in the system ANSI code page (cp1252 on en-US Windows).  In the `*node properties` section the body writes `tQuote + !c_name + tQuote`; when `c_name` contains a character with no cp1252 representation (a CJK Han ideograph in particular), `WriteLine` raises VBA error 5 ('Invalid procedure call or argument') and the export aborts, leaving a truncated `.vna` file.  `Form_LookAtKinship.CmdUCINet_Click` has the identical 2-arg pattern at line 2510.
+`Form_LookAtAssociations.CmdUCINet_Click` writes the `.vna` export via `Scripting.FileSystemObject.CreateTextFile(tFileName, True)` (line 2580).  The 3rd argument (`Unicode`) is omitted, so it defaults to FALSE — the file opens in the system ANSI code page (cp1252 on en-US Windows).  In the `*node properties` section the body writes `tQuote + !c_name + tQuote`; when `c_name` contains a character with no cp1252 representation (a CJK Han ideograph in particular), `WriteLine` raises VBA error 5 ('Invalid procedure call or argument') and the export aborts, leaving a truncated `.vna` file.  `Form_LookAtKinship.CmdUCINet_Click` has the identical 2-arg pattern at line 2510.
 
 Why LATENT this build: the CmdUCINet button exists, but this non-interactive session could not drive the export, so the runtime error was not reproduced/re-verified.  The missing-Unicode-flag defect is a confirmed static fact; filed as latent pending UI re-verification.  Verified fixture for the trigger: association code `c_assoc_code = 437` (Presented literary composition as gift to / 贈詩、文), whose 1st-order association network includes a person carrying a Han ideograph in c_name.
 
 #### Steps to reproduce
 
 1. On this build the runtime error was not reproduced (non-interactive session).  Verify the missing flag statically:
-2. Open `analysis/dump/vba/Form_LookAtAssociations.vb` line 2575: `Set tVNA = tFileSystem.CreateTextFile(tFileName, True)` — only 2 arguments, no Unicode flag.  The same pattern is at `Form_LookAtKinship.vb:2510`.
+2. Open `analysis/dump/vba/Form_LookAtAssociations.vb` line 2580: `Set tVNA = tFileSystem.CreateTextFile(tFileName, True)` — only 2 arguments, no Unicode flag.  The same pattern is at `Form_LookAtKinship.vb:2510`.
 3. To re-verify interactively later: open LookAtAssociations, pick `c_assoc_code = 437` (Presented literary composition as gift to / 贈詩、文), Run Query, click UCINet, choose a save location — expect a Run-time error 5 popup and a truncated `.vna`.
 
 #### Suggested fix
 
-Add `True` as the 3rd argument of `CreateTextFile` to open the file in Unicode (UTF-16LE) mode at `Form_LookAtAssociations.vb:2575` — `CreateTextFile(tFileName, True, True)` — and apply the same one-line fix to `Form_LookAtKinship.vb:2510`.  Verify UCINET / Visone accept the UTF-16 `.vna` on the fixed build before declaring it closed.
+Add `True` as the 3rd argument of `CreateTextFile` to open the file in Unicode (UTF-16LE) mode at `Form_LookAtAssociations.vb:2580` — `CreateTextFile(tFileName, True, True)` — and apply the same one-line fix to `Form_LookAtKinship.vb:2510`.  Verify UCINET / Visone accept the UTF-16 `.vna` on the fixed build before declaring it closed.
 
 ### Issue #23 — LookAtAssociations.CmdPajek '*Vertices' header count read from RecordCount before MoveLast (undercounts vertices) — structural metric, P5
 
@@ -441,19 +165,19 @@ Add `True` as the 3rd argument of `CreateTextFile` to open the file in Unicode (
 
 #### Description
 
-`Form_LookAtAssociations.CmdPajek_Click` binds the node recordset to a form recordset (`Set tRstNode = ZZ_SCRATCH_P_ASSOC.Form.Recordset`, line 2924), calls `tRstNode.MoveFirst` (line 2924), then writes the Pajek header `tStr = "*Vertices " + Trim(Str(tRstNode.RecordCount))` (line 2924).  On a DAO recordset, `RecordCount` is only the number of rows ACCESSED so far, not the true total, until a `MoveLast` has fully populated it.  Reading it right after `MoveFirst` (with no MoveLast) yields an undercount, so the declared `*Vertices N` header can be far smaller than the actual number of vertex rows the loop subsequently writes.
+`Form_LookAtAssociations.CmdPajek_Click` binds the node recordset to a form recordset (`Set tRstNode = ZZ_SCRATCH_P_ASSOC.Form.Recordset`, line 2923), calls `tRstNode.MoveFirst` (line 2928), then writes the Pajek header `tStr = "*Vertices " + Trim(Str(tRstNode.RecordCount))` (line 2929).  On a DAO recordset, `RecordCount` is only the number of rows ACCESSED so far, not the true total, until a `MoveLast` has fully populated it.  Reading it right after `MoveFirst` (with no MoveLast) yields an undercount, so the declared `*Vertices N` header can be far smaller than the actual number of vertex rows the loop subsequently writes.
 
 Finding class is structural_metric: the off-by-N was derived by parsing the exported `.net` header against the emitted vertex-row count, not from a re-verified UI symptom (this build was non-interactive; ui_verified is not set).  Filed at P5.  Demo fixture for the network: person c_personid = 437 (Jia Zhaoming / 賈昭明).
 
 #### Steps to reproduce
 
 1. Verify statically from the dump and the cross-form test:
-2. Open `analysis/dump/vba/Form_LookAtAssociations.vb` lines 2924-2924: `tRstNode` is set to the form recordset, `MoveFirst` is called, then `RecordCount` is read for the `*Vertices` header BEFORE any `MoveLast`.
+2. Open `analysis/dump/vba/Form_LookAtAssociations.vb` lines 2923-2929: `tRstNode` is set to the form recordset, `MoveFirst` is called, then `RecordCount` is read for the `*Vertices` header BEFORE any `MoveLast`.
 3. The cross-form structural probe `test_vba_pajek_gephi_cross_form` parses the exported `.net` and compares the `*Vertices N` header against the count of vertex rows emitted; the demo network is person c_personid = 437 (Jia Zhaoming / 賈昭明).
 
 #### Suggested fix
 
-Call `tRstNode.MoveLast` (then `MoveFirst`) before reading `RecordCount` at line 2924 so the header reflects the true vertex total, e.g. `tRstNode.MoveLast: tRstNode.MoveFirst: tStr = "*Vertices " + Trim(Str(tRstNode.RecordCount))`.
+Call `tRstNode.MoveLast` (then `MoveFirst`) before reading `RecordCount` at line 2929 so the header reflects the true vertex total, e.g. `tRstNode.MoveLast: tRstNode.MoveFirst: tStr = "*Vertices " + Trim(Str(tRstNode.RecordCount))`.
 
 ### Issue #24 — LookAtKinship GUESS/Gephi .gdf nodedef declares 15 columns but some node rows emit 13 cells — structural metric, P5
 
