@@ -269,8 +269,8 @@ ISSUES: list[dict] = [
             "finding_class": "user_facing_bug",
             "vba_ref": "Form_BIOG_MAIN_2_Subform.vb:64 "
                        "(stDocName = \"frmPickNIAN_HAO\"); the OpenForm "
-                       "+ Forms!frmPickNIAN_HAO!… references follow at "
-                       "lines 133-151.",
+                       "+ Forms!frmPickNIAN_HAO! references follow at "
+                       ":67-76 (Forms!frmPickNIAN_HAO!frmNIAN_HAO).",
             "fixture": "Any person reachable in CBDB_Browser_2 whose "
                        "BIOG_MAIN_2_Subform reign-period picker is "
                        "clicked.",
@@ -1207,8 +1207,9 @@ ISSUES: list[dict] = [
             "finding_class": "latent_code",
             "vba_ref": "Form_KIN_DATA_Subform.vb:63 "
                        "(stDocName = \"frmPickKINSHIP_CODES\") + "
-                       "OpenForm/Forms! references at :131-161; picker "
-                       "form and KIN_DATA Subform both absent from "
+                       "OpenForm/Forms! references at :66-81 "
+                       "(Forms!frmPickKINSHIP_CODES!frmKINSHIP_CODES); "
+                       "picker form and KIN_DATA Subform both absent from "
                        "analysis/dump/control_inventory.json.",
             "fixture": "n/a — KIN_DATA Subform is not embedded by any "
                        "navigable form (BIOG_MAIN_2_Subform uses "

@@ -161,6 +161,18 @@ looking at.
      this after report generation — its MANIFEST is the permanent record
      of required / forbidden labels per issue (lives in `analysis/`, not
      cleared between builds).
+   - **⚠️ Every `Form_*.vb:N` line citation must land on the code it
+     claims.**  `python analysis/audit_vba_ref_lines.py` (run by
+     `run_tests.ps1 -Verify`, pinned by `tests/test_vba_ref_lines.py`)
+     checks every `evidence.vba_ref` line against the dump: the file must
+     exist, the line must be in range + non-blank, and a distinctive code
+     token named in the citation must appear within ±3 lines.  This
+     catches a line-number offset (a drafting pass once put a uniform
+     ~+2200 on every ref) or an in-range citation that points at the
+     wrong code — which the structural triage gate does NOT.  Use the
+     `Form_X.vb:N` / `:N-M` colon form so it is checked; line numbering is
+     `\n`-based (grep -n / editors), NOT PowerShell `Get-Content` (the
+     dump has mixed CRLF/CR terminators, so Get-Content over-counts).
 8. **Regenerate** report: `python reports/generate_report.py`
    The report now always contains: Coverage Matrix | Issues |
    Appendix A (index drift) | Appendix B (TablesFields diff) |

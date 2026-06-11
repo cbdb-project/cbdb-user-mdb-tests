@@ -1,6 +1,6 @@
 # Report screenshot consistency audit
 
-**Generated:** 2026-06-10T14:12:46+00:00
+**Generated:** 2026-06-11T09:45:53+00:00
 **Generator:** `analysis/audit_report_screenshot_consistency.py`
 **Companion JSON:** `reports/report_screenshot_audit.json`
 
