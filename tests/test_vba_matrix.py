@@ -121,19 +121,42 @@ def _build_lookatentry_fixtures(inputs: dict) -> list[Fixture]:
             cmd_name="CmdQuery",
             pickers=[("ZZ_SCRATCH_ENTRY_CODE", [c], "c_entry_code")],
             controls={
-                "FrameYears": 3,    # dynasty mode (we set globals via autodetect later — for now just FrameYears)
+                # FrameYears=3 selects dynasty mode.  The dynasty *value*
+                # (gFromDynasty) normally comes from the frmpickdynasty picker,
+                # which the matrix bypasses -- so gFromDynasty stays at its -2
+                # default.  In CmdQuery_Click's FrameYears=3 branch
+                # (Form_LookAtEntry.vb:1622-1624) that -2 default takes the
+                # `If gFromDynasty = -2 Then tStrYears = "((BIOG_MAIN.c_dy) > 0)"`
+                # path and sets gUseDynasties=True (which adds a DYNASTIES join),
+                # NOT a filter on dynasty {dy}.  The year textboxes are not read
+                # in this branch, so TxtFromYear/TxtToYear apply no filter (years
+                # read live only under FrameYears 1/2 at :1596/:1609).  This
+                # fixture therefore exercises the FrameYears=3 entry path; it does
+                # NOT (and through the picker bypass cannot) verify dynasty
+                # *selection* -- that needs a driver-side gFromDynasty injection,
+                # tracked but not done here.  {dy} survives only as the
+                # high-density combo this case was sampled from.
+                "FrameYears": 3,
                 "TxtEntryDesc": "[selected]",
                 "TxtTypeCode": "N/A",
                 "TxtFromYear": int(dyn_row["c_start"]),
                 "TxtToYear": int(dyn_row["c_end"]),
             },
             expected_min_rows=max(1, int(combo["n_persons"]) // 50),
+            # Oracle = the entry code only, NOT `c_dy = {dy}` and NOT `c_dy > 0`.
+            # Although the VBA literally builds `((BIOG_MAIN.c_dy) > 0)`, that
+            # clause does NOT reduce the DISTINCT c_personid set in this path:
+            # measured via COM, an oracle carrying `AND c_dy > 0` is short by
+            # exactly the c_dy<=0 / NULL persons VBA still returns (e.g. 38 for
+            # entry 39 / dy 20).  VBA's effective result is every person for the
+            # entry code, so the information-loss oracle (4.7, strict
+            # set-equality) mirrors that.  Empirically confirmed: this oracle
+            # passes 4.7 against live Access; the `c_dy > 0` variant does not.
             source_sql=f"""
                 SELECT DISTINCT BIOG_MAIN.c_personid
                 FROM BIOG_MAIN INNER JOIN ENTRY_DATA
                   ON BIOG_MAIN.c_personid = ENTRY_DATA.c_personid
                 WHERE ENTRY_DATA.c_entry_code = {c}
-                  AND BIOG_MAIN.c_dy = {dy}
             """,
         ))
 
