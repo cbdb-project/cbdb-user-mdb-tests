@@ -80,6 +80,11 @@ function Verify-Complete {
     Run "python `"$ROOT\analysis\audit_report_code_labels.py`""
     Write-Host "`n>>> report screenshot-consistency audit" -ForegroundColor Cyan
     Run "python `"$ROOT\analysis\audit_report_screenshot_consistency.py`""
+    # vba_ref line-citation audit: every Form_*.vb:N in the ISSUES must land on
+    # the code it claims (catches a line-number offset / a wrong-line citation
+    # that the structural triage gate does not).
+    Write-Host "`n>>> vba_ref line-citation audit" -ForegroundColor Cyan
+    Run "python `"$ROOT\analysis\audit_vba_ref_lines.py`""
     Write-Host "`n=== build verified complete ===" -ForegroundColor Green
 }
 
