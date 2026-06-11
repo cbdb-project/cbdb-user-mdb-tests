@@ -35,10 +35,11 @@ from typing import Iterable
 import pandas as pd
 import pyodbc
 import win32com.client
-import win32process
 from pywinauto import Application as PWA
 
-from .access_app import kill_access_pid, register_spawned_pid
+from .access_app import (
+    kill_access_pid, register_spawned_pid, _pid_for_access_app,
+)
 from ._timeouts import vba_timeout
 
 # Generous, env-tunable (CBDB_VBA_TIMEOUT_S) ceiling for VBA/COM waits (B5).
@@ -360,21 +361,6 @@ def _suppress_associations_cmdneo4j_debug_msgbox(match) -> str:
             sub_body,
         )
     return sub_body
-
-
-def _pid_for_access_app(app) -> int | None:
-    """PID of an Access.Application COM object via its main HWND."""
-    try:
-        hwnd = int(app.hWndAccessApp)
-    except Exception:
-        return None
-    if hwnd == 0:
-        return None
-    try:
-        _tid, pid = win32process.GetWindowThreadProcessId(hwnd)
-    except Exception:
-        return None
-    return int(pid) if pid else None
 
 
 class VbaSession:

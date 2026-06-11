@@ -30,9 +30,24 @@ def _pid_for_access_app(app) -> int | None:
     Walks `app.hWndAccessApp` (the main window handle) through
     win32process.GetWindowThreadProcessId.  Returns None if the app
     object doesn't expose a usable HWND (e.g. early in startup, or
-    after Quit)."""
+    after Quit).
+
+    `hWndAccessApp` is read in a binding-agnostic way: under early
+    binding (a cached/makepy typelib) it surfaces as a property whose
+    value is the int handle, but under DispatchEx *late* binding (no
+    typelib) win32com surfaces it as a bound METHOD.  In that case
+    ``int(app.hWndAccessApp)`` raises ``TypeError: ... not 'method'``,
+    which the old code swallowed -> returned None -> the spawned PID was
+    never registered or killed, silently disabling the scoped-kill
+    safety net and leaking one MSACCESS.EXE per spawn (visible only when
+    ``app.Quit()`` itself fails to terminate, e.g. with extra COM refs
+    held by a pywinauto interaction).  So: read the attribute, and call
+    it if it came back callable."""
     try:
-        hwnd = int(app.hWndAccessApp)
+        raw = app.hWndAccessApp
+        if callable(raw):
+            raw = raw()
+        hwnd = int(raw)
     except Exception:
         return None
     if hwnd == 0:
