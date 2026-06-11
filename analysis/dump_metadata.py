@@ -154,7 +154,9 @@ def dump_via_dao(mdb_path: Path):
 
 def dump_via_access(mdb_path: Path):
     print("[2/4] Access.Application: opening database (this may take a moment)...")
-    app = win32com.client.Dispatch("Access.Application")
+    # DispatchEx (NOT Dispatch): force a FRESH out-of-process instance so this
+    # never binds to / closes a developer's already-running Access (landmine #9).
+    app = win32com.client.DispatchEx("Access.Application")
     app.Visible = False
     try:
         app.OpenCurrentDatabase(str(mdb_path))

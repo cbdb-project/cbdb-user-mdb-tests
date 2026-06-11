@@ -170,10 +170,16 @@ def main() -> int:
     # ---- Bug #5: LookAtStatus.CmdPajek ChkIDs + SQL ----------------
     has_chkids = _has_control("LookAtStatus", "ChkIDs")
     has_pajek_button = _has_control("LookAtStatus", "CmdPajek")
+    status_body = (ROOT / "analysis/dump/vba/Form_LookAtStatus.vb"
+                   ).read_bytes().decode("utf-8")
     status_cols = _table_cols("ZZ_SCRATCH_STATUS")
     bad_sql_cols = [c for c in ("c_person_id", "c_status_id", "c_status_count")
                      if c not in status_cols]
-    if has_chkids and not bad_sql_cols:
+    if "CmdPajek_Click" not in status_body:
+        findings.append((5, "REVIEW",
+                         "LookAtStatus.CmdPajek_Click handler (and its ChkIDs "
+                         "SQL) removed this build — defect gone"))
+    elif has_chkids and not bad_sql_cols:
         findings.append((5, "REVIEW", "neither ChkIDs nor bad SQL cols anymore"))
     elif not has_pajek_button:
         findings.append((5, "LATENT",
@@ -199,21 +205,38 @@ def main() -> int:
               "ZZ_SCRATCH_P_TEXT.c_name, ZZ_SCRATCH_P_TEXT.c_name_chn, "
               "ZZ_SCRATCH_P_TEXT.c_index_year")
     has_place_neo4j = _has_control("LookAtPlace", "CmdNeo4j")
-    if buggy7 in body7 and has_place_neo4j:
+    # buggy7 is a substring of the FIXED SELECT too (the fix appends columns
+    # after c_index_year), so also check whether the SELECT now projects the
+    # dynasty/female columns the row loop reads.
+    proj_fixed7 = "DYNASTIES.c_dynasty" in body7
+    if buggy7 in body7 and not proj_fixed7 and has_place_neo4j:
         findings.append((7, "REAL",
                          "buggy 4-col SELECT still in source; CmdNeo4j "
                          "button exists; verified ERR via behavioral test"))
+    elif proj_fixed7:
+        findings.append((7, "REVIEW",
+                         "CmdNeo4j SELECT now projects DYNASTIES.c_dynasty / "
+                         "c_dynasty_chn / BIOG_MAIN.c_female (the columns the "
+                         "row loop reads) — fixed this build"))
     else:
         findings.append((7, "REVIEW",
                          f"premise changed (buggy SELECT={buggy7 in body7}, "
                          f"button={has_place_neo4j})"))
 
     # ---- Bug #8: Networks.CmdNeo4j — Form_Open hangs in driver -----
+    body8 = (ROOT / "analysis/dump/vba/Form_LookAtNetworks.vb"
+             ).read_bytes().decode("utf-8")
     has_net_neo4j = _has_control("LookAtNetworks", "CmdNeo4j")
-    findings.append((8, "REAL" if has_net_neo4j else "LATENT",
-                     f"static auditor confirms buggy SQL; CmdNeo4j "
-                     f"button on Networks={has_net_neo4j}; "
-                     "behavioral repro blocked by driver Form_Open hang"))
+    if "ADDR_CODES.x_coord" in body8:
+        findings.append((8, "REVIEW",
+                         "CmdNeo4j place SELECT now projects ADDR_CODES.x_coord"
+                         " / y_coord (the columns the loop reads) — fixed this "
+                         "build"))
+    else:
+        findings.append((8, "REAL" if has_net_neo4j else "LATENT",
+                         f"static auditor confirms buggy SQL; CmdNeo4j "
+                         f"button on Networks={has_net_neo4j}; "
+                         "behavioral repro blocked by driver Form_Open hang"))
 
     # ---- Bug #9: Entry.CmdNeo4j — gated by institution rows --------
     # Re-verified 2026-05-04: source-level typo on
@@ -225,17 +248,22 @@ def main() -> int:
     # can ask the question with a simple SQL pre-image.
     body9 = (ROOT / "analysis/dump/vba/Form_LookAtEntry.vb"
              ).read_bytes().decode("utf-8")
-    typo_present = "With tRstAssocCodes" in body9
+    # The bug was the Institutions block opening tRstInstitutions but using
+    # `With tRstAssocCodes` (the already-closed recordset).  `With
+    # tRstAssocCodes` also appears legitimately in the Associations block, so
+    # the fix marker is the Institutions block now using `With tRstInstitutions`.
+    inst_fixed9 = "With tRstInstitutions" in body9
     cur.execute("SELECT COUNT(*) FROM ENTRY_DATA "
                 "WHERE c_inst_code > 0")
     n_inst = int(cur.fetchone()[0])
     cur.execute("SELECT COUNT(*) FROM ENTRY_DATA "
                 "WHERE c_inst_name_code > 0")
     n_inst_name = int(cur.fetchone()[0])
-    if not typo_present:
+    if inst_fixed9:
         findings.append((9, "REVIEW",
-                         "`With tRstAssocCodes` typo no longer in "
-                         "Form_LookAtEntry.vb — flip this branch."))
+                         "Institutions block now `Set tRstInstitutions` then "
+                         "`With tRstInstitutions` (consistent recordset) — the "
+                         "wrong-variable typo is fixed this build."))
     elif n_inst == 0 and n_inst_name == 0:
         findings.append((9, "LATENT",
                          f"`With tRstAssocCodes` typo confirmed at "
@@ -402,21 +430,38 @@ def main() -> int:
     has_kc = _has_form("frmPickKINSHIP_CODES")
 
     biog_main_2_reachable = _is_subform_reachable("BIOG_MAIN_2_Subform")
-    findings.append(
-        (13, "REAL" if (not has_nh and biog_main_2_reachable) else
-         ("LATENT" if not has_nh else "REVIEW"),
-         f"frmPickNIAN_HAO in inventory={has_nh}, "
-         f"BIOG_MAIN_2_Subform reachable={biog_main_2_reachable}")
-    )
+    # The defect only exists if the host's CODE still calls the missing picker.
+    _b2 = ROOT / "analysis/dump/vba/Form_BIOG_MAIN_2_Subform.vb"
+    calls_nh = (_b2.exists()
+                and "frmPickNIAN_HAO" in _b2.read_bytes().decode("utf-8", "replace"))
+    if not calls_nh:
+        findings.append((13, "REVIEW",
+                         "no code in BIOG_MAIN_2_Subform references "
+                         "frmPickNIAN_HAO this build — defect gone"))
+    else:
+        findings.append(
+            (13, "REAL" if (not has_nh and biog_main_2_reachable) else
+             ("LATENT" if not has_nh else "REVIEW"),
+             f"frmPickNIAN_HAO in inventory={has_nh}, "
+             f"BIOG_MAIN_2_Subform reachable={biog_main_2_reachable}")
+        )
 
     kin_subform_reachable = _is_subform_reachable("KIN_DATA Subform")
-    findings.append(
-        (14, "REAL" if (not has_kc and kin_subform_reachable) else
-         ("LATENT" if not has_kc else "REVIEW"),
-         f"frmPickKINSHIP_CODES in inventory={has_kc}, "
-         f"KIN_DATA Subform (host of CmdPickKinRel) "
-         f"reachable={kin_subform_reachable}")
-    )
+    # The buggy host form 'KIN_DATA Subform' (the variant WITH CmdPickKinRel)
+    # may have been removed from the build entirely (only KIN_DATA_2 remains).
+    _kh = ROOT / "analysis/dump/vba/Form_KIN_DATA_Subform.vb"
+    if not _kh.exists():
+        findings.append((14, "REVIEW",
+                         "KIN_DATA Subform host (with CmdPickKinRel) removed "
+                         "from this build — defect gone"))
+    else:
+        findings.append(
+            (14, "REAL" if (not has_kc and kin_subform_reachable) else
+             ("LATENT" if not has_kc else "REVIEW"),
+             f"frmPickKINSHIP_CODES in inventory={has_kc}, "
+             f"KIN_DATA Subform (host of CmdPickKinRel) "
+             f"reachable={kin_subform_reachable}")
+        )
 
     # ---- Bug #15-#19: design-time, sub exists but no UI button ----
     cases15 = [

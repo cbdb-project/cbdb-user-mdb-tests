@@ -1422,7 +1422,7 @@ On Error GoTo Err_CmdNeo4j_Click
             gStream.WriteText tStr, adWriteLine
             'tGDF.WriteLine (tStr)
 
-            With tRstAssocCodes
+            With tRstInstitutions
                 .MoveFirst
                 Do While Not .EOF
                     If Not IsNull(!c_inst_code) Then

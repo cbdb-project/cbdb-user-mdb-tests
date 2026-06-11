@@ -89,7 +89,9 @@ looking at.
 3. **Relink** linked tables (auto on next `pytest`, or manual):
    `python analysis/relink_data_mdb.py`
 4. **Re-dump** metadata (after relink, so column defs are complete):
-   `python analysis/dump_metadata.py && python analysis/dump_vba.py`
+   `python analysis/dump_metadata.py && python analysis/dump_vba.py && python analysis/extract_form_code.py`
+   (extract_form_code splits vba_modules.json into the per-form
+   `dump/vba/Form_*.vb` files the audits + reverify read)
 5. **Run tests** (with JSON report — needed by step 5b):
    `python -m pytest tests/ -W ignore --include-vba --json-report --json-report-file=reports/pytest_report_<build>.json`
    Monitor the session — Access dialogs can block unhandled (see landmine #3b).
@@ -182,11 +184,13 @@ looking at.
 
 **Any time the user asks to "run tests" (or equivalent), execute the
 full workflow via `run_tests.ps1` — the single canonical entrypoint.  It
-automates steps 1 (ARCHIVE prior, never delete) / 5 / 5b / 5c (incl. drift
-classification) / 5d / 5e (export matrix) / 5f (static audits) / 6
-(screenshots) and runs the coverage-floor check.  Step 7 (rebuild ISSUES —
-LLM judgment, the ONLY manual gate) and step 8 (generate_report.py) follow,
-then `-Verify` enforces completeness + the coverage floor.**
+automates steps 1 (ARCHIVE prior, never delete) / 5 / 5a (re-dump metadata +
+VBA — step 4, so the static audits + vba_ref line numbers + reverify reflect
+THIS build's source) / 5b / 5c (incl. drift classification) / 5d / 5e (export
+matrix) / 5f (static audits) / 6 (screenshots) and runs the coverage-floor
+check.  Step 7 (rebuild ISSUES — LLM judgment, the ONLY manual gate) and step 8
+(generate_report.py) follow, then `-Verify` enforces completeness + the
+coverage floor.**
 
 ```powershell
 # From repo root — archives prior build, runs steps 5/5b-5f/6 + floor check:
@@ -855,6 +859,7 @@ freshness logic lives in `_refresh_decision` and is unit-tested in
 # 1. Re-extract metadata + VBA source (so analysis/dump/* is fresh)
 python analysis/dump_metadata.py
 python analysis/dump_vba.py
+python analysis/extract_form_code.py   # split vba_modules.json -> dump/vba/Form_*.vb
 
 # 2. Re-discover high-density test inputs
 python analysis/discover_test_inputs.py

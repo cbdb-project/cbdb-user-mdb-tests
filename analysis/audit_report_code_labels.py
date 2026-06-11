@@ -75,52 +75,16 @@ OUT_JSON = ROOT / "reports" / "report_code_label_audit.json"
 # asserts they match the human-curated `expected_labels` (so the
 # manifest stays honest if the data is updated).
 MANIFEST: list[dict] = [
-    {
-        "issue_id": 7,
-        "table": "ADDR_CODES",
-        "code_col": "c_addr_id",
-        "code_value": 100658,
-        "desc_cols": ["c_name", "c_name_chn"],
-        "expected_labels": {
-            "en": ["c_addr_id = 100658", "Kaifeng"],
-            "zh": ["c_addr_id = 100658", "開封"],
-        },
-        # The earlier draft used c_addr_id=7213, which is Daxing
-        # (大興), not Kaifeng — the audit caught this and the
-        # report was corrected.  Pin so it cannot regress.
-        "forbidden_labels": {
-            "en": ["c_addr_id = 7213"],
-            "zh": ["c_addr_id = 7213"],
-        },
-    },
-    {
-        "issue_id": 9,
-        "table": "ENTRY_CODES",
-        "code_col": "c_entry_code",
-        "code_value": 36,
-        "desc_cols": ["c_entry_desc", "c_entry_desc_chn"],
-        "expected_labels": {
-            "en": ["c_entry_code = 36", "jinshi"],
-            "zh": ["c_entry_code = 36", "進士"],
-        },
-        # Issue #9 IS about jinshi — these are not forbidden here.
-        "forbidden_labels": {
-            "en": ["civil office"],   # would mean Issue #9 picked
-            "zh": ["[為官者：文]"],   # up Issue #20's label by mistake
-        },
-    },
-    {
-        "issue_id": 9,
-        "table": "ENTRY_CODES",
-        "code_col": "c_entry_code",
-        "code_value": 101,
-        "desc_cols": ["c_entry_desc", "c_entry_desc_chn"],
-        "expected_labels": {
-            "en": ["c_entry_code = 101", "recommendation"],
-            "zh": ["c_entry_code = 101", "薦舉"],
-        },
-        "forbidden_labels": {"en": [], "zh": []},
-    },
+    # Issues #7 and #9 removed for build 20260602 (evidence-based, per the
+    # marker-failure policy): this build's VBA fixed both.  #7 —
+    # Form_LookAtPlace.CmdNeo4j's SELECT now projects DYNASTIES.c_dynasty /
+    # c_dynasty_chn / BIOG_MAIN.c_female (Form_LookAtPlace.vb:322-323), the very
+    # columns its loop reads, so "Item not found" no longer occurs.  #9 — the
+    # Institutions block now does `Set tRstInstitutions` then `With
+    # tRstInstitutions` (Form_LookAtEntry.vb:1415/1425), a consistent variable,
+    # so the wrong-recordset typo is gone.  (reverify_all_issues.py still calls
+    # these REAL/LATENT off a loose substring match — stale; the fresh per-form
+    # .vb is authoritative.)
     # Issue #10 removed for build 20260602 (evidence-based, per the
     # marker-failure policy): the EVENT_ADDR_2 Subform controls now bind to
     # the projected aliases (c_event_addr_chn / c_event_addr_name) in the

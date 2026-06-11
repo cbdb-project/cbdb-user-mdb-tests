@@ -8,9 +8,9 @@
 #   .\run_tests.ps1 -Verify    # completeness gate ONLY (run AFTER step 7 + step 8)
 #
 # Steps 7 (rebuild ISSUES -- LLM judgment) and 8 (generate_report.py) are the
-# ONLY manual gate.  The script automates everything else (steps 1/5/5b-5f/6 +
-# the coverage-floor gate) and -Verify FAILS LOUDLY if the build ends partial,
-# so reports/ is never left in a JSON-without-MD state.
+# ONLY manual gate.  The script automates everything else (steps 1/5/5a(re-dump)/
+# 5b-5f/6 + the coverage-floor gate) and -Verify FAILS LOUDLY if the build ends
+# partial, so reports/ is never left in a JSON-without-MD state.
 #
 # Build-independence: each run is judged on its own test run + source.  Step 1
 # ARCHIVES the prior build (never deletes -- preserves the audit trail).
@@ -145,6 +145,29 @@ $vbaFlag = if ($Fast) { "--fast" } else { "--include-vba" }
 $PYTEST_CMD = "python -m pytest tests/ -W ignore $vbaFlag --json-report --json-report-file=`"$REPORT_FILE`""
 if ($Filter) { $PYTEST_CMD += " -k `"$Filter`"" }
 RunSoft $PYTEST_CMD   # don't abort the pipeline on test failures
+
+# ---- Step 5a: re-dump metadata + VBA (AGENTS.md step 4) -------------------
+# Refresh analysis/dump/* so the static consumers below (5f audits, the
+# vba_ref line-citation audit, reverify_all_issues, and the report's vba_ref
+# line numbers) reflect THIS build's source -- not a prior build's.  The order
+# matters: dump_vba writes vba_modules.json, then extract_form_code splits it
+# into the per-form dump/vba/Form_*.vb files that the vba_ref audit + reverify
+# + the static audits actually read -- skipping it leaves those .vb files stale.
+# Runs AFTER pytest: pytest_sessionfinish has scope-killed the suite's Access
+# instances, and the linked tables are current (conftest.pytest_configure
+# relinks when the DATA build changed; otherwise the links persist in the mdb).
+# The dump scripts open the production mdb via COM and self-quit (and only ever
+# open forms in DESIGN view -- OpenCurrentDatabase does not run AutoExec -- so
+# Form_Open never fires and there is no relink popup).  HARD steps: a stale
+# dump silently corrupts vba_ref line numbers + audits, so a dump failure must
+# abort the build rather than ship a report built on old source.  If a step
+# errors with "You already have the database open", an Access instance is still
+# holding the mdb (a prior crash, or a developer window) -- close it and re-run.
+Write-Host "`n=== Step 5a: Re-dump metadata + VBA (analysis/dump/*) ===" -ForegroundColor Yellow
+Run "python `"$ROOT\analysis\dump_metadata.py`""
+Run "python `"$ROOT\analysis\dump_vba.py`""
+Run "python `"$ROOT\analysis\extract_form_code.py`""
+Run "python `"$ROOT\analysis\control_inventory.py`""
 
 # ---- Step 5b: coverage matrix --------------------------------------------
 Write-Host "`n=== Step 5b: Coverage matrix ===" -ForegroundColor Yellow

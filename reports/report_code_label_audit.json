@@ -1,28 +1,10 @@
 {
   "summary": {
-    "n_manifest_entries": 6,
-    "n_per_lang_checks_total": 12,
-    "n_per_lang_checks_passed": 12,
+    "n_manifest_entries": 3,
+    "n_per_lang_checks_total": 6,
+    "n_per_lang_checks_passed": 6,
     "n_mismatches": 0,
     "manifest_coverage": [
-      {
-        "issue_id": 7,
-        "table": "ADDR_CODES",
-        "code_col": "c_addr_id",
-        "code_value": 100658
-      },
-      {
-        "issue_id": 9,
-        "table": "ENTRY_CODES",
-        "code_col": "c_entry_code",
-        "code_value": 36
-      },
-      {
-        "issue_id": 9,
-        "table": "ENTRY_CODES",
-        "code_col": "c_entry_code",
-        "code_value": 101
-      },
       {
         "issue_id": 20,
         "table": "STATUS_CODES",
@@ -44,96 +26,6 @@
     ]
   },
   "findings": [
-    {
-      "issue_id": 7,
-      "table": "ADDR_CODES",
-      "code_col": "c_addr_id",
-      "code_value": 100658,
-      "lang": "en",
-      "block_found": true,
-      "mdb_desc": {
-        "c_name": "Kaifeng",
-        "c_name_chn": "開封"
-      },
-      "missing_expected_labels": [],
-      "found_forbidden_labels": [],
-      "mdb_desc_present_in_block": true
-    },
-    {
-      "issue_id": 7,
-      "table": "ADDR_CODES",
-      "code_col": "c_addr_id",
-      "code_value": 100658,
-      "lang": "zh",
-      "block_found": true,
-      "mdb_desc": {
-        "c_name": "Kaifeng",
-        "c_name_chn": "開封"
-      },
-      "missing_expected_labels": [],
-      "found_forbidden_labels": [],
-      "mdb_desc_present_in_block": true
-    },
-    {
-      "issue_id": 9,
-      "table": "ENTRY_CODES",
-      "code_col": "c_entry_code",
-      "code_value": 36,
-      "lang": "en",
-      "block_found": true,
-      "mdb_desc": {
-        "c_entry_desc": "examination: jinshi (general)",
-        "c_entry_desc_chn": "科舉: 進士(籠統)"
-      },
-      "missing_expected_labels": [],
-      "found_forbidden_labels": [],
-      "mdb_desc_present_in_block": true
-    },
-    {
-      "issue_id": 9,
-      "table": "ENTRY_CODES",
-      "code_col": "c_entry_code",
-      "code_value": 36,
-      "lang": "zh",
-      "block_found": true,
-      "mdb_desc": {
-        "c_entry_desc": "examination: jinshi (general)",
-        "c_entry_desc_chn": "科舉: 進士(籠統)"
-      },
-      "missing_expected_labels": [],
-      "found_forbidden_labels": [],
-      "mdb_desc_present_in_block": true
-    },
-    {
-      "issue_id": 9,
-      "table": "ENTRY_CODES",
-      "code_col": "c_entry_code",
-      "code_value": 101,
-      "lang": "en",
-      "block_found": true,
-      "mdb_desc": {
-        "c_entry_desc": "recommendation",
-        "c_entry_desc_chn": "薦舉 (保任,保舉)"
-      },
-      "missing_expected_labels": [],
-      "found_forbidden_labels": [],
-      "mdb_desc_present_in_block": true
-    },
-    {
-      "issue_id": 9,
-      "table": "ENTRY_CODES",
-      "code_col": "c_entry_code",
-      "code_value": 101,
-      "lang": "zh",
-      "block_found": true,
-      "mdb_desc": {
-        "c_entry_desc": "recommendation",
-        "c_entry_desc_chn": "薦舉 (保任,保舉)"
-      },
-      "missing_expected_labels": [],
-      "found_forbidden_labels": [],
-      "mdb_desc_present_in_block": true
-    },
     {
       "issue_id": 20,
       "table": "STATUS_CODES",
