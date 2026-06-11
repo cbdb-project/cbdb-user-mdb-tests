@@ -76,6 +76,48 @@ def spawned_pids() -> set[int]:
     return set(_SPAWNED_PIDS)
 
 
+# Session-wide registry of live-UI (pywinauto) triggers that FELL BACK to the
+# headless COM timer path.  A fallback means the result was logic-triggered, not
+# confirmed by a real UI click -> it is NOT ui_verified, so the generated report
+# must disclose it (a 0-fallback run is the clean case).  Populated by
+# `record_ui_fallback()` from the driver's `prefer="ui"` path; drained into the
+# pytest JSON report's `environment.ui_fallbacks` by conftest, and surfaced by
+# generate_report.  Mirrors the _SPAWNED_PIDS registry pattern.
+_UI_FALLBACKS: list[dict] = []
+
+
+def record_ui_fallback(*, form: str, ctl: str | None, caption: str,
+                       reason: str, test_id: str | None = None) -> None:
+    """Record one pywinauto->COM-timer fallback event.
+
+    `test_id` defaults to the current pytest node id (PYTEST_CURRENT_TEST) so
+    callers don't have to thread it through.  `reason` is the pywinauto failure
+    (e.g. "LookupError: button 'Run Query' not found") that forced the headless
+    path."""
+    if test_id is None:
+        # "tests/x.py::test_y (call)" -> strip the trailing phase marker.
+        test_id = (os.environ.get("PYTEST_CURRENT_TEST", "") or "").split(" (")[0]
+    _UI_FALLBACKS.append({
+        "test_id": test_id or None,
+        "form": form,
+        "ctl": ctl,
+        "caption": caption,
+        "reason": reason,
+        "method": "timer",        # the path actually taken after fallback
+        "ui_verified": False,     # a fallback can never be UI-verified
+    })
+
+
+def ui_fallbacks() -> list[dict]:
+    """All fallback events recorded this session (newest last)."""
+    return list(_UI_FALLBACKS)
+
+
+def clear_ui_fallbacks() -> None:
+    """Reset the registry (test hygiene)."""
+    _UI_FALLBACKS.clear()
+
+
 def kill_access_pid(pid: int, wait_s: float = 3.0) -> bool:
     """Force-kill exactly one MSACCESS.EXE PID and wait for it to exit.
 

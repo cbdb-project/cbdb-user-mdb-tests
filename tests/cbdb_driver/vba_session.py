@@ -39,6 +39,7 @@ from pywinauto import Application as PWA
 
 from .access_app import (
     kill_access_pid, register_spawned_pid, _pid_for_access_app,
+    record_ui_fallback,
 )
 from ._timeouts import vba_timeout
 
@@ -1686,46 +1687,17 @@ class VbaSession:
         except Exception:
             return initial
 
-    def click_button_and_wait_table(self, caption: str, *,
-                                    form: str,
-                                    result_table: str,
-                                    force_enable_ctl: str | None = None,
-                                    ctl: str | None = None,
-                                    timeout: float = DEFAULT_VBA_TIMEOUT) -> int:
-        """Fire the form's query button and return the result-table row count.
+    def _click_ui_and_wait(self, caption: str, *, form: str,
+                           result_table: str,
+                           force_enable_ctl: str | None = None,
+                           timeout: float = DEFAULT_VBA_TIMEOUT) -> int:
+        """Real pywinauto click + poll ``result_table`` until it changes.
 
-        Prefers the COM Form_Timer trigger (`click_via_timer`): it invokes
-        the real `<ctl>_Click` handler directly through Access COM and needs
-        NO interactive desktop, so it works in locked / RDP-detached /
-        headless sessions where pywinauto UIA cannot reach the button
-        (`_find_button` raises ``button 'Run Query' not found``).  This is
-        the project's documented "Form_Timer trigger universally" direction
-        (AGENTS.md landmines #1/#5); the LookAtEntry-driving callers
-        (`test_vba_integrity` / `test_vba_matrix` / `test_vba_differential`)
-        were the last ones still on the pywinauto path.  (`test_vba_inline`
-        keeps its own inline pywinauto click on purpose — it is the
-        enabled-button contract test and does NOT call this method.)
-
-        The trigger control is `ctl` if given, else `force_enable_ctl` — every
-        query caller already passes its CmdQuery control there.  The COM path
-        fires the identical VBA handler, so result-table contents (and thus
-        all downstream assertions) are unchanged; only the *trigger* differs.
-
-        Falls back to the legacy pywinauto click ONLY when no control name is
-        available (caption-only callers), preserving old behaviour for them.
-        """
-        trigger_ctl = ctl or force_enable_ctl
-        if trigger_ctl:
-            # COM path — robust, no UIA dependency.  click_via_timer waits on
-            # the '<form>:DONE' marker (covers the backfill UPDATE chain) then
-            # returns the result-table row count.
-            return self.click_via_timer(
-                form, ctl=trigger_ctl,
-                result_table=result_table, timeout=timeout,
-            )
-        # Legacy pywinauto fallback (caption-only callers; interactive desktop
-        # required).  Polls result_table until it changes from the initial
-        # row count, then returns the final count.
+        Needs an INTERACTIVE desktop; raises (e.g. ``LookupError: button 'Run
+        Query' not found``) when UIA can't reach the Access window.  This is the
+        only trigger that proves the button is reachable/clickable — the
+        ui_verified-grade path.  Shared by the caption-only ``prefer='timer'``
+        leg and the ``prefer='ui'`` leg below."""
         try:
             initial = self.row_count(result_table)
         except Exception:
@@ -1742,6 +1714,77 @@ class VbaSession:
             except Exception:
                 continue
         return self.row_count(result_table)
+
+    def click_button_and_wait_table(self, caption: str, *,
+                                    form: str,
+                                    result_table: str,
+                                    force_enable_ctl: str | None = None,
+                                    ctl: str | None = None,
+                                    timeout: float = DEFAULT_VBA_TIMEOUT,
+                                    prefer: str = "timer") -> int:
+        """Fire the form's query button and return the result-table row count.
+
+        ``prefer`` selects the trigger *intent*:
+
+        * ``"timer"`` (default) — the robust headless COM Form_Timer trigger
+          (`click_via_timer`): invokes the real `<ctl>_Click` handler directly
+          through Access COM, needs NO interactive desktop, and works in locked
+          / RDP-detached / headless sessions where pywinauto UIA cannot reach
+          the button.  This is the documented "Form_Timer trigger universally"
+          direction (AGENTS.md landmines #1/#5) and the path the bulk suites
+          (`test_vba_integrity` / `test_vba_matrix` / `test_vba_differential`)
+          run on.  Caption-only callers (no control name) use the legacy
+          pywinauto click.
+
+        * ``"ui"`` — UI-verification intent: try a REAL pywinauto click first
+          (the only path that proves the button is reachable/clickable, i.e.
+          ui_verified-grade), and if the desktop can't be driven, FALL BACK to
+          the headless timer.  Every fallback is recorded via
+          `record_ui_fallback()` so the generated report can disclose that the
+          result was logic-triggered, not UI-confirmed (not ui_verified).  The
+          headless fallback needs a control name; a caption-only ``prefer='ui'``
+          call has no fallback, so the pywinauto failure propagates.
+
+        Either way the SAME VBA `<ctl>_Click` handler runs, so result-table
+        contents (and downstream assertions) are identical; only the *trigger*
+        and its ui_verified provenance differ.
+        """
+        trigger_ctl = ctl or force_enable_ctl
+
+        if prefer == "ui":
+            # Prefer the real UI click; degrade to the headless timer on any
+            # pywinauto failure, recording it so the report stays honest.
+            try:
+                return self._click_ui_and_wait(
+                    caption, form=form, result_table=result_table,
+                    force_enable_ctl=force_enable_ctl, timeout=timeout,
+                )
+            except Exception as e:
+                if not trigger_ctl:
+                    raise  # caption-only: no headless path — surface the failure
+                record_ui_fallback(
+                    form=form, ctl=trigger_ctl, caption=caption,
+                    reason=f"{type(e).__name__}: {e}",
+                )
+                return self.click_via_timer(
+                    form, ctl=trigger_ctl,
+                    result_table=result_table, timeout=timeout,
+                )
+
+        # prefer == "timer": robust headless path (unchanged behaviour).
+        if trigger_ctl:
+            # click_via_timer waits on the '<form>:DONE' marker (covers the
+            # backfill UPDATE chain) then returns the result-table row count.
+            return self.click_via_timer(
+                form, ctl=trigger_ctl,
+                result_table=result_table, timeout=timeout,
+            )
+        # Legacy pywinauto fallback for caption-only callers (interactive
+        # desktop required).
+        return self._click_ui_and_wait(
+            caption, form=form, result_table=result_table,
+            force_enable_ctl=force_enable_ctl, timeout=timeout,
+        )
 
 
 def make_fixture(src_mdb: Path, work_mdb: Path):
