@@ -487,6 +487,18 @@ by the report-triage gate (`_validate_issues()` in
 [`docs/skills/issue-report-maintainer.md`](docs/skills/issue-report-maintainer.md)
 § "Report-triage contract".
 
+**Session interactivity gates P0/P1/P2.**  `evidence.ui_verified` (required
+for P0/P1/P2) means the symptom was reproduced by driving the real Access UI
+via pywinauto — which only works on an **interactive desktop**.  A
+non-interactive run (locked / headless / RDP-detached, the usual state of
+this box) cannot set `ui_verified`, so it **cannot file any P0/P1/P2**; every
+otherwise-user-facing defect is P5 pending verification, and a 0 count for
+P0/P1/P2 is a *run constraint*, not "no user bugs".  Declare interactivity
+via `CBDB_INTERACTIVE=1` (the flag that also un-skips
+`tests/test_vba_inline.py`); `generate_report.py` stamps "Session:
+interactive / non-interactive" into the report header from it.  See the
+skill § "Session interactivity gates P0/P1/P2".
+
 **Static audits** are a release-workflow must-run.  Every audit
 under `analysis/audit_*.py` runs via
 `python analysis/run_all_audits.py` (cheap — ~6 s for the full

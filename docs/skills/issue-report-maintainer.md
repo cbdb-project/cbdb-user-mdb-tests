@@ -129,6 +129,27 @@ labelled `user_facing_bug` really is one.  That judgement — and the
 reviewer, codex).  A deliberate mis-label is caught in review, not by
 the gate.
 
+### Session interactivity gates P0/P1/P2
+
+`ui_verified` means a human/agent reproduced the symptom by **driving the
+real Access UI** (open → click → observe).  pywinauto (the only way the
+harness reaches form buttons) needs an **interactive desktop**; on a
+locked / headless / RDP-detached session it cannot reach the Access
+window, so **no run on a non-interactive desktop can set `ui_verified=True`,
+and therefore cannot file ANY P0/P1/P2.**  On such a run every otherwise-
+user-facing defect is `latent_code` → **P5 pending verification**, and the
+report must say so — a 0 count for P0/P1/P2 is then a *run constraint*, not
+evidence that no user-facing bug exists.
+
+- The operator declares interactivity via the `CBDB_INTERACTIVE` env var
+  (the same flag that gates `tests/test_vba_inline.py`).  `generate_report.py`
+  stamps "Session: interactive / non-interactive" into the report header
+  from it, so readers know which case a 0-P0/P1/P2 report is.
+- To file a P0/P1/P2 you MUST run on an interactive desktop, reproduce the
+  symptom by hand (or via the pywinauto path), and only then set
+  `evidence.ui_verified=True`.  Do NOT set it because a COM/Form_Timer test
+  or an injected marker fired — that is not a UI repro.
+
 ## Report self-review rubric + review protocol (the LLM-judgment half)
 
 The triage gate above is the **machine-checkable** half: deterministic,
