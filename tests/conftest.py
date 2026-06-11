@@ -422,20 +422,32 @@ def pytest_configure(config):
 
 @pytest.hookimpl(optionalhook=True)
 def pytest_json_modifyreport(json_report):
-    """Stamp the DATA build into the pytest JSON report (B7 part 2).
+    """Stamp run metadata into the pytest JSON report.
 
     Fires only when pytest-json-report is active (--json-report).  Marked
     optionalhook so pluggy doesn't error when that plugin isn't installed.
-    Lets the generated report + any consumer know which build this run tested.
+    Two independent best-effort blocks (one failing must not skip the other);
+    stamping is metadata — never fail the report over it.
     """
+    env = json_report.setdefault("environment", {})
+    # (1) DATA build stamp (B7 part 2) — which build this run tested.
     try:
         _ana = str(ROOT / "analysis")
         if _ana not in sys.path:
             sys.path.insert(0, _ana)
         from build_stamp import build_stamp as _stamp  # type: ignore[import]
-        json_report.setdefault("environment", {}).update(_stamp(ROOT))
+        env.update(_stamp(ROOT))
     except Exception:
-        # Stamping is best-effort metadata; never fail the report over it.
+        pass
+    # (2) live-UI fallbacks — any prefer="ui" trigger that degraded to the
+    # headless COM timer this run (NOT ui_verified).  Always written (even as
+    # []) when the driver is importable, so the report can tell "clean run, 0
+    # fallbacks" from "field absent / not instrumented".  generate_report
+    # discloses these so a fallen-back result is never claimed UI-confirmed.
+    try:
+        from cbdb_driver.access_app import ui_fallbacks
+        env["ui_fallbacks"] = ui_fallbacks()
+    except Exception:
         pass
 
 
