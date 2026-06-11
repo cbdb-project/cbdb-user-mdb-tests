@@ -4,6 +4,8 @@ _A respectful summary of issues uncovered during regression testing._
 
 _Data build: 20260602_
 
+_Session: non-interactive — P0/P1/P2 require a symptom re-verified in the live Access UI (ui_verified), which this run could not produce; user-facing defects whose symptom was not UI-verified are filed P5 pending verification. A 0 count for P0/P1/P2 here is a run constraint, not evidence that no user-facing bug exists._
+
 Dear maintainer,
 
 Below is a summary of the issues we uncovered while building an automated regression-test suite for the CBDB User MDB. We hope this report is useful as you continue your wonderful stewardship of this dataset, and we sincerely thank you for the immense work that has gone into building it.

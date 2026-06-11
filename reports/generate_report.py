@@ -2843,6 +2843,34 @@ def _build_md(lang: str, out_path: Path) -> None:
     lines.append(f"_{Z(_build_label)}_")
     lines.append("")
 
+    # Session interactivity -- the run constraint behind a 0-count for P0/P1/P2.
+    # Those tiers require evidence.ui_verified: a symptom re-verified by driving
+    # the real Access UI, which pywinauto can only do on an INTERACTIVE desktop.
+    # A non-interactive run (locked / headless / RDP-detached) cannot produce
+    # ui_verified, so any user-facing defect whose symptom was not UI-verified is
+    # filed P5 pending verification.  The operator declares interactivity via
+    # CBDB_INTERACTIVE (the same flag that gates the pywinauto inline test).
+    import os as _os
+    if _os.environ.get("CBDB_INTERACTIVE"):
+        _sess = ("Session: interactive — P0/P1/P2 were eligible (live-UI "
+                 "re-verification possible)."
+                 if is_en else
+                 "会话：互动式——可填报 P0/P1/P2（可在真实 UI 重新验证）。")
+    else:
+        _sess = ("Session: non-interactive — P0/P1/P2 require a symptom "
+                 "re-verified in the live Access UI (ui_verified), which this "
+                 "run could not produce; user-facing defects whose symptom was "
+                 "not UI-verified are filed P5 pending verification. A 0 count "
+                 "for P0/P1/P2 here is a run constraint, not evidence that no "
+                 "user-facing bug exists."
+                 if is_en else
+                 "会话：非互动式——P0/P1/P2 需在真实 Access UI 重新验证症状"
+                 "（ui_verified），本次无法做到；凡症状未经 UI 验证的用户级"
+                 "缺陷皆列 P5 pending verification。此处 P0/P1/P2 为 0 是本次"
+                 "运行的限制，并非『不存在用户级 bug』。")
+    lines.append(f"_{Z(_sess)}_")
+    lines.append("")
+
     intro = (
         "Dear maintainer,\n\n"
         "Below is a summary of the issues we uncovered while building "
